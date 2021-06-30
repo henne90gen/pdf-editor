@@ -1,5 +1,7 @@
 #include "Parser.h"
 
+#include <stdexcept>
+
 bool Parser::currentTokenIs(Token::Type type) const {
     return currentTokenIdx < tokens.size() && tokens[currentTokenIdx].type == type;
 }
@@ -8,25 +10,65 @@ Boolean *Parser::parseBoolean() {
     if (!currentTokenIs(Token::Type::BOOLEAN)) {
         return nullptr;
     }
+    std::string &content = tokens[currentTokenIdx].content;
+
     currentTokenIdx++;
+
     bool value = false;
-    if (tokens[currentTokenIdx].content == "true") {
+    if (content == "true") {
         value = true;
-    } else if (tokens[currentTokenIdx].content == "false") {
+    } else if (content == "false") {
         value = false;
     } else {
-        // TODO print warning
+        // TODO add logging
     }
     return new Boolean(value);
 }
 
-Integer *Parser::parseInteger() { return nullptr; }
+Integer *Parser::parseInteger() {
+    if (!currentTokenIs(Token::Type::INTEGER)) {
+        return nullptr;
+    }
+    std::string &content = tokens[currentTokenIdx].content;
+    try {
+        int64_t value = std::stoll(content);
+        currentTokenIdx++;
+        return new Integer(value);
+    } catch (std::invalid_argument &) {
+        // TODO add logging
+    } catch (std::out_of_range &) {
+        // TODO add logging
+    }
+    return nullptr;
+}
 
-Real *Parser::parseReal() { return nullptr; }
+Real *Parser::parseReal() {
+    if (!currentTokenIs(Token::Type::REAL)) {
+        return nullptr;
+    }
+    std::string &content = tokens[currentTokenIdx].content;
+    try {
+        double value = std::stod(content);
+        currentTokenIdx++;
+        return new Real(value);
+    } catch (std::invalid_argument &) {
+        // TODO add logging
+    } catch (std::out_of_range &) {
+        // TODO add logging
+    }
+    return nullptr;
+}
 
 String *Parser::parseString() { return nullptr; }
 
-Name *Parser::parseName() { return nullptr; }
+Name *Parser::parseName() {
+    if (!currentTokenIs(Token::Type::NAME)) {
+        return nullptr;
+    }
+    std::string &content = tokens[currentTokenIdx].content;
+    currentTokenIdx++;
+    return new Name(content.substr(1));
+}
 
 Array *Parser::parseArray() {
     if (!currentTokenIs(Token::Type::ARRAY_START)) {

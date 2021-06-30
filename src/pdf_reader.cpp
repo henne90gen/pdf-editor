@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-// TODO create real assertion macro
-#define ASSERT(x)
+#include "util.h"
 
 struct Line {
   char *start = nullptr;

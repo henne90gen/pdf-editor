@@ -37,7 +37,7 @@ TEST(Lexer, Real) {
 
 TEST(Lexer, Name) {
     auto textProvider = StringTextProvider("/Name1 /ASomewhatLongerName /A;Name_With-Various***Characters? "
-                                           "/1.2 /$$ /@pattern /.notdef /");
+                                           "/1.2 /$$ /@pattern /.notdef / /NameWithClosingBracket]");
     auto lexer        = Lexer(textProvider);
 
     assertNextToken(lexer, Token::Type::NAME, "/Name1");
@@ -48,6 +48,8 @@ TEST(Lexer, Name) {
     assertNextToken(lexer, Token::Type::NAME, "/@pattern");
     assertNextToken(lexer, Token::Type::NAME, "/.notdef");
     assertNextToken(lexer, Token::Type::NAME, "/");
+    assertNextToken(lexer, Token::Type::NAME, "/NameWithClosingBracket");
+    assertNextToken(lexer, Token::Type::ARRAY_END, "]");
 }
 
 TEST(Lexer, NameWithHash) {

@@ -46,10 +46,10 @@ std::optional<Token> Lexer::getToken() {
             return wordToken.value();
         }
 
-        auto nameToken = matchRegex("^\\/\\S*", Token::Type::NAME);
+        // TODO check with the standard again
+        auto nameToken = matchRegex(R"(^\/[^\r\n\t\f\v \[\]\(\)\{\}]*)", Token::Type::NAME);
         if (nameToken.has_value()) {
-            // TODO parse content of name token and replace '#__' with the
-            // corresponding characters
+            // TODO parse content of name token and replace '#__' with the corresponding characters
             currentWord = currentWord.substr(nameToken.value().content.length(), currentWord.length() - 1);
             return nameToken.value();
         }
