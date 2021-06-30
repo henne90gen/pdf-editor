@@ -59,7 +59,23 @@ Real *Parser::parseReal() {
     return nullptr;
 }
 
-String *Parser::parseString() { return nullptr; }
+LiteralString *Parser::parseLiteralString() {
+    if (!currentTokenIs(Token::Type::LITERAL_STRING)) {
+        return nullptr;
+    }
+    std::string &content = tokens[currentTokenIdx].content;
+    currentTokenIdx++;
+    return new LiteralString(content.substr(1, content.size() - 2));
+}
+
+HexadecimalString *Parser::parseHexadecimalString() {
+    if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        return nullptr;
+    }
+    std::string &content = tokens[currentTokenIdx].content;
+    currentTokenIdx++;
+    return new HexadecimalString(content.substr(1, content.size() - 2));
+}
 
 Name *Parser::parseName() {
     if (!currentTokenIs(Token::Type::NAME)) {
@@ -88,6 +104,12 @@ Array *Parser::parseArray() {
             currentTokenIdx = beforeTokenIdx;
             return nullptr;
         }
+
+        while (currentTokenIs(Token::Type::NEW_LINE)) {
+            // ignore NEW_LINE tokens
+            currentTokenIdx++;
+        }
+
         objects.push_back(object);
     }
 
@@ -121,7 +143,7 @@ Dictionary *Parser::parseDictionary() {
             return nullptr;
         }
 
-        if (currentTokenIs(Token::Type::NEW_LINE)) {
+        while (currentTokenIs(Token::Type::NEW_LINE)) {
             // ignore NEW_LINE tokens
             currentTokenIdx++;
         }
@@ -149,9 +171,14 @@ Object *Parser::parseObject() {
         return real;
     }
 
-    auto string = parseString();
-    if (string != nullptr) {
-        return string;
+    auto literalString = parseLiteralString();
+    if (literalString != nullptr) {
+        return literalString;
+    }
+
+    auto hexadecimalString = parseHexadecimalString();
+    if (hexadecimalString != nullptr) {
+        return hexadecimalString;
     }
 
     auto name = parseName();
@@ -167,6 +194,11 @@ Object *Parser::parseObject() {
     auto dictionary = parseDictionary();
     if (dictionary != nullptr) {
         return dictionary;
+    }
+
+    auto indirectReference = parseIndirectReference();
+    if (indirectReference != nullptr) {
+        return indirectReference;
     }
 
     return nullptr;
@@ -185,4 +217,26 @@ Object *Parser::parse() {
     }
 
     return parseObject();
+}
+
+IndirectReference *Parser::parseIndirectReference() {
+    if (!currentTokenIs(Token::Type::INDIRECT_REFERENCE)) {
+        return nullptr;
+    }
+
+    const std::string &content = tokens[currentTokenIdx].content;
+
+    try {
+        const size_t pos1            = content.find(' ');
+        const int64_t typeId         = std::stoll(content.substr(0, pos1));
+        const size_t pos2            = content.find(' ', pos1);
+        const int64_t revisionNumber = std::stoll(content.substr(pos1 + 1, pos2));
+        currentTokenIdx++;
+        return new IndirectReference(typeId, revisionNumber);
+    } catch (std::out_of_range &err) {
+        // TODO add logging
+    } catch (std::invalid_argument &err) {
+        // TODO add logging
+    }
+    return nullptr;
 }

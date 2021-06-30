@@ -72,6 +72,19 @@ TEST(Parser, DictionaryNested) {
     });
 }
 
+TEST(Parser, IndirectReference) {
+    assertParses<IndirectReference>("1 2 R", [](IndirectReference *result) {
+        ASSERT_EQ(result->typeId, 1);
+        ASSERT_EQ(result->revisionNumber, 2);
+    });
+}
+
+TEST(Parser, HexadecimalString) {
+    assertParses<HexadecimalString>("<949FFBA879E60749D38B89A33E0DD9E7>", [](HexadecimalString *result) {
+        ASSERT_EQ(result->value, "949FFBA879E60749D38B89A33E0DD9E7"); //
+    });
+}
+
 TEST(Parser, DictionaryTrailer) {
     assertParses<Dictionary>("<</Size 9/Root 7 0 R\n"
                              "/Info 8 0 R\n"

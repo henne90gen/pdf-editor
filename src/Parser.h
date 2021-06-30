@@ -11,13 +11,15 @@
 
 struct Object {
     enum class Type {
-        BOOLEAN    = 0,
-        INTEGER    = 1,
-        REAL       = 2,
-        STRING     = 3,
-        NAME       = 4,
-        ARRAY      = 5,
-        DICTIONARY = 6,
+        BOOLEAN            = 0,
+        INTEGER            = 1,
+        REAL               = 2,
+        HEXADECIMAL_STRING = 3,
+        LITERAL_STRING     = 4,
+        NAME               = 5,
+        ARRAY              = 6,
+        DICTIONARY         = 7,
+        INDIRECT_REFERENCE = 8,
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
@@ -28,46 +30,77 @@ struct Object {
 };
 
 struct Boolean : public Object {
-    bool value = false;
-    explicit Boolean(bool b) : Object(staticType()), value(b) {}
-
     static Type staticType() { return Type::BOOLEAN; }
+
+    bool value = false;
+
+    explicit Boolean(bool b) : Object(staticType()), value(b) {}
 };
 
 struct Integer : public Object {
-    int64_t value = 0;
-    explicit Integer(int64_t i) : Object(staticType()), value(i) {}
     static Type staticType() { return Type::INTEGER; }
+
+    int64_t value = 0;
+
+    explicit Integer(int64_t i) : Object(staticType()), value(i) {}
 };
 
 struct Real : public Object {
-    double value = 0;
-    explicit Real(double d) : Object(staticType()), value(d) {}
     static Type staticType() { return Type::REAL; }
+
+    double value = 0;
+
+    explicit Real(double d) : Object(staticType()), value(d) {}
 };
 
-struct String : public Object {
+struct LiteralString : public Object {
+    static Type staticType() { return Type::LITERAL_STRING; }
+
     std::string value;
-    String() : Object(staticType()) {}
-    static Type staticType() { return Type::STRING; }
+
+    explicit LiteralString(std::string s) : Object(staticType()), value(std::move(s)) {}
+};
+
+struct HexadecimalString : public Object {
+    static Type staticType() { return Type::HEXADECIMAL_STRING; }
+
+    std::string value;
+
+    explicit HexadecimalString(std::string s) : Object(staticType()), value(std::move(s)) {}
 };
 
 struct Name : public Object {
-    std::string value;
-    explicit Name(std::string string) : Object(staticType()), value(std::move(string)) {}
     static Type staticType() { return Type::NAME; }
+
+    std::string value;
+
+    explicit Name(std::string string) : Object(staticType()), value(std::move(string)) {}
 };
 
 struct Array : public Object {
-    std::vector<Object *> values = {};
-    explicit Array(std::vector<Object *> objects) : Object(staticType()), values(std::move(objects)) {}
     static Type staticType() { return Type::ARRAY; }
+
+    std::vector<Object *> values = {};
+
+    explicit Array(std::vector<Object *> objects) : Object(staticType()), values(std::move(objects)) {}
 };
 
 struct Dictionary : public Object {
-    std::unordered_map<Name *, Object *> values = {};
-    explicit Dictionary(std::unordered_map<Name *, Object *> map) : Object(staticType()), values(std::move(map)) {}
     static Type staticType() { return Type::DICTIONARY; }
+
+    std::unordered_map<Name *, Object *> values = {};
+
+    explicit Dictionary(std::unordered_map<Name *, Object *> map) : Object(staticType()), values(std::move(map)) {}
+};
+
+struct IndirectReference : public Object {
+    static Type staticType() { return Type::INDIRECT_REFERENCE; }
+
+    int64_t typeId         = 0;
+    int64_t revisionNumber = 0;
+
+    explicit IndirectReference(int64_t _typeId, int64_t _revisionNumber)
+        : Object(staticType()), typeId(_typeId), revisionNumber(_revisionNumber) {}
 };
 
 class Parser {
@@ -86,8 +119,10 @@ class Parser {
     Boolean *parseBoolean();
     Integer *parseInteger();
     Real *parseReal();
-    String *parseString();
+    LiteralString *parseLiteralString();
+    HexadecimalString *parseHexadecimalString();
     Name *parseName();
     Array *parseArray();
     Dictionary *parseDictionary();
+    IndirectReference *parseIndirectReference();
 };
