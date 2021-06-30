@@ -13,48 +13,12 @@ struct Line {
   int32_t length = 0;
   Line() = default;
   Line(char *_start, int32_t _length) : start(_start), length(_length) {}
-  std::string to_string() const { return std::string(start, length); }
+  [[nodiscard]] std::string to_string() const { return std::string(start, length); }
 };
 
 struct Trailer {
   Line lastCrossRefStart = {};
   std::unordered_map<std::string, std::string> dict = {};
-};
-
-enum class TokenType {
-  BOOLEAN = 0,
-  INTEGER = 1,
-  REAL = 2,
-  LITERAL_STRING = 3,
-  HEXADECIMAL_STRING = 4,
-  NAME = 5,
-  ARRAY_START = 6,
-  ARRAY_END = 7,
-  DICTIONARY_START = 8,
-  DICTIONARY_END = 9,
-};
-
-struct Token {
-  TokenType token;
-  std::string content;
-};
-
-struct Lexer {
-  Token getToken() {
-std::string currentWord = "";
-    auto floatToken = matchRegex("^[0-9]+\\.[0-9]+", TokenType::REAL);
-    if (floatToken.has_value()) {
-      currentWord = currentWord.substr(floatToken.value().content.length(), currentWord.length() - 1);
-      return floatToken.value();
-    }
-
-    auto intToken = matchRegex("^[0-9]+", TokenType::INTEGER);
-    if (intToken.has_value()) {
-      currentWord = currentWord.substr(intToken.value().content.length(), currentWord.length() - 1);
-      return intToken.value();
-    }
-
-  }
 };
 
 std::unordered_map<std::string, std::string> parseDict(std::vector<Line> lines,
