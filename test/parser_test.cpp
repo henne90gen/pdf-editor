@@ -53,3 +53,33 @@ TEST(Parser, ArrayNested) {
         ASSERT_EQ(result->values.size(), 3); //
     });
 }
+
+TEST(Parser, DictionaryEmpty) {
+    assertParses<Dictionary>("<< >>", [](Dictionary *result) {
+        ASSERT_EQ(result->values.size(), 0); //
+    });
+}
+
+TEST(Parser, DictionaryWithValues) {
+    assertParses<Dictionary>("<< /Type /Hello \n /Key /Value \n >>", [](Dictionary *result) {
+        ASSERT_EQ(result->values.size(), 2); //
+    });
+}
+
+TEST(Parser, DictionaryNested) {
+    assertParses<Dictionary>("<< /Type /Hello \n /Dict << /Key /Value \n >> \n >>", [](Dictionary *result) {
+        ASSERT_EQ(result->values.size(), 2); //
+    });
+}
+
+TEST(Parser, DictionaryTrailer) {
+    assertParses<Dictionary>("<</Size 9/Root 7 0 R\n"
+                             "/Info 8 0 R\n"
+                             "/ID [ <949FFBA879E60749D38B89A33E0DD9E7>\n"
+                             "<949FFBA879E60749D38B89A33E0DD9E7> ]\n"
+                             "/DocChecksum /87E47BA8C63C8BA796458FA05DBE8C32\n"
+                             ">>",
+                             [](Dictionary *result) {
+                                 ASSERT_EQ(result->values.size(), 5); //
+                             });
+}

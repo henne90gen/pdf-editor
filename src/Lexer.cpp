@@ -28,6 +28,12 @@ std::optional<Token> Lexer::getToken() {
 
         currentWord = removeLeadingWhitespace(currentWord);
 
+        auto indirectReferenceToken= matchRegex("^[0-9]+ [0-9]+ R", Token::Type::INDIRECT_REFERENCE);
+        if (indirectReferenceToken.has_value()){
+            currentWord = currentWord.substr(indirectReferenceToken.value().content.length(), currentWord.length() - 1);
+            return indirectReferenceToken.value();
+        }
+
         auto floatToken = matchRegex("^[+-]?[0-9]+\\.[0-9]+", Token::Type::REAL);
         if (floatToken.has_value()) {
             currentWord = currentWord.substr(floatToken.value().content.length(), currentWord.length() - 1);
@@ -44,6 +50,12 @@ std::optional<Token> Lexer::getToken() {
         if (wordToken.has_value()) {
             currentWord = currentWord.substr(wordToken.value().content.length(), currentWord.length() - 1);
             return wordToken.value();
+        }
+
+        auto hexadecimalString = matchRegex("^<[0-9a-fA-F]*>", Token::Type::HEXADECIMAL_STRING);
+        if (hexadecimalString.has_value()) {
+            currentWord = currentWord.substr(hexadecimalString.value().content.length(), currentWord.length() - 1);
+            return hexadecimalString.value();
         }
 
         // TODO check with the standard again
@@ -78,6 +90,7 @@ std::optional<Token> Lexer::getToken() {
 
     if (!invalidToken.empty()) {
         std::cerr << "Found an invalid token: '" + invalidToken + "'";
+        return std::optional(Token(Token::Type::INVALID, invalidToken));
     }
 
     return {};

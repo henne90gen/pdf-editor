@@ -66,7 +66,7 @@ struct Array : public Object {
 
 struct Dictionary : public Object {
     std::unordered_map<Name *, Object *> values = {};
-    Dictionary() : Object(staticType()) {}
+    explicit Dictionary(std::unordered_map<Name *, Object *> map) : Object(staticType()), values(std::move(map)) {}
     static Type staticType() { return Type::DICTIONARY; }
 };
 

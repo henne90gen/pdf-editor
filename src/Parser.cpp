@@ -95,7 +95,43 @@ Array *Parser::parseArray() {
     return new Array(objects);
 }
 
-Dictionary *Parser::parseDictionary() { return nullptr; }
+Dictionary *Parser::parseDictionary() {
+    if (!currentTokenIs(Token::Type::DICTIONARY_START)) {
+        return nullptr;
+    }
+
+    auto beforeTokenIdx = currentTokenIdx;
+    currentTokenIdx++;
+
+    std::unordered_map<Name *, Object *> objects = {};
+    while (true) {
+        if (currentTokenIs(Token::Type::DICTIONARY_END)) {
+            break;
+        }
+
+        auto key = parseName();
+        if (key == nullptr) {
+            currentTokenIdx = beforeTokenIdx;
+            return nullptr;
+        }
+
+        auto value = parseObject();
+        if (value == nullptr) {
+            currentTokenIdx = beforeTokenIdx;
+            return nullptr;
+        }
+
+        if (currentTokenIs(Token::Type::NEW_LINE)) {
+            // ignore NEW_LINE tokens
+            currentTokenIdx++;
+        }
+
+        objects[key] = value;
+    }
+
+    currentTokenIdx++;
+    return new Dictionary(objects);
+}
 
 Object *Parser::parseObject() {
     auto boolean = parseBoolean();
@@ -141,6 +177,9 @@ Object *Parser::parse() {
         std::optional<Token> token = lexer.getToken();
         if (!token.has_value()) {
             break;
+        }
+        if (token.value().type == Token::Type::INVALID) {
+            return nullptr;
         }
         tokens.push_back(token.value());
     }

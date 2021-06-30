@@ -16,7 +16,9 @@ struct Token {
         ARRAY_END          = 7,
         DICTIONARY_START   = 8,
         DICTIONARY_END     = 9,
-        NEW_LINE           = 10,
+        INDIRECT_REFERENCE = 10,
+        NEW_LINE           = 11,
+        INVALID            = 12,
     };
 
     Type type;

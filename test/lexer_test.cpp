@@ -80,3 +80,15 @@ TEST(Lexer, NewLine) {
 
     assertNextToken(lexer, Token::Type::NEW_LINE, "\n");
 }
+
+TEST(Lexer, IndirectReference) {
+    auto textProvider = StringTextProvider("1 0 R");
+    auto lexer        = Lexer(textProvider);
+    assertNextToken(lexer, Token::Type::INDIRECT_REFERENCE, "1 0 R");
+}
+
+TEST(Lexer, HexadecimalString) {
+    auto textProvider = StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7>");
+    auto lexer        = Lexer(textProvider);
+    assertNextToken(lexer, Token::Type::HEXADECIMAL_STRING, "<949FFBA879E60749D38B89A33E0DD9E7>");
+}

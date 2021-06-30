@@ -2,5 +2,5 @@
 
 int main() {
   auto reader = pdf_reader();
-  reader.read("../test-files/blank.pdf");
+  reader.read("../../test-files/blank.pdf");
 }
