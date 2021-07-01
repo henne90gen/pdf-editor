@@ -167,6 +167,46 @@ void readCrossReferenceTable(PDFFile &file) {
     file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
 }
 
+void print(PDFFile &file, Object *object) {
+    switch (object->type) {
+    case Object::Type::BOOLEAN:
+        std::cout << object->as<Boolean>()->value << std::endl;
+        break;
+    case Object::Type::INTEGER:
+        std::cout << object->as<Integer>()->value << std::endl;
+        break;
+    case Object::Type::REAL:
+        std::cout << object->as<Real>()->value << std::endl;
+        break;
+    case Object::Type::HEXADECIMAL_STRING:
+        std::cout << object->as<HexadecimalString>()->value << std::endl;
+        break;
+    case Object::Type::LITERAL_STRING:
+        std::cout << object->as<LiteralString>()->value << std::endl;
+        break;
+    case Object::Type::NAME:
+        std::cout << object->as<Name>()->value << std::endl;
+        break;
+    case Object::Type::ARRAY: {
+        auto array = object->as<Array>();
+        std::cout << array << std::endl;
+        break;
+    }
+    case Object::Type::DICTIONARY: {
+        auto dictionary = object->as<Dictionary>();
+        std::cout << dictionary << std::endl;
+    } break;
+    case Object::Type::INDIRECT_REFERENCE:
+        break;
+    case Object::Type::INDIRECT_OBJECT:
+        break;
+    case Object::Type::STREAM: {
+        auto stream = object->as<Stream>();
+        std::cout << stream << std::endl;
+    } break;
+    }
+}
+
 void pdf_reader::read(const std::string &filePath) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
@@ -185,6 +225,9 @@ void pdf_reader::read(const std::string &filePath) {
 
     readTrailer(file);
     readCrossReferenceTable(file);
+
+    auto catalog = file.trailer.dict->values["Root"];
+    print(file, catalog);
 
     std::cout << std::string(file.data, file.sizeInBytes) << std::endl;
 

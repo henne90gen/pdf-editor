@@ -2,9 +2,35 @@
 
 #include <stdexcept>
 
-bool Parser::currentTokenIs(Token::Type type) const {
-    return currentTokenIdx < tokens.size() && tokens[currentTokenIdx].type == type;
+bool Parser::currentTokenIs(Token::Type type) {
+    if (currentTokenIdx >= tokens.size()) {
+        std::optional<Token> token = lexer.getToken();
+        if (!token.has_value()) {
+            return false;
+        }
+        if (token.value().type == Token::Type::INVALID) {
+            return false;
+        }
+        tokens.push_back(token.value());
+    }
+
+    return tokens[currentTokenIdx].type == type;
 }
+
+// bool Parser::currentTokenIs(Token::Type type) {
+//     if (currentTokenIdx >= tokens.size()) {
+//         std::optional<Token> token = lexer.getToken();
+//         if (!token.has_value()) {
+//             return false;
+//         }
+//         if (token.value().type == Token::Type::INVALID) {
+//             return false;
+//         }
+//         tokens.push_back(token.value());
+//     }
+//
+//     return tokens[currentTokenIdx].type == type;
+// }
 
 Boolean *Parser::parseBoolean() {
     if (!currentTokenIs(Token::Type::BOOLEAN)) {
@@ -181,7 +207,7 @@ IndirectObject *Parser::parseIndirectObject() {
     if (!currentTokenIs(Token::Type::OBJECT_START)) {
         return nullptr;
     }
-    std::string &objectStartContent = tokens[currentTokenIdx].content;
+    std::string objectStartContent = tokens[currentTokenIdx].content;
 
     auto beforeTokenIndex = currentTokenIdx;
     currentTokenIdx++;
@@ -220,33 +246,61 @@ IndirectObject *Parser::parseIndirectObject() {
 }
 
 Object *Parser::parseStreamOrDictionary() {
-    auto dictionary = parseDictionary();
+    auto beforeTokenIdx = currentTokenIdx;
+    auto dictionary     = parseDictionary();
     if (dictionary == nullptr) {
+        currentTokenIdx = beforeTokenIdx;
         return nullptr;
+    }
+
+    if (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
     }
 
     if (!currentTokenIs(Token::Type::STREAM_START)) {
         return dictionary;
     }
 
+    currentTokenIdx++;
+
+    if (!currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx=beforeTokenIdx;
+        return nullptr;
+    }
+
+    currentTokenIdx++;
+
     auto itr = dictionary->values.find("Length");
     if (itr == dictionary->values.end()) {
         // TODO add logging
+        currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
 
     if (itr->second->is<Integer>()) {
-        auto length = itr->second->as<Integer>()->value;
-        // TODO read 'length' bytes from the stream
-        // TODO check that the following token is 'STREAM_END'
+        auto length  = itr->second->as<Integer>()->value;
+        auto content = lexer.advanceStream(length);
+        if (currentTokenIs(Token::Type::NEW_LINE)) {
+            currentTokenIdx++;
+        }
+
+        if (!currentTokenIs(Token::Type::STREAM_END)) {
+            currentTokenIdx = beforeTokenIdx;
+            return nullptr;
+        }
+        currentTokenIdx++;
+
+        auto data = (char *)malloc(length);
+        memcpy(data, content.c_str(), length);
+        return new Stream(dictionary, data, length);
     } else if (itr->second->is<IndirectReference>()) {
         // TODO load indirect reference to length
+        return nullptr;
     } else {
         // TODO add logging
+        currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
-
-    return nullptr;
 }
 
 Object *Parser::parseObject() {
@@ -303,17 +357,4 @@ Object *Parser::parseObject() {
     return nullptr;
 }
 
-Object *Parser::parse() {
-    while (true) {
-        std::optional<Token> token = lexer.getToken();
-        if (!token.has_value()) {
-            break;
-        }
-        if (token.value().type == Token::Type::INVALID) {
-            return nullptr;
-        }
-        tokens.push_back(token.value());
-    }
-
-    return parseObject();
-}
+Object *Parser::parse() { return parseObject(); }

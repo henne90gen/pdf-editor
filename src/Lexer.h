@@ -57,7 +57,7 @@ class Lexer {
     explicit Lexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
 
     std::optional<Token> getToken();
-    void advanceStream(size_t characters);
+    std::string advanceStream(size_t characters);
 
   private:
     TextProvider &textProvider;

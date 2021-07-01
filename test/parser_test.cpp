@@ -110,6 +110,11 @@ TEST(Parser, DictionaryTrailer) {
     });
 }
 
+TEST(Parser, DictionaryStream) {
+    assertParses<Dictionary>("<</Length 45/Filter/FlateDecode>>",
+                             [](Dictionary *result) { ASSERT_EQ(result->values.size(), 2); });
+}
+
 TEST(Parser, MoreThanOneObject) {
     assertParses<Array>("[/MyName] /AnotherName", [](Array *result) {
         ASSERT_EQ(result->values.size(), 1); //
@@ -125,11 +130,12 @@ TEST(Parser, IndirectObject) {
 }
 
 TEST(Parser, Stream) {
-    const std::string input = "<</Length 45/Filter/FlateDecode>>\n"
+    const std::string input = "<</Length 10/Filter/FlateDecode>>\n"
                               "stream\n"
-                              "x£3╨3T(τ*T0P0╨30▓P034╘│47T0╖ä╨E⌐\\ßZ\n"
-                              "y\\ü\n"
-                              " ╢¼\n"
+                              "some bytes\n"
                               "endstream";
-    assertParses<Stream>(input, [](Stream *result) {});
+    assertParses<Stream>(input, [](Stream *result) {
+        ASSERT_EQ(result->length, 10);
+        ASSERT_EQ(std::string(result->data, result->length), "some bytes");
+    });
 }

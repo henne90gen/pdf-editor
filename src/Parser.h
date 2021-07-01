@@ -125,7 +125,8 @@ struct Stream : Object {
     char *data             = nullptr;
     size_t length          = 0;
 
-    explicit Stream() : Object(staticType()) {}
+    explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
+        : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
 };
 
 class Parser {
@@ -138,7 +139,7 @@ class Parser {
     Lexer &lexer;
     std::vector<Token> tokens = {};
     int currentTokenIdx       = 0;
-    [[nodiscard]] bool currentTokenIs(Token::Type type) const;
+    [[nodiscard]] bool currentTokenIs(Token::Type type);
 
     Object *parseObject();
     Boolean *parseBoolean();

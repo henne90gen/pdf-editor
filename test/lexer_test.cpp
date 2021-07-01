@@ -102,14 +102,26 @@ TEST(Lexer, IndirectObject) {
 
 TEST(Lexer, Stream) {
     auto textProvider = StringTextProvider("stream\n"
-                                           "x£3╨3T(τ*T0P0╨30▓P034╘│47T0╖ä╨E⌐\\ßZ\n"
-                                           "y\\ü\n"
-                                           " ╢¼\n"
+                                           "some bytes\n"
                                            "endstream");
     auto lexer        = Lexer(textProvider);
     assertNextToken(lexer, Token::Type::STREAM_START, "stream");
     assertNextToken(lexer, Token::Type::NEW_LINE, "\n");
-    lexer.advanceStream(45);
+    ASSERT_EQ(lexer.advanceStream(10), "some bytes");
     assertNextToken(lexer, Token::Type::NEW_LINE, "\n");
     assertNextToken(lexer, Token::Type::STREAM_END, "endstream");
+}
+
+TEST(Lexer, DictionaryStream){
+    auto textProvider = StringTextProvider("<</Length 45/Filter/FlateDecode>>");
+    auto lexer = Lexer(textProvider);
+    assertNextToken(lexer, Token::Type::DICTIONARY_START, "<<");
+
+    assertNextToken(lexer, Token::Type::NAME, "/Length");
+    assertNextToken(lexer, Token::Type::INTEGER, "45");
+
+    assertNextToken(lexer, Token::Type::NAME, "/Filter");
+    assertNextToken(lexer, Token::Type::NAME, "/FlateDecode");
+
+    assertNextToken(lexer, Token::Type::DICTIONARY_END, ">>");
 }

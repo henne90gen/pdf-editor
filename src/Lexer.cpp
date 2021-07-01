@@ -94,7 +94,7 @@ std::optional<Token> findToken(const std::string &word) {
     }
 
     // TODO check with the standard again
-    auto nameToken = matchRegex(word, R"(^\/[^\r\n\t\f\v \[\]\(\)\{\}]*)", Token::Type::NAME);
+    auto nameToken = matchRegex(word, R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)", Token::Type::NAME);
     if (nameToken.has_value()) {
         return nameToken.value();
     }
@@ -143,4 +143,8 @@ std::optional<Token> Lexer::getToken() {
     return {};
 }
 
-void Lexer::advanceStream(size_t characters) { currentWord = currentWord.substr(characters); }
+std::string Lexer::advanceStream(size_t characters) {
+    std::string tmp = currentWord.substr(0, characters);
+    currentWord     = currentWord.substr(characters);
+    return tmp;
+}
