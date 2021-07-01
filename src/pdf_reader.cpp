@@ -47,10 +47,10 @@ Dictionary *parseDict(std::vector<Line> lines, int start, int end) {
 }
 
 IndirectObject *parseIndirectObject(const std::string &input) {
-    auto text     = StringTextProvider(input);
-    auto lexer    = Lexer(text);
-    auto parser   = Parser(lexer);
-    auto result   = parser.parse();
+    auto text   = StringTextProvider(input);
+    auto lexer  = Lexer(text);
+    auto parser = Parser(lexer);
+    auto result = parser.parse();
     return result->as<IndirectObject>();
 }
 
@@ -158,6 +158,10 @@ void pdf_reader::read(const std::string &filePath) {
 
     std::vector<Object *> objects = {};
     for (auto &entry : table.entries) {
+        if (entry.isFree) {
+            continue;
+        }
+
         auto start = buf + entry.byteOffset;
 
         // TODO this is dangerous (it might read past the end of the stream)
@@ -166,6 +170,7 @@ void pdf_reader::read(const std::string &filePath) {
             length++;
         }
         auto obj = parseIndirectObject(std::string(start, length + 6));
+        objects.push_back(obj);
     }
 
     for (auto line : lines) {

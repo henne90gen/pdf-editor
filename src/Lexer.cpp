@@ -95,7 +95,7 @@ std::optional<Token> Lexer::getToken() {
     }
 
     if (!invalidToken.empty()) {
-        std::cerr << "Found an invalid token: '" + invalidToken + "'";
+        std::cerr << "Found an invalid token: '" + invalidToken + "'" << std::endl;
         return std::optional(Token(Token::Type::INVALID, invalidToken));
     }
 

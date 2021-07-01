@@ -21,6 +21,7 @@ struct Object {
         DICTIONARY         = 7,
         INDIRECT_REFERENCE = 8,
         INDIRECT_OBJECT    = 9,
+        STREAM             = 10,
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
@@ -117,6 +118,16 @@ struct IndirectObject : Object {
         : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
+struct Stream : Object {
+    static Type staticType() { return Type::STREAM; }
+
+    Dictionary *dictionary = nullptr;
+    char *data             = nullptr;
+    size_t length          = 0;
+
+    explicit Stream() : Object(staticType()) {}
+};
+
 class Parser {
   public:
     explicit Parser(Lexer &_lexer) : lexer(_lexer) {}
@@ -140,4 +151,5 @@ class Parser {
     Dictionary *parseDictionary();
     IndirectReference *parseIndirectReference();
     IndirectObject *parseIndirectObject();
+    Stream *parseStream();
 };

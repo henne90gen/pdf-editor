@@ -123,3 +123,13 @@ TEST(Parser, IndirectObject) {
         ASSERT_EQ(result->object->as<Name>()->value, "MyName");
     });
 }
+
+TEST(Parser, Stream) {
+    const std::string input = "<</Length 3 0 R/Filter/FlateDecode>>\n"
+                              "stream\n"
+                              "x£3╨3T(τ*T0P0╨30▓P034╘│47T0╖ä╨E⌐\\ßZ\n"
+                              "y\\ü\n"
+                              " ╢¼\n"
+                              "endstream";
+    assertParses<Stream>(input, [](Stream *result) {});
+}
