@@ -25,7 +25,7 @@ private:
 
 int main(int argc, char *argv[]) {
   auto app = Gtk::Application::create(argc, argv, "de.henne90gen.pdf_editor");
-  auto builder = Gtk::Builder::create_from_file("../pdf-editor.glade");
+  auto builder = Gtk::Builder::create_from_file("../../src/pdf-editor.glade");
 
   MainWindow *wnd = nullptr;
   builder->get_widget_derived("MainWindow", wnd);

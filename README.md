@@ -1,5 +1,9 @@
 # PDF Editor
 
+## Useful Links
+
+- [PDF Specification](https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdf_reference_archive/pdf_reference_1-7.pdf)
+
 ## Development
 
 ### Unix
