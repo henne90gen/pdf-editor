@@ -21,8 +21,8 @@ struct Token {
         INDIRECT_REFERENCE = 12,
         OBJECT_START       = 13,
         OBJECT_END         = 14,
-        STREAM_START       = 13,
-        STREAM_END         = 14,
+        STREAM_START       = 15,
+        STREAM_END         = 16,
     };
 
     Type type;
@@ -57,11 +57,7 @@ class Lexer {
     explicit Lexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
 
     std::optional<Token> getToken();
-
-  private:
-    std::optional<Token> matchRegex(const std::string &regex, Token::Type tokenType);
-    std::optional<Token> matchWordToken();
-    std::optional<Token> matchCharToken();
+    void advanceStream(size_t characters);
 
   private:
     TextProvider &textProvider;

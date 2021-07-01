@@ -125,7 +125,7 @@ TEST(Parser, IndirectObject) {
 }
 
 TEST(Parser, Stream) {
-    const std::string input = "<</Length 3 0 R/Filter/FlateDecode>>\n"
+    const std::string input = "<</Length 45/Filter/FlateDecode>>\n"
                               "stream\n"
                               "x£3╨3T(τ*T0P0╨30▓P034╘│47T0╖ä╨E⌐\\ßZ\n"
                               "y\\ü\n"

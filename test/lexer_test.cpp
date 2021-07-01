@@ -99,3 +99,17 @@ TEST(Lexer, IndirectObject) {
     assertNextToken(lexer, Token::Type::OBJECT_START, "12 0 obj");
     assertNextToken(lexer, Token::Type::OBJECT_END, "endobj");
 }
+
+TEST(Lexer, Stream) {
+    auto textProvider = StringTextProvider("stream\n"
+                                           "x£3╨3T(τ*T0P0╨30▓P034╘│47T0╖ä╨E⌐\\ßZ\n"
+                                           "y\\ü\n"
+                                           " ╢¼\n"
+                                           "endstream");
+    auto lexer        = Lexer(textProvider);
+    assertNextToken(lexer, Token::Type::STREAM_START, "stream");
+    assertNextToken(lexer, Token::Type::NEW_LINE, "\n");
+    lexer.advanceStream(45);
+    assertNextToken(lexer, Token::Type::NEW_LINE, "\n");
+    assertNextToken(lexer, Token::Type::STREAM_END, "endstream");
+}

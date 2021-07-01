@@ -151,5 +151,5 @@ class Parser {
     Dictionary *parseDictionary();
     IndirectReference *parseIndirectReference();
     IndirectObject *parseIndirectObject();
-    Stream *parseStream();
+    Object *parseStreamOrDictionary();
 };

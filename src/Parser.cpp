@@ -219,6 +219,36 @@ IndirectObject *Parser::parseIndirectObject() {
     return nullptr;
 }
 
+Object *Parser::parseStreamOrDictionary() {
+    auto dictionary = parseDictionary();
+    if (dictionary == nullptr) {
+        return nullptr;
+    }
+
+    if (!currentTokenIs(Token::Type::STREAM_START)) {
+        return dictionary;
+    }
+
+    auto itr = dictionary->values.find("Length");
+    if (itr == dictionary->values.end()) {
+        // TODO add logging
+        return nullptr;
+    }
+
+    if (itr->second->is<Integer>()) {
+        auto length = itr->second->as<Integer>()->value;
+        // TODO read 'length' bytes from the stream
+        // TODO check that the following token is 'STREAM_END'
+    } else if (itr->second->is<IndirectReference>()) {
+        // TODO load indirect reference to length
+    } else {
+        // TODO add logging
+        return nullptr;
+    }
+
+    return nullptr;
+}
+
 Object *Parser::parseObject() {
     auto boolean = parseBoolean();
     if (boolean != nullptr) {
@@ -255,9 +285,9 @@ Object *Parser::parseObject() {
         return array;
     }
 
-    auto dictionary = parseDictionary();
-    if (dictionary != nullptr) {
-        return dictionary;
+    auto stream = parseStreamOrDictionary();
+    if (stream != nullptr) {
+        return stream;
     }
 
     auto indirectReference = parseIndirectReference();

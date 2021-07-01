@@ -34,54 +34,105 @@ struct CrossReferenceTable {
     std::vector<CrossReferenceEntry> entries = {};
 };
 
-Dictionary *parseDict(std::vector<Line> lines, int start, int end) {
+struct PDFFile {
+    char *data                              = nullptr;
+    int64_t sizeInBytes                     = 0;
+    Trailer trailer                         = {};
+    CrossReferenceTable crossReferenceTable = {};
+    std::vector<Object *> objects           = {};
+
+    Object *getObject(int64_t objectNumber) {
+        if (objects[objectNumber] != nullptr) {
+            return objects[objectNumber];
+        }
+
+        auto object           = loadObject(objectNumber);
+        objects[objectNumber] = object;
+        return object;
+    }
+
+    [[nodiscard]] Object *loadObject(int64_t objectNumber) const {
+        auto &entry = crossReferenceTable.entries[objectNumber];
+        if (entry.isFree) {
+            return nullptr;
+        }
+
+        auto start = data + entry.byteOffset;
+
+        // TODO this is dangerous (it might read past the end of the stream)
+        size_t length = 0;
+        while (std::string(start + length, 6) != "endobj") {
+            length++;
+        }
+
+        auto input  = std::string(start, length + 6);
+        auto text   = StringTextProvider(input);
+        auto lexer  = Lexer(text);
+        auto parser = Parser(lexer);
+        auto result = parser.parse();
+        return result;
+    }
+};
+
+Dictionary *parseDict(char *start, size_t length) {
     ASSERT(start < end);
     // TODO find a better way of passing the data to the parser
-    auto textPtr  = lines[start].ptr;
-    auto textSize = static_cast<int64_t>((lines[end].ptr + lines[end].length) - textPtr);
-    auto text     = StringTextProvider(std::string(textPtr, textSize));
-    auto lexer    = Lexer(text);
-    auto parser   = Parser(lexer);
-    auto result   = parser.parse();
-    return result->as<Dictionary>();
-}
-
-IndirectObject *parseIndirectObject(const std::string &input) {
-    auto text   = StringTextProvider(input);
+    auto text   = StringTextProvider(std::string(start, length));
     auto lexer  = Lexer(text);
     auto parser = Parser(lexer);
     auto result = parser.parse();
-    return result->as<IndirectObject>();
+    return result->as<Dictionary>();
 }
 
-void readTrailer(const std::vector<Line> &lines, Trailer &trailer) {
+void readTrailer(PDFFile &file) {
+    char *startOfEofMarker = file.data + (file.sizeInBytes - 6);
+    if (std::string(startOfEofMarker, 6) != "%%EOF\n") {
+        std::cerr << "Last line did not have '%%EOF'" << std::endl;
+        return;
+    }
+
+    char *lastCrossRefStartPtr = startOfEofMarker - 2;
+    while (*lastCrossRefStartPtr != '\n' && file.data < lastCrossRefStartPtr) {
+        lastCrossRefStartPtr--;
+    }
+    if (file.data == lastCrossRefStartPtr) {
+        std::cerr << "ERROR: reached start of file" << std::endl;
+        return;
+    }
+    lastCrossRefStartPtr++;
+
     try {
-        trailer.lastCrossRefStart = std::stoll(lines[lines.size() - 2].to_string());
+        file.trailer.lastCrossRefStart =
+              std::stoll(std::string(lastCrossRefStartPtr, startOfEofMarker - 1 - lastCrossRefStartPtr));
     } catch (std::invalid_argument &err) {
         // TODO add logging
     } catch (std::out_of_range &err) {
         // TODO add logging
     }
 
-    int startOfTrailer = -1;
-    for (int i = lines.size() - 1; i >= 0; i--) {
-        if (lines[i].to_string() == "trailer") {
-            startOfTrailer = i + 1;
-            break;
-        }
-    }
-
-    if (startOfTrailer == -1) {
-        std::cerr << "Failed to find ptr of trailer" << std::endl;
+    char *startxrefPtr = lastCrossRefStartPtr - 10;
+    auto startxrefLine = std::string(startxrefPtr, 9);
+    if (startxrefLine != "startxref") {
+        std::cerr << "Expected startxref" << std::endl;
         return;
     }
 
-    int endOfTrailer = lines.size() - 4;
-    trailer.dict     = parseDict(lines, startOfTrailer, endOfTrailer)->as<Dictionary>();
+    char *startOfTrailerPtr = startxrefPtr;
+    while (std::string(startOfTrailerPtr, 7) != "trailer" && file.data < startOfTrailerPtr) {
+        startOfTrailerPtr--;
+    }
+    if (file.data == startOfTrailerPtr) {
+        std::cerr << "ERROR: reached start of file" << std::endl;
+        return;
+    }
+
+    startOfTrailerPtr += 7;
+    auto lengthOfTrailerDict = startxrefPtr - 1 - startOfTrailerPtr;
+    file.trailer.dict        = parseDict(startOfTrailerPtr, lengthOfTrailerDict);
 }
 
-void readCrossReferenceTable(char *buf, const Trailer &trailer, CrossReferenceTable &table) {
-    char *crossRefPtr = buf + trailer.lastCrossRefStart;
+void readCrossReferenceTable(PDFFile &file) {
+    char *crossRefPtr = file.data + file.trailer.lastCrossRefStart;
     if (std::string(crossRefPtr, 5) != "xref\n") {
         std::cerr << "Expected xref" << std::endl;
         return;
@@ -99,9 +150,9 @@ void readCrossReferenceTable(char *buf, const Trailer &trailer, CrossReferenceTa
     auto beginTable = tmp + 1;
     auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
     // TODO catch exceptions
-    table.firstObjectId = std::stoll(metaData.substr(0, spaceLocation));
-    table.objectCount   = std::stoll(metaData.substr(spaceLocation));
-    for (int i = 0; i < table.objectCount; i++) {
+    file.crossReferenceTable.firstObjectId = std::stoll(metaData.substr(0, spaceLocation));
+    file.crossReferenceTable.objectCount   = std::stoll(metaData.substr(spaceLocation));
+    for (int i = 0; i < file.crossReferenceTable.objectCount; i++) {
         // nnnnnnnnnn ggggg f__
         CrossReferenceEntry entry = {};
         auto s                    = std::string(beginTable, 20);
@@ -109,9 +160,11 @@ void readCrossReferenceTable(char *buf, const Trailer &trailer, CrossReferenceTa
         entry.byteOffset       = std::stoll(s.substr(0, 10));
         entry.generationNumber = std::stoll(s.substr(11, 16));
         entry.isFree           = s[17] == 'f';
-        table.entries.push_back(entry);
+        file.crossReferenceTable.entries.push_back(entry);
+
         beginTable += 20;
     }
+    file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
 }
 
 void pdf_reader::read(const std::string &filePath) {
@@ -123,59 +176,17 @@ void pdf_reader::read(const std::string &filePath) {
         return;
     }
 
-    auto fileSize = is.tellg();
-    char *buf     = (char *)malloc(fileSize);
+    PDFFile file     = {};
+    file.sizeInBytes = is.tellg();
+    file.data        = (char *)malloc(file.sizeInBytes);
 
     is.seekg(0);
-    is.read(buf, fileSize);
+    is.read(file.data, file.sizeInBytes);
 
-    std::vector<Line> lines = {};
-    char *lastLineStart     = buf;
-    for (int i = 0; i < fileSize; i++) {
-        if (buf[i] == '\n') {
-            unsigned long lineLength = i - (lastLineStart - buf);
-            lines.emplace_back(lastLineStart, lineLength);
-            lastLineStart = buf + i + 1;
-        }
-    }
+    readTrailer(file);
+    readCrossReferenceTable(file);
 
-    if (lines.back().to_string() != "%%EOF") {
-        std::cerr << "Last line did not have '%%EOF'" << std::endl;
-        return;
-    }
-
-    auto startxrefLine = lines[lines.size() - 3];
-    if (startxrefLine.to_string() != "startxref") {
-        std::cerr << "Expected startxref" << std::endl;
-        return;
-    }
-
-    Trailer trailer = {};
-    readTrailer(lines, trailer);
-
-    CrossReferenceTable table = {};
-    readCrossReferenceTable(buf, trailer, table);
-
-    std::vector<Object *> objects = {};
-    for (auto &entry : table.entries) {
-        if (entry.isFree) {
-            continue;
-        }
-
-        auto start = buf + entry.byteOffset;
-
-        // TODO this is dangerous (it might read past the end of the stream)
-        size_t length = 0;
-        while (std::string(start + length, 6) != "endobj") {
-            length++;
-        }
-        auto obj = parseIndirectObject(std::string(start, length + 6));
-        objects.push_back(obj);
-    }
-
-    for (auto line : lines) {
-        std::cout << line.to_string() << std::endl;
-    }
+    std::cout << std::string(file.data, file.sizeInBytes) << std::endl;
 
     std::cout << std::endl << "Success" << std::endl;
 }
