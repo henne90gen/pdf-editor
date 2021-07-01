@@ -6,19 +6,23 @@
 
 struct Token {
     enum class Type {
-        BOOLEAN            = 0,
-        INTEGER            = 1,
-        REAL               = 2,
-        LITERAL_STRING     = 3,
-        HEXADECIMAL_STRING = 4,
-        NAME               = 5,
-        ARRAY_START        = 6,
-        ARRAY_END          = 7,
-        DICTIONARY_START   = 8,
-        DICTIONARY_END     = 9,
-        INDIRECT_REFERENCE = 10,
-        NEW_LINE           = 11,
-        INVALID            = 12,
+        INVALID            = 0,
+        NEW_LINE           = 1,
+        BOOLEAN            = 2,
+        INTEGER            = 3,
+        REAL               = 4,
+        LITERAL_STRING     = 5,
+        HEXADECIMAL_STRING = 6,
+        NAME               = 7,
+        ARRAY_START        = 8,
+        ARRAY_END          = 9,
+        DICTIONARY_START   = 10,
+        DICTIONARY_END     = 11,
+        INDIRECT_REFERENCE = 12,
+        OBJECT_START       = 13,
+        OBJECT_END         = 14,
+        STREAM_START       = 13,
+        STREAM_END         = 14,
     };
 
     Type type;

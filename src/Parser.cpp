@@ -125,7 +125,7 @@ Dictionary *Parser::parseDictionary() {
     auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
-    std::unordered_map<Name *, Object *> objects = {};
+    std::unordered_map<std::string, Object *> objects = {};
     while (true) {
         if (currentTokenIs(Token::Type::DICTIONARY_END)) {
             break;
@@ -148,11 +148,75 @@ Dictionary *Parser::parseDictionary() {
             currentTokenIdx++;
         }
 
-        objects[key] = value;
+        objects[key->value] = value;
     }
 
     currentTokenIdx++;
     return new Dictionary(objects);
+}
+
+IndirectReference *Parser::parseIndirectReference() {
+    if (!currentTokenIs(Token::Type::INDIRECT_REFERENCE)) {
+        return nullptr;
+    }
+
+    const std::string &content = tokens[currentTokenIdx].content;
+
+    try {
+        const size_t pos1              = content.find(' ');
+        const int64_t objectNumber     = std::stoll(content.substr(0, pos1));
+        const size_t pos2              = content.find(' ', pos1);
+        const int64_t generationNumber = std::stoll(content.substr(pos1 + 1, pos2));
+        currentTokenIdx++;
+        return new IndirectReference(objectNumber, generationNumber);
+    } catch (std::out_of_range &err) {
+        // TODO add logging
+    } catch (std::invalid_argument &err) {
+        // TODO add logging
+    }
+    return nullptr;
+}
+
+IndirectObject *Parser::parseIndirectObject() {
+    if (!currentTokenIs(Token::Type::OBJECT_START)) {
+        return nullptr;
+    }
+    std::string &objectStartContent = tokens[currentTokenIdx].content;
+
+    auto beforeTokenIndex = currentTokenIdx;
+    currentTokenIdx++;
+    while (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
+
+    auto object = parseObject();
+    if (object == nullptr) {
+        currentTokenIdx = beforeTokenIndex;
+        return nullptr;
+    }
+
+    while (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
+
+    if (!currentTokenIs(Token::Type::OBJECT_END)) {
+        currentTokenIdx = beforeTokenIndex;
+        return nullptr;
+    }
+
+    try {
+        const size_t pos1              = objectStartContent.find(' ');
+        const int64_t objectNumber     = std::stoll(objectStartContent.substr(0, pos1));
+        const size_t pos2              = objectStartContent.find(' ', pos1);
+        const int64_t generationNumber = std::stoll(objectStartContent.substr(pos1 + 1, pos2));
+        currentTokenIdx++;
+        return new IndirectObject(objectNumber, generationNumber, object);
+    } catch (std::out_of_range &err) {
+        // TODO add logging
+    } catch (std::invalid_argument &err) {
+        // TODO add logging
+    }
+    return nullptr;
 }
 
 Object *Parser::parseObject() {
@@ -201,6 +265,11 @@ Object *Parser::parseObject() {
         return indirectReference;
     }
 
+    auto indirectObject = parseIndirectObject();
+    if (indirectObject != nullptr) {
+        return indirectObject;
+    }
+
     return nullptr;
 }
 
@@ -217,26 +286,4 @@ Object *Parser::parse() {
     }
 
     return parseObject();
-}
-
-IndirectReference *Parser::parseIndirectReference() {
-    if (!currentTokenIs(Token::Type::INDIRECT_REFERENCE)) {
-        return nullptr;
-    }
-
-    const std::string &content = tokens[currentTokenIdx].content;
-
-    try {
-        const size_t pos1            = content.find(' ');
-        const int64_t typeId         = std::stoll(content.substr(0, pos1));
-        const size_t pos2            = content.find(' ', pos1);
-        const int64_t revisionNumber = std::stoll(content.substr(pos1 + 1, pos2));
-        currentTokenIdx++;
-        return new IndirectReference(typeId, revisionNumber);
-    } catch (std::out_of_range &err) {
-        // TODO add logging
-    } catch (std::invalid_argument &err) {
-        // TODO add logging
-    }
-    return nullptr;
 }

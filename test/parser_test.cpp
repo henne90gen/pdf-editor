@@ -63,19 +63,23 @@ TEST(Parser, DictionaryEmpty) {
 TEST(Parser, DictionaryWithValues) {
     assertParses<Dictionary>("<< /Type /Hello \n /Key /Value \n >>", [](Dictionary *result) {
         ASSERT_EQ(result->values.size(), 2); //
+        ASSERT_EQ(result->values["Type"]->as<Name>()->value, "Hello");
+        ASSERT_EQ(result->values["Key"]->as<Name>()->value, "Value");
     });
 }
 
 TEST(Parser, DictionaryNested) {
     assertParses<Dictionary>("<< /Type /Hello \n /Dict << /Key /Value \n >> \n >>", [](Dictionary *result) {
-        ASSERT_EQ(result->values.size(), 2); //
+        ASSERT_EQ(result->values.size(), 2);
+        ASSERT_EQ(result->values["Type"]->as<Name>()->value, "Hello");
+        ASSERT_EQ(result->values["Dict"]->as<Dictionary>()->values.size(), 1);
     });
 }
 
 TEST(Parser, IndirectReference) {
     assertParses<IndirectReference>("1 2 R", [](IndirectReference *result) {
-        ASSERT_EQ(result->typeId, 1);
-        ASSERT_EQ(result->revisionNumber, 2);
+        ASSERT_EQ(result->objectNumber, 1);
+        ASSERT_EQ(result->generationNumber, 2);
     });
 }
 
@@ -86,13 +90,36 @@ TEST(Parser, HexadecimalString) {
 }
 
 TEST(Parser, DictionaryTrailer) {
-    assertParses<Dictionary>("<</Size 9/Root 7 0 R\n"
-                             "/Info 8 0 R\n"
-                             "/ID [ <949FFBA879E60749D38B89A33E0DD9E7>\n"
-                             "<949FFBA879E60749D38B89A33E0DD9E7> ]\n"
-                             "/DocChecksum /87E47BA8C63C8BA796458FA05DBE8C32\n"
-                             ">>",
-                             [](Dictionary *result) {
-                                 ASSERT_EQ(result->values.size(), 5); //
-                             });
+    const std::string input = "<</Size 9/Root 7 0 R\n"
+                              "/Info 8 0 R\n"
+                              "/ID [ <949FFBA879E60749D38B89A33E0DD9E7>\n"
+                              "<949FFBA879E60749D38B89A33E0DD9E7> ]\n"
+                              "/DocChecksum /87E47BA8C63C8BA796458FA05DBE8C32\n"
+                              ">>";
+    assertParses<Dictionary>(input, [](Dictionary *result) {
+        ASSERT_EQ(result->values.size(), 5); //
+        ASSERT_EQ(result->values["Size"]->as<Integer>()->value, 9);
+        ASSERT_EQ(result->values["Info"]->as<IndirectReference>()->objectNumber, 8);
+        ASSERT_EQ(result->values["Info"]->as<IndirectReference>()->generationNumber, 0);
+        ASSERT_EQ(result->values["ID"]->as<Array>()->values.size(), 2);
+        ASSERT_EQ(result->values["ID"]->as<Array>()->values[0]->as<HexadecimalString>()->value,
+                  "949FFBA879E60749D38B89A33E0DD9E7");
+        ASSERT_EQ(result->values["ID"]->as<Array>()->values[1]->as<HexadecimalString>()->value,
+                  "949FFBA879E60749D38B89A33E0DD9E7");
+        ASSERT_EQ(result->values["DocChecksum"]->as<Name>()->value, "87E47BA8C63C8BA796458FA05DBE8C32");
+    });
+}
+
+TEST(Parser, MoreThanOneObject) {
+    assertParses<Array>("[/MyName] /AnotherName", [](Array *result) {
+        ASSERT_EQ(result->values.size(), 1); //
+    });
+}
+
+TEST(Parser, IndirectObject) {
+    assertParses<IndirectObject>("12 1 obj \n /MyName \n endobj", [](IndirectObject *result) {
+        ASSERT_EQ(result->objectNumber, 12);
+        ASSERT_EQ(result->generationNumber, 1);
+        ASSERT_EQ(result->object->as<Name>()->value, "MyName");
+    });
 }

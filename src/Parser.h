@@ -20,13 +20,16 @@ struct Object {
         ARRAY              = 6,
         DICTIONARY         = 7,
         INDIRECT_REFERENCE = 8,
+        INDIRECT_OBJECT    = 9,
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
+
     template <typename T> T *as() {
         ASSERT(T::staticType() != type);
         return (T *)this;
     }
+    template <typename T> bool is() { return T::staticType() == type; }
 };
 
 struct Boolean : public Object {
@@ -88,19 +91,30 @@ struct Array : public Object {
 struct Dictionary : public Object {
     static Type staticType() { return Type::DICTIONARY; }
 
-    std::unordered_map<Name *, Object *> values = {};
+    std::unordered_map<std::string, Object *> values = {};
 
-    explicit Dictionary(std::unordered_map<Name *, Object *> map) : Object(staticType()), values(std::move(map)) {}
+    explicit Dictionary(std::unordered_map<std::string, Object *> map) : Object(staticType()), values(std::move(map)) {}
 };
 
 struct IndirectReference : public Object {
     static Type staticType() { return Type::INDIRECT_REFERENCE; }
 
-    int64_t typeId         = 0;
-    int64_t revisionNumber = 0;
+    int64_t objectNumber     = 0;
+    int64_t generationNumber = 0;
 
-    explicit IndirectReference(int64_t _typeId, int64_t _revisionNumber)
-        : Object(staticType()), typeId(_typeId), revisionNumber(_revisionNumber) {}
+    explicit IndirectReference(int64_t _objectNumber, int64_t _generationNumber)
+        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
+};
+
+struct IndirectObject : Object {
+    static Type staticType() { return Type::INDIRECT_OBJECT; }
+
+    int64_t objectNumber     = 0;
+    int64_t generationNumber = 0;
+    Object *object           = nullptr;
+
+    explicit IndirectObject(int64_t _objectNumber, int64_t _generationNumber, Object *_object)
+        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
 class Parser {
@@ -125,4 +139,5 @@ class Parser {
     Array *parseArray();
     Dictionary *parseDictionary();
     IndirectReference *parseIndirectReference();
+    IndirectObject *parseIndirectObject();
 };

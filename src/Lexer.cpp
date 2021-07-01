@@ -28,10 +28,16 @@ std::optional<Token> Lexer::getToken() {
 
         currentWord = removeLeadingWhitespace(currentWord);
 
-        auto indirectReferenceToken= matchRegex("^[0-9]+ [0-9]+ R", Token::Type::INDIRECT_REFERENCE);
-        if (indirectReferenceToken.has_value()){
+        auto indirectReferenceToken = matchRegex("^[0-9]+ [0-9]+ R", Token::Type::INDIRECT_REFERENCE);
+        if (indirectReferenceToken.has_value()) {
             currentWord = currentWord.substr(indirectReferenceToken.value().content.length(), currentWord.length() - 1);
             return indirectReferenceToken.value();
+        }
+
+        auto objectStartToken = matchRegex("^[0-9]+ [0-9]+ obj", Token::Type::OBJECT_START);
+        if (objectStartToken.has_value()) {
+            currentWord = currentWord.substr(objectStartToken.value().content.length(), currentWord.length() - 1);
+            return objectStartToken.value();
         }
 
         auto floatToken = matchRegex("^[+-]?[0-9]+\\.[0-9]+", Token::Type::REAL);
@@ -107,14 +113,16 @@ std::optional<Token> Lexer::matchRegex(const std::string &regex, Token::Type tok
     return {};
 }
 
-#define STARTS_WITH(word, search) word.find(search) == 0
-
 std::optional<Token> Lexer::matchWordToken() {
+#define STARTS_WITH(word, search) word.find(search) == 0
     if (STARTS_WITH(currentWord, "true")) {
         return Token(Token::Type::BOOLEAN, "true");
     }
     if (STARTS_WITH(currentWord, "false")) {
         return Token(Token::Type::BOOLEAN, "false");
+    }
+    if (STARTS_WITH(currentWord, "endobj")) {
+        return Token(Token::Type::OBJECT_END, "endobj");
     }
     return {};
 }

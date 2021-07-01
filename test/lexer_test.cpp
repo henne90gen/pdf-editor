@@ -92,3 +92,10 @@ TEST(Lexer, HexadecimalString) {
     auto lexer        = Lexer(textProvider);
     assertNextToken(lexer, Token::Type::HEXADECIMAL_STRING, "<949FFBA879E60749D38B89A33E0DD9E7>");
 }
+
+TEST(Lexer, IndirectObject) {
+    auto textProvider = StringTextProvider("12 0 obj endobj");
+    auto lexer        = Lexer(textProvider);
+    assertNextToken(lexer, Token::Type::OBJECT_START, "12 0 obj");
+    assertNextToken(lexer, Token::Type::OBJECT_END, "endobj");
+}
