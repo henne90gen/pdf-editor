@@ -126,7 +126,7 @@ void readTrailer(PDFFile &file) {
         return;
     }
 
-    startOfTrailerPtr += 7;
+    startOfTrailerPtr += 8;
     auto lengthOfTrailerDict = startxrefPtr - 1 - startOfTrailerPtr;
     file.trailer.dict        = parseDict(startOfTrailerPtr, lengthOfTrailerDict);
 }
@@ -196,8 +196,10 @@ void print(PDFFile &file, Object *object) {
         auto dictionary = object->as<Dictionary>();
         std::cout << dictionary << std::endl;
     } break;
-    case Object::Type::INDIRECT_REFERENCE:
-        break;
+    case Object::Type::INDIRECT_REFERENCE: {
+        auto ref = object->as<IndirectReference>();
+        std::cout << "Ref: " << ref->objectNumber << std::endl;
+    } break;
     case Object::Type::INDIRECT_OBJECT:
         break;
     case Object::Type::STREAM: {
@@ -229,7 +231,7 @@ void pdf_reader::read(const std::string &filePath) {
     auto catalog = file.trailer.dict->values["Root"];
     print(file, catalog);
 
-    std::cout << std::string(file.data, file.sizeInBytes) << std::endl;
+//    std::cout << std::string(file.data, file.sizeInBytes) << std::endl;
 
     std::cout << std::endl << "Success" << std::endl;
 }
