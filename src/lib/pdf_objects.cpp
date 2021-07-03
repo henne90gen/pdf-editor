@@ -76,6 +76,7 @@ std::string Stream::to_string() const {
 }
 
 std::string HexadecimalString::to_string() const {
+    // TODO this is quite hacky
     std::string tmp = value;
     if (tmp.size() % 2 == 1) {
         tmp += "0";
