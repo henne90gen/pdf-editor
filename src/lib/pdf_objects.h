@@ -76,6 +76,8 @@ struct HexadecimalString : public Object {
     std::string value;
 
     explicit HexadecimalString(std::string s) : Object(staticType()), value(std::move(s)) {}
+
+    std::string to_string() const;
 };
 
 struct Name : public Object {
@@ -132,6 +134,9 @@ struct Stream : Object {
 
     explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
         : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
+
+    [[nodiscard]] std::string to_string() const;
+    [[nodiscard]] std::vector<std::string> filters() const;
 };
 
 struct Null : Object {

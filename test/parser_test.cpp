@@ -4,9 +4,9 @@
 
 class TestReferenceResolver : public pdf::ReferenceResolver {
   public:
-    explicit TestReferenceResolver(const std::vector<pdf::Object *> &refs) : references(refs) {}
+    explicit TestReferenceResolver(const std::vector<pdf::IndirectObject *> &refs) : references(refs) {}
 
-    pdf::Object *resolve(pdf::IndirectReference *reference) override {
+    pdf::IndirectObject *resolve(pdf::IndirectReference *reference) override {
         if (reference->objectNumber >= references.size()) {
             return nullptr;
         }
@@ -14,7 +14,7 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
     }
 
   private:
-    const std::vector<pdf::Object *> &references;
+    const std::vector<pdf::IndirectObject *> &references;
 };
 
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
@@ -112,7 +112,11 @@ TEST(Parser, IndirectReference) {
 
 TEST(Parser, HexadecimalString) {
     assertParses<pdf::HexadecimalString>("<949FFBA879E60749D38B89A33E0DD9E7>", [](pdf::HexadecimalString *result) {
-        ASSERT_EQ(result->value, "949FFBA879E60749D38B89A33E0DD9E7"); //
+        ASSERT_EQ(result->value, "949FFBA879E60749D38B89A33E0DD9E7");
+    });
+    assertParses<pdf::HexadecimalString>("<48656c6c6f>", [](pdf::HexadecimalString *result) {
+        ASSERT_EQ(result->value, "48656c6c6f");
+        ASSERT_EQ(result->to_string(), "Hello");
     });
 }
 
@@ -178,7 +182,7 @@ TEST(Parser, StreamIndirectLength) {
                               "stream\n"
                               "some bytes\n"
                               "endstream";
-    std::vector<pdf::Object *> refs = {new pdf::IndirectObject(3, 0, new pdf::Integer(10))};
+    std::vector<pdf::IndirectObject *> refs = {new pdf::IndirectObject(3, 0, new pdf::Integer(10))};
     assertParsesWithReferenceResolver<pdf::Stream>(input, new TestReferenceResolver(refs), [](pdf::Stream *result) {
         ASSERT_EQ(result->length, 10);
         ASSERT_EQ(std::string(result->data, result->length), "some bytes");

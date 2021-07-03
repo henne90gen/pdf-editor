@@ -6,6 +6,9 @@
 
 namespace pdf {
 
+struct PageTreeNode;
+struct PageNode;
+
 struct Trailer {
     int64_t lastCrossRefStart = {};
     Dictionary *dict          = nullptr;
@@ -23,49 +26,50 @@ struct CrossReferenceTable {
     std::vector<CrossReferenceEntry> entries = {};
 };
 
-struct PageTreeNode;
-
 struct File : public ReferenceResolver {
     char *data                              = nullptr;
     int64_t sizeInBytes                     = 0;
     Trailer trailer                         = {};
     CrossReferenceTable crossReferenceTable = {};
-    std::vector<Object *> objects           = {};
+    std::vector<IndirectObject *> objects   = {};
 
-    Object *getObject(int64_t objectNumber);
+    IndirectObject *getObject(int64_t objectNumber);
     Dictionary *getRoot();
-    PageTreeNode *getPages();
-    std::vector<Object *> getAllObjects();
-    Object *resolve(IndirectReference *ref) override;
+    PageTreeNode *getPageTree();
+    std::vector<IndirectObject *> getAllObjects();
+    IndirectObject *resolve(IndirectReference *ref) override;
 
   private:
-    [[nodiscard]] Object *loadObject(int64_t objectNumber) const;
+    [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber) const;
+};
+
+struct Rectangle : public Array {
+    Integer *lowerLeftX() { return values[0]->as<Integer>(); }
+    Integer *lowerLeftY() { return values[1]->as<Integer>(); }
+    Integer *upperRightX() { return values[2]->as<Integer>(); }
+    Integer *upperRightY() { return values[3]->as<Integer>(); }
 };
 
 struct PageTreeNode : public Dictionary {
-
     Name *type() { return values["Type"]->as<Name>(); }
+    bool isPage() { return type()->value == "Page"; }
+    PageTreeNode *parent(File &file);
+    std::vector<PageNode *> pages(File &file);
 
-    PageTreeNode *parent(File &file) {
-        auto itr = values.find("Parent");
-        if (itr == values.end()) {
-            return nullptr;
-        }
-        auto reference         = itr->second->as<IndirectReference>();
-        auto resolvedReference = file.resolve(reference);
-        return resolvedReference->as<PageTreeNode>();
-    }
-
-    Object *attribute(File &file, const std::string &attributeName, bool inheritable) {
+    template <typename T> std::optional<T *> attribute(File &file, const std::string &attributeName, bool inheritable) {
         auto itr = values.find(attributeName);
         if (itr == values.end()) {
             if (inheritable) {
-                return parent(file)->attribute(file, attributeName, inheritable);
+                const std::optional<T *> &attrib = parent(file)->attribute<T>(file, attributeName, inheritable);
+                if (!attrib.has_value()) {
+                    return {};
+                }
+                return attrib.value()->template as<T>();
             } else {
-                return nullptr;
+                return {};
             }
         }
-        return itr->second->as<IndirectReference>();
+        return itr->second->as<T>();
     }
 };
 
@@ -75,7 +79,17 @@ struct IntermediateNode : public PageTreeNode {
 };
 
 struct PageNode : public PageTreeNode {
-    Dictionary *resources(File &file) { return attribute(file, "Resources", true)->as<Dictionary>(); }
+    Dictionary *resources(File &file) { return attribute<Dictionary>(file, "Resources", true).value(); }
+    Rectangle *mediaBox(File &file) { return attribute<Rectangle>(file, "MediaBox", true).value(); }
+
+    // TODO make mediaBox the default value for cropBox, bleedBox, trimBox and artBox
+    std::optional<Rectangle *> cropBox(File &file) { return attribute<Rectangle>(file, "CropBox", true); }
+    std::optional<Rectangle *> bleedBox(File &file) { return attribute<Rectangle>(file, "BleedBox", true); }
+    std::optional<Rectangle *> trimBox(File &file) { return attribute<Rectangle>(file, "TrimBox", true); }
+    std::optional<Rectangle *> artBox(File &file) { return attribute<Rectangle>(file, "ArtBox", true); }
+    std::optional<Dictionary *> boxColorInfo(File &file) { return attribute<Dictionary>(file, "BoxColorInfo", false); }
+    std::optional<Object *> contents(File &file) { return attribute<Object>(file, "Contents", false); }
+    int64_t rotate(File &file);
 };
 
 } // namespace pdf

@@ -17,11 +17,11 @@ PdfPage::PdfPage(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder, std::
     }
     std::cout << std::endl;
 
-    auto pages = file.getPages();
-    if (pages == nullptr) {
+    auto pageTree = file.getPageTree();
+    if (pageTree == nullptr) {
         return;
     }
-    for (auto &entry : pages->values) {
+    for (auto &entry : pageTree->values) {
         std::cout << entry.first << ": " << entry.second->type << " | " << entry.second << std::endl;
     }
     std::cout << std::endl;

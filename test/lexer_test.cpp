@@ -132,7 +132,7 @@ TEST(Lexer, Null) {
     assertNextToken(lexer, pdf::Token::Type::NULL_OBJ, "null");
 }
 
-TEST(LiteralString, Simple) {
+TEST(Lexer, LiteralString) {
     auto textProvider = pdf::StringTextProvider("(This is a string)"
                                                 "(Strings may contain newlines\nand such.)"
                                                 "(Strings may contain balanced parentheses ( ) and\nspecial characters (*!&}^% and so on).)"

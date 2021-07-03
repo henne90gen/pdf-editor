@@ -2,7 +2,7 @@
 
 namespace pdf {
 
-Object *pdf::File::loadObject(int64_t objectNumber) const {
+IndirectObject *File::loadObject(int64_t objectNumber) const {
     auto &entry = crossReferenceTable.entries[objectNumber];
     if (entry.isFree) {
         return nullptr;
@@ -21,10 +21,10 @@ Object *pdf::File::loadObject(int64_t objectNumber) const {
     auto lexer  = Lexer(text);
     auto parser = Parser(lexer, (ReferenceResolver *)this);
     auto result = parser.parse();
-    return result;
+    return result->as<IndirectObject>();
 }
 
-Object *File::getObject(int64_t objectNumber) {
+IndirectObject *File::getObject(int64_t objectNumber) {
     if (objects[objectNumber] != nullptr) {
         return objects[objectNumber];
     }
@@ -41,18 +41,18 @@ Dictionary *File::getRoot() {
     return indirectObject->object->as<Dictionary>();
 }
 
-PageTreeNode *File::getPages() {
-    auto root = getRoot();
-    auto pagesRef  = root->values["Pages"]->as<IndirectReference>();
-    auto resolvedObj = resolve(pagesRef);
+PageTreeNode *File::getPageTree() {
+    auto root           = getRoot();
+    auto pagesRef       = root->values["Pages"]->as<IndirectReference>();
+    auto resolvedObj    = resolve(pagesRef);
     auto indirectObject = resolvedObj->as<IndirectObject>();
     return indirectObject->object->as<PageTreeNode>();
 }
 
-Object *File::resolve(IndirectReference *ref) { return getObject(ref->objectNumber); }
+IndirectObject *File::resolve(IndirectReference *ref) { return getObject(ref->objectNumber); }
 
-std::vector<Object *> File::getAllObjects() {
-    std::vector<Object *> result = {};
+std::vector<IndirectObject *> File::getAllObjects() {
+    std::vector<IndirectObject *> result = {};
     for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
         auto &entry = crossReferenceTable.entries[i];
         if (entry.isFree) {
@@ -62,6 +62,48 @@ std::vector<Object *> File::getAllObjects() {
         result.push_back(object);
     }
     return result;
+}
+
+std::vector<PageNode *> PageTreeNode::pages(File &file) {
+    // TODO this is super inefficient, but works for now
+
+    if (isPage()) {
+        return {this->as<PageNode>()};
+    }
+
+    auto _this  = this->as<IntermediateNode>();
+    auto result = std::vector<PageNode *>();
+
+    auto count = _this->count()->value;
+    result.reserve(count);
+
+    for (auto kid : _this->kids()->values) {
+        auto resolvedKid = file.resolve(kid->as<IndirectReference>());
+        auto subPages    = resolvedKid->object->as<PageTreeNode>()->pages(file);
+        for (auto page : subPages) {
+            result.push_back(page);
+        }
+    }
+
+    return result;
+}
+
+PageTreeNode *PageTreeNode::parent(File &file) {
+    auto itr = values.find("Parent");
+    if (itr == values.end()) {
+        return nullptr;
+    }
+    auto reference         = itr->second->as<IndirectReference>();
+    auto resolvedReference = file.resolve(reference);
+    return resolvedReference->as<PageTreeNode>();
+}
+
+int64_t PageNode::rotate(File &file) {
+    const std::optional<Integer *> &rot = attribute<Integer>(file, "Rotate", true);
+    if (!rot.has_value()) {
+        return 0;
+    }
+    return rot.value()->value;
 }
 
 } // namespace pdf

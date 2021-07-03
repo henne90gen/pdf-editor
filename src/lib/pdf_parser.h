@@ -14,12 +14,12 @@ namespace pdf {
 
 class ReferenceResolver {
   public:
-    virtual Object *resolve(IndirectReference *reference) = 0;
+    virtual IndirectObject *resolve(IndirectReference *reference) = 0;
 };
 
 class NoopReferenceResolver : public ReferenceResolver {
   public:
-    Object *resolve(IndirectReference *reference) override { return nullptr; }
+    IndirectObject *resolve(IndirectReference *reference) override { return nullptr; }
 };
 
 class Parser {
