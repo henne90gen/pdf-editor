@@ -17,16 +17,16 @@ TEST(Reader, Blank) {
     auto pages = pageTree->pages(file);
     ASSERT_EQ(pages.size(), 1);
 
-//    auto page        = pages[0];
-//    auto contentsOpt = page->contents(file);
-//    ASSERT_TRUE(contentsOpt.has_value());
-//    auto contents    = contentsOpt.value();
-//    auto contentsObj = file.resolve(contents->as<pdf::IndirectReference>());
-//    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
-//    auto stream  = contentsObj->object->as<pdf::Stream>();
-//    auto str     = stream->to_string();
-//    auto filters = stream->filters();
-//    std::cout << "";
+    auto page        = pages[0];
+    auto contentsOpt = page->contents(file);
+    ASSERT_TRUE(contentsOpt.has_value());
+    auto contents    = contentsOpt.value();
+    auto contentsObj = file.resolve(contents->as<pdf::IndirectReference>());
+    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
+    auto stream  = contentsObj->object->as<pdf::Stream>();
+    auto str     = stream->to_string();
+    auto filters = stream->filters();
+    std::cout << "";
 }
 
 TEST(Reader, HelloWorld) {
@@ -44,6 +44,7 @@ TEST(Reader, HelloWorld) {
     auto pages = pageTree->pages(file);
     ASSERT_EQ(pages.size(), 1);
 
+    // TODO this makes the tests fail
 //    auto page        = pages[0];
 //    auto contentsOpt = page->contents(file);
 //    ASSERT_TRUE(contentsOpt.has_value());
@@ -54,5 +55,3 @@ TEST(Reader, HelloWorld) {
 //    auto str     = stream->to_string();
 //    auto filters = stream->filters();
 }
-
-// <01>-2<02>1<03>2<03>2<0405>17<06>76<040708>
