@@ -32,6 +32,7 @@ struct File : public ReferenceResolver {
 
     Object *getObject(int64_t objectNumber);
     Dictionary *getRoot();
+    Dictionary *getPages();
     std::vector<Object *> getAllObjects();
     Object *resolve(IndirectReference *ref) override;
 

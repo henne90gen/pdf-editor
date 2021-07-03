@@ -41,6 +41,11 @@ Dictionary *File::getRoot() {
     return indirectObject->object->as<Dictionary>();
 }
 
+Dictionary *File::getPages() {
+    auto root = getRoot();
+    return root->values["Pages"]->as<Dictionary>();
+}
+
 Object *File::resolve(IndirectReference *ref) { return getObject(ref->objectNumber); }
 
 std::vector<Object *> File::getAllObjects() {

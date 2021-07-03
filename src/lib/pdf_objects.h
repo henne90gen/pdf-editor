@@ -1,24 +1,32 @@
 #pragma once
 
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
 #include "util.h"
 
+namespace pdf {
+
+#define ENUMERATE_OBJECT_TYPES(O)                                                                                      \
+    O(BOOLEAN)                                                                                                         \
+    O(INTEGER)                                                                                                         \
+    O(REAL)                                                                                                            \
+    O(HEXADECIMAL_STRING)                                                                                              \
+    O(LITERAL_STRING)                                                                                                  \
+    O(NAME)                                                                                                            \
+    O(ARRAY)                                                                                                           \
+    O(DICTIONARY)                                                                                                      \
+    O(INDIRECT_REFERENCE)                                                                                              \
+    O(INDIRECT_OBJECT)                                                                                                 \
+    O(STREAM)                                                                                                          \
+    O(NULL_OBJ)
+
 struct Object {
     enum class Type {
-        BOOLEAN            = 0,
-        INTEGER            = 1,
-        REAL               = 2,
-        HEXADECIMAL_STRING = 3,
-        LITERAL_STRING     = 4,
-        NAME               = 5,
-        ARRAY              = 6,
-        DICTIONARY         = 7,
-        INDIRECT_REFERENCE = 8,
-        INDIRECT_OBJECT    = 9,
-        STREAM             = 10,
-        NULL_OBJ           = 11,
+#define DECLARE_ENUM(Name) Name,
+        ENUMERATE_OBJECT_TYPES(DECLARE_ENUM)
+#undef DECLARE_ENUM
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
@@ -131,3 +139,7 @@ struct Null : Object {
 
     explicit Null() : Object(staticType()) {}
 };
+
+std::ostream &operator<<(std::ostream &os, Object::Type type);
+
+} // namespace pdf

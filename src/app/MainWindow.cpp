@@ -9,32 +9,9 @@
 #include <gtkmm/notebook.h>
 #include <gtkmm/textview.h>
 
-#include <pdf_file.h>
-#include <pdf_reader.h>
+#include "PdfPage.h"
 
 std::string getGladeFile(const std::string &fileName) { return "../../../src/app/" + fileName; }
-
-class PdfPage : public Gtk::Box {
-  public:
-    PdfPage(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder, std::string _fileName)
-        : Gtk::Box(obj), builder(std::move(_builder)), fileName(std::move(_fileName)) {
-        std::cout << "Created page for file: " << fileName << std::endl;
-
-        if (!pdf::load_from_file(fileName, file)) {
-            return;
-        }
-
-        auto root = file.getRoot();
-        for (auto &entry : root->values) {
-            std::cout << entry.first << std::endl;
-        }
-    }
-
-  private:
-    Glib::RefPtr<Gtk::Builder> builder;
-    std::string fileName;
-    pdf::File file;
-};
 
 class MainWindow : public Gtk::ApplicationWindow {
   public:
@@ -53,6 +30,7 @@ class MainWindow : public Gtk::ApplicationWindow {
         }
 
         add_pdf_page("../../../test-files/blank.pdf");
+        add_pdf_page("../../../test-files/hello-world.pdf");
         notebook->show_all();
     }
 

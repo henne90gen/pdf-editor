@@ -12,14 +12,6 @@
 
 namespace pdf {
 
-// struct Line {
-//     char *ptr      = nullptr;
-//     int32_t length = 0;
-//     Line()         = default;
-//     Line(char *_start, int32_t _length) : ptr(_start), length(_length) {}
-//     [[nodiscard]] std::string to_string() const { return std::string(ptr, length); }
-// };
-
 Dictionary *parseDict(char *start, size_t length) {
     ASSERT(start < end);
     // TODO find a better way of passing the data to the parser
@@ -111,52 +103,6 @@ void readCrossReferenceTable(File &file) {
         beginTable += 20;
     }
     file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
-}
-
-void print(File &file, Object *object) {
-    switch (object->type) {
-    case Object::Type::BOOLEAN:
-        std::cout << object->as<Boolean>()->value << std::endl;
-        break;
-    case Object::Type::INTEGER:
-        std::cout << object->as<Integer>()->value << std::endl;
-        break;
-    case Object::Type::REAL:
-        std::cout << object->as<Real>()->value << std::endl;
-        break;
-    case Object::Type::HEXADECIMAL_STRING:
-        std::cout << object->as<HexadecimalString>()->value << std::endl;
-        break;
-    case Object::Type::LITERAL_STRING:
-        std::cout << object->as<LiteralString>()->value << std::endl;
-        break;
-    case Object::Type::NAME:
-        std::cout << object->as<Name>()->value << std::endl;
-        break;
-    case Object::Type::ARRAY: {
-        auto array = object->as<Array>();
-        std::cout << array << std::endl;
-        break;
-    }
-    case Object::Type::DICTIONARY: {
-        auto dictionary = object->as<Dictionary>();
-        std::cout << dictionary << std::endl;
-    } break;
-    case Object::Type::INDIRECT_REFERENCE: {
-        auto ref = object->as<IndirectReference>();
-        std::cout << "Ref: " << ref->objectNumber << std::endl;
-    } break;
-    case Object::Type::INDIRECT_OBJECT:
-        break;
-    case Object::Type::STREAM: {
-        auto stream = object->as<Stream>();
-        std::cout << stream << std::endl;
-    } break;
-    case Object::Type::NULL_OBJ:
-        std::cout << "null" << std::endl;
-    default:
-        ASSERT(false);
-    }
 }
 
 bool load_from_file(const std::string &filePath, File &file) {
