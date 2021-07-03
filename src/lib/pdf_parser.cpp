@@ -1,6 +1,8 @@
 #include "pdf_parser.h"
 
 #include <stdexcept>
+#include <cstring>
+
 namespace pdf {
 
 bool Parser::currentTokenIs(Token::Type type) {
