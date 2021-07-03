@@ -1,6 +1,7 @@
-#include "Parser.h"
+#include "pdf_parser.h"
 
 #include <stdexcept>
+namespace pdf{
 
 bool Parser::currentTokenIs(Token::Type type) {
     if (currentTokenIdx >= tokens.size()) {
@@ -358,3 +359,4 @@ Object *Parser::parseObject() {
 }
 
 Object *Parser::parse() { return parseObject(); }
+}

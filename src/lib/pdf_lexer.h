@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 
+namespace pdf {
+
 struct Token {
     enum class Type {
         INVALID            = 0,
@@ -63,3 +65,4 @@ class Lexer {
     TextProvider &textProvider;
     std::string currentWord;
 };
+} // namespace pdf

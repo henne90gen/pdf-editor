@@ -1,12 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <unordered_map>
-#include <utility>
 #include <vector>
+#include <unordered_map>
 
-#include "Lexer.h"
 #include "util.h"
 
 struct Object {
@@ -104,7 +100,7 @@ struct IndirectReference : public Object {
     int64_t generationNumber = 0;
 
     explicit IndirectReference(int64_t _objectNumber, int64_t _generationNumber)
-        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
+          : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
 };
 
 struct IndirectObject : Object {
@@ -115,7 +111,7 @@ struct IndirectObject : Object {
     Object *object           = nullptr;
 
     explicit IndirectObject(int64_t _objectNumber, int64_t _generationNumber, Object *_object)
-        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
+          : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
 struct Stream : Object {
@@ -126,31 +122,5 @@ struct Stream : Object {
     size_t length          = 0;
 
     explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
-        : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
-};
-
-class Parser {
-  public:
-    explicit Parser(Lexer &_lexer) : lexer(_lexer) {}
-
-    Object *parse();
-
-  private:
-    Lexer &lexer;
-    std::vector<Token> tokens = {};
-    int currentTokenIdx       = 0;
-    [[nodiscard]] bool currentTokenIs(Token::Type type);
-
-    Object *parseObject();
-    Boolean *parseBoolean();
-    Integer *parseInteger();
-    Real *parseReal();
-    LiteralString *parseLiteralString();
-    HexadecimalString *parseHexadecimalString();
-    Name *parseName();
-    Array *parseArray();
-    Dictionary *parseDictionary();
-    IndirectReference *parseIndirectReference();
-    IndirectObject *parseIndirectObject();
-    Object *parseStreamOrDictionary();
+          : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
 };

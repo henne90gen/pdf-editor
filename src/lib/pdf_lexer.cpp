@@ -1,8 +1,10 @@
-#include "Lexer.h"
+#include "pdf_lexer.h"
 
 #include <iostream>
 #include <regex>
 #include <string>
+
+namespace pdf {
 
 std::string removeLeadingWhitespace(const std::string &str) {
     std::string result = str;
@@ -148,3 +150,5 @@ std::string Lexer::advanceStream(size_t characters) {
     currentWord     = currentWord.substr(characters);
     return tmp;
 }
+
+} // namespace pdf

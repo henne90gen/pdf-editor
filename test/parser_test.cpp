@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <Parser.h>
+#include <pdf_parser.h>
 
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
-    auto textProvider = StringTextProvider(input);
-    auto lexer        = Lexer(textProvider);
-    auto parser       = Parser(lexer);
+    auto textProvider = pdf::StringTextProvider(input);
+    auto lexer        = pdf::Lexer(textProvider);
+    auto parser       = pdf::Parser(lexer);
     auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());

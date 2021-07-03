@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Parser.h"
 #include <string>
 
-class pdf_reader {
-public:
-  void read(const std::string& filePath);
-};
+#include "pdf_file.h"
+
+namespace pdf {
+
+bool load_from_file(const std::string &filePath, File &file);
+
+}
