@@ -1,7 +1,7 @@
 #include "pdf_parser.h"
 
 #include <stdexcept>
-namespace pdf{
+namespace pdf {
 
 bool Parser::currentTokenIs(Token::Type type) {
     if (currentTokenIdx >= tokens.size()) {
@@ -84,6 +84,15 @@ Real *Parser::parseReal() {
         // TODO add logging
     }
     return nullptr;
+}
+
+Null *Parser::parseNullObject() {
+    if (!currentTokenIs(Token::Type::NULL_OBJ)) {
+        return nullptr;
+    }
+
+    currentTokenIdx++;
+    return new Null();
 }
 
 LiteralString *Parser::parseLiteralString() {
@@ -265,7 +274,7 @@ Object *Parser::parseStreamOrDictionary() {
     currentTokenIdx++;
 
     if (!currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx=beforeTokenIdx;
+        currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
 
@@ -278,30 +287,44 @@ Object *Parser::parseStreamOrDictionary() {
         return nullptr;
     }
 
+    int64_t length = -1;
     if (itr->second->is<Integer>()) {
-        auto length  = itr->second->as<Integer>()->value;
-        auto content = lexer.advanceStream(length);
-        if (currentTokenIs(Token::Type::NEW_LINE)) {
-            currentTokenIdx++;
-        }
-
-        if (!currentTokenIs(Token::Type::STREAM_END)) {
-            currentTokenIdx = beforeTokenIdx;
+        length = itr->second->as<Integer>()->value;
+    } else if (itr->second->is<IndirectReference>()) {
+        auto obj = referenceResolver->resolve(itr->second->as<IndirectReference>());
+        if (obj == nullptr) {
+            // TODO add logging
             return nullptr;
         }
-        currentTokenIdx++;
-
-        auto data = (char *)malloc(length);
-        memcpy(data, content.c_str(), length);
-        return new Stream(dictionary, data, length);
-    } else if (itr->second->is<IndirectReference>()) {
-        // TODO load indirect reference to length
-        return nullptr;
+        if (!obj->is<IndirectObject>()) {
+            // TODO add logging
+            return nullptr;
+        }
+        if (!obj->as<IndirectObject>()->object->is<Integer>()) {
+            // TODO add logging
+            return nullptr;
+        }
+        length = obj->as<IndirectObject>()->object->as<Integer>()->value;
     } else {
         // TODO add logging
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
+
+    auto content = lexer.advanceStream(length);
+    if (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
+
+    if (!currentTokenIs(Token::Type::STREAM_END)) {
+        currentTokenIdx = beforeTokenIdx;
+        return nullptr;
+    }
+    currentTokenIdx++;
+
+    auto data = (char *)malloc(length);
+    memcpy(data, content.c_str(), length);
+    return new Stream(dictionary, data, length);
 }
 
 Object *Parser::parseObject() {
@@ -318,6 +341,11 @@ Object *Parser::parseObject() {
     auto real = parseReal();
     if (real != nullptr) {
         return real;
+    }
+
+    auto nullObject = parseNullObject();
+    if (nullObject != nullptr) {
+        return nullObject;
     }
 
     auto literalString = parseLiteralString();
@@ -359,4 +387,4 @@ Object *Parser::parseObject() {
 }
 
 Object *Parser::parse() { return parseObject(); }
-}
+} // namespace pdf

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "util.h"
 
@@ -18,6 +18,7 @@ struct Object {
         INDIRECT_REFERENCE = 8,
         INDIRECT_OBJECT    = 9,
         STREAM             = 10,
+        NULL_OBJ           = 11,
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
@@ -100,7 +101,7 @@ struct IndirectReference : public Object {
     int64_t generationNumber = 0;
 
     explicit IndirectReference(int64_t _objectNumber, int64_t _generationNumber)
-          : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
+        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
 };
 
 struct IndirectObject : Object {
@@ -111,7 +112,7 @@ struct IndirectObject : Object {
     Object *object           = nullptr;
 
     explicit IndirectObject(int64_t _objectNumber, int64_t _generationNumber, Object *_object)
-          : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
+        : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
 struct Stream : Object {
@@ -122,5 +123,11 @@ struct Stream : Object {
     size_t length          = 0;
 
     explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
-          : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
+        : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
+};
+
+struct Null : Object {
+    static Type staticType() { return Type::NULL_OBJ; }
+
+    explicit Null() : Object(staticType()) {}
 };

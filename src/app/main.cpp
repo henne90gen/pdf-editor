@@ -24,13 +24,9 @@ class PdfPage : public Gtk::Box {
             return;
         }
 
-        for (int i = 0; i < file.crossReferenceTable.entries.size(); i++) {
-            auto &entry = file.crossReferenceTable.entries[i];
-            if (entry.isFree) {
-                continue;
-            }
-            auto obj = file.getObject(i);
-
+        auto root = file.getRoot();
+        for (auto &entry : root->values) {
+            std::cout << entry.first << std::endl;
         }
     }
 

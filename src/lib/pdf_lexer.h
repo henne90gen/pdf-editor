@@ -25,6 +25,7 @@ struct Token {
         OBJECT_END         = 14,
         STREAM_START       = 15,
         STREAM_END         = 16,
+        NULL_OBJ               = 17,
     };
 
     Type type;

@@ -37,7 +37,7 @@ TEST(Lexer, Real) {
 
 TEST(Lexer, Name) {
     auto textProvider = pdf::StringTextProvider("/Name1 /ASomewhatLongerName /A;Name_With-Various***Characters? "
-                                           "/1.2 /$$ /@pattern /.notdef / /NameWithClosingBracket]");
+                                                "/1.2 /$$ /@pattern /.notdef / /NameWithClosingBracket]");
     auto lexer        = pdf::Lexer(textProvider);
 
     assertNextToken(lexer, pdf::Token::Type::NAME, "/Name1");
@@ -54,7 +54,7 @@ TEST(Lexer, Name) {
 
 TEST(Lexer, NameWithHash) {
     auto textProvider = pdf::StringTextProvider("/Adobe#20Green /PANTONE#205757#20CV /paired#28#29parentheses "
-                                           "/The_Key_of_F#23_Minor /A#42");
+                                                "/The_Key_of_F#23_Minor /A#42");
     auto lexer        = pdf::Lexer(textProvider);
 
     assertNextToken(lexer, pdf::Token::Type::NAME, "/Adobe#20Green");
@@ -102,8 +102,8 @@ TEST(Lexer, IndirectObject) {
 
 TEST(Lexer, Stream) {
     auto textProvider = pdf::StringTextProvider("stream\n"
-                                           "some bytes\n"
-                                           "endstream");
+                                                "some bytes\n"
+                                                "endstream");
     auto lexer        = pdf::Lexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::STREAM_START, "stream");
     assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\n");
@@ -112,9 +112,9 @@ TEST(Lexer, Stream) {
     assertNextToken(lexer, pdf::Token::Type::STREAM_END, "endstream");
 }
 
-TEST(Lexer, DictionaryStream){
+TEST(Lexer, DictionaryStream) {
     auto textProvider = pdf::StringTextProvider("<</Length 45/Filter/FlateDecode>>");
-    auto lexer = pdf::Lexer(textProvider);
+    auto lexer        = pdf::Lexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::DICTIONARY_START, "<<");
 
     assertNextToken(lexer, pdf::Token::Type::NAME, "/Length");
@@ -124,4 +124,21 @@ TEST(Lexer, DictionaryStream){
     assertNextToken(lexer, pdf::Token::Type::NAME, "/FlateDecode");
 
     assertNextToken(lexer, pdf::Token::Type::DICTIONARY_END, ">>");
+}
+
+TEST(Lexer, Null) {
+    auto textProvider = pdf::StringTextProvider("null");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::NULL_OBJ, "null");
+}
+
+TEST(LiteralString, Simple) {
+    auto textProvider = pdf::StringTextProvider("(This is a string)"
+                                                "(Strings may contain newlines\nand such.)"
+                                                "(Strings may contain balanced parentheses ( ) and\nspecial characters (*!&}^% and so on).)"
+                                                "(The following is an empty string.)"
+                                                "()"
+                                                "(It has zero (0) length.)");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(This is a string)");
 }

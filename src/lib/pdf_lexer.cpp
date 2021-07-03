@@ -42,6 +42,9 @@ std::optional<Token> matchWordToken(const std::string &word) {
     if (STARTS_WITH(word, "endstream")) {
         return Token(Token::Type::STREAM_END, "endstream");
     }
+    if (STARTS_WITH(word, "null")) {
+        return Token(Token::Type::NULL_OBJ, "null");
+    }
     return {};
 }
 
@@ -62,6 +65,30 @@ std::optional<Token> matchCharToken(const std::string &word) {
         return Token(Token::Type::DICTIONARY_END, ">>");
     }
     return {};
+}
+
+std::optional<Token> matchString(const std::string &word) {
+    if (word[0] != '(') {
+        return {};
+    }
+
+    // TODO implement backslash handling
+
+    int openParenthesis = 1;
+    int stringLength    = -1;
+    for (int i = 1; i < word.size(); i++) {
+        if (word[i] == '(') {
+            openParenthesis++;
+        } else if (word[i] == ')') {
+            openParenthesis--;
+        }
+        if (openParenthesis == 0) {
+            stringLength = i;
+            break;
+        }
+    }
+
+    return Token(Token::Type::LITERAL_STRING, word.substr(0, stringLength + 1));
 }
 
 std::optional<Token> findToken(const std::string &word) {
@@ -93,6 +120,11 @@ std::optional<Token> findToken(const std::string &word) {
     auto hexadecimalString = matchRegex(word, "^<[0-9a-fA-F]*>", Token::Type::HEXADECIMAL_STRING);
     if (hexadecimalString.has_value()) {
         return hexadecimalString.value();
+    }
+
+    auto literalString = matchString(word);
+    if (literalString.has_value()) {
+        return literalString;
     }
 
     // TODO check with the standard again

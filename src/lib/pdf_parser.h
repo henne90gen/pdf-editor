@@ -12,14 +12,28 @@
 
 namespace pdf {
 
+class ReferenceResolver {
+  public:
+    virtual Object *resolve(IndirectReference *reference) = 0;
+};
+
+class NoopReferenceResolver : public ReferenceResolver {
+  public:
+    Object *resolve(IndirectReference *reference) override { return nullptr; }
+};
+
 class Parser {
   public:
-    explicit Parser(Lexer &_lexer) : lexer(_lexer) {}
+    explicit Parser(Lexer &_lexer) : lexer(_lexer), referenceResolver(new NoopReferenceResolver()) {}
+
+    explicit Parser(Lexer &_lexer, ReferenceResolver *_referenceResolver)
+        : lexer(_lexer), referenceResolver(_referenceResolver) {}
 
     Object *parse();
 
   private:
     Lexer &lexer;
+    ReferenceResolver *referenceResolver;
     std::vector<Token> tokens = {};
     int currentTokenIdx       = 0;
     [[nodiscard]] bool currentTokenIs(Token::Type type);
@@ -28,6 +42,7 @@ class Parser {
     Boolean *parseBoolean();
     Integer *parseInteger();
     Real *parseReal();
+    Null *parseNullObject();
     LiteralString *parseLiteralString();
     HexadecimalString *parseHexadecimalString();
     Name *parseName();

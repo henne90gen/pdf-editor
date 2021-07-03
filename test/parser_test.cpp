@@ -2,10 +2,37 @@
 
 #include <pdf_parser.h>
 
+class TestReferenceResolver : public pdf::ReferenceResolver {
+  public:
+    explicit TestReferenceResolver(const std::vector<Object *> &refs) : references(refs) {}
+
+    Object *resolve(IndirectReference *reference) override {
+        if (reference->objectNumber >= references.size()) {
+            return nullptr;
+        }
+        return references[reference->objectNumber];
+    }
+
+  private:
+    const std::vector<Object *> &references;
+};
+
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::Lexer(textProvider);
     auto parser       = pdf::Parser(lexer);
+    auto result       = parser.parse();
+    ASSERT_NE(result, nullptr);
+    ASSERT_EQ(result->type, T::staticType());
+    func(result->as<T>());
+}
+
+template <typename T>
+void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceResolver *referenceResolver,
+                                       std::function<void(T *)> func) {
+    auto textProvider = pdf::StringTextProvider(input);
+    auto lexer        = pdf::Lexer(textProvider);
+    auto parser       = pdf::Parser(lexer, referenceResolver);
     auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
@@ -89,6 +116,12 @@ TEST(Parser, HexadecimalString) {
     });
 }
 
+TEST(Parser, LiteralString) {
+    assertParses<LiteralString>("(This is a string)", [](LiteralString *result) {
+      ASSERT_EQ(result->value, "This is a string"); //
+    });
+}
+
 TEST(Parser, DictionaryTrailer) {
     const std::string input = "<</Size 9/Root 7 0 R\n"
                               "/Info 8 0 R\n"
@@ -138,4 +171,30 @@ TEST(Parser, Stream) {
         ASSERT_EQ(result->length, 10);
         ASSERT_EQ(std::string(result->data, result->length), "some bytes");
     });
+}
+
+TEST(Parser, StreamIndirectLength) {
+    const std::string input = "<</Length 0 0 R/Filter/FlateDecode>>\n"
+                              "stream\n"
+                              "some bytes\n"
+                              "endstream";
+    std::vector<Object *> refs = {new IndirectObject(3, 0, new Integer(10))};
+    assertParsesWithReferenceResolver<Stream>(input, new TestReferenceResolver(refs), [](Stream *result) {
+        ASSERT_EQ(result->length, 10);
+        ASSERT_EQ(std::string(result->data, result->length), "some bytes");
+    });
+}
+
+TEST(Parser, Null) {
+    const std::string input = "null";
+    assertParses<Null>(input, [](Null *result) {});
+}
+
+TEST(Parser, CatalogDict) {
+    assertParses<IndirectObject>("7 0 obj\n"
+                                 "<</Type/Catalog/Pages 4 0 R\n"
+                                 "/OpenAction[1 0 R /XYZ null null 0]\n"
+                                 "/Lang(en-US)\n"
+                                 ">>\n"
+                                 "endobj", [](IndirectObject *result) {});
 }

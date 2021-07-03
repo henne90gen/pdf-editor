@@ -152,6 +152,10 @@ void print(File &file, Object *object) {
         auto stream = object->as<Stream>();
         std::cout << stream << std::endl;
     } break;
+    case Object::Type::NULL_OBJ:
+        std::cout << "null" << std::endl;
+    default:
+        ASSERT(false);
     }
 }
 
@@ -172,13 +176,6 @@ bool load_from_file(const std::string &filePath, File &file) {
 
     readTrailer(file);
     readCrossReferenceTable(file);
-
-    auto catalog = file.trailer.dict->values["Root"];
-    print(file, catalog);
-
-    //    std::cout << std::string(file.data, file.sizeInBytes) << std::endl;
-
-    std::cout << std::endl << "Success" << std::endl;
 
     return true;
 }
