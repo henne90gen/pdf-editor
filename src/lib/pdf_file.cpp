@@ -35,15 +35,18 @@ Object *File::getObject(int64_t objectNumber) {
 }
 
 Dictionary *File::getRoot() {
-    auto rootRef        = trailer.dict->values["Root"];
-    auto resolvedObj    = resolve(rootRef->as<IndirectReference>());
+    auto rootRef        = trailer.dict->values["Root"]->as<IndirectReference>();
+    auto resolvedObj    = resolve(rootRef);
     auto indirectObject = resolvedObj->as<IndirectObject>();
     return indirectObject->object->as<Dictionary>();
 }
 
-Dictionary *File::getPages() {
+PageTreeNode *File::getPages() {
     auto root = getRoot();
-    return root->values["Pages"]->as<Dictionary>();
+    auto pagesRef  = root->values["Pages"]->as<IndirectReference>();
+    auto resolvedObj = resolve(pagesRef);
+    auto indirectObject = resolvedObj->as<IndirectObject>();
+    return indirectObject->object->as<PageTreeNode>();
 }
 
 Object *File::resolve(IndirectReference *ref) { return getObject(ref->objectNumber); }
