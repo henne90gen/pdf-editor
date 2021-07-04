@@ -13,9 +13,9 @@ TEST(OperationParser, Simple) {
     auto lexer        = pdf::Lexer(textProvider);
     auto parser       = pdf::OperationParser(lexer);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth);
-    assertNextOp(parser, pdf::Operator::Type::q_PushGraphisState);
+    assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState);
     assertNextOp(parser, pdf::Operator::Type::re_AppendRectanlge);
     assertNextOp(parser, pdf::Operator::Type::Wx_UNKNOWN);
     assertNextOp(parser, pdf::Operator::Type::n_UNKNOWN);
-    assertNextOp(parser, pdf::Operator::Type::Q_PopGraphisState);
+    assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState);
 }
