@@ -1,5 +1,6 @@
 .vscode
 .idea
+build
 cmake-build-*
 *.glade~
 \#*.glade#

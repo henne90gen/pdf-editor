@@ -77,7 +77,7 @@ struct HexadecimalString : public Object {
 
     explicit HexadecimalString(std::string s) : Object(staticType()), value(std::move(s)) {}
 
-    std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 };
 
 struct Name : public Object {
@@ -125,6 +125,8 @@ struct IndirectObject : Object {
         : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
+class OperationParser;
+
 struct Stream : Object {
     static Type staticType() { return Type::STREAM; }
 
@@ -137,6 +139,7 @@ struct Stream : Object {
 
     [[nodiscard]] std::string to_string() const;
     [[nodiscard]] std::vector<std::string> filters() const;
+    [[nodiscard]] OperationParser operationParser() const;
 };
 
 struct Null : Object {

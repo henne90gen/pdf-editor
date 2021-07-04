@@ -91,6 +91,27 @@ std::optional<Token> matchString(const std::string &word) {
     return Token(Token::Type::LITERAL_STRING, word.substr(0, stringLength + 1));
 }
 
+std::optional<Token> matchOperator(const std::string &word) {
+    std::vector<std::string> operators = {
+          // Text Operators
+          "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
+          // Graphics Operators
+          "q", "Q", "cm", "w", "J", "j", "M", "d", "ri", "i", "gs",
+          // Path Construction Operators
+          "m", "l", "c", "v", "y", "h", "re",
+          // Path Painting Operators
+          "S", "s", "f*", "F", "f", "B*", "B", "b*", "b", "n",
+          // Clipping Path Operators
+          "W*", "W", //
+    };
+    for (auto &op : operators) {
+        if (STARTS_WITH(word, op)) {
+            return Token(Token::Type::OPERATOR, word.substr(0, op.size()));
+        }
+    }
+    return {};
+}
+
 std::optional<Token> findToken(const std::string &word) {
     auto indirectReferenceToken = matchRegex(word, "^[0-9]+ [0-9]+ R", Token::Type::INDIRECT_REFERENCE);
     if (indirectReferenceToken.has_value()) {
@@ -115,6 +136,11 @@ std::optional<Token> findToken(const std::string &word) {
     auto wordToken = matchWordToken(word);
     if (wordToken.has_value()) {
         return wordToken.value();
+    }
+
+    auto operatorToken = matchOperator(word);
+    if (operatorToken.has_value()) {
+        return operatorToken.value();
     }
 
     auto hexadecimalString = matchRegex(word, "^<[0-9a-fA-F]*>", Token::Type::HEXADECIMAL_STRING);

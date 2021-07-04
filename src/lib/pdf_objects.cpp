@@ -3,6 +3,8 @@
 #include <cstring>
 #include <zlib.h>
 
+#include "pdf_operation_parser.h"
+
 namespace pdf {
 
 std::ostream &operator<<(std::ostream &os, Object::Type type) {
@@ -62,10 +64,11 @@ std::string Stream::to_string() const {
             infstream.avail_out = (uInt)outputSize; // size of output
             infstream.next_out  = (Bytef *)output;  // output char array
 
-            // the actual DE-compression work.
             inflateInit(&infstream);
             inflate(&infstream, Z_NO_FLUSH);
             inflateEnd(&infstream);
+
+            outputSize = infstream.total_out;
         } else {
             std::cerr << "Unknown filter: " << filter << std::endl;
         }
@@ -100,6 +103,12 @@ std::string HexadecimalString::to_string() const {
 
     free(buf);
     return result;
+}
+
+OperationParser Stream::operationParser() const {
+    auto textProvider = StringTextProvider(to_string());
+    auto lexer        = Lexer(textProvider);
+    return OperationParser(lexer);
 }
 
 } // namespace pdf

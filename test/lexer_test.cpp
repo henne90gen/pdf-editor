@@ -133,12 +133,74 @@ TEST(Lexer, Null) {
 }
 
 TEST(Lexer, LiteralString) {
-    auto textProvider = pdf::StringTextProvider("(This is a string)"
-                                                "(Strings may contain newlines\nand such.)"
-                                                "(Strings may contain balanced parentheses ( ) and\nspecial characters (*!&}^% and so on).)"
-                                                "(The following is an empty string.)"
-                                                "()"
-                                                "(It has zero (0) length.)");
-    auto lexer        = pdf::Lexer(textProvider);
+    auto textProvider = pdf::StringTextProvider(
+          "(This is a string)"
+          "(Strings may contain newlines\nand such.)"
+          "(Strings may contain balanced parentheses ( ) and\nspecial characters (*!&}^% and so on).)"
+          "(The following is an empty string.)"
+          "()"
+          "(It has zero (0) length.)");
+    auto lexer = pdf::Lexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(This is a string)");
+}
+
+TEST(Lexer, TextOperators) {
+    auto textProvider = pdf::StringTextProvider("BT ET Td TD Tm T* Tc Tw Tz TL Tf Tr Ts");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "BT");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "ET");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Td");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "TD");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tm");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "T*");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tc");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tw");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tz");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "TL");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tf");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Tr");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Ts");
+}
+
+TEST(Lexer, GraphicsOperators) {
+    auto textProvider = pdf::StringTextProvider("q Q cm w J j M d ri i gs");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "q");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "Q");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "cm");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "w");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "J");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "j");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "M");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "d");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "ri");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "i");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "gs");
+}
+
+TEST(Lexer, PathContructionOperators) {
+    auto textProvider = pdf::StringTextProvider("m l c v y h re");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "m");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "l");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "c");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "v");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "y");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "h");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "re");
+}
+
+TEST(Lexer, PathPaintingOperators) {
+    auto textProvider = pdf::StringTextProvider("S s f* F f B* B b* b n");
+    auto lexer        = pdf::Lexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "S");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "s");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "f*");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "F");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "f");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "B*");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "B");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "b*");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "b");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "n");
 }
