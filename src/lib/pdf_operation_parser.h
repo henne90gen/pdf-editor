@@ -44,7 +44,7 @@ namespace pdf {
     O(v, AppendCubicBezier)                                                                                            \
     O(y, AppendCubicBezier)                                                                                            \
     O(h, CloseCurrentSubpathWithStraightLineSegment)                                                                   \
-    O(re, AppendRectanlge)                                                                                             \
+    O(re, AppendRectangle)                                                                                             \
     /* Path Painting Operators TODO add more descriptive names */                                                      \
     O(S, UNKNOWN)                                                                                                      \
     O(s, UNKNOWN)                                                                                                      \
@@ -58,11 +58,26 @@ namespace pdf {
     O(n, UNKNOWN)                                                                                                      \
     /* Clipping Path Operators TODO add more descriptive names */                                                      \
     O(W, UNKNOWN)                                                                                                      \
-    O(Wx, UNKNOWN)
+    O(Wx, UNKNOWN)                                                                                                     \
+    /* Unsorted Operators TODO add more descriptive names and find headlines */                                        \
+    O(Tj, ShowTextString)                                                                                              \
+    O(TJ, ShowOneOrMoreTextStrings)                                                                                    \
+    /*TODO O(')*/                                                                                                      \
+    /*TODO O(")*/                                                                                                      \
+    O(d0, UNKNOWN)                                                                                                     \
+    O(d1, UNKNOWN)                                                                                                     \
+    O(CS, UNKNOWN)                                                                                                     \
+    O(SC, UNKNOWN)                                                                                                     \
+    O(SCN, UNKNOWN)                                                                                                    \
+    O(sc, UNKNOWN)                                                                                                     \
+    O(scn, UNKNOWN)                                                                                                    \
+    O(G, SetStrokingColorGray)                                                                                         \
+    O(g, SetNonStrokingColorGray)                                                                                      \
+    O(RG, SetStrokingColorRGB)                                                                                         \
+    O(rg, SetNonStrokingColorRGB)                                                                                      \
+    O(K, UNKNOWN)                                                                                                      \
+    O(k, UNKNOWN)
 
-// Tj, TJ, ', "
-// d0, d1
-// CS, cs, SC, SCN, sc, scn, G, g, RG, rg, K, k
 // sh
 // BI, ID, EI
 // Do
@@ -77,69 +92,29 @@ struct Operator {
     };
     Type type;
     explicit Operator(Type _type) : type(_type) {}
+
+    union {
+        struct {
+            double lineWidth;
+        } w_SetLineWidth;
+        struct {
+            std::array<double, 4> rect;
+        } re_AppendRectangle;
+        struct {
+            double r, g, b;
+        } rg_SetNonStrokingColorRGB;
+        struct {
+            double x, y;
+        } Td_MoveStartOfNextLine;
+        struct {
+            char *fontName;
+            size_t fontName_length;
+            double fontSize; // TODO is font size a "real" or an "integer"
+        } Tf_SetTextFont;
+    } data;
 };
 
 Operator::Type stringToOperatorType(const std::string &t);
-
-// NOTE: Use this code to generate the struct definitions for all operators
-//#define STRUCT(Name, Description) \
-//    struct Name##_##Description : public Operator {};
-// ENUMERATE_OPERATION_TYPES(STRUCT)
-//#undef STRUCT
-
-/* Text Object Operators */
-struct BT_BeginText : public Operator {};
-struct ET_EndText : public Operator {};
-/* Text Positioning Operators */
-struct Td_MoveStartOfNextLine : public Operator {};
-struct TD_MoveStartOfNextLineAndSetTextLeading : public Operator {};
-struct Tm_SetTextMatrixAndTextLineMatrix : public Operator {};
-struct Tx_MoveStartOfNextLineAbsolute : public Operator {};
-/* Text State Operators */
-struct Tc_SetCharacterSpacing : public Operator {};
-struct Tw_SetWordSpacing : public Operator {};
-struct Tz_SetHorizontalScaling : public Operator {};
-struct TL_SetTextLeading : public Operator {};
-struct Tf_SetTextFont : public Operator {};
-struct Tr_SetRenderingMode : public Operator {};
-struct Ts_SetTextRise : public Operator {};
-/* Graphics State Operators */
-struct q_PushGraphicsState : public Operator {};
-struct Q_PopGraphicsState : public Operator {};
-struct cm_ModifyCurrentTransformationMatrix : public Operator {};
-struct w_SetLineWidth : public Operator {
-    explicit w_SetLineWidth(double _lineWidth) : Operator(Operator::Type::w_SetLineWidth), lineWidth(_lineWidth) {}
-    double lineWidth = 0.0;
-};
-struct J_SetLineCapStyle : public Operator {};
-struct j_SetLineJoinStyle : public Operator {};
-struct M_SetMiterLimit : public Operator {};
-struct d_SetLineDashPatter : public Operator {};
-struct ri_SetColorRenderingIntent : public Operator {};
-struct i_SetFlatnessTolerance : public Operator {};
-struct gs_SetParametersGraphicsState : public Operator {};
-/* Path Construction Operators */
-struct m_AppendNewSubpath : public Operator {};
-struct l_AppendStraightLineSegment : public Operator {};
-struct c_AppendCubicBezier : public Operator {};
-struct v_AppendCubicBezier : public Operator {};
-struct y_AppendCubicBezier : public Operator {};
-struct h_CloseCurrentSubpathWithStraightLineSegment : public Operator {};
-struct re_AppendRectanlge : public Operator {};
-/* Path Painting Operators */
-struct S_UNKNOWN : public Operator {};
-struct s_UNKNOWN : public Operator {};
-struct f_UNKNOWN : public Operator {};
-struct F_UNKNOWN : public Operator {};
-struct fx_UNKNOWN : public Operator {};
-struct B_UNKNOWN : public Operator {};
-struct Bx_UNKNOWN : public Operator {};
-struct b_UNKNOWN : public Operator {};
-struct bx_UNKNOWN : public Operator {};
-struct n_UNKNOWN : public Operator {};
-/* Clipping Path Operators */
-struct W_UNKNOWN : public Operator {};
-struct Wx_UNKNOWN : public Operator {};
 
 class OperationParser {
   public:

@@ -45,13 +45,13 @@ TEST(Reader, HelloWorld) {
     ASSERT_EQ(pages.size(), 1);
 
     // TODO this makes the tests fail
-//    auto page        = pages[0];
-//    auto contentsOpt = page->contents(file);
-//    ASSERT_TRUE(contentsOpt.has_value());
-//    auto contents    = contentsOpt.value();
-//    auto contentsObj = file.resolve(contents->as<pdf::IndirectReference>());
-//    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
-//    auto stream  = contentsObj->object->as<pdf::Stream>();
-//    auto str     = stream->to_string();
-//    auto filters = stream->filters();
+    auto page        = pages[0];
+    auto contentsOpt = page->contents(file);
+    ASSERT_TRUE(contentsOpt.has_value());
+    auto contents    = contentsOpt.value();
+    auto contentsObj = file.resolve(contents->as<pdf::IndirectReference>());
+    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
+    auto stream  = contentsObj->object->as<pdf::Stream>();
+    auto str     = stream->to_string();
+    auto filters = stream->filters();
 }

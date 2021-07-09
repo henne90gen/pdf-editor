@@ -102,7 +102,10 @@ std::optional<Token> matchOperator(const std::string &word) {
           // Path Painting Operators
           "S", "s", "f*", "F", "f", "B*", "B", "b*", "b", "n",
           // Clipping Path Operators
-          "W*", "W", //
+          "W*", "W",
+          // Unsorted Operators
+          "Tj", "TJ", "d0", "d1", "CS", "SC", "SCN", "sc", "scn", "G", "g", "RG", "rg", "K",
+          "k", //
     };
     for (auto &op : operators) {
         if (STARTS_WITH(word, op)) {
