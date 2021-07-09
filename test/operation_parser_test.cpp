@@ -56,10 +56,15 @@ TEST(OperationParser, HelloWorld) {
         ASSERT_FLOAT_EQ(op->data.Td_MoveStartOfNextLine.x, 56.8);
         ASSERT_FLOAT_EQ(op->data.Td_MoveStartOfNextLine.y, 724.1);
     });
-    assertNextOp(parser, pdf::Operator::Type::Tf_SetTextFont,
-                 [](auto op) { ASSERT_EQ(op->data.Tf_SetTextFont.fontSize, 12); });
+    assertNextOp(parser, pdf::Operator::Type::Tf_SetTextFont, [](auto op) {
+        for (int i = 0; i < 2; i++) {
+            ASSERT_EQ(op->data.Tf_SetTextFont.fontName[i], "/F1"[i]);
+        }
+        ASSERT_EQ(op->data.Tf_SetTextFont.fontSize, 12);
+    });
     assertNextOp(parser, pdf::Operator::Type::TJ_ShowOneOrMoreTextStrings, [](auto op) {
         // TODO extend this test
+//      [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]
     });
     assertNextOp(parser, pdf::Operator::Type::ET_EndText, [](auto op) {});
     assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState, [](auto op) {});

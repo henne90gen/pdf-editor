@@ -4,8 +4,11 @@
 #include <vector>
 
 #include "pdf_lexer.h"
+#include "pdf_objects.h"
 
 namespace pdf {
+
+constexpr int MAX_FONT_NAME_SIZE = 10;
 
 #define ENUMERATE_OPERATION_TYPES(O)                                                                                   \
     O(UNKNOWN, UNKNOWN)                                                                                                \
@@ -25,6 +28,11 @@ namespace pdf {
     O(Tf, SetTextFont)                                                                                                 \
     O(Tr, SetRenderingMode)                                                                                            \
     O(Ts, SetTextRise)                                                                                                 \
+    /* Text Showing Operators */                                                                                       \
+    O(Tj, ShowTextString)                                                                                              \
+    O(TJ, ShowOneOrMoreTextStrings)                                                                                    \
+    /*TODO O(')*/                                                                                                      \
+    /*TODO O(")*/                                                                                                      \
     /* Graphics State Operators */                                                                                     \
     O(q, PushGraphicsState)                                                                                            \
     O(Q, PopGraphicsState)                                                                                             \
@@ -59,14 +67,12 @@ namespace pdf {
     /* Clipping Path Operators TODO add more descriptive names */                                                      \
     O(W, UNKNOWN)                                                                                                      \
     O(Wx, UNKNOWN)                                                                                                     \
-    /* Unsorted Operators TODO add more descriptive names and find headlines */                                        \
-    O(Tj, ShowTextString)                                                                                              \
-    O(TJ, ShowOneOrMoreTextStrings)                                                                                    \
-    /*TODO O(')*/                                                                                                      \
-    /*TODO O(")*/                                                                                                      \
+    /* Type 3 Font Operators TODO add more descriptive names */                                                        \
     O(d0, UNKNOWN)                                                                                                     \
     O(d1, UNKNOWN)                                                                                                     \
+    /* Color Operators TODO add more descriptive names */                                                              \
     O(CS, UNKNOWN)                                                                                                     \
+    O(cs, UNKNOWN)                                                                                                     \
     O(SC, UNKNOWN)                                                                                                     \
     O(SCN, UNKNOWN)                                                                                                    \
     O(sc, UNKNOWN)                                                                                                     \
@@ -76,13 +82,24 @@ namespace pdf {
     O(RG, SetStrokingColorRGB)                                                                                         \
     O(rg, SetNonStrokingColorRGB)                                                                                      \
     O(K, UNKNOWN)                                                                                                      \
-    O(k, UNKNOWN)
-
-// sh
-// BI, ID, EI
-// Do
-// MP, DP, BMC, BDC, EMC
-// BX, EX
+    O(k, UNKNOWN)                                                                                                      \
+    /* Shading Pattern Operators TODO add more descriptive names */                                                    \
+    O(sh, UNKNOWN)                                                                                                     \
+    /* Inline Image Operators TODO add more descriptive names */                                                       \
+    O(BI, UNKNOWN)                                                                                                     \
+    O(ID, UNKNOWN)                                                                                                     \
+    O(EI, UNKNOWN)                                                                                                     \
+    /* XObject Operators TODO add more descriptive names */                                                            \
+    O(Do, UNKNOWN)                                                                                                     \
+    /* Marked Content Operators TODO add more descriptive names */                                                     \
+    O(MP, UNKNOWN)                                                                                                     \
+    O(DP, UNKNOWN)                                                                                                     \
+    O(BMC, UNKNOWN)                                                                                                    \
+    O(BDC, UNKNOWN)                                                                                                    \
+    O(EMC, UNKNOWN)                                                                                                    \
+    /* Compatibility Operators TODO add more descriptive names */                                                      \
+    O(BX, UNKNOWN)                                                                                                     \
+    O(EX, UNKNOWN)
 
 struct Operator {
     enum class Type {
@@ -91,7 +108,7 @@ struct Operator {
 #undef DECLARE_ENUM
     };
     Type type;
-    explicit Operator(Type _type) : type(_type) {}
+    explicit Operator(Type _type) : type(_type), data() {}
 
     union {
         struct {
@@ -107,10 +124,13 @@ struct Operator {
             double x, y;
         } Td_MoveStartOfNextLine;
         struct {
-            char *fontName;
-            size_t fontName_length;
-            double fontSize; // TODO is font size a "real" or an "integer"
+            char fontName[MAX_FONT_NAME_SIZE]; // TODO this might not be enough space for all font names
+            double fontSize;                   // TODO is font size a "real" or an "integer"
         } Tf_SetTextFont;
+        struct {
+            Object **array;
+            size_t count;
+        } TJ_ShowOneOrMoreTextStrings;
     } data;
 };
 

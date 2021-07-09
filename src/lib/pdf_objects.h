@@ -32,7 +32,6 @@ struct Object {
     explicit Object(Type _type) : type(_type) {}
 
     template <typename T> T *as() {
-        ASSERT(T::staticType() != type);
         return (T *)this;
     }
     template <typename T> bool is() { return T::staticType() == type; }
