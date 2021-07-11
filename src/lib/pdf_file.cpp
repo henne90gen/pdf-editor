@@ -18,7 +18,7 @@ IndirectObject *File::loadObject(int64_t objectNumber) const {
 
     auto input  = std::string(start, length + 6);
     auto text   = StringTextProvider(input);
-    auto lexer  = Lexer(text);
+    auto lexer  = TextLexer(text);
     auto parser = Parser(lexer, (ReferenceResolver *)this);
     auto result = parser.parse();
     return result->as<IndirectObject>();

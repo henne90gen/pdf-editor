@@ -1,5 +1,7 @@
 #include "pdf_operation_parser.h"
+#include <spqr.hpp>
 
+#include "pdf_parser.h"
 #include "util.h"
 
 namespace pdf {
@@ -23,6 +25,21 @@ Operator::Type stringToOperatorType(const std::string &t) {
     return Operator::Type::UNKNOWN_UNKNOWN;
 }
 
+std::ostream &operator<<(std::ostream &os, Operator::Type &type) {
+#define __BYTECODE_OP(Name, Description)                                                                               \
+    case Operator::Type::Name##_##Description:                                                                         \
+        os.write("Operator::Type::" #Name "_" #Description, strlen("Operator::Type::" #Name "_" #Description));        \
+        break;
+
+    switch (type) {
+        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+    default:
+        ASSERT(false);
+    }
+#undef __BYTECODE_OP
+    return os;
+}
+
 Operator *OperationParser::getOperator() {
     while (true) {
         while (currentTokenIdx >= tokens.size()) {
@@ -43,65 +60,106 @@ Operator *OperationParser::getOperator() {
     }
 }
 
+Operator *OperationParser::createOperator_w(Operator *result) {
+    auto &content                         = tokens[currentTokenIdx - 2].content;
+    auto lineWidth                        = std::stod(content);
+    result->data.w_SetLineWidth.lineWidth = lineWidth;
+    return result;
+}
+
+Operator *OperationParser::createOperator_re(Operator *result) {
+    for (int i = 0; i < 4; i++) {
+        auto &content                           = tokens[currentTokenIdx - 1 - (4 - i)].content;
+        auto d                                  = std::stod(content);
+        result->data.re_AppendRectangle.rect[i] = d;
+    }
+    return result;
+}
+
+Operator *OperationParser::createOperator_rg(Operator *result) {
+    auto &contentR                           = tokens[currentTokenIdx - 4].content;
+    auto &contentG                           = tokens[currentTokenIdx - 3].content;
+    auto &contentB                           = tokens[currentTokenIdx - 2].content;
+    result->data.rg_SetNonStrokingColorRGB.r = std::stod(contentR);
+    result->data.rg_SetNonStrokingColorRGB.g = std::stod(contentG);
+    result->data.rg_SetNonStrokingColorRGB.b = std::stod(contentB);
+    return result;
+}
+
+Operator *OperationParser::createOperator_TJ(Operator *result) {
+    int arrayStartIndex = -1;
+    for (int i = 0; i < currentTokenIdx; i++) {
+        if (tokens[currentTokenIdx - i].type == Token::Type::ARRAY_START) {
+            arrayStartIndex = currentTokenIdx - i;
+            break;
+        }
+    }
+    ASSERT(arrayStartIndex != -1);
+
+    int objectCount             = currentTokenIdx - 2 - arrayStartIndex;
+    const auto first            = tokens.begin() + arrayStartIndex;
+    const auto last             = first + objectCount + 1;
+    const std::vector<Token> ts = std::vector<Token>(first, last);
+    auto l                      = TokenLexer(ts);
+    auto p                      = Parser(l);
+    auto arr                    = p.parse()->as<Array>();
+
+    ASSERT(arr != nullptr);
+    result->data.TJ_ShowOneOrMoreTextStrings.objects = arr;
+    return result;
+}
+
+Operator *OperationParser::createOperator_Tf(Operator *result) {
+    auto &contentFontName = tokens[currentTokenIdx - 3].content;
+    ASSERT(contentFontName.size() <= MAX_FONT_NAME_SIZE);
+    for (int i = 0; i < contentFontName.size(); i++) {
+        result->data.Tf_SetTextFont.fontName[i] = contentFontName[i];
+    }
+    auto &contentFontSize                = tokens[currentTokenIdx - 2].content;
+    result->data.Tf_SetTextFont.fontSize = std::stod(contentFontSize);
+    return result;
+}
+
+Operator *OperationParser::createOperator_Td(Operator *result) {
+    auto &contentX                        = tokens[currentTokenIdx - 3].content;
+    auto &contentY                        = tokens[currentTokenIdx - 2].content;
+    result->data.Td_MoveStartOfNextLine.x = std::stod(contentX);
+    result->data.Td_MoveStartOfNextLine.y = std::stod(contentY);
+    return result;
+}
+
 Operator *OperationParser::createOperator(Operator::Type type) {
     auto result = new Operator(type);
-    if (type == Operator::Type::w_SetLineWidth) {
-        auto &content                         = tokens[currentTokenIdx - 2].content;
-        auto lineWidth                        = std::stod(content);
-        result->data.w_SetLineWidth.lineWidth = lineWidth;
+    if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
+        type == Operator::Type::W_ModifyClippingPathUsingNonZeroWindingNumberRule ||
+        type == Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule ||
+        type == Operator::Type::n_EndPathWithoutFillingOrStroking || type == Operator::Type::BT_BeginText ||
+        type == Operator::Type::ET_EndText) {
+        // operators without operands
         return result;
+    }
+    if (type == Operator::Type::w_SetLineWidth) {
+        return createOperator_w(result);
     }
     if (type == Operator::Type::re_AppendRectangle) {
-        for (int i = 0; i < 4; i++) {
-            auto &content                           = tokens[currentTokenIdx - 1 - (4 - i)].content;
-            auto d                                  = std::stod(content);
-            result->data.re_AppendRectangle.rect[i] = d;
-        }
-        return result;
+        return createOperator_re(result);
     }
     if (type == Operator::Type::rg_SetNonStrokingColorRGB) {
-        auto &contentR                           = tokens[currentTokenIdx - 4].content;
-        auto &contentG                           = tokens[currentTokenIdx - 3].content;
-        auto &contentB                           = tokens[currentTokenIdx - 2].content;
-        result->data.rg_SetNonStrokingColorRGB.r = std::stod(contentR);
-        result->data.rg_SetNonStrokingColorRGB.g = std::stod(contentG);
-        result->data.rg_SetNonStrokingColorRGB.b = std::stod(contentB);
-        return result;
+        return createOperator_rg(result);
     }
     if (type == Operator::Type::Td_MoveStartOfNextLine) {
-        auto &contentX                        = tokens[currentTokenIdx - 3].content;
-        auto &contentY                        = tokens[currentTokenIdx - 2].content;
-        result->data.Td_MoveStartOfNextLine.x = std::stod(contentX);
-        result->data.Td_MoveStartOfNextLine.y = std::stod(contentY);
-        return result;
+        return createOperator_Td(result);
     }
     if (type == Operator::Type::Tf_SetTextFont) {
-        auto &contentFontName = tokens[currentTokenIdx - 3].content;
-        ASSERT(contentFontName.size() <= MAX_FONT_NAME_SIZE);
-        for (int i = 0; i < contentFontName.size(); i++) {
-            result->data.Tf_SetTextFont.fontName[i] = contentFontName[i];
-        }
-        auto &contentFontSize                = tokens[currentTokenIdx - 2].content;
-        result->data.Tf_SetTextFont.fontSize = std::stod(contentFontSize);
-        return result;
+        return createOperator_Tf(result);
     }
     if (type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-        int arrayStartIndex = -1;
-        for (int i = 0; i < currentTokenIdx; i++) {
-            if (tokens[currentTokenIdx - i].type == Token::Type::ARRAY_START) {
-                arrayStartIndex = currentTokenIdx - i + 1;
-                break;
-            }
-        }
-        ASSERT(arrayStartIndex != -1);
-        int objectCount = currentTokenIdx - 2 - arrayStartIndex;
-        //      [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]
-//        result->data.TJ_ShowOneOrMoreTextStrings.array = (Object **)malloc(objectCount * sizeof(Object *));
-//        for (int i = 0; i < objectCount;i++) {
-//            result->data.TJ_ShowOneOrMoreTextStrings.array[i]=
-//        }
-        return result;
+        return createOperator_TJ(result);
     }
+
+    std::cerr << "Failed to parse command of type: " << type << "\n";
+    ASSERT(false);
+
     return result;
 }
 

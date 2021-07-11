@@ -63,10 +63,10 @@ constexpr int MAX_FONT_NAME_SIZE = 10;
     O(Bx, UNKNOWN)                                                                                                     \
     O(b, UNKNOWN)                                                                                                      \
     O(bx, UNKNOWN)                                                                                                     \
-    O(n, UNKNOWN)                                                                                                      \
+    O(n, EndPathWithoutFillingOrStroking)                                                                              \
     /* Clipping Path Operators TODO add more descriptive names */                                                      \
-    O(W, UNKNOWN)                                                                                                      \
-    O(Wx, UNKNOWN)                                                                                                     \
+    O(W, ModifyClippingPathUsingNonZeroWindingNumberRule)                                                              \
+    O(Wx, ModifyClippingPathUsingEvenOddRule)                                                                          \
     /* Type 3 Font Operators TODO add more descriptive names */                                                        \
     O(d0, UNKNOWN)                                                                                                     \
     O(d1, UNKNOWN)                                                                                                     \
@@ -128,8 +128,7 @@ struct Operator {
             double fontSize;                   // TODO is font size a "real" or an "integer"
         } Tf_SetTextFont;
         struct {
-            Object **array;
-            size_t count;
+            Array *objects;
         } TJ_ShowOneOrMoreTextStrings;
     } data;
 };
@@ -148,6 +147,13 @@ class OperationParser {
     int currentTokenIdx       = 0;
 
     Operator *createOperator(Operator::Type type);
+
+    Operator *createOperator_w(Operator *result);
+    Operator *createOperator_re(Operator *result);
+    Operator *createOperator_rg(Operator *result);
+    Operator *createOperator_Td(Operator *result);
+    Operator *createOperator_Tf(Operator *result);
+    Operator *createOperator_TJ(Operator *result);
 };
 
 } // namespace pdf

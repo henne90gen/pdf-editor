@@ -19,7 +19,7 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
 
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
-    auto lexer        = pdf::Lexer(textProvider);
+    auto lexer        = pdf::TextLexer(textProvider);
     auto parser       = pdf::Parser(lexer);
     auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -31,7 +31,7 @@ template <typename T>
 void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceResolver *referenceResolver,
                                        std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
-    auto lexer        = pdf::Lexer(textProvider);
+    auto lexer        = pdf::TextLexer(textProvider);
     auto parser       = pdf::Parser(lexer, referenceResolver);
     auto result       = parser.parse();
     ASSERT_NE(result, nullptr);

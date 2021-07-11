@@ -170,7 +170,7 @@ std::optional<Token> findToken(const std::string &word) {
     return {};
 }
 
-std::optional<Token> Lexer::getToken() {
+std::optional<Token> TextLexer::getToken() {
     std::string previousWord = currentWord;
     while (true) {
         if (currentWord.empty()) {
@@ -206,7 +206,7 @@ std::optional<Token> Lexer::getToken() {
     return {};
 }
 
-std::string Lexer::advanceStream(size_t characters) {
+std::string TextLexer::advanceStream(size_t characters) {
     std::string tmp = currentWord.substr(0, characters);
     currentWord     = currentWord.substr(characters);
     return tmp;

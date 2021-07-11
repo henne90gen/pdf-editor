@@ -7,10 +7,10 @@
 
 namespace pdf {
 
-std::ostream &operator<<(std::ostream &os, Object::Type type) {
+std::ostream &operator<<(std::ostream &os, Object::Type &type) {
 #define __BYTECODE_OP(op)                                                                                              \
     case Object::Type::op:                                                                                             \
-        os.write(#op, strlen(#op));                                                                                    \
+        os.write("Object::Type::" #op, strlen("Object::Type::" #op));                                                  \
         break;
 
     switch (type) {
@@ -107,7 +107,7 @@ std::string HexadecimalString::to_string() const {
 
 OperationParser Stream::operationParser() const {
     auto textProvider = StringTextProvider(to_string());
-    auto lexer        = Lexer(textProvider);
+    auto lexer        = TextLexer(textProvider);
     return OperationParser(lexer);
 }
 

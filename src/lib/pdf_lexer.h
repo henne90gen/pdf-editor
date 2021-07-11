@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace pdf {
 
@@ -58,13 +59,38 @@ class StringTextProvider : public TextProvider {
 
 class Lexer {
   public:
-    explicit Lexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
+    virtual std::optional<Token> getToken()              = 0;
+    virtual std::string advanceStream(size_t characters) = 0;
+};
 
-    std::optional<Token> getToken();
-    std::string advanceStream(size_t characters);
+class TextLexer : public Lexer {
+  public:
+    explicit TextLexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
+
+    std::optional<Token> getToken() override;
+    std::string advanceStream(size_t characters) override;
 
   private:
     TextProvider &textProvider;
     std::string currentWord;
 };
+
+class TokenLexer : public Lexer {
+  public:
+    explicit TokenLexer(const std::vector<Token> &_tokens) : tokens(_tokens) {}
+
+    std::optional<Token> getToken() override {
+        if (tokens.empty() || currentTokenIdx >= tokens.size()) {
+            return {};
+        }
+        return tokens[currentTokenIdx++];
+    }
+
+    std::string advanceStream(size_t characters) override { return ""; }
+
+  private:
+    const std::vector<Token> &tokens;
+    int currentTokenIdx = 0;
+};
+
 } // namespace pdf

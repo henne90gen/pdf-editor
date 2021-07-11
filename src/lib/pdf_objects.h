@@ -31,9 +31,7 @@ struct Object {
     Type type;
     explicit Object(Type _type) : type(_type) {}
 
-    template <typename T> T *as() {
-        return (T *)this;
-    }
+    template <typename T> T *as() { return (T *)this; }
     template <typename T> bool is() { return T::staticType() == type; }
 };
 
@@ -147,6 +145,6 @@ struct Null : Object {
     explicit Null() : Object(staticType()) {}
 };
 
-std::ostream &operator<<(std::ostream &os, Object::Type type);
+std::ostream &operator<<(std::ostream &os, Object::Type &type);
 
 } // namespace pdf

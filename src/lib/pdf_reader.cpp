@@ -17,7 +17,7 @@ Dictionary *parseDict(char *start, size_t length) {
     ASSERT(length > 0);
     // TODO find a better way of passing the data to the parser
     auto text   = StringTextProvider(std::string(start, length));
-    auto lexer  = Lexer(text);
+    auto lexer  = TextLexer(text);
     auto parser = Parser(lexer);
     auto result = parser.parse();
     return result->as<Dictionary>();
