@@ -1,0 +1,2 @@
+add_executable(treeview treeview_example.cpp treeview_example_main.cpp)
+target_link_gtk3(treeview)
