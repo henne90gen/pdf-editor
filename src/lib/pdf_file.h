@@ -37,7 +37,7 @@ struct File : public ReferenceResolver {
     Dictionary *getRoot();
     PageTreeNode *getPageTree();
     std::vector<IndirectObject *> getAllObjects();
-    IndirectObject *resolve(IndirectReference *ref) override;
+    IndirectObject *resolve(const IndirectReference *ref) override;
 
   private:
     [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber) const;

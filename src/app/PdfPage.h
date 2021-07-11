@@ -4,21 +4,40 @@
 
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
-#include <gtkmm/applicationwindow.h>
-#include <gtkmm/box.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/notebook.h>
-#include <gtkmm/textview.h>
+#include <gtkmm/label.h>
+#include <gtkmm/scrolledwindow.h>
+#include <gtkmm/treestore.h>
+#include <gtkmm/treeview.h>
 
 #include <pdf_file.h>
 #include <pdf_reader.h>
 
-class PdfPage : public Gtk::Box {
+class PdfPage : public Gtk::ScrolledWindow {
   public:
-    PdfPage(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder, std::string _fileName);
+    explicit PdfPage(std::string _fileName);
+
+    class ModelColumns : public Gtk::TreeStore::ColumnRecord {
+      public:
+        ModelColumns() {
+            add(m_col_name);
+            add(m_col_value);
+        }
+
+        Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+        Gtk::TreeModelColumn<Glib::ustring> m_col_value;
+    };
 
   private:
-    Glib::RefPtr<Gtk::Builder> builder;
     std::string fileName;
     pdf::File file;
+    Gtk::TreeView treeView;
+    ModelColumns columns;
+    Glib::RefPtr<Gtk::TreeStore> treeStore;
+
+    void addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
+    void addRows(const pdf::Dictionary *dict, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
+    void addRows(const pdf::Array *arr, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
+    void addRows(const pdf::IndirectReference *ref, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
+
+    Gtk::TreeModel::Row createRow(Gtk::TreeRow *parentRow);
 };

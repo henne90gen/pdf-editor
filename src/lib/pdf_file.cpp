@@ -49,7 +49,7 @@ PageTreeNode *File::getPageTree() {
     return indirectObject->object->as<PageTreeNode>();
 }
 
-IndirectObject *File::resolve(IndirectReference *ref) { return getObject(ref->objectNumber); }
+IndirectObject *File::resolve(const IndirectReference *ref) { return getObject(ref->objectNumber); }
 
 std::vector<IndirectObject *> File::getAllObjects() {
     std::vector<IndirectObject *> result = {};
