@@ -1,5 +1,6 @@
 #include "pdf_operation_parser.h"
-#include <spqr.hpp>
+
+#include <cstring>
 
 #include "pdf_parser.h"
 #include "util.h"

@@ -6,7 +6,7 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
   public:
     explicit TestReferenceResolver(const std::vector<pdf::IndirectObject *> &refs) : references(refs) {}
 
-    pdf::IndirectObject *resolve(pdf::IndirectReference *reference) override {
+    pdf::IndirectObject *resolve(const pdf::IndirectReference *reference) override {
         if (reference->objectNumber >= references.size()) {
             return nullptr;
         }
