@@ -15,11 +15,11 @@ namespace pdf {
 Dictionary *parseDict(char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
-    // TODO find a better way of passing the data to the parser
-    auto text   = StringTextProvider(std::string(start, length));
-    auto lexer  = TextLexer(text);
-    auto parser = Parser(lexer);
-    auto result = parser.parse();
+    const std::string_view input = std::string_view(start, length);
+    auto text                    = StringTextProvider(input);
+    auto lexer                   = TextLexer(text);
+    auto parser                  = Parser(lexer);
+    auto result                  = parser.parse();
     return result->as<Dictionary>();
 }
 

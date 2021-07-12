@@ -80,7 +80,7 @@ void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRo
     case pdf::Object::Type::STREAM:
         ASSERT(parentRow != nullptr);
         // TODO this does not yet work as expected (crashes with "munmap_chunk(): invalid pointer")
-        (*parentRow)[columns.m_col_value] = obj->as<pdf::Stream>()->to_string();
+        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Stream>()->to_string());
         break;
     case pdf::Object::Type::NULL_OBJ: {
         ASSERT(parentRow != nullptr);

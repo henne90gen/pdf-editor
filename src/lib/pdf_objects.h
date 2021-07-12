@@ -30,6 +30,7 @@ struct Object {
     };
     Type type;
     explicit Object(Type _type) : type(_type) {}
+    virtual ~Object() = default;
 
     template <typename T> T *as() { return (T *)this; }
     template <typename T> bool is() { return T::staticType() == type; }
@@ -134,7 +135,7 @@ struct Stream : Object {
     explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
         : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
 
-    [[nodiscard]] std::string to_string() const;
+    [[nodiscard]] std::string_view to_string() const;
     [[nodiscard]] std::vector<std::string> filters() const;
     [[nodiscard]] OperationParser operationParser() const;
 };

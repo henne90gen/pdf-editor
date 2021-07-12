@@ -41,11 +41,15 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string Stream::to_string() const {
+std::string_view Stream::to_string() const {
     char *output      = data;
     size_t outputSize = length;
 
     auto fs = filters();
+    if (fs.empty()) {
+        return std::string_view(data, length);
+    }
+
     for (const auto &filter : fs) {
         if (filter == "FlateDecode") {
             // TODO this works, but is far from optimal
@@ -75,7 +79,7 @@ std::string Stream::to_string() const {
         // TODO handle more filters
     }
 
-    return std::string(output, outputSize);
+    return std::string_view(output, outputSize);
 }
 
 std::string HexadecimalString::to_string() const {

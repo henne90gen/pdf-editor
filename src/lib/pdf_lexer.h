@@ -37,14 +37,16 @@ struct Token {
 
 class TextProvider {
   public:
-    virtual std::optional<std::string> getText() = 0;
+    virtual std::optional<std::string_view> getText() = 0;
 };
 
 class StringTextProvider : public TextProvider {
   public:
-    explicit StringTextProvider(std::string _text) : text(std::move(_text)) {}
+    explicit StringTextProvider(const char *_text) : text(_text) {}
+    explicit StringTextProvider(const std::string &_text) : text(_text) {}
+    explicit StringTextProvider(const std::string_view &_text) : text(_text) {}
 
-    std::optional<std::string> getText() override {
+    std::optional<std::string_view> getText() override {
         if (hasBeenQueried) {
             return {};
         }
@@ -53,7 +55,7 @@ class StringTextProvider : public TextProvider {
     }
 
   private:
-    std::string text;
+    std::string_view text;
     bool hasBeenQueried = false;
 };
 

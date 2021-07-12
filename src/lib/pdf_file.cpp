@@ -15,8 +15,9 @@ IndirectObject *File::loadObject(int64_t objectNumber) const {
     while (std::string(start + length, 6) != "endobj") {
         length++;
     }
+    length += 6;
 
-    auto input  = std::string(start, length + 6);
+    auto input  = std::string_view(start, length);
     auto text   = StringTextProvider(input);
     auto lexer  = TextLexer(text);
     auto parser = Parser(lexer, (ReferenceResolver *)this);
