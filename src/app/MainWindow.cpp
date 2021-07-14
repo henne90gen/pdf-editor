@@ -29,7 +29,7 @@ class MainWindow : public Gtk::ApplicationWindow {
             notebook->remove_page(i);
         }
 
-//        add_pdf_page("../../../test-files/blank.pdf");
+        add_pdf_page("../../../test-files/blank.pdf");
         add_pdf_page("../../../test-files/hello-world.pdf");
         notebook->show_all();
     }
@@ -56,7 +56,12 @@ class MainWindow : public Gtk::ApplicationWindow {
     }
 
     void add_pdf_page(const std::string &filePath) {
-        auto &page = pages.emplace_back(filePath);
+        pdf::File file = files.emplace_back();
+        if (!pdf::load_from_file(filePath, file)) {
+            return;
+        }
+
+        auto &page     = pages.emplace_back(file);
         auto lastSlash = filePath.find_last_of('/');
         auto fileName  = filePath.substr(lastSlash + 1);
         notebook->append_page(page, fileName);
@@ -67,7 +72,8 @@ class MainWindow : public Gtk::ApplicationWindow {
     Gtk::Notebook *notebook = nullptr;
 
     // using std::list here, because the stored objects have to have stable addresses
-    std::list<PdfPage> pages = {};
+    std::list<pdf::File> files = {};
+    std::list<PdfPage> pages   = {};
 };
 
 int main(int argc, char *argv[]) {

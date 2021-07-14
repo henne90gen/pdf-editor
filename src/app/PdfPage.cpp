@@ -1,12 +1,6 @@
 #include "PdfPage.h"
 
-PdfPage::PdfPage(std::string _fileName) : fileName(std::move(_fileName)) {
-    std::cout << "Created page for file: " << fileName << std::endl;
-
-    if (!pdf::load_from_file(fileName, file)) {
-        return;
-    }
-
+PdfPage::PdfPage(pdf::File &_file) : file(_file), pdfWidget(_file) {
     box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
     add(box);
 
@@ -30,6 +24,10 @@ PdfPage::PdfPage(std::string _fileName) : fileName(std::move(_fileName)) {
 void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRow) {
     // TODO use a hash set to stop infinite recursion
     if (depth > 5) {
+        return;
+    }
+    if (obj == nullptr) {
+        // TODO maybe show a special row?
         return;
     }
 
@@ -120,6 +118,13 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     }
 }
 
-PdfWidget::PdfWidget() {
-    signal_draw().connect(sigc::mem_fun(*this,& PdfWidget::on_draw));
+PdfWidget::PdfWidget(pdf::File &_file) : file(_file) {
+    signal_draw().connect(sigc::mem_fun(*this, &PdfWidget::on_draw));
+}
+
+bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
+    cr->translate(10, 10);
+    cr->show_text("Hello");
+    cr->rectangle(0, 0, 200, 200);
+    return false;
 }

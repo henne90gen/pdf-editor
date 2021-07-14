@@ -16,19 +16,17 @@
 
 class PdfWidget : public Gtk::DrawingArea {
   public:
-    PdfWidget();
+    explicit PdfWidget(pdf::File &file);
 
-    bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
-        cr->translate(10, 10);
-        cr->show_text("Hello");
-        cr->rectangle(0, 0, 200, 200);
-        return false;
-    }
+    bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr);
+
+  private:
+    pdf::File &file;
 };
 
 class PdfPage : public Gtk::ScrolledWindow {
   public:
-    explicit PdfPage(std::string _fileName);
+    explicit PdfPage(pdf::File &file);
 
     class ModelColumns : public Gtk::TreeStore::ColumnRecord {
       public:
@@ -42,8 +40,7 @@ class PdfPage : public Gtk::ScrolledWindow {
     };
 
   private:
-    std::string fileName;
-    pdf::File file;
+    pdf::File &file;
     Gtk::Box box;
     PdfWidget pdfWidget;
     Gtk::TreeView treeView;
