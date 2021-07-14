@@ -7,7 +7,11 @@ PdfPage::PdfPage(std::string _fileName) : fileName(std::move(_fileName)) {
         return;
     }
 
-    add(treeView);
+    box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+    add(box);
+
+    box.pack_start(treeView);
+    box.pack_start(pdfWidget);
     set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
     treeStore = Gtk::TreeStore::create(columns);
@@ -80,7 +84,7 @@ void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRo
     case pdf::Object::Type::STREAM:
         ASSERT(parentRow != nullptr);
         // TODO this does not yet work as expected (crashes with "munmap_chunk(): invalid pointer")
-        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Stream>()->to_string());
+        //        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Stream>()->to_string());
         break;
     case pdf::Object::Type::NULL_OBJ: {
         ASSERT(parentRow != nullptr);
@@ -114,4 +118,8 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     } else {
         return *treeStore->append(parentRow->children());
     }
+}
+
+PdfWidget::PdfWidget() {
+    signal_draw().connect(sigc::mem_fun(*this,& PdfWidget::on_draw));
 }
