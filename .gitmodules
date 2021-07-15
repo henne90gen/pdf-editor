@@ -7,3 +7,6 @@
 [submodule "vendor/benchmark"]
 	path = vendor/benchmark
 	url = git@github.com:google/benchmark.git
+[submodule "vendor/poppler"]
+	path = vendor/poppler
+	url = https://gitlab.freedesktop.org/poppler/poppler.git

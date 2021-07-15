@@ -1,19 +1,19 @@
 #include <benchmark/benchmark.h>
 
-#include <pdf_reader.h>
+#include <pdf/document.h>
 
-static void BM_Blank(benchmark::State& state) {
+static void BM_Blank(benchmark::State &state) {
     for (auto _ : state) {
-        pdf::File file;
-        pdf::load_from_file("../../../test-files/blank.pdf", file);
+        pdf::Document document;
+        pdf::Document::load_from_file("../../../test-files/blank.pdf", document);
     }
 }
 BENCHMARK(BM_Blank);
 
-static void BM_HelloWorld(benchmark::State& state) {
+static void BM_HelloWorld(benchmark::State &state) {
     for (auto _ : state) {
-        pdf::File file;
-        pdf::load_from_file("../../../test-files/hello-world.pdf", file);
+        pdf::Document document;
+        pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
     }
 }
 BENCHMARK(BM_HelloWorld);

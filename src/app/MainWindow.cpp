@@ -4,7 +4,6 @@
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/applicationwindow.h>
-#include <gtkmm/box.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/notebook.h>
 #include <gtkmm/textview.h>
@@ -56,12 +55,12 @@ class MainWindow : public Gtk::ApplicationWindow {
     }
 
     void add_pdf_page(const std::string &filePath) {
-        pdf::File file = files.emplace_back();
-        if (!pdf::load_from_file(filePath, file)) {
+        pdf::Document document = documents.emplace_back();
+        if (!pdf::Document::load_from_file(filePath, document)) {
             return;
         }
 
-        auto &page     = pages.emplace_back(file);
+        auto &page     = pages.emplace_back(document);
         auto lastSlash = filePath.find_last_of('/');
         auto fileName  = filePath.substr(lastSlash + 1);
         notebook->append_page(page, fileName);
@@ -72,7 +71,7 @@ class MainWindow : public Gtk::ApplicationWindow {
     Gtk::Notebook *notebook = nullptr;
 
     // using std::list here, because the stored objects have to have stable addresses
-    std::list<pdf::File> files = {};
+    std::list<pdf::Document> documents = {};
     std::list<PdfPage> pages   = {};
 };
 

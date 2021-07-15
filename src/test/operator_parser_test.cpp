@@ -1,23 +1,23 @@
 #include <functional>
 #include <gtest/gtest.h>
 
-#include <pdf_operation_parser.h>
+#include <pdf/operator_parser.h>
 
-void assertNextOp(pdf::OperationParser &parser, pdf::Operator::Type type, std::function<void(pdf::Operator *)> func) {
+void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type, std::function<void(pdf::Operator *)> func) {
     auto operation = parser.getOperator();
     ASSERT_NE(operation, nullptr);
     ASSERT_EQ(operation->type, type);
     func(operation);
 }
 
-void assertNextOp(pdf::OperationParser &parser, pdf::Operator::Type type) {
+void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type) {
     assertNextOp(parser, type, [](auto op) {});
 }
 
 TEST(OperationParser, Simple) {
     auto textProvider = pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nQ ");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto parser       = pdf::OperationParser(lexer);
+    auto parser       = pdf::OperatorParser(lexer);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState);
@@ -37,7 +37,7 @@ TEST(OperationParser, HelloWorld) {
           pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nq 0 0 0 rg\nBT\n56.8 724.1 Td /F1 12 "
                                   "Tf[<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ\nET\nQ\nQ ");
     auto lexer  = pdf::TextLexer(textProvider);
-    auto parser = pdf::OperationParser(lexer);
+    auto parser = pdf::OperatorParser(lexer);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState);

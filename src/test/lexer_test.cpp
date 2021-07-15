@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <pdf_lexer.h>
+#include <pdf/lexer.h>
 
 void assertNextToken(pdf::Lexer &lexer, pdf::Token::Type type, const std::string &content) {
     auto result = lexer.getToken();

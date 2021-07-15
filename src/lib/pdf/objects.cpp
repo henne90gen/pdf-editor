@@ -1,9 +1,9 @@
-#include "pdf_objects.h"
+#include "objects.h"
 
 #include <cstring>
 #include <zlib.h>
 
-#include "pdf_operation_parser.h"
+#include "operator_parser.h"
 
 namespace pdf {
 
@@ -107,12 +107,6 @@ std::string HexadecimalString::to_string() const {
 
     free(buf);
     return result;
-}
-
-OperationParser Stream::operationParser() const {
-    auto textProvider = StringTextProvider(to_string());
-    auto lexer        = TextLexer(textProvider);
-    return OperationParser(lexer);
 }
 
 } // namespace pdf

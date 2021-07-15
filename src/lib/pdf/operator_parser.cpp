@@ -1,8 +1,8 @@
-#include "pdf_operation_parser.h"
+#include "operator_parser.h"
 
 #include <cstring>
 
-#include "pdf_parser.h"
+#include "parser.h"
 #include "util.h"
 
 namespace pdf {
@@ -41,7 +41,7 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type) {
     return os;
 }
 
-Operator *OperationParser::getOperator() {
+Operator *OperatorParser::getOperator() {
     while (true) {
         while (currentTokenIdx >= tokens.size()) {
             auto t = lexer.getToken();
@@ -61,14 +61,14 @@ Operator *OperationParser::getOperator() {
     }
 }
 
-Operator *OperationParser::createOperator_w(Operator *result) {
+Operator *OperatorParser::createOperator_w(Operator *result) {
     auto &content                         = tokens[currentTokenIdx - 2].content;
     auto lineWidth                        = std::stod(content);
     result->data.w_SetLineWidth.lineWidth = lineWidth;
     return result;
 }
 
-Operator *OperationParser::createOperator_re(Operator *result) {
+Operator *OperatorParser::createOperator_re(Operator *result) {
     for (int i = 0; i < 4; i++) {
         auto &content                           = tokens[currentTokenIdx - 1 - (4 - i)].content;
         auto d                                  = std::stod(content);
@@ -77,7 +77,7 @@ Operator *OperationParser::createOperator_re(Operator *result) {
     return result;
 }
 
-Operator *OperationParser::createOperator_rg(Operator *result) {
+Operator *OperatorParser::createOperator_rg(Operator *result) {
     auto &contentR                           = tokens[currentTokenIdx - 4].content;
     auto &contentG                           = tokens[currentTokenIdx - 3].content;
     auto &contentB                           = tokens[currentTokenIdx - 2].content;
@@ -87,7 +87,7 @@ Operator *OperationParser::createOperator_rg(Operator *result) {
     return result;
 }
 
-Operator *OperationParser::createOperator_TJ(Operator *result) {
+Operator *OperatorParser::createOperator_TJ(Operator *result) {
     int arrayStartIndex = -1;
     for (int i = 0; i < currentTokenIdx; i++) {
         if (tokens[currentTokenIdx - i].type == Token::Type::ARRAY_START) {
@@ -110,7 +110,7 @@ Operator *OperationParser::createOperator_TJ(Operator *result) {
     return result;
 }
 
-Operator *OperationParser::createOperator_Tf(Operator *result) {
+Operator *OperatorParser::createOperator_Tf(Operator *result) {
     auto &contentFontName = tokens[currentTokenIdx - 3].content;
     ASSERT(contentFontName.size() <= MAX_FONT_NAME_SIZE);
     for (int i = 0; i < contentFontName.size(); i++) {
@@ -121,7 +121,7 @@ Operator *OperationParser::createOperator_Tf(Operator *result) {
     return result;
 }
 
-Operator *OperationParser::createOperator_Td(Operator *result) {
+Operator *OperatorParser::createOperator_Td(Operator *result) {
     auto &contentX                        = tokens[currentTokenIdx - 3].content;
     auto &contentY                        = tokens[currentTokenIdx - 2].content;
     result->data.Td_MoveStartOfNextLine.x = std::stod(contentX);
@@ -129,7 +129,7 @@ Operator *OperationParser::createOperator_Td(Operator *result) {
     return result;
 }
 
-Operator *OperationParser::createOperator(Operator::Type type) {
+Operator *OperatorParser::createOperator(Operator::Type type) {
     auto result = new Operator(type);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
         type == Operator::Type::W_ModifyClippingPathUsingNonZeroWindingNumberRule ||

@@ -3,8 +3,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pdf_lexer.h"
-#include "pdf_objects.h"
+#include "lexer.h"
+#include "objects.h"
 
 namespace pdf {
 
@@ -134,10 +134,11 @@ struct Operator {
 };
 
 Operator::Type stringToOperatorType(const std::string &t);
+std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
-class OperationParser {
+class OperatorParser {
   public:
-    explicit OperationParser(Lexer &_lexer) : lexer(_lexer) {}
+    explicit OperatorParser(Lexer &_lexer) : lexer(_lexer) {}
 
     Operator *getOperator();
 

@@ -123,7 +123,7 @@ struct IndirectObject : Object {
         : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber), object(_object) {}
 };
 
-class OperationParser;
+class OperatorParser;
 
 struct Stream : Object {
     static Type staticType() { return Type::STREAM; }
@@ -137,7 +137,6 @@ struct Stream : Object {
 
     [[nodiscard]] std::string_view to_string() const;
     [[nodiscard]] std::vector<std::string> filters() const;
-    [[nodiscard]] OperationParser operationParser() const;
 };
 
 struct Null : Object {

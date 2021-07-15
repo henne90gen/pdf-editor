@@ -1,6 +1,6 @@
 #include "PdfPage.h"
 
-PdfPage::PdfPage(pdf::File &_file) : file(_file), pdfWidget(_file) {
+PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
     box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
     add(box);
 
@@ -11,7 +11,7 @@ PdfPage::PdfPage(pdf::File &_file) : file(_file), pdfWidget(_file) {
     treeStore = Gtk::TreeStore::create(columns);
     treeView.set_model(treeStore);
 
-    auto root = file.getRoot();
+    auto root = file.root();
     ASSERT(root != nullptr);
     addRows(root, 0);
 
@@ -118,7 +118,7 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     }
 }
 
-PdfWidget::PdfWidget(pdf::File &_file) : file(_file) {
+PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) {
     signal_draw().connect(sigc::mem_fun(*this, &PdfWidget::on_draw));
 }
 

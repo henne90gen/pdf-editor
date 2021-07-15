@@ -11,22 +11,21 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 
-#include <pdf_file.h>
-#include <pdf_reader.h>
+#include <pdf/document.h>
 
 class PdfWidget : public Gtk::DrawingArea {
   public:
-    explicit PdfWidget(pdf::File &file);
+    explicit PdfWidget(pdf::Document &file);
 
     bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr);
 
   private:
-    pdf::File &file;
+    pdf::Document &file;
 };
 
 class PdfPage : public Gtk::ScrolledWindow {
   public:
-    explicit PdfPage(pdf::File &file);
+    explicit PdfPage(pdf::Document &file);
 
     class ModelColumns : public Gtk::TreeStore::ColumnRecord {
       public:
@@ -40,7 +39,7 @@ class PdfPage : public Gtk::ScrolledWindow {
     };
 
   private:
-    pdf::File &file;
+    pdf::Document &file;
     Gtk::Box box;
     PdfWidget pdfWidget;
     Gtk::TreeView treeView;

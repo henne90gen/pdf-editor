@@ -1,13 +1,13 @@
 #pragma once
 
-#include "pdf_lexer.h"
-#include "pdf_objects.h"
-#include "pdf_parser.h"
+#include "lexer.h"
+#include "objects.h"
+#include "parser.h"
 
 namespace pdf {
 
 struct PageTreeNode;
-struct PageNode;
+struct Page;
 
 struct Trailer {
     int64_t lastCrossRefStart = {};
@@ -26,7 +26,7 @@ struct CrossReferenceTable {
     std::vector<CrossReferenceEntry> entries = {};
 };
 
-struct File : public ReferenceResolver {
+struct Document : public ReferenceResolver {
     char *data                              = nullptr;
     int64_t sizeInBytes                     = 0;
     Trailer trailer                         = {};
@@ -34,10 +34,12 @@ struct File : public ReferenceResolver {
     std::vector<IndirectObject *> objects   = {};
 
     IndirectObject *getObject(int64_t objectNumber);
-    Dictionary *getRoot();
-    PageTreeNode *getPageTree();
+    Dictionary *root();
+    std::vector<Page *> pages();
     std::vector<IndirectObject *> getAllObjects();
     IndirectObject *resolve(const IndirectReference *ref) override;
+
+    static bool load_from_file(const std::string &filePath, Document &document);
 
   private:
     [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber) const;
@@ -53,10 +55,12 @@ struct Rectangle : public Array {
 struct PageTreeNode : public Dictionary {
     Name *type() { return values["Type"]->as<Name>(); }
     bool isPage() { return type()->value == "Page"; }
-    PageTreeNode *parent(File &file);
-    std::vector<PageNode *> pages(File &file);
+    PageTreeNode *parent(Document &file);
+    Array *kids() { return values["Kids"]->as<Array>(); }
+    Integer *count() { return values["Count"]->as<Integer>(); }
 
-    template <typename T> std::optional<T *> attribute(File &file, const std::string &attributeName, bool inheritable) {
+    template <typename T>
+    std::optional<T *> attribute(Document &file, const std::string &attributeName, bool inheritable) {
         auto itr = values.find(attributeName);
         if (itr == values.end()) {
             if (inheritable) {
@@ -73,23 +77,23 @@ struct PageTreeNode : public Dictionary {
     }
 };
 
-struct IntermediateNode : public PageTreeNode {
-    Array *kids() { return values["Kids"]->as<Array>(); }
-    Integer *count() { return values["Count"]->as<Integer>(); }
-};
+struct Page {
+    explicit Page(Document &_document, PageTreeNode *_node) : document(_document), node(_node) {}
 
-struct PageNode : public PageTreeNode {
-    Dictionary *resources(File &file) { return attribute<Dictionary>(file, "Resources", true).value(); }
-    Rectangle *mediaBox(File &file) { return attribute<Rectangle>(file, "MediaBox", true).value(); }
+    Dictionary *resources() { return node->attribute<Dictionary>(document, "Resources", true).value(); }
+    Rectangle *mediaBox() { return node->attribute<Rectangle>(document, "MediaBox", true).value(); }
 
     // TODO make mediaBox the default value for cropBox, bleedBox, trimBox and artBox
-    std::optional<Rectangle *> cropBox(File &file) { return attribute<Rectangle>(file, "CropBox", true); }
-    std::optional<Rectangle *> bleedBox(File &file) { return attribute<Rectangle>(file, "BleedBox", true); }
-    std::optional<Rectangle *> trimBox(File &file) { return attribute<Rectangle>(file, "TrimBox", true); }
-    std::optional<Rectangle *> artBox(File &file) { return attribute<Rectangle>(file, "ArtBox", true); }
-    std::optional<Dictionary *> boxColorInfo(File &file) { return attribute<Dictionary>(file, "BoxColorInfo", false); }
-    std::optional<Object *> contents(File &file) { return attribute<Object>(file, "Contents", false); }
-    int64_t rotate(File &file);
+    std::optional<Rectangle *> cropBox() { return node->attribute<Rectangle>(document, "CropBox", true); }
+    std::optional<Rectangle *> bleedBox() { return node->attribute<Rectangle>(document, "BleedBox", true); }
+    std::optional<Rectangle *> trimBox() { return node->attribute<Rectangle>(document, "TrimBox", true); }
+    std::optional<Rectangle *> artBox() { return node->attribute<Rectangle>(document, "ArtBox", true); }
+    std::optional<Dictionary *> boxColorInfo() { return node->attribute<Dictionary>(document, "BoxColorInfo", false); }
+    std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
+    int64_t rotate();
+
+    Document &document;
+    PageTreeNode *node;
 };
 
 } // namespace pdf

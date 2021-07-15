@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "pdf_lexer.h"
-#include "pdf_objects.h"
+#include "lexer.h"
+#include "objects.h"
 #include "util.h"
 
 namespace pdf {

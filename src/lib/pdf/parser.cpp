@@ -1,4 +1,4 @@
-#include "pdf_parser.h"
+#include "parser.h"
 
 #include <stdexcept>
 #include <cstring>

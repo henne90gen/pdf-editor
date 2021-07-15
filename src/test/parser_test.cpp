@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <pdf_parser.h>
+#include <pdf/parser.h>
 
 class TestReferenceResolver : public pdf::ReferenceResolver {
   public:
