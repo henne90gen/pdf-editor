@@ -4,7 +4,7 @@
 
 TEST(Reader, Blank) {
     pdf::File file;
-    pdf::load_from_file("../../test-files/blank.pdf", file);
+    pdf::load_from_file("../../../test-files/blank.pdf", file);
     std::vector<pdf::IndirectObject *> objects = file.getAllObjects();
     ASSERT_EQ(objects.size(), 8);
 
@@ -31,7 +31,7 @@ TEST(Reader, Blank) {
 
 TEST(Reader, HelloWorld) {
     pdf::File file;
-    pdf::load_from_file("../../test-files/hello-world.pdf", file);
+    pdf::load_from_file("../../../test-files/hello-world.pdf", file);
     std::vector<pdf::IndirectObject *> objects = file.getAllObjects();
     ASSERT_EQ(objects.size(), 13);
 
@@ -44,7 +44,6 @@ TEST(Reader, HelloWorld) {
     auto pages = pageTree->pages(file);
     ASSERT_EQ(pages.size(), 1);
 
-    // TODO this makes the tests fail
     auto page        = pages[0];
     auto contentsOpt = page->contents(file);
     ASSERT_TRUE(contentsOpt.has_value());
