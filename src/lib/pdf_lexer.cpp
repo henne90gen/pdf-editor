@@ -124,7 +124,6 @@ std::optional<Token> matchOperator(const std::string &word) {
 }
 
 std::optional<Token> findToken(const std::string &word) {
-#if 1
     auto literalString = matchString(word);
     if (literalString.has_value()) {
         return literalString;
@@ -175,109 +174,6 @@ std::optional<Token> findToken(const std::string &word) {
     if (nameToken.has_value()) {
         return nameToken.value();
     }
-#elif 0
-    auto indirectReferenceToken = matchRegex(word, indirectReferenceRegex, Token::Type::INDIRECT_REFERENCE);
-    if (indirectReferenceToken.has_value()) {
-        return indirectReferenceToken.value();
-    }
-
-    auto objectStartToken = matchRegex(word, objectStartRegex, Token::Type::OBJECT_START);
-    if (objectStartToken.has_value()) {
-        return objectStartToken.value();
-    }
-
-    auto floatToken = matchRegex(word, floatRegex, Token::Type::REAL);
-    if (floatToken.has_value()) {
-        return floatToken.value();
-    }
-
-    auto intToken = matchRegex(word, intRegex, Token::Type::INTEGER);
-    if (intToken.has_value()) {
-        return intToken.value();
-    }
-
-    auto wordToken = matchWordToken(word);
-    if (wordToken.has_value()) {
-        return wordToken.value();
-    }
-
-    auto operatorToken = matchOperator(word);
-    if (operatorToken.has_value()) {
-        return operatorToken.value();
-    }
-
-    auto hexadecimalString = matchRegex(word, hexadecimalRegex, Token::Type::HEXADECIMAL_STRING);
-    if (hexadecimalString.has_value()) {
-        return hexadecimalString.value();
-    }
-
-    auto literalString = matchString(word);
-    if (literalString.has_value()) {
-        return literalString;
-    }
-
-    // TODO check with the standard again
-    auto nameToken = matchRegex(word, nameRegex, Token::Type::NAME);
-    if (nameToken.has_value()) {
-        return nameToken.value();
-    }
-
-    auto charToken = matchCharToken(word);
-    if (charToken.has_value()) {
-        return charToken.value();
-    }
-#else
-    auto indirectReferenceToken = matchRegex(word, std::regex("^[0-9]+ [0-9]+ R"), Token::Type::INDIRECT_REFERENCE);
-    if (indirectReferenceToken.has_value()) {
-        return indirectReferenceToken.value();
-    }
-
-    auto objectStartToken = matchRegex(word, std::regex("^[0-9]+ [0-9]+ obj"), Token::Type::OBJECT_START);
-    if (objectStartToken.has_value()) {
-        return objectStartToken.value();
-    }
-
-    auto floatToken = matchRegex(word, std::regex("^[+-]?[0-9]+\\.[0-9]+"), Token::Type::REAL);
-    if (floatToken.has_value()) {
-        return floatToken.value();
-    }
-
-    auto intToken = matchRegex(word, std::regex("^[+-]?[0-9]+"), Token::Type::INTEGER);
-    if (intToken.has_value()) {
-        return intToken.value();
-    }
-
-    auto wordToken = matchWordToken(word);
-    if (wordToken.has_value()) {
-        return wordToken.value();
-    }
-
-    auto operatorToken = matchOperator(word);
-    if (operatorToken.has_value()) {
-        return operatorToken.value();
-    }
-
-    auto hexadecimalString = matchRegex(word, std::regex("^<[0-9a-fA-F]*>"), Token::Type::HEXADECIMAL_STRING);
-    if (hexadecimalString.has_value()) {
-        return hexadecimalString.value();
-    }
-
-    auto literalString = matchString(word);
-    if (literalString.has_value()) {
-        return literalString;
-    }
-
-    // TODO check with the standard again
-    auto nameToken = matchRegex(word, std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)"), Token::Type::NAME);
-    if (nameToken.has_value()) {
-        return nameToken.value();
-    }
-
-    auto charToken = matchCharToken(word);
-    if (charToken.has_value()) {
-        return charToken.value();
-    }
-#endif
 
     return {};
 }
