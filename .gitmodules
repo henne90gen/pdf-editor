@@ -10,3 +10,6 @@
 [submodule "vendor/poppler"]
 	path = vendor/poppler
 	url = https://gitlab.freedesktop.org/poppler/poppler.git
+[submodule "vendor/freetype"]
+	path = vendor/freetype
+	url = git@github.com:freetype/freetype.git

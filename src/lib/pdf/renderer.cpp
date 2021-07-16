@@ -47,6 +47,18 @@ void pdf::renderer::render(const std::vector<Stream *> &streams) {
             } else if (op->type == Operator::Type::n_EndPathWithoutFillingOrStroking) {
                 // TODO this is a path painting no-op
                 //  it does however set the clipping path, if a clipping path operator was used before it
+            } else if (op->type == Operator::Type::rg_SetNonStrokingColorRGB) {
+                // TODO implement this
+            } else if (op->type == Operator::Type::BT_BeginText) {
+                // TODO implement this
+            } else if (op->type == Operator::Type::ET_EndText) {
+                // TODO implement this
+            } else if (op->type == Operator::Type::Td_MoveStartOfNextLine) {
+                // TODO implement this
+            } else if (op->type == Operator::Type::Tf_SetTextFont) {
+                // TODO implement this
+            } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
+                // TODO implement this
             } else {
                 std::cout << "Found unknown operator: " << op->type << std::endl;
             }
