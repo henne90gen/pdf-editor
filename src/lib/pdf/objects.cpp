@@ -29,31 +29,33 @@ std::vector<std::string> Stream::filters() const {
     }
 
     if (itr->second->is<Name>()) {
-        return {itr->second->as<Name>()->value};
+        // TODO is this conversion to a string really necessary?
+        return {std::string(itr->second->as<Name>()->value)};
     }
 
     auto array  = itr->second->as<Array>();
     auto result = std::vector<std::string>();
     result.reserve(array->values.size());
     for (auto filter : array->values) {
-        result.push_back(filter->as<Name>()->value);
+        // TODO is this conversion to a string really necessary?
+        result.push_back(std::string(filter->as<Name>()->value));
     }
     return result;
 }
 
 std::string_view Stream::to_string() const {
-    char *output      = data;
-    size_t outputSize = length;
+    const char *output      = data.data();
+    size_t outputSize = data.length();
 
     auto fs = filters();
     if (fs.empty()) {
-        return std::string_view(data, length);
+        return data;
     }
 
     for (const auto &filter : fs) {
         if (filter == "FlateDecode") {
             // TODO this works, but is far from optimal
-            char *input      = output;
+            const char *input      = output;
             size_t inputSize = outputSize;
 
             output     = (char *)malloc(inputSize);
@@ -84,7 +86,8 @@ std::string_view Stream::to_string() const {
 
 std::string HexadecimalString::to_string() const {
     // TODO this is quite hacky
-    std::string tmp = value;
+    // TODO is this conversion to a string really necessary?
+    std::string tmp = std::string(value);
     if (tmp.size() % 2 == 1) {
         tmp += "0";
     }

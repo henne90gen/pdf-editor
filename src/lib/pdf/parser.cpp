@@ -1,7 +1,7 @@
 #include "parser.h"
 
-#include <stdexcept>
 #include <cstring>
+#include <stdexcept>
 
 namespace pdf {
 
@@ -39,7 +39,7 @@ Boolean *Parser::parseBoolean() {
     if (!currentTokenIs(Token::Type::BOOLEAN)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+    std::string_view &content = tokens[currentTokenIdx].content;
 
     currentTokenIdx++;
 
@@ -58,9 +58,11 @@ Integer *Parser::parseInteger() {
     if (!currentTokenIs(Token::Type::INTEGER)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+
+    auto &content = tokens[currentTokenIdx].content;
     try {
-        int64_t value = std::stoll(content);
+        // TODO is this conversion to a string really necessary?
+        int64_t value = std::stoll(std::string(content));
         currentTokenIdx++;
         return new Integer(value);
     } catch (std::invalid_argument &) {
@@ -75,9 +77,11 @@ Real *Parser::parseReal() {
     if (!currentTokenIs(Token::Type::REAL)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+
+    auto &content = tokens[currentTokenIdx].content;
     try {
-        double value = std::stod(content);
+        // TODO is this conversion to a string really necessary?
+        double value = std::stod(std::string(content));
         currentTokenIdx++;
         return new Real(value);
     } catch (std::invalid_argument &) {
@@ -101,7 +105,8 @@ LiteralString *Parser::parseLiteralString() {
     if (!currentTokenIs(Token::Type::LITERAL_STRING)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+
+    auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
     return new LiteralString(content.substr(1, content.size() - 2));
 }
@@ -110,7 +115,8 @@ HexadecimalString *Parser::parseHexadecimalString() {
     if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+
+    auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
     return new HexadecimalString(content.substr(1, content.size() - 2));
 }
@@ -119,7 +125,7 @@ Name *Parser::parseName() {
     if (!currentTokenIs(Token::Type::NAME)) {
         return nullptr;
     }
-    std::string &content = tokens[currentTokenIdx].content;
+    auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
     return new Name(content.substr(1));
 }
@@ -186,7 +192,8 @@ Dictionary *Parser::parseDictionary() {
             currentTokenIdx++;
         }
 
-        objects[key->value] = value;
+        // TODO is this conversion to a string really necessary?
+        objects[std::string(key->value)] = value;
     }
 
     currentTokenIdx++;
@@ -198,13 +205,14 @@ IndirectReference *Parser::parseIndirectReference() {
         return nullptr;
     }
 
-    const std::string &content = tokens[currentTokenIdx].content;
+    const auto &content = tokens[currentTokenIdx].content;
 
     try {
-        const size_t pos1              = content.find(' ');
-        const int64_t objectNumber     = std::stoll(content.substr(0, pos1));
+        const size_t pos1 = content.find(' ');
+        // TODO is this conversion to a string really necessary?
+        const int64_t objectNumber     = std::stoll(std::string(content.substr(0, pos1)));
         const size_t pos2              = content.find(' ', pos1);
-        const int64_t generationNumber = std::stoll(content.substr(pos1 + 1, pos2));
+        const int64_t generationNumber = std::stoll(std::string(content.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
         return new IndirectReference(objectNumber, generationNumber);
     } catch (std::out_of_range &err) {
@@ -219,7 +227,7 @@ IndirectObject *Parser::parseIndirectObject() {
     if (!currentTokenIs(Token::Type::OBJECT_START)) {
         return nullptr;
     }
-    std::string objectStartContent = tokens[currentTokenIdx].content;
+    auto objectStartContent = tokens[currentTokenIdx].content;
 
     auto beforeTokenIndex = currentTokenIdx;
     currentTokenIdx++;
@@ -243,10 +251,11 @@ IndirectObject *Parser::parseIndirectObject() {
     }
 
     try {
-        const size_t pos1              = objectStartContent.find(' ');
-        const int64_t objectNumber     = std::stoll(objectStartContent.substr(0, pos1));
+        const size_t pos1 = objectStartContent.find(' ');
+        // TODO is this conversion to a string really necessary?
+        const int64_t objectNumber     = std::stoll(std::string(objectStartContent.substr(0, pos1)));
         const size_t pos2              = objectStartContent.find(' ', pos1);
-        const int64_t generationNumber = std::stoll(objectStartContent.substr(pos1 + 1, pos2));
+        const int64_t generationNumber = std::stoll(std::string(objectStartContent.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
         return new IndirectObject(objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
@@ -324,9 +333,7 @@ Object *Parser::parseStreamOrDictionary() {
     }
     currentTokenIdx++;
 
-    auto data = (char *)malloc(length);
-    memcpy(data, content.c_str(), length);
-    return new Stream(dictionary, data, length);
+    return new Stream(dictionary, content);
 }
 
 Object *Parser::parseObject() {

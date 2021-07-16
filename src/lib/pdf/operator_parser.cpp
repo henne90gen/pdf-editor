@@ -15,7 +15,7 @@ std::string replace(std::string str, const std::string &from, const std::string 
     return str;
 }
 
-Operator::Type stringToOperatorType(const std::string &t) {
+Operator::Type stringToOperatorType(const std::string_view &t) {
     // TODO using string replace to get around the 'x' <--> '*' issue, this could be improved
 #define CONDITION(Name, Description)                                                                                   \
     if (t == replace(std::string(#Name), "x", "*")) {                                                                  \
@@ -52,7 +52,7 @@ Operator *OperatorParser::getOperator() {
         }
 
         if (tokens[currentTokenIdx].type == Token::Type::OPERATOR) {
-            const std::string &content = tokens[currentTokenIdx].content;
+            const std::string_view &content = tokens[currentTokenIdx].content;
             currentTokenIdx++;
             return createOperator(stringToOperatorType(content));
         }
@@ -62,28 +62,32 @@ Operator *OperatorParser::getOperator() {
 }
 
 Operator *OperatorParser::createOperator_w(Operator *result) {
-    auto &content                         = tokens[currentTokenIdx - 2].content;
-    auto lineWidth                        = std::stod(content);
+    auto &content = tokens[currentTokenIdx - 2].content;
+    // TODO is this conversion to a string really necessary?
+    auto lineWidth                        = std::stod(std::string(content));
     result->data.w_SetLineWidth.lineWidth = lineWidth;
     return result;
 }
 
 Operator *OperatorParser::createOperator_re(Operator *result) {
     for (int i = 0; i < 4; i++) {
-        auto &content                           = tokens[currentTokenIdx - 1 - (4 - i)].content;
-        auto d                                  = std::stod(content);
+        auto &content = tokens[currentTokenIdx - 1 - (4 - i)].content;
+        // TODO is this conversion to a string really necessary?
+        auto d                                  = std::stod(std::string(content));
         result->data.re_AppendRectangle.rect[i] = d;
     }
     return result;
 }
 
 Operator *OperatorParser::createOperator_rg(Operator *result) {
-    auto &contentR                           = tokens[currentTokenIdx - 4].content;
-    auto &contentG                           = tokens[currentTokenIdx - 3].content;
-    auto &contentB                           = tokens[currentTokenIdx - 2].content;
-    result->data.rg_SetNonStrokingColorRGB.r = std::stod(contentR);
-    result->data.rg_SetNonStrokingColorRGB.g = std::stod(contentG);
-    result->data.rg_SetNonStrokingColorRGB.b = std::stod(contentB);
+    auto &contentR = tokens[currentTokenIdx - 4].content;
+    auto &contentG = tokens[currentTokenIdx - 3].content;
+    auto &contentB = tokens[currentTokenIdx - 2].content;
+
+    // TODO is this conversion to a string really necessary?
+    result->data.rg_SetNonStrokingColorRGB.r = std::stod(std::string(contentR));
+    result->data.rg_SetNonStrokingColorRGB.g = std::stod(std::string(contentG));
+    result->data.rg_SetNonStrokingColorRGB.b = std::stod(std::string(contentB));
     return result;
 }
 
@@ -116,16 +120,19 @@ Operator *OperatorParser::createOperator_Tf(Operator *result) {
     for (int i = 0; i < contentFontName.size(); i++) {
         result->data.Tf_SetTextFont.fontName[i] = contentFontName[i];
     }
-    auto &contentFontSize                = tokens[currentTokenIdx - 2].content;
-    result->data.Tf_SetTextFont.fontSize = std::stod(contentFontSize);
+    auto &contentFontSize = tokens[currentTokenIdx - 2].content;
+
+    // TODO is this conversion to a string really necessary?
+    result->data.Tf_SetTextFont.fontSize = std::stod(std::string(contentFontSize));
     return result;
 }
 
 Operator *OperatorParser::createOperator_Td(Operator *result) {
-    auto &contentX                        = tokens[currentTokenIdx - 3].content;
-    auto &contentY                        = tokens[currentTokenIdx - 2].content;
-    result->data.Td_MoveStartOfNextLine.x = std::stod(contentX);
-    result->data.Td_MoveStartOfNextLine.y = std::stod(contentY);
+    auto &contentX = tokens[currentTokenIdx - 3].content;
+    auto &contentY = tokens[currentTokenIdx - 2].content;
+    // TODO is this conversion to a string really necessary?
+    result->data.Td_MoveStartOfNextLine.x = std::stod(std::string(contentX));
+    result->data.Td_MoveStartOfNextLine.y = std::stod(std::string(contentY));
     return result;
 }
 

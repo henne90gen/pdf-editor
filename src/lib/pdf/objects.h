@@ -63,17 +63,17 @@ struct Real : public Object {
 struct LiteralString : public Object {
     static Type staticType() { return Type::LITERAL_STRING; }
 
-    std::string value;
+    std::string_view value;
 
-    explicit LiteralString(std::string s) : Object(staticType()), value(std::move(s)) {}
+    explicit LiteralString(std::string_view s) : Object(staticType()), value(s) {}
 };
 
 struct HexadecimalString : public Object {
     static Type staticType() { return Type::HEXADECIMAL_STRING; }
 
-    std::string value;
+    std::string_view value;
 
-    explicit HexadecimalString(std::string s) : Object(staticType()), value(std::move(s)) {}
+    explicit HexadecimalString(std::string_view s) : Object(staticType()), value(s) {}
 
     [[nodiscard]] std::string to_string() const;
 };
@@ -81,9 +81,9 @@ struct HexadecimalString : public Object {
 struct Name : public Object {
     static Type staticType() { return Type::NAME; }
 
-    std::string value;
+    std::string_view value;
 
-    explicit Name(std::string string) : Object(staticType()), value(std::move(string)) {}
+    explicit Name(std::string_view s) : Object(staticType()), value(s) {}
 };
 
 struct Array : public Object {
@@ -129,11 +129,10 @@ struct Stream : Object {
     static Type staticType() { return Type::STREAM; }
 
     Dictionary *dictionary = nullptr;
-    char *data             = nullptr;
-    size_t length          = 0;
+    std::string_view data;
 
-    explicit Stream(Dictionary *_dictionary, char *_data, size_t _length)
-        : Object(staticType()), dictionary(_dictionary), data(_data), length(_length) {}
+    explicit Stream(Dictionary *_dictionary, std::string_view _data)
+        : Object(staticType()), dictionary(_dictionary), data(_data) {}
 
     [[nodiscard]] std::string_view to_string() const;
     [[nodiscard]] std::vector<std::string> filters() const;

@@ -13,3 +13,14 @@ TEST(Renderer, Blank) {
         renderer.render(page);
     }
 }
+
+TEST(Renderer, HelloWorld) {
+    pdf::Document document;
+    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+
+    auto pages = document.pages();
+    for (auto page : pages) {
+        pdf::renderer renderer;
+        renderer.render(page);
+    }
+}

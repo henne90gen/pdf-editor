@@ -31,8 +31,8 @@ struct Token {
     };
 
     Type type;
-    std::string content;
-    Token(Type _type, std::string _content) : type(_type), content(std::move(_content)) {}
+    std::string_view content;
+    Token(Type _type, std::string_view _content) : type(_type), content(_content) {}
 };
 
 class TextProvider {
@@ -61,8 +61,8 @@ class StringTextProvider : public TextProvider {
 
 class Lexer {
   public:
-    virtual std::optional<Token> getToken()              = 0;
-    virtual std::string advanceStream(size_t characters) = 0;
+    virtual std::optional<Token> getToken()                   = 0;
+    virtual std::string_view advanceStream(size_t characters) = 0;
 };
 
 class TextLexer : public Lexer {
@@ -70,11 +70,11 @@ class TextLexer : public Lexer {
     explicit TextLexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
 
     std::optional<Token> getToken() override;
-    std::string advanceStream(size_t characters) override;
+    std::string_view advanceStream(size_t characters) override;
 
   private:
     TextProvider &textProvider;
-    std::string currentWord;
+    std::string_view currentWord;
 };
 
 class TokenLexer : public Lexer {
@@ -88,7 +88,7 @@ class TokenLexer : public Lexer {
         return tokens[currentTokenIdx++];
     }
 
-    std::string advanceStream(size_t characters) override { return ""; }
+    std::string_view advanceStream(size_t characters) override { return ""; }
 
   private:
     const std::vector<Token> &tokens;

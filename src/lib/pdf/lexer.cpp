@@ -15,25 +15,28 @@ auto intRegex               = std::regex("^[+-]?[0-9]+");
 auto hexadecimalRegex       = std::regex("^<[0-9a-fA-F]*>");
 auto nameRegex              = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
 
-std::string removeLeadingWhitespace(const std::string &str) {
-    std::string result = str;
+std::string_view removeLeadingWhitespace(const std::string_view &str) {
+    std::string_view result = str;
     while (!result.empty() && (result[0] == ' ' || result[0] == '\t')) {
         result = result.substr(1, result.length());
     }
     return result;
 }
 
-std::optional<Token> matchRegex(const std::string &word, const std::regex &regex, Token::Type tokenType) {
-    auto itr = std::sregex_iterator(word.begin(), word.end(), regex);
+std::optional<Token> matchRegex(const std::string_view &word, const std::regex &regex, Token::Type tokenType) {
+    // TODO improve this, it is probably very inefficient
+    auto tmp = std::string(word);
+    auto itr = std::sregex_iterator(tmp.begin(), tmp.end(), regex);
     if (itr != std::sregex_iterator()) {
         auto content = static_cast<std::string>((*itr).str());
-        Token token  = {tokenType, content};
+        // TODO I hope this ensures that we still point to the original data stream
+        auto token = Token(tokenType, word.substr(0, content.length()));
         return std::optional<Token>(token);
     }
     return {};
 }
 
-std::optional<Token> matchWordToken(const std::string &word) {
+std::optional<Token> matchWordToken(const std::string_view &word) {
 #define STARTS_WITH(word, search) word.find(search) == 0
     if (STARTS_WITH(word, "true")) {
         return Token(Token::Type::BOOLEAN, "true");
@@ -56,7 +59,7 @@ std::optional<Token> matchWordToken(const std::string &word) {
     return {};
 }
 
-std::optional<Token> matchCharToken(const std::string &word) {
+std::optional<Token> matchCharToken(const std::string_view &word) {
     if (!word.empty() && word[0] == '\n') {
         return Token(Token::Type::NEW_LINE, "\n");
     }
@@ -75,7 +78,7 @@ std::optional<Token> matchCharToken(const std::string &word) {
     return {};
 }
 
-std::optional<Token> matchString(const std::string &word) {
+std::optional<Token> matchString(const std::string_view &word) {
     if (word[0] != '(') {
         return {};
     }
@@ -99,7 +102,7 @@ std::optional<Token> matchString(const std::string &word) {
     return Token(Token::Type::LITERAL_STRING, word.substr(0, stringLength + 1));
 }
 
-std::optional<Token> matchOperator(const std::string &word) {
+std::optional<Token> matchOperator(const std::string_view &word) {
     std::vector<std::string> operators = {
           // Text Operators
           "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
@@ -123,7 +126,7 @@ std::optional<Token> matchOperator(const std::string &word) {
     return {};
 }
 
-std::optional<Token> findToken(const std::string &word) {
+std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
         return literalString;
@@ -179,7 +182,7 @@ std::optional<Token> findToken(const std::string &word) {
 }
 
 std::optional<Token> TextLexer::getToken() {
-    std::string previousWord = currentWord;
+    std::string_view previousWord = currentWord;
     while (true) {
         if (currentWord.empty()) {
             auto optionalCode = textProvider.getText();
@@ -207,16 +210,16 @@ std::optional<Token> TextLexer::getToken() {
     }
 
     if (!currentWord.empty()) {
-        std::cerr << "Found an invalid token: '" + currentWord + "'" << std::endl;
+        std::cerr << "Found an invalid token: '" << currentWord << "'" << std::endl;
         return std::optional(Token(Token::Type::INVALID, currentWord));
     }
 
     return {};
 }
 
-std::string TextLexer::advanceStream(size_t characters) {
-    std::string tmp = currentWord.substr(0, characters);
-    currentWord     = currentWord.substr(characters);
+std::string_view TextLexer::advanceStream(size_t characters) {
+    auto tmp    = currentWord.substr(0, characters);
+    currentWord = currentWord.substr(characters);
     return tmp;
 }
 
