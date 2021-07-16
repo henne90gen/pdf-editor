@@ -54,17 +54,17 @@ void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRo
     case pdf::Object::Type::HEXADECIMAL_STRING: {
         ASSERT(parentRow != nullptr);
         auto *hexString                   = obj->as<pdf::HexadecimalString>();
-        (*parentRow)[columns.m_col_value] = hexString->value + " (" + hexString->to_string() + ")";
+        (*parentRow)[columns.m_col_value] = std::string(hexString->value) + " (" + hexString->to_string() + ")";
         break;
     }
     case pdf::Object::Type::LITERAL_STRING: {
         ASSERT(parentRow != nullptr);
-        (*parentRow)[columns.m_col_value] = obj->as<pdf::LiteralString>()->value;
+        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::LiteralString>()->value);
         break;
     }
     case pdf::Object::Type::NAME: {
         ASSERT(parentRow != nullptr);
-        (*parentRow)[columns.m_col_value] = obj->as<pdf::Name>()->value;
+        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Name>()->value);
         break;
     }
     case pdf::Object::Type::ARRAY:
