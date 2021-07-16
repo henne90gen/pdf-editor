@@ -7,6 +7,9 @@ void pdf::renderer::render(pdf::Page *page) {
     if (!contentsOpt.has_value()) {
         return;
     }
+
+    // TODO set graphics state to default values
+
     auto content = contentsOpt.value();
     if (content->is<IndirectReference>()) {
         content = page->document.resolve(content->as<IndirectReference>())->object;
@@ -48,11 +51,19 @@ void pdf::renderer::render(const std::vector<Stream *> &streams) {
                 // TODO this is a path painting no-op
                 //  it does however set the clipping path, if a clipping path operator was used before it
             } else if (op->type == Operator::Type::rg_SetNonStrokingColorRGB) {
-                // TODO implement this
+                stateStack.back().nonStrokingColor = Color::rgb( //
+                      op->data.rg_SetNonStrokingColorRGB.r,      //
+                      op->data.rg_SetNonStrokingColorRGB.g,      //
+                      op->data.rg_SetNonStrokingColorRGB.b       //
+                );
             } else if (op->type == Operator::Type::BT_BeginText) {
-                // TODO implement this
+                // only one BT ... ET can be open at a time
+                ASSERT(!stateStack.back().textState.textObjectParams.has_value());
+                stateStack.back().textState.textObjectParams = std::optional(TextObjectState());
             } else if (op->type == Operator::Type::ET_EndText) {
-                // TODO implement this
+                // make sure text object parameters are set before unsetting them
+                ASSERT(stateStack.back().textState.textObjectParams.has_value());
+                stateStack.back().textState.textObjectParams = {};
             } else if (op->type == Operator::Type::Td_MoveStartOfNextLine) {
                 // TODO implement this
             } else if (op->type == Operator::Type::Tf_SetTextFont) {
