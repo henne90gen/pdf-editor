@@ -50,6 +50,13 @@ struct Document : public ReferenceResolver {
         return nullptr;
     }
 
+    template <typename T> std::optional<T *> get(std::optional<Object *> object) {
+        if (object.has_value()) {
+            return get<T>(object.value());
+        }
+        return {};
+    }
+
     static bool load_from_file(const std::string &filePath, Document &document);
 
   private:

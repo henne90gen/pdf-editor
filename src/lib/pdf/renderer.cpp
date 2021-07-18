@@ -101,17 +101,27 @@ void renderer::setTextFont(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFont.fontSize;
 
     auto fontName      = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
+    fontName           = fontName.substr(1); // remove leading "/"
     auto resourcesDict = page->resources();
     auto &values       = resourcesDict->values;
     auto itr           = values.find("Font");
-    if (itr != values.end()) {
-        auto fontDict = page->document.get<Dictionary>(itr->second);
-        for (auto entry : fontDict->values) {
-            std::cout << entry.first << std::endl;
+    if (itr == values.end()) {}
+
+    auto fontsDict = page->document.get<Dictionary>(itr->second);
+    for (auto &entry : fontsDict->values) {
+        if (entry.first != fontName) {
+            continue;
+        }
+
+        auto fontDict = page->document.get<Dictionary>(entry.second);
+        auto type     = fontDict->values["Subtype"]->as<Name>()->value;
+        if (type == "TrueType") {
+            loadTrueTypeFont(fontDict);
+        } else {
+            TODO("implement loading of other fonts");
+            ASSERT(false);
         }
     }
-    std::cout;
-    //    stateStack.back().textState.textFont = ;
 }
 
 void renderer::showText(Operator *op) {
@@ -125,6 +135,22 @@ void renderer::showText(Operator *op) {
             std::cout << str << std::endl;
         }
     }
+}
+
+void renderer::loadTrueTypeFont(Dictionary *fontDict) {
+    stateStack.back().textState.textFont.type          = FontType::TRUE_TYPE;
+    auto font                                          = fontDict->as<TrueTypeFont>();
+    stateStack.back().textState.textFont.font.trueType = font;
+
+    // TODO inspect font correctly
+    std::cout << font->name().has_value() << std::endl;
+    std::cout << font->baseFont() << std::endl;
+    std::cout << font->firstChar() << std::endl;
+    std::cout << font->lastChar() << std::endl;
+    std::cout << font->widths(page->document) << std::endl;
+    std::cout << font->fontDescriptor(page->document) << std::endl;
+    std::cout << font->encoding(page->document).has_value() << std::endl;
+    std::cout << font->toUnicode(page->document).has_value() << std::endl;
 }
 
 } // namespace pdf

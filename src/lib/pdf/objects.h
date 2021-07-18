@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -105,6 +106,14 @@ struct Dictionary : public Object {
     std::unordered_map<std::string, Object *> values = {};
 
     explicit Dictionary(std::unordered_map<std::string, Object *> map) : Object(staticType()), values(std::move(map)) {}
+
+    template <typename T> std::optional<T *> find(const std::string &key) {
+        auto itr = values.find(key);
+        if (itr == values.end()) {
+            return {};
+        }
+        return itr->second->as<T>();
+    }
 };
 
 struct IndirectReference : public Object {

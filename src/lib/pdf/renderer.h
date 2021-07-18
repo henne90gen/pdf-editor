@@ -45,7 +45,33 @@ enum class TextRenderingMode {
     CLIP             = 7,
 };
 
-struct TextFont {};
+enum class FontType {
+    TYPE0        = 0,
+    TYPE1        = 1,
+    MMTYPE1      = 2,
+    TYPE3        = 3,
+    TRUE_TYPE    = 4,
+    CIDFONTTYPE0 = 5,
+    CIDFONTTYPE1 = 6,
+};
+
+struct TrueTypeFont : public Dictionary {
+    std::optional<Name *> name() { return find<Name>("Name"); }
+    Name *baseFont() { return values["BaseFont"]->as<Name>(); }
+    Integer *firstChar() { return values["FirstChar"]->as<Integer>(); }
+    Integer *lastChar() { return values["LastChar"]->as<Integer>(); }
+    Array *widths(Document &document) { return document.get<Array>(values["Widths"]); }
+    Dictionary *fontDescriptor(Document &document) { return document.get<Dictionary>(values["FontDescriptor"]); }
+    std::optional<Object *> encoding(Document &document) { return document.get<Object>(find<Object>("Encoding")); }
+    std::optional<Stream *> toUnicode(Document &document) { return document.get<Stream>(find<Object>("ToUnicode")); }
+};
+
+struct TextFont {
+    FontType type;
+    union {
+        TrueTypeFont *trueType;
+    } font;
+};
 
 struct TextState {
     double characterSpacing            = 0.0;
@@ -96,6 +122,7 @@ struct renderer {
     void moveStartOfNextLine(Operator *op);
     void setTextFont(Operator *op);
     void showText(Operator *pOperator);
+    void loadTrueTypeFont(Dictionary *fontDict);
 };
 
 } // namespace pdf
