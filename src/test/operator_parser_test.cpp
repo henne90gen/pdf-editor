@@ -61,9 +61,8 @@ TEST(OperationParser, HelloWorld) {
         ASSERT_FLOAT_EQ(op->data.Td_MoveStartOfNextLine.y, 724.1);
     });
     assertNextOp(parser, pdf::Operator::Type::Tf_SetTextFont, [](auto op) {
-        for (int i = 0; i < 2; i++) {
-            ASSERT_EQ(op->data.Tf_SetTextFont.fontName[i], "/F1"[i]);
-        }
+        auto fontName = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
+        ASSERT_EQ(fontName, "/F1");
         ASSERT_EQ(op->data.Tf_SetTextFont.fontSize, 12);
     });
     assertNextOp(parser, pdf::Operator::Type::TJ_ShowOneOrMoreTextStrings, [](auto op) {

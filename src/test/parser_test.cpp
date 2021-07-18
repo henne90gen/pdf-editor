@@ -152,6 +152,14 @@ TEST(Parser, DictionaryStream) {
                                   [](pdf::Dictionary *result) { ASSERT_EQ(result->values.size(), 2); });
 }
 
+TEST(Parser, IndirectObjectWithEmptyDictionary) {
+    assertParses<pdf::IndirectObject>("5 0 obj\n<<\n>>\nendobj", [](pdf::IndirectObject *result) {
+        ASSERT_EQ(result->objectNumber, 5);
+        ASSERT_EQ(result->generationNumber, 0);
+        ASSERT_EQ(result->object->as<pdf::Dictionary>()->values.size(), 0);
+    });
+}
+
 TEST(Parser, MoreThanOneObject) {
     assertParses<pdf::Array>("[/MyName] /AnotherName", [](pdf::Array *result) {
         ASSERT_EQ(result->values.size(), 1); //

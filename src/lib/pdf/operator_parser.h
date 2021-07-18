@@ -8,8 +8,6 @@
 
 namespace pdf {
 
-constexpr int MAX_FONT_NAME_SIZE = 10;
-
 #define ENUMERATE_OPERATION_TYPES(O)                                                                                   \
     O(UNKNOWN, UNKNOWN)                                                                                                \
     /* Text Object Operators */                                                                                        \
@@ -124,8 +122,9 @@ struct Operator {
             double x, y;
         } Td_MoveStartOfNextLine;
         struct {
-            char fontName[MAX_FONT_NAME_SIZE]; // TODO this might not be enough space for all font names
-            double fontSize;                   // TODO is font size a "real" or an "integer"
+            const char *fontNameData;
+            size_t fontNameLength;
+            double fontSize;
         } Tf_SetTextFont;
         struct {
             Array *objects;

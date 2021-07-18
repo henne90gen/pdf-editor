@@ -37,19 +37,11 @@ IndirectObject *Document::getObject(int64_t objectNumber) {
     return object;
 }
 
-Dictionary *Document::root() {
-    auto rootRef        = trailer.dict->values["Root"]->as<IndirectReference>();
-    auto resolvedObj    = resolve(rootRef);
-    auto indirectObject = resolvedObj->as<IndirectObject>();
-    return indirectObject->object->as<Dictionary>();
-}
+Dictionary *Document::root() { return get<Dictionary>(trailer.dict->values["Root"]); }
 
 std::vector<Page *> Document::pages() {
-    auto root           = this->root();
-    auto pagesRef       = root->values["Pages"]->as<IndirectReference>();
-    auto resolvedObj    = resolve(pagesRef);
-    auto indirectObject = resolvedObj->as<IndirectObject>();
-    auto pageTreeRoot   = indirectObject->object->as<PageTreeNode>();
+    auto root         = this->root();
+    auto pageTreeRoot = get<PageTreeNode>(root->values["Pages"]);
 
     if (pageTreeRoot->isPage()) {
         return {new Page(*this, pageTreeRoot)};
@@ -63,7 +55,7 @@ std::vector<Page *> Document::pages() {
         queue.pop_back();
 
         for (auto kid : current->kids()->values) {
-            auto resolvedKid = resolve(kid->as<IndirectReference>())->object->as<PageTreeNode>();
+            auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->isPage()) {
                 result.push_back(new Page(*this, resolvedKid));
             } else {
@@ -90,20 +82,18 @@ std::vector<IndirectObject *> Document::getAllObjects() {
     return result;
 }
 
-PageTreeNode *PageTreeNode::parent(Document &file) {
+PageTreeNode *PageTreeNode::parent(Document &document) {
     auto itr = values.find("Parent");
     if (itr == values.end()) {
         return nullptr;
     }
-    auto reference         = itr->second->as<IndirectReference>();
-    auto resolvedReference = file.resolve(reference);
-    return resolvedReference->as<PageTreeNode>();
+    return document.get<PageTreeNode>(itr->second);
 }
 
 int64_t Page::rotate() {
     const std::optional<Integer *> &rot = node->attribute<Integer>(document, "Rotate", true);
     if (!rot.has_value()) {
-        return {};
+        return 0;
     }
     return rot.value()->value;
 }

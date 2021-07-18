@@ -5,15 +5,23 @@
 #endif
 
 #ifdef _MSC_VER
-// TODO create real assertion macro
 #define ASSERT(x)                                                                                                      \
-    if (!(x))                                                                                                             \
+    if (!(x))                                                                                                          \
     __debugbreak()
 #else
 #if __has_builtin(__builtin_trap)
 #define ASSERT(x)                                                                                                      \
-    if (!(x))                                                                                                             \
+    if (!(x))                                                                                                          \
     __builtin_trap()
+#else
+#endif
+#endif
+
+#ifdef _MSC_VER
+#define TODO(x) printf("TODO: %s\n", x)
+#else
+#if __has_builtin(__builtin_trap)
+#define TODO(x) printf("TODO: %s\n", x)
 #else
 #endif
 #endif

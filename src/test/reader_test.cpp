@@ -17,10 +17,9 @@ TEST(Reader, Blank) {
     auto page        = pages[0];
     auto contentsOpt = page->contents();
     ASSERT_TRUE(contentsOpt.has_value());
-    auto contents    = contentsOpt.value();
-    auto contentsObj = document.resolve(contents->as<pdf::IndirectReference>());
-    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
-    auto stream  = contentsObj->object->as<pdf::Stream>();
+    auto contents = contentsOpt.value();
+    ASSERT_TRUE(contents->is<pdf::Stream>());
+    auto stream  = contents->as<pdf::Stream>();
     auto str     = stream->to_string();
     auto filters = stream->filters();
 }
@@ -40,10 +39,9 @@ TEST(Reader, HelloWorld) {
     auto page        = pages[0];
     auto contentsOpt = page->contents();
     ASSERT_TRUE(contentsOpt.has_value());
-    auto contents    = contentsOpt.value();
-    auto contentsObj = document.resolve(contents->as<pdf::IndirectReference>());
-    ASSERT_TRUE(contentsObj->object->is<pdf::Stream>());
-    auto stream  = contentsObj->object->as<pdf::Stream>();
-//    auto str     = stream->to_string();
-//    auto filters = stream->filters();
+    auto contents = contentsOpt.value();
+    ASSERT_TRUE(contents->is<pdf::Stream>());
+    auto stream  = contents->as<pdf::Stream>();
+    auto str     = stream->to_string();
+    auto filters = stream->filters();
 }

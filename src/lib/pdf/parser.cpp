@@ -169,6 +169,10 @@ Dictionary *Parser::parseDictionary() {
     auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
+    if (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
+
     std::unordered_map<std::string, Object *> objects = {};
     while (true) {
         if (currentTokenIs(Token::Type::DICTIONARY_END)) {
@@ -304,20 +308,20 @@ Object *Parser::parseStreamOrDictionary() {
     } else if (itr->second->is<IndirectReference>()) {
         auto obj = referenceResolver->resolve(itr->second->as<IndirectReference>());
         if (obj == nullptr) {
-            // TODO add logging
+            TODO("add logging");
             return nullptr;
         }
         if (!obj->is<IndirectObject>()) {
-            // TODO add logging
+            TODO("add logging");
             return nullptr;
         }
         if (!obj->as<IndirectObject>()->object->is<Integer>()) {
-            // TODO add logging
+            TODO("add logging");
             return nullptr;
         }
         length = obj->as<IndirectObject>()->object->as<Integer>()->value;
     } else {
-        // TODO add logging
+        TODO("add logging");
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }

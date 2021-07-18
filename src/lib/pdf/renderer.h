@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cairomm/cairomm.h>
+
 #include "document.h"
+#include "operator_parser.h"
 
 namespace pdf {
 
@@ -42,12 +45,14 @@ enum class TextRenderingMode {
     CLIP             = 7,
 };
 
+struct TextFont {};
+
 struct TextState {
     double characterSpacing            = 0.0;
     double wordSpacing                 = 0.0;
     double horizontalScalingPercentage = 100;
     double leadingUnscaled; // TODO default unclear, not sure whether this should be a double or an int
-    double textFont;        // TODO
+    TextFont textFont;
     double textFontSize;
     TextRenderingMode textRenderingMode = TextRenderingMode::FILL;
     double textRiseUnscaled             = 0; // TODO not sure whether this should be a double or an int
@@ -73,14 +78,24 @@ struct GraphicsState {
 };
 
 struct renderer {
-    explicit renderer() { stateStack.emplace_back(); }
+    explicit renderer(Page *_page) : page(_page) { stateStack.emplace_back(); }
 
-    void render(Page *page);
+    void render(const Cairo::RefPtr<Cairo::Context> &cr);
 
   private:
-    void render(const std::vector<Stream *> &streams);
-
+    Page *page;
     std::vector<GraphicsState> stateStack = {};
+
+    void render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<Stream *> &streams);
+
+    void setNonStrokingColor(Operator *op);
+    void endText();
+    void beginText();
+    void pushGraphicsState();
+    void popGraphicsState();
+    void moveStartOfNextLine(Operator *op);
+    void setTextFont(Operator *op);
+    void showText(Operator *pOperator);
 };
 
 } // namespace pdf

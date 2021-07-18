@@ -33,15 +33,27 @@ struct Document : public ReferenceResolver {
     CrossReferenceTable crossReferenceTable = {};
     std::vector<IndirectObject *> objects   = {};
 
-    IndirectObject *getObject(int64_t objectNumber);
     Dictionary *root();
     std::vector<Page *> pages();
     std::vector<IndirectObject *> getAllObjects();
     IndirectObject *resolve(const IndirectReference *ref) override;
 
+    template <typename T> T *get(Object *object) {
+        if (object->is<T>()) {
+            return dynamic_cast<T *>(object);
+        } else if (object->is<IndirectReference>()) {
+            return resolve(object->as<IndirectReference>())->object->as<T>();
+        } else if (object->is<IndirectObject>()) {
+            return object->as<IndirectObject>()->object->as<T>();
+        }
+        ASSERT(false);
+        return nullptr;
+    }
+
     static bool load_from_file(const std::string &filePath, Document &document);
 
   private:
+    IndirectObject *getObject(int64_t objectNumber);
     [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber) const;
 };
 
@@ -55,25 +67,26 @@ struct Rectangle : public Array {
 struct PageTreeNode : public Dictionary {
     Name *type() { return values["Type"]->as<Name>(); }
     bool isPage() { return type()->value == "Page"; }
-    PageTreeNode *parent(Document &file);
+    PageTreeNode *parent(Document &document);
     Array *kids() { return values["Kids"]->as<Array>(); }
     Integer *count() { return values["Count"]->as<Integer>(); }
 
     template <typename T>
-    std::optional<T *> attribute(Document &file, const std::string &attributeName, bool inheritable) {
+    std::optional<T *> attribute(Document &document, const std::string &attributeName, bool inheritable) {
         auto itr = values.find(attributeName);
-        if (itr == values.end()) {
-            if (inheritable) {
-                const std::optional<T *> &attrib = parent(file)->attribute<T>(file, attributeName, inheritable);
-                if (!attrib.has_value()) {
-                    return {};
-                }
-                return attrib.value()->template as<T>();
-            } else {
+        if (itr != values.end()) {
+            return document.get<T>(itr->second);
+        }
+
+        if (inheritable) {
+            const std::optional<T *> &attrib = parent(document)->attribute<T>(document, attributeName, inheritable);
+            if (!attrib.has_value()) {
                 return {};
             }
+            return attrib.value()->template as<T>();
+        } else {
+            return {};
         }
-        return itr->second->as<T>();
     }
 };
 

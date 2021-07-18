@@ -9,6 +9,7 @@
 namespace pdf {
 
 #define ENUMERATE_OBJECT_TYPES(O)                                                                                      \
+    O(OBJECT)                                                                                                          \
     O(BOOLEAN)                                                                                                         \
     O(INTEGER)                                                                                                         \
     O(REAL)                                                                                                            \
@@ -20,7 +21,7 @@ namespace pdf {
     O(INDIRECT_REFERENCE)                                                                                              \
     O(INDIRECT_OBJECT)                                                                                                 \
     O(STREAM)                                                                                                          \
-    O(NULL_OBJ)
+    O(NULL_OBJECT)
 
 struct Object {
     enum class Type {
@@ -32,7 +33,11 @@ struct Object {
     explicit Object(Type _type) : type(_type) {}
     virtual ~Object() = default;
 
-    template <typename T> T *as() { return (T *)this; }
+    static Type staticType() { return Type::OBJECT; }
+    template <typename T> T *as() {
+        ASSERT(T::staticType() == type || T::staticType() == Type::OBJECT);
+        return (T *)this;
+    }
     template <typename T> bool is() { return T::staticType() == type; }
 };
 
@@ -139,7 +144,7 @@ struct Stream : Object {
 };
 
 struct Null : Object {
-    static Type staticType() { return Type::NULL_OBJ; }
+    static Type staticType() { return Type::NULL_OBJECT; }
 
     explicit Null() : Object(staticType()) {}
 };
