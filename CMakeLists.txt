@@ -11,7 +11,6 @@ set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(vendor/benchmark)
 add_subdirectory(vendor/googletest)
 add_subdirectory(vendor/zlib)
-add_subdirectory(vendor/freetype)
 
 # Source Code
 add_subdirectory(src)
