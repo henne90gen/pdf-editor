@@ -55,13 +55,28 @@ enum class FontType {
     CIDFONTTYPE1 = 6,
 };
 
+struct FontDescriptor : public Dictionary {
+    Name *fontName() { return values["FontName"]->as<Name>(); }
+    // TODO std::optional<std::string_view> fontFamily() {return find<>()}
+    std::optional<Name *> fontStretch() { return find<Name>("FontStretch"); }
+    std::optional<Real *> fontWeight() { return find<Real>("FontWeight"); }
+    Integer *flags() { return values["Flags"]->as<Integer>(); }
+    Rectangle *fontBBox() { return values["FontBBox"]->as<Rectangle>(); }
+    Real *italicAngle() { return values["ItalicAngle"]->as<Real>(); }
+    Real *ascent() { return values["Ascent"]->as<Real>(); }
+    Real *descent() { return values["Descent"]->as<Real>(); }
+    Real *leading() { return values["Leading"]->as<Real>(); }
+};
+
 struct TrueTypeFont : public Dictionary {
     std::optional<Name *> name() { return find<Name>("Name"); }
     Name *baseFont() { return values["BaseFont"]->as<Name>(); }
     Integer *firstChar() { return values["FirstChar"]->as<Integer>(); }
     Integer *lastChar() { return values["LastChar"]->as<Integer>(); }
     Array *widths(Document &document) { return document.get<Array>(values["Widths"]); }
-    Dictionary *fontDescriptor(Document &document) { return document.get<Dictionary>(values["FontDescriptor"]); }
+    FontDescriptor *fontDescriptor(Document &document) {
+        return document.get<FontDescriptor>(values["FontDescriptor"]);
+    }
     std::optional<Object *> encoding(Document &document) { return document.get<Object>(find<Object>("Encoding")); }
     std::optional<Stream *> toUnicode(Document &document) { return document.get<Stream>(find<Object>("ToUnicode")); }
 };

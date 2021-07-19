@@ -142,15 +142,24 @@ void renderer::loadTrueTypeFont(Dictionary *fontDict) {
     auto font                                          = fontDict->as<TrueTypeFont>();
     stateStack.back().textState.textFont.font.trueType = font;
 
-    // TODO inspect font correctly
-    std::cout << font->name().has_value() << std::endl;
-    std::cout << font->baseFont() << std::endl;
-    std::cout << font->firstChar() << std::endl;
-    std::cout << font->lastChar() << std::endl;
-    std::cout << font->widths(page->document) << std::endl;
-    std::cout << font->fontDescriptor(page->document) << std::endl;
-    std::cout << font->encoding(page->document).has_value() << std::endl;
-    std::cout << font->toUnicode(page->document).has_value() << std::endl;
+    std::cout << "Base Font: " << font->baseFont()->value << std::endl;
+    std::cout << "First Char: " << font->firstChar()->value << std::endl;
+    std::cout << "Last Char: " << font->lastChar()->value << std::endl;
+
+    std::cout << "Widths: ";
+    for (auto &value : font->widths(page->document)->values) {
+        std::cout << value->as<Integer>()->value << ", ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Font Descriptor:" << std::endl;
+    for (auto &entry : font->fontDescriptor(page->document)->values) {
+        std::cout << "  " << entry.first << ": " << entry.second << std::endl;
+    }
+
+    std::cout << "Has Name: " << font->name().has_value() << std::endl;
+    std::cout << "Has Encoding: " << font->encoding(page->document).has_value() << std::endl;
+    std::cout << "Has ToUnicode: " << font->toUnicode(page->document).has_value() << std::endl;
 }
 
 } // namespace pdf
