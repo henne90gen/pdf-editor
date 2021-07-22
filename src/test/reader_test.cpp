@@ -24,7 +24,7 @@ TEST(Reader, Blank) {
     auto filters = stream->filters();
 }
 
-TEST(Reader, HelloWorld) {
+TEST(Reader, HelloWorldGeneral) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
@@ -44,4 +44,43 @@ TEST(Reader, HelloWorld) {
     auto stream  = contents->as<pdf::Stream>();
     auto str     = stream->to_string();
     auto filters = stream->filters();
+}
+
+TEST(Reader, HelloWorldFont) {
+    pdf::Document document;
+    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+
+    auto pages = document.pages();
+    ASSERT_EQ(pages.size(), 1);
+    auto page = pages[0];
+
+    auto fontMapOpt = page->resources()->fonts(page->document);
+    ASSERT_TRUE(fontMapOpt.has_value());
+    auto fontMap = fontMapOpt.value();
+    ASSERT_NE(fontMap, nullptr);
+
+    auto fontOpt = fontMap->get(page->document, "F1");
+    ASSERT_TRUE(fontOpt.has_value());
+
+    auto font = fontOpt.value();
+    ASSERT_NE(font, nullptr);
+    ASSERT_EQ(font->type()->value, "TrueType");
+    ASSERT_TRUE(font->isTrueType());
+    auto ttFont = font->as<pdf::TrueTypeFont>();
+    ASSERT_EQ(ttFont->baseFont()->value, "BAAAAA+LiberationSerif");
+
+    auto fontDescriptor = ttFont->fontDescriptor(document);
+    ASSERT_NE(fontDescriptor, nullptr);
+    ASSERT_EQ(fontDescriptor->fontName()->value, "BAAAAA+LiberationSerif");
+
+    auto flags = fontDescriptor->flags();
+    ASSERT_TRUE(flags->symbolic());
+}
+
+TEST(Reader, FontFlags) {
+    auto i = new pdf::Integer(262178);
+    auto f = i->as<pdf::FontFlags>();
+    ASSERT_TRUE(f->serif());
+    ASSERT_TRUE(f->nonsymbolic());
+    ASSERT_TRUE(f->forceBold());
 }

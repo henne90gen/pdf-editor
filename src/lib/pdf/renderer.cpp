@@ -100,27 +100,27 @@ void renderer::moveStartOfNextLine(Operator *op) { TODO("implement move start of
 void renderer::setTextFont(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFont.fontSize;
 
-    auto fontName      = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
-    fontName           = fontName.substr(1); // remove leading "/"
-    auto resourcesDict = page->resources();
-    auto &values       = resourcesDict->values;
-    auto itr           = values.find("Font");
-    if (itr == values.end()) {}
+    auto fontName   = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
+    fontName        = fontName.substr(1); // remove leading "/"
+    auto fontMapOpt = page->resources()->fonts(page->document);
+    if (!fontMapOpt.has_value()) {
+        TODO("logging");
+        return;
+    }
 
-    auto fontsDict = page->document.get<Dictionary>(itr->second);
-    for (auto &entry : fontsDict->values) {
-        if (entry.first != fontName) {
-            continue;
-        }
+    auto fontOpt = fontMapOpt.value()->get(page->document, std::string(fontName));
+    if (!fontOpt.has_value()) {
+        TODO("logging");
+        return;
+    }
 
-        auto fontDict = page->document.get<Dictionary>(entry.second);
-        auto type     = fontDict->values["Subtype"]->as<Name>()->value;
-        if (type == "TrueType") {
-            loadTrueTypeFont(fontDict);
-        } else {
-            TODO("implement loading of other fonts");
-            ASSERT(false);
-        }
+    auto font = fontOpt.value();
+
+    if (font->isTrueType()) {
+        loadTrueTypeFont(font->as<TrueTypeFont>());
+    } else {
+        TODO("implement loading of other fonts");
+        ASSERT(false);
     }
 }
 
@@ -137,9 +137,8 @@ void renderer::showText(Operator *op) {
     }
 }
 
-void renderer::loadTrueTypeFont(Dictionary *fontDict) {
+void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     stateStack.back().textState.textFont.type          = FontType::TRUE_TYPE;
-    auto font                                          = fontDict->as<TrueTypeFont>();
     stateStack.back().textState.textFont.font.trueType = font;
 
     std::cout << "Base Font: " << font->baseFont()->value << std::endl;
