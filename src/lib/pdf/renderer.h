@@ -57,9 +57,9 @@ enum class FontType {
 
 struct TextFont {
     FontType type;
-    union {
-        TrueTypeFont *trueType;
-    } font;
+    TrueTypeFont *trueType;
+    FT_Face ftFace;
+    Cairo::RefPtr<Cairo::FontFace> cairoFace;
 };
 
 struct TextState {
@@ -110,7 +110,7 @@ struct renderer {
     void popGraphicsState();
     void moveStartOfNextLine(Operator *op);
     void setTextFont(Operator *op);
-    void showText(Operator *pOperator);
+    void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *pOperator);
     void loadTrueTypeFont(TrueTypeFont *font);
 };
 

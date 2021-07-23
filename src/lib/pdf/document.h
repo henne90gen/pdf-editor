@@ -129,9 +129,9 @@ struct FontDescriptor : public Dictionary {
     std::optional<Real *> avgWidth() { return find<Real>("AvgWidth"); }
     std::optional<Real *> maxWidth() { return find<Real>("MaxWidth"); }
     std::optional<Real *> missingWidth() { return find<Real>("MissingWidth"); }
-    std::optional<Stream *> fontFile() { return find<Stream>("FontFile"); }
-    std::optional<Stream *> fontFile2() { return find<Stream>("FontFile2"); }
-    std::optional<Stream *> fontFile3() { return find<Stream>("FontFile3"); }
+    std::optional<Stream *> fontFile(Document &document) { return document.get<Stream>(find<Object>("FontFile")); }
+    std::optional<Stream *> fontFile2(Document &document) { return document.get<Stream>(find<Object>("FontFile2")); }
+    std::optional<Stream *> fontFile3(Document &document) { return document.get<Stream>(find<Object>("FontFile3")); }
 
     /**
      * @return ASCII string or byte string

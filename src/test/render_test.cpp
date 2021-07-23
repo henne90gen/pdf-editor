@@ -21,7 +21,7 @@ TEST(Renderer, HelloWorld) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
 
-    auto surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, 100, 100);
+    auto surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, 1000, 1000);
     auto cr      = Cairo::Context::create(surface);
 
     auto pages = document.pages();
