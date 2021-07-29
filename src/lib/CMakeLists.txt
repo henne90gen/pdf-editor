@@ -16,6 +16,7 @@ add_library(pdf-lib
         pdf/parser.cpp
         pdf/document.cpp
         pdf/objects.cpp
+        pdf/cmap.cpp
         pdf/graphics.cpp
         pdf/text.cpp
         pdf/operator_parser.cpp

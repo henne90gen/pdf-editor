@@ -207,11 +207,11 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     auto toUnicodeOpt = font->toUnicode(page->document);
     std::cout << "Has ToUnicode: " << toUnicodeOpt.has_value() << std::endl;
     // TODO getting the ToUnicode table crashes the following object load operation
-//    if (toUnicodeOpt.has_value()) {
-//        auto toUnicode          = toUnicodeOpt.value();
-//        const char *cmapFilePtr = toUnicode->to_string().data();
-//        // TODO read in cmap file
-//    }
+    if (toUnicodeOpt.has_value()) {
+        auto toUnicode          = toUnicodeOpt.value();
+        const char *cmapFilePtr = toUnicode->to_string().data();
+        // TODO read in cmap file
+    }
 
     std::optional<Stream *> fontFileOpt = font->fontDescriptor(page->document)->fontFile2(page->document);
     if (!fontFileOpt.has_value()) {

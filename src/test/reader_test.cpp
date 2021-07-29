@@ -75,6 +75,37 @@ TEST(Reader, HelloWorldFont) {
 
     auto flags = fontDescriptor->flags();
     ASSERT_TRUE(flags->symbolic());
+
+    auto encodingOpt = ttFont->encoding(document);
+    ASSERT_FALSE(encodingOpt.has_value());
+
+    auto toUnicodeOpt = ttFont->toUnicode(document);
+    ASSERT_TRUE(toUnicodeOpt.has_value());
+}
+
+TEST(Reader, HelloWorldCmap) {
+    pdf::Document document;
+    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+
+    auto pages = document.pages();
+    ASSERT_EQ(pages.size(), 1);
+    auto page = pages[0];
+
+    auto fontMapOpt = page->resources()->fonts(page->document);
+    ASSERT_TRUE(fontMapOpt.has_value());
+    auto fontMap = fontMapOpt.value();
+    ASSERT_NE(fontMap, nullptr);
+
+    auto fontOpt = fontMap->get(page->document, "F1");
+    ASSERT_TRUE(fontOpt.has_value());
+
+    auto font = fontOpt.value();
+    ASSERT_NE(font, nullptr);
+    auto trueTypeFont = font->as<pdf::TrueTypeFont>();
+    auto toUnicodeOpt = trueTypeFont->toUnicode(document);
+    ASSERT_TRUE(toUnicodeOpt.has_value());
+    auto toUnicode   = toUnicodeOpt.value();
+    auto cmap        = toUnicode->read_cmap();
 }
 
 TEST(Reader, FontFlags) {

@@ -56,6 +56,48 @@ std::optional<Token> matchWordToken(const std::string_view &word) {
     if (STARTS_WITH(word, "null")) {
         return Token(Token::Type::NULL_OBJ, "null");
     }
+    if (STARTS_WITH(word, "begincmap")) {
+        return Token(Token::Type::CMAP_BEGIN, "begincmap");
+    }
+    if (STARTS_WITH(word, "endcmap")) {
+        return Token(Token::Type::CMAP_END, "endcmap");
+    }
+    if (STARTS_WITH(word, "usecmap")) {
+        return Token(Token::Type::CMAP_USE, "usecmap");
+    }
+    if (STARTS_WITH(word, "begincodespacerange")) {
+        return Token(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE, "begincodespacerange");
+    }
+    if (STARTS_WITH(word, "endcodespacerange")) {
+        return Token(Token::Type::CMAP_END_CODE_SPACE_RANGE, "endcodespacerange");
+    }
+    if (STARTS_WITH(word, "usefont")) {
+        return Token(Token::Type::CMAP_USE_FONT, "usefont");
+    }
+    if (STARTS_WITH(word, "beginbfchar")) {
+        return Token(Token::Type::CMAP_BEGIN_BF_CHAR, "beginbfchar");
+    }
+    if (STARTS_WITH(word, "endbfchar")) {
+        return Token(Token::Type::CMAP_END_BF_CHAR, "endbfchar");
+    }
+    if (STARTS_WITH(word, "beginbfrange")) {
+        return Token(Token::Type::CMAP_BEGIN_BF_RANGE, "beginbfrange");
+    }
+    if (STARTS_WITH(word, "endbfrange")) {
+        return Token(Token::Type::CMAP_END_BF_RANGE, "endbfrange");
+    }
+    if (STARTS_WITH(word, "begincidchar")) {
+        return Token(Token::Type::CMAP_BEGIN_CID_CHAR, "begincidchar");
+    }
+    if (STARTS_WITH(word, "endcidchar")) {
+        return Token(Token::Type::CMAP_END_CID_CHAR, "endcidchar");
+    }
+    if (STARTS_WITH(word, "begincidrange")) {
+        return Token(Token::Type::CMAP_BEGIN_CID_RANGE, "begincidrange");
+    }
+    if (STARTS_WITH(word, "endcidrange")) {
+        return Token(Token::Type::CMAP_END_CID_RANGE, "endcidrange");
+    }
     return {};
 }
 

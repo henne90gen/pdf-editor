@@ -2,6 +2,7 @@
 
 #include "lexer.h"
 #include "objects.h"
+#include "cmap.h"
 #include "parser.h"
 
 namespace pdf {
@@ -160,7 +161,7 @@ struct TrueTypeFont : public Font {
         return document.get<FontDescriptor>(values["FontDescriptor"]);
     }
     std::optional<Object *> encoding(Document &document) { return document.get<Object>(find<Object>("Encoding")); }
-    std::optional<Stream *> toUnicode(Document &document) { return document.get<Stream>(find<Object>("ToUnicode")); }
+    std::optional<CMapStream *> toUnicode(Document &document) { return document.get<CMapStream>(find<Object>("ToUnicode")); }
 };
 
 struct FontMap : public Dictionary {

@@ -54,12 +54,12 @@ std::string_view Stream::to_string() const {
 
     for (const auto &filter : fs) {
         if (filter == "FlateDecode") {
-            // TODO this works, but is far from optimal
+            // TODO this works, but is not optimal
             const char *input      = output;
             size_t inputSize = outputSize;
 
-            output     = (char *)malloc(inputSize);
             outputSize = inputSize * 2;
+            output     = (char *)malloc(outputSize);
 
             z_stream infstream;
             infstream.zalloc    = Z_NULL;
