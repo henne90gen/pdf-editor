@@ -20,21 +20,6 @@ bool Parser::currentTokenIs(Token::Type type) {
     return tokens[currentTokenIdx].type == type;
 }
 
-// bool Parser::currentTokenIs(Token::Type type) {
-//     if (currentTokenIdx >= tokens.size()) {
-//         std::optional<Token> token = lexer.getToken();
-//         if (!token.has_value()) {
-//             return false;
-//         }
-//         if (token.value().type == Token::Type::INVALID) {
-//             return false;
-//         }
-//         tokens.push_back(token.value());
-//     }
-//
-//     return tokens[currentTokenIdx].type == type;
-// }
-
 Boolean *Parser::parseBoolean() {
     if (!currentTokenIs(Token::Type::BOOLEAN)) {
         return nullptr;
@@ -400,4 +385,5 @@ Object *Parser::parseObject() {
 }
 
 Object *Parser::parse() { return parseObject(); }
+
 } // namespace pdf
