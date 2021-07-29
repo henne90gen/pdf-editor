@@ -99,6 +99,18 @@ std::optional<Token> matchWordToken(const std::string_view &word) {
     if (STARTS_WITH(word, "endcidrange")) {
         return Token(Token::Type::CMAP_END_CID_RANGE, "endcidrange");
     }
+    if (STARTS_WITH(word, "beginnotdefchar")) {
+        return Token(Token::Type::CMAP_BEGIN_NOTDEF_CHAR, "beginnotdefchar");
+    }
+    if (STARTS_WITH(word, "endnotdefchar")) {
+        return Token(Token::Type::CMAP_END_NOTDEF_CHAR, "endnotdefchar");
+    }
+    if (STARTS_WITH(word, "beginnotdefrange")) {
+        return Token(Token::Type::CMAP_BEGIN_NOTDEF_RANGE, "beginnotdefrange");
+    }
+    if (STARTS_WITH(word, "endnotdefrange")) {
+        return Token(Token::Type::CMAP_END_NOTDEF_RANGE, "endnotdefrange");
+    }
     return {};
 }
 

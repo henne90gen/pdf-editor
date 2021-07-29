@@ -42,10 +42,10 @@ struct Token {
         CMAP_END_CID_CHAR,
         CMAP_BEGIN_CID_RANGE,
         CMAP_END_CID_RANGE,
-        CMAP_BEGIN_NOT_DEF_CHAR,
-        CMAP_END_NOT_DEF_CHAR,
-        CMAP_BEGIN_NOT_DEF_RANGE,
-        CMAP_END_NOT_DEF_RANGE,
+        CMAP_BEGIN_NOTDEF_CHAR,
+        CMAP_END_NOTDEF_CHAR,
+        CMAP_BEGIN_NOTDEF_RANGE,
+        CMAP_END_NOTDEF_RANGE,
     };
 
     Type type;

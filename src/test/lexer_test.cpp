@@ -229,7 +229,8 @@ TEST(Lexer, PathPaintingOperators) {
 TEST(Lexer, CMap) {
     auto textProvider = pdf::StringTextProvider("begincmap endcmap usecmap usefont begincodespacerange "
                                                 "endcodespacerange beginbfchar endbfchar beginbfrange endbfrange "
-                                                "begincidchar endcidchar begincidrange endcidrange");
+                                                "begincidchar endcidchar begincidrange endcidrange beginnotdefchar "
+                                                "endnotdefchar beginnotdefrange endnotdefrange");
     auto lexer        = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::CMAP_BEGIN, "begincmap");
     assertNextToken(lexer, pdf::Token::Type::CMAP_END, "endcmap");
@@ -245,5 +246,9 @@ TEST(Lexer, CMap) {
     assertNextToken(lexer, pdf::Token::Type::CMAP_END_CID_CHAR, "endcidchar");
     assertNextToken(lexer, pdf::Token::Type::CMAP_BEGIN_CID_RANGE, "begincidrange");
     assertNextToken(lexer, pdf::Token::Type::CMAP_END_CID_RANGE, "endcidrange");
+    assertNextToken(lexer, pdf::Token::Type::CMAP_BEGIN_NOTDEF_CHAR, "beginnotdefchar");
+    assertNextToken(lexer, pdf::Token::Type::CMAP_END_NOTDEF_CHAR, "endnotdefchar");
+    assertNextToken(lexer, pdf::Token::Type::CMAP_BEGIN_NOTDEF_RANGE, "beginnotdefrange");
+    assertNextToken(lexer, pdf::Token::Type::CMAP_END_NOTDEF_RANGE, "endnotdefrange");
     assertNoMoreTokens(lexer);
 }
