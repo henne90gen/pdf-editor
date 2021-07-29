@@ -37,6 +37,7 @@ std::optional<Token> matchRegex(const std::string_view &word, const std::regex &
 }
 
 std::optional<Token> matchWordToken(const std::string_view &word) {
+    // TODO combine common prefixes for better performance (begin, end)
 #define STARTS_WITH(word, search) word.find(search) == 0
     if (STARTS_WITH(word, "true")) {
         return Token(Token::Type::BOOLEAN, "true");
