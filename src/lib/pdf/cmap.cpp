@@ -2,54 +2,68 @@
 
 namespace pdf {
 
-#pragma pack(push, 1)
-struct CMap_Index {
-    uint16_t version;
-    uint16_t numberSubtables;
-};
+bool CMapParser::currentTokenIs(Token::Type type) {
+    if (currentTokenIdx >= tokens.size()) {
+        std::optional<Token> token = lexer.getToken();
+        if (!token.has_value()) {
+            return false;
+        }
+        if (token.value().type == Token::Type::INVALID) {
+            return false;
+        }
+        tokens.push_back(token.value());
+    }
 
-struct CMap_Subtable {
-    uint16_t platformID;
-    uint16_t platformSpecificID;
-    uint32_t offset;
-};
-#pragma pack(pop)
+    return tokens[currentTokenIdx].type == type;
+}
 
-/*
- "/CIDInit/ProcSet findresource begin
- 12 dict begin
-begincmap
-/CIDSystemInfo<<
-/Registry (Adobe)
-/Ordering (UCS)
-/Supplement 0
->> def
-/CMapName/Adobe-Identity-UCS def
-/CMapType 2 def
-1 begincodespacerange
-<00> <FF>
-endcodespacerange
-8 beginbfchar
-<01> <0048>
-<02> <0065>
-<03> <006C>
-<04> <006F>
-<05> <0020>
-<06> <0057>
-<07> <0072>
-<08> <0064>
-endbfchar
-endcmap
-CMapName currentdict /CMap defineresource pop
-end
-end
-"
- */
+CMap *CMapParser::parse() {
+    if (!currentTokenIs(Token::Type::CMAP_BEGIN)) {
+        return nullptr;
+    }
 
-CMap* CMapStream::read_cmap() {
-    auto data  = to_string();
+    while (true) {
+        auto beforeTokenCount = tokens.size();
+        if (currentTokenIs(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE)) {
+            // parse codespacerange
+        }
+        if (currentTokenIs(Token::Type::CMAP_BEGIN_BF_CHAR)) {
+            // parse bfchar
+        }
+        currentTokenIdx++;
+        if (beforeTokenCount == tokens.size()) {
+            break;
+        }
+    }
 
-    return new CMap(data);
+    if (currentTokenIs(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE)) {
+        std::cout << "Hello" << std::endl;
+    }
+
+    if (currentTokenIs(Token::Type::CMAP_BEGIN_BF_CHAR)) {
+        std::cout << "Hello" << std::endl;
+    }
+
+    return nullptr;
+}
+
+std::optional<CMap *> CMapStream::read_cmap() {
+    auto data = to_string();
+    auto idx  = data.find("begincmap");
+    if (idx == -1) {
+        return {};
+    }
+
+    auto textProvider = StringTextProvider(data.substr(idx));
+    auto lexer        = TextLexer(textProvider);
+    auto parser       = CMapParser(lexer);
+
+    auto result = parser.parse();
+    if (result == nullptr) {
+        return {};
+    }
+
+    return result;
 }
 
 } // namespace pdf
