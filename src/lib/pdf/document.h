@@ -1,8 +1,8 @@
 #pragma once
 
+#include "cmap.h"
 #include "lexer.h"
 #include "objects.h"
-#include "cmap.h"
 #include "parser.h"
 
 namespace pdf {
@@ -45,7 +45,7 @@ struct Document : public ReferenceResolver {
         } else if (object->is<IndirectObject>()) {
             return object->as<IndirectObject>()->object->as<T>();
         } else if (object->is<T>()) {
-            return dynamic_cast<T *>(object);
+            return object->as<T>();
         }
         ASSERT(false);
         return nullptr;
@@ -66,10 +66,24 @@ struct Document : public ReferenceResolver {
 };
 
 struct Rectangle : public Array {
-    Integer *lowerLeftX() { return values[0]->as<Integer>(); }
-    Integer *lowerLeftY() { return values[1]->as<Integer>(); }
-    Integer *upperRightX() { return values[2]->as<Integer>(); }
-    Integer *upperRightY() { return values[3]->as<Integer>(); }
+    double getCoord(int i) {
+        Object *lowerLeftX = values[i];
+        if (lowerLeftX->is<Real>()) {
+            return lowerLeftX->as<Real>()->value;
+        } else if (lowerLeftX->is<Integer>()) {
+            return static_cast<double>(lowerLeftX->as<Integer>()->value);
+        } else {
+            // TODO log a warning
+            return 0;
+        }
+    }
+
+    double lowerLeftX() { return getCoord(0); }
+    double lowerLeftY() { return getCoord(1); }
+    double upperRightX() { return getCoord(2); }
+    double upperRightY() { return getCoord(3); }
+    double width() { return upperRightX() - lowerLeftX(); }
+    double height() { return upperRightY() - lowerLeftY(); }
 };
 
 struct PageTreeNode : public Dictionary {
@@ -86,15 +100,21 @@ struct PageTreeNode : public Dictionary {
             return document.get<T>(itr->second);
         }
 
-        if (inheritable) {
-            const std::optional<T *> &attrib = parent(document)->attribute<T>(document, attributeName, inheritable);
-            if (!attrib.has_value()) {
-                return {};
-            }
-            return attrib.value()->template as<T>();
-        } else {
+        if (!inheritable) {
             return {};
         }
+
+        auto p = parent(document);
+        if (p == nullptr) {
+            return {};
+        }
+
+        const std::optional<T *> &attrib = p->attribute<T>(document, attributeName, inheritable);
+        if (!attrib.has_value()) {
+            return {};
+        }
+
+        return attrib.value()->template as<T>();
     }
 };
 
@@ -161,7 +181,9 @@ struct TrueTypeFont : public Font {
         return document.get<FontDescriptor>(values["FontDescriptor"]);
     }
     std::optional<Object *> encoding(Document &document) { return document.get<Object>(find<Object>("Encoding")); }
-    std::optional<CMapStream *> toUnicode(Document &document) { return document.get<CMapStream>(find<Object>("ToUnicode")); }
+    std::optional<CMapStream *> toUnicode(Document &document) {
+        return document.get<CMapStream>(find<Object>("ToUnicode"));
+    }
 };
 
 struct FontMap : public Dictionary {
@@ -180,11 +202,11 @@ struct Page {
     Resources *resources() { return node->attribute<Resources>(document, "Resources", true).value(); }
     Rectangle *mediaBox() { return node->attribute<Rectangle>(document, "MediaBox", true).value(); }
 
-    // TODO make mediaBox the default value for cropBox, bleedBox, trimBox and artBox
-    std::optional<Rectangle *> cropBox() { return node->attribute<Rectangle>(document, "CropBox", true); }
-    std::optional<Rectangle *> bleedBox() { return node->attribute<Rectangle>(document, "BleedBox", true); }
-    std::optional<Rectangle *> trimBox() { return node->attribute<Rectangle>(document, "TrimBox", true); }
-    std::optional<Rectangle *> artBox() { return node->attribute<Rectangle>(document, "ArtBox", true); }
+    // TODO make value_or more efficient (currently mediaBox is fetched even if it is not being used)
+    Rectangle *cropBox() { return node->attribute<Rectangle>(document, "CropBox", true).value_or(mediaBox()); }
+    Rectangle *bleedBox() { return node->attribute<Rectangle>(document, "BleedBox", true).value_or(mediaBox()); }
+    Rectangle *trimBox() { return node->attribute<Rectangle>(document, "TrimBox", true).value_or(mediaBox()); }
+    Rectangle *artBox() { return node->attribute<Rectangle>(document, "ArtBox", true).value_or(mediaBox()); }
     std::optional<Dictionary *> boxColorInfo() { return node->attribute<Dictionary>(document, "BoxColorInfo", false); }
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
     int64_t rotate();

@@ -116,12 +116,12 @@ Operator *OperatorParser::createOperator_TJ(Operator *result) {
 
 Operator *OperatorParser::createOperator_Tf(Operator *result) {
     auto contentFontName                       = tokens[currentTokenIdx - 3].content;
-    result->data.Tf_SetTextFont.fontNameData   = contentFontName.data();
-    result->data.Tf_SetTextFont.fontNameLength = contentFontName.length();
+    result->data.Tf_SetTextFontAndSize.fontNameData   = contentFontName.data();
+    result->data.Tf_SetTextFontAndSize.fontNameLength = contentFontName.length();
 
     auto contentFontSize = tokens[currentTokenIdx - 2].content;
     // TODO is this conversion to a string really necessary?
-    result->data.Tf_SetTextFont.fontSize = std::stod(std::string(contentFontSize));
+    result->data.Tf_SetTextFontAndSize.fontSize = std::stod(std::string(contentFontSize));
     return result;
 }
 
@@ -156,7 +156,7 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     if (type == Operator::Type::Td_MoveStartOfNextLine) {
         return createOperator_Td(result);
     }
-    if (type == Operator::Type::Tf_SetTextFont) {
+    if (type == Operator::Type::Tf_SetTextFontAndSize) {
         return createOperator_Tf(result);
     }
     if (type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {

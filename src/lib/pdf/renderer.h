@@ -109,9 +109,12 @@ struct renderer {
     void pushGraphicsState();
     void popGraphicsState();
     void moveStartOfNextLine(Operator *op);
-    void setTextFont(Operator *op);
+    void setTextFontAndSize(Operator *op);
     void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *pOperator);
     void loadTrueTypeFont(TrueTypeFont *font);
+    void endPathWithoutFillingOrStroking() const;
+    void modifyClippingPathUsingEvenOddRule() const;
+    void appendRectangle() const;
 };
 
 } // namespace pdf

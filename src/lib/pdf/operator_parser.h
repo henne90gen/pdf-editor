@@ -23,7 +23,7 @@ namespace pdf {
     O(Tw, SetWordSpacing)                                                                                              \
     O(Tz, SetHorizontalScaling)                                                                                        \
     O(TL, SetTextLeading)                                                                                              \
-    O(Tf, SetTextFont)                                                                                                 \
+    O(Tf, SetTextFontAndSize)                                                                                                 \
     O(Tr, SetRenderingMode)                                                                                            \
     O(Ts, SetTextRise)                                                                                                 \
     /* Text Showing Operators */                                                                                       \
@@ -125,7 +125,7 @@ struct Operator {
             const char *fontNameData;
             size_t fontNameLength;
             double fontSize;
-        } Tf_SetTextFont;
+        } Tf_SetTextFontAndSize;
         struct {
             Array *objects;
         } TJ_ShowOneOrMoreTextStrings;

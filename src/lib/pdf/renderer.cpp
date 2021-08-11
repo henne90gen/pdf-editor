@@ -12,6 +12,7 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     }
 
     // TODO set graphics state to default values
+    cr->set_identity_matrix();
 
     auto content = contentsOpt.value();
 
@@ -44,13 +45,11 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
             } else if (op->type == Operator::Type::Q_PopGraphicsState) {
                 popGraphicsState();
             } else if (op->type == Operator::Type::re_AppendRectangle) {
-                TODO("append rectangle to the current path");
+                appendRectangle();
             } else if (op->type == Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule) {
-                TODO("clipping path modification");
+                modifyClippingPathUsingEvenOddRule();
             } else if (op->type == Operator::Type::n_EndPathWithoutFillingOrStroking) {
-                // TODO this is a path painting no-op
-                //  it does however set the clipping path, if a clipping path operator was used before it
-                TODO("path painting no-op");
+                endPathWithoutFillingOrStroking();
             } else if (op->type == Operator::Type::rg_SetNonStrokingColorRGB) {
                 setNonStrokingColor(op);
             } else if (op->type == Operator::Type::BT_BeginText) {
@@ -59,8 +58,8 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
                 endText();
             } else if (op->type == Operator::Type::Td_MoveStartOfNextLine) {
                 moveStartOfNextLine(op);
-            } else if (op->type == Operator::Type::Tf_SetTextFont) {
-                setTextFont(op);
+            } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
+                setTextFontAndSize(op);
             } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
                 showText(cr, op);
             } else {
@@ -69,6 +68,16 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
             op = operatorParser.getOperator();
         }
     }
+}
+
+void renderer::appendRectangle() const { TODO("append rectangle to the current path"); }
+
+void renderer::modifyClippingPathUsingEvenOddRule() const { TODO("clipping path modification"); }
+
+void renderer::endPathWithoutFillingOrStroking() const {
+    // TODO this is a path painting no-op
+    //  it does however set the clipping path, if a clipping path operator was used before it
+    TODO("path painting no-op");
 }
 
 void renderer::setNonStrokingColor(Operator *op) {
@@ -97,10 +106,11 @@ void renderer::popGraphicsState() { stateStack.pop_back(); }
 
 void renderer::moveStartOfNextLine(Operator *op) { TODO("implement move start of next line"); }
 
-void renderer::setTextFont(Operator *op) {
-    stateStack.back().textState.textFontSize = op->data.Tf_SetTextFont.fontSize;
+void renderer::setTextFontAndSize(Operator *op) {
+    stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
-    auto fontName   = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
+    auto fontName =
+          std::string_view(op->data.Tf_SetTextFontAndSize.fontNameData, op->data.Tf_SetTextFontAndSize.fontNameLength);
     fontName        = fontName.substr(1); // remove leading "/"
     auto fontMapOpt = page->resources()->fonts(page->document);
     if (!fontMapOpt.has_value()) {
@@ -125,6 +135,8 @@ void renderer::setTextFont(Operator *op) {
 }
 
 void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+    auto &textState = stateStack.back().textState;
+
     auto values                      = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
     std::vector<Cairo::Glyph> glyphs = {};
     double xOffset                   = 0;
@@ -132,7 +144,7 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
         if (value->is<Integer>()) {
             auto i = value->as<Integer>();
             std::cout << "Integer " << i->value << std::endl;
-            //            xOffset += static_cast<double>(i->value);
+            //            xOffset += static_cast<double>(i->value) / 1000.0;
         } else if (value->is<HexadecimalString>()) {
             std::cout << "HexadecimalString: ";
             auto str = value->as<HexadecimalString>()->to_string();
@@ -140,47 +152,28 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
             for (char c : str) {
                 auto i = static_cast<unsigned long>(c);
                 std::cout << i << " ";
-                stateStack.back().textState.textFont.ftFace->charmap;
-                //                cr->get_text_extents()
-                glyphs.push_back({.index = i, .x = xOffset / 0.5, .y = 1.0});
+                // TODO apply T_rise as y offset
+                glyphs.push_back({.index = i, .x = xOffset, .y = 0.0});
+                xOffset += 10;
+
+                // TODO get text extents and adjust xOffset accordingly
+                //                textState.textFont.ftFace->charmap;
+                //                Cairo::TextExtents extents;
+                //                cr->get_text_extents("H", extents);
+                //                xOffset += extents.x_advance;
             }
             std::cout << std::endl;
         }
     }
 
-    cr->scale(50, 50);
-    cr->move_to(0, 0);
+    auto matrix = Cairo::identity_matrix();
+    matrix.translate(100, 100);
+    matrix.scale(textState.textFontSize, textState.textFontSize);
+
     cr->set_source_rgb(0.0, 0.0, 0.0);
-    cr->set_font_size(1.2);
-    cr->set_font_face(stateStack.back().textState.textFont.cairoFace);
-
-    constexpr size_t num_glyphs = 9;
-    //    auto glyphs                 = std::vector<Cairo::Glyph>(num_glyphs);
-    //    for (int i = 0; i < num_glyphs; i++) {
-    //        glyphs[i] = {.index = static_cast<unsigned long>(i), .x = i * 0.1, .y = i * 0.1};
-    //    }
+    cr->set_font_matrix(matrix);
+    cr->set_font_face(textState.textFont.cairoFace);
     cr->show_glyphs(glyphs);
-
-    return;
-    cairo_set_source_rgb(cr->cobj(), 0, 0, 0);
-    cairo_move_to(cr->cobj(), 0, 0);
-    cairo_line_to(cr->cobj(), 1, 1);
-    cairo_move_to(cr->cobj(), 1, 0);
-    cairo_line_to(cr->cobj(), 0, 1);
-    cairo_set_line_width(cr->cobj(), 0.2);
-    cairo_stroke(cr->cobj());
-
-    cairo_rectangle(cr->cobj(), 0, 0, 0.5, 0.5);
-    cairo_set_source_rgba(cr->cobj(), 1, 0, 0, 0.80);
-    cairo_fill(cr->cobj());
-
-    cairo_rectangle(cr->cobj(), 0, 0.5, 0.5, 0.5);
-    cairo_set_source_rgba(cr->cobj(), 0, 1, 0, 0.60);
-    cairo_fill(cr->cobj());
-
-    cairo_rectangle(cr->cobj(), 0.5, 0, 0.5, 0.5);
-    cairo_set_source_rgba(cr->cobj(), 0, 0, 1, 0.40);
-    cairo_fill(cr->cobj());
 }
 
 void renderer::loadTrueTypeFont(TrueTypeFont *font) {
