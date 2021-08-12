@@ -12,10 +12,14 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     }
 
     // TODO set graphics state to default values
-    cr->set_identity_matrix();
+    // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
+
+    auto cropBox = page->cropBox();
+    cr->set_source_rgb(1, 1, 1);
+    cr->rectangle(0, 0, cropBox->width(), cropBox->height());
+    cr->fill();
 
     auto content = contentsOpt.value();
-
     if (content->is<Stream>()) {
         render(cr, {content->as<Stream>()});
     } else if (content->is<Array>()) {
@@ -104,7 +108,16 @@ void renderer::pushGraphicsState() { stateStack.emplace_back(); }
 
 void renderer::popGraphicsState() { stateStack.pop_back(); }
 
-void renderer::moveStartOfNextLine(Operator *op) { TODO("implement move start of next line"); }
+void renderer::moveStartOfNextLine(Operator *op) {
+    auto currentLineMatrix = stateStack.back().textState.textObjectParams.value().textLineMatrix;
+    auto tmp               = Cairo::identity_matrix();
+    tmp.translate(op->data.Td_MoveStartOfNextLine.x, op->data.Td_MoveStartOfNextLine.x);
+
+    auto newLineMatrix = tmp * currentLineMatrix;
+
+    stateStack.back().textState.textObjectParams.value().textLineMatrix = newLineMatrix;
+    stateStack.back().textState.textObjectParams.value().textMatrix     = newLineMatrix;
+}
 
 void renderer::setTextFontAndSize(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
@@ -135,7 +148,15 @@ void renderer::setTextFontAndSize(Operator *op) {
 }
 
 void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
-    auto &textState = stateStack.back().textState;
+    auto &textState       = stateStack.back().textState;
+    auto textRenderMatrix = Cairo::identity_matrix();
+    textRenderMatrix.scale(textState.textFontSize, textState.textFontSize);
+    textRenderMatrix.translate(0, textState.textRiseUnscaled);
+
+    auto fontMatrix = textRenderMatrix * textState.textObjectParams.value().textMatrix;
+    cr->set_font_matrix(fontMatrix);
+    cr->set_font_face(textState.textFont.cairoFace);
+    cr->set_source_rgb(0.0, 0.0, 0.0);
 
     auto values                      = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
     std::vector<Cairo::Glyph> glyphs = {};
@@ -143,36 +164,22 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     for (auto value : values) {
         if (value->is<Integer>()) {
             auto i = value->as<Integer>();
-            std::cout << "Integer " << i->value << std::endl;
-            //            xOffset += static_cast<double>(i->value) / 1000.0;
+            xOffset += static_cast<double>(i->value) / 1000.0;
         } else if (value->is<HexadecimalString>()) {
-            std::cout << "HexadecimalString: ";
             auto str = value->as<HexadecimalString>()->to_string();
-            std::cout << str.length() << " | ";
             for (char c : str) {
                 auto i = static_cast<unsigned long>(c);
-                std::cout << i << " ";
-                // TODO apply T_rise as y offset
-                glyphs.push_back({.index = i, .x = xOffset, .y = 0.0});
-                xOffset += 10;
+                Cairo::Glyph glyph = {.index = i, .x = xOffset, .y = 0.0};
+                glyphs.push_back(glyph);
 
-                // TODO get text extents and adjust xOffset accordingly
-                //                textState.textFont.ftFace->charmap;
-                //                Cairo::TextExtents extents;
-                //                cr->get_text_extents("H", extents);
-                //                xOffset += extents.x_advance;
+                auto scaledFont = cr->get_scaled_font();
+                Cairo::TextExtents extents;
+                cairo_scaled_font_glyph_extents(scaledFont->cobj(), &glyph, 1, &extents);
+                xOffset += static_cast<double>(extents.x_advance);
             }
-            std::cout << std::endl;
         }
     }
 
-    auto matrix = Cairo::identity_matrix();
-    matrix.translate(100, 100);
-    matrix.scale(textState.textFontSize, textState.textFontSize);
-
-    cr->set_source_rgb(0.0, 0.0, 0.0);
-    cr->set_font_matrix(matrix);
-    cr->set_font_face(textState.textFont.cairoFace);
     cr->show_glyphs(glyphs);
 }
 

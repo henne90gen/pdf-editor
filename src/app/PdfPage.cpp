@@ -1,10 +1,11 @@
 #include "PdfPage.h"
+#include <pdf/renderer.h>
 
 PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
     box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
     add(box);
 
-    box.pack_start(treeView);
+    box.pack_start(treeView, false, true);
     box.pack_start(pdfWidget);
     set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
@@ -123,8 +124,11 @@ PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) {
 }
 
 bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->translate(10, 10);
-    cr->show_text("Hello");
-    cr->rectangle(0, 0, 200, 200);
+    auto pages = file.pages();
+    for (auto page : pages) {
+        pdf::renderer renderer(page);
+        renderer.render(cr);
+    }
+
     return false;
 }

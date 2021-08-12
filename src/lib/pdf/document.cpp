@@ -37,7 +37,10 @@ IndirectObject *Document::getObject(int64_t objectNumber) {
     return object;
 }
 
-Dictionary *Document::root() { return get<Dictionary>(trailer.dict->values["Root"]); }
+Dictionary *Document::root() {
+    auto root = trailer.dict->values["Root"];
+    return get<Dictionary>(root);
+}
 
 std::vector<Page *> Document::pages() {
     auto root         = this->root();

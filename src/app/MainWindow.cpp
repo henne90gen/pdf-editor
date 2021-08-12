@@ -28,7 +28,7 @@ class MainWindow : public Gtk::ApplicationWindow {
             notebook->remove_page(i);
         }
 
-        add_pdf_page("../../../test-files/blank.pdf");
+//        add_pdf_page("../../../test-files/blank.pdf");
         add_pdf_page("../../../test-files/hello-world.pdf");
         notebook->show_all();
     }
@@ -55,7 +55,7 @@ class MainWindow : public Gtk::ApplicationWindow {
     }
 
     void add_pdf_page(const std::string &filePath) {
-        pdf::Document document = documents.emplace_back();
+        auto &document = documents.emplace_back();
         if (!pdf::Document::load_from_file(filePath, document)) {
             return;
         }

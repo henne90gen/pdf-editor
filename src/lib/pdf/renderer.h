@@ -25,13 +25,9 @@ struct Color {
     explicit Color(double _r, double _g, double _b, double _a) : r(_r), g(_g), b(_b), a(_a) {}
 };
 
-// TODO create matrix class or use math library for this
-typedef std::array<double, 9> matrix3;
-
 struct TextObjectState {
-    // TODO initialize these matrices to the identity matrix
-    matrix3 textMatrix     = {};
-    matrix3 textLineMatrix = {};
+    Cairo::Matrix textMatrix     = Cairo::identity_matrix();
+    Cairo::Matrix textLineMatrix = Cairo::identity_matrix();
 };
 
 enum class TextRenderingMode {
@@ -78,7 +74,7 @@ struct TextState {
 
 struct GraphicsState {
     // default is a matrix that converts default user coordinates to device coordinates (TODO whatever that means)
-    matrix3 currentTransformationMatrix = {}; // aka CTM
+    Cairo::Matrix currentTransformationMatrix = Cairo::identity_matrix(); // aka CTM
 
     double colorSpace      = {};
     Color strokingColor    = {};
