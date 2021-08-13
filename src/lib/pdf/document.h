@@ -58,7 +58,8 @@ struct Document : public ReferenceResolver {
         return {};
     }
 
-    static bool load_from_file(const std::string &filePath, Document &document);
+    bool saveToFile(const std::string &filePath) const;
+    static bool loadFromFile(const std::string &filePath, Document &document);
 
   private:
     IndirectObject *getObject(int64_t objectNumber);

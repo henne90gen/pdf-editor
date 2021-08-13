@@ -56,7 +56,7 @@ class MainWindow : public Gtk::ApplicationWindow {
 
     void add_pdf_page(const std::string &filePath) {
         auto &document = documents.emplace_back();
-        if (!pdf::Document::load_from_file(filePath, document)) {
+        if (!pdf::Document::loadFromFile(filePath, document)) {
             return;
         }
 

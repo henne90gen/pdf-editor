@@ -10,6 +10,7 @@ enable_testing()
 set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(vendor/benchmark)
 add_subdirectory(vendor/googletest)
+add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/zlib)
 
 # Source Code

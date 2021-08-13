@@ -195,11 +195,12 @@ void readCrossReferenceTable(Document &file) {
     file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
 }
 
-bool Document::load_from_file(const std::string &filePath, Document &document) {
+bool Document::loadFromFile(const std::string &filePath, Document &document) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
+        // TODO logging
         std::cerr << "Failed to open pdf file." << std::endl;
         return false;
     }
@@ -212,6 +213,21 @@ bool Document::load_from_file(const std::string &filePath, Document &document) {
 
     readTrailer(document);
     readCrossReferenceTable(document);
+
+    return true;
+}
+
+bool Document::saveToFile(const std::string &filePath) const {
+    auto os = std::ofstream();
+    os.open(filePath, std::ios::out | std::ios::binary);
+
+    if (!os.is_open()) {
+        // TODO logging
+        std::cerr << "Failed to open pdf file." << std::endl;
+        return false;
+    }
+
+    os.write(data, sizeInBytes);
 
     return true;
 }

@@ -4,7 +4,7 @@
 
 TEST(Reader, Blank) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/blank.pdf", document);
+    pdf::Document::loadFromFile("../../../test-files/blank.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
     ASSERT_EQ(objects.size(), 8);
 
@@ -26,7 +26,7 @@ TEST(Reader, Blank) {
 
 TEST(Reader, HelloWorldGeneral) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::loadFromFile("../../../test-files/hello-world.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
     ASSERT_EQ(objects.size(), 13);
 
@@ -48,7 +48,7 @@ TEST(Reader, HelloWorldGeneral) {
 
 TEST(Reader, HelloWorldFont) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::loadFromFile("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
     ASSERT_EQ(pages.size(), 1);
@@ -85,7 +85,7 @@ TEST(Reader, HelloWorldFont) {
 
 TEST(Reader, HelloWorldCmap) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::loadFromFile("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
     ASSERT_EQ(pages.size(), 1);
@@ -104,8 +104,8 @@ TEST(Reader, HelloWorldCmap) {
     auto trueTypeFont = font->as<pdf::TrueTypeFont>();
     auto toUnicodeOpt = trueTypeFont->toUnicode(document);
     ASSERT_TRUE(toUnicodeOpt.has_value());
-    auto toUnicode   = toUnicodeOpt.value();
-    auto cmap        = toUnicode->read_cmap();
+    auto toUnicode = toUnicodeOpt.value();
+    auto cmap      = toUnicode->read_cmap();
 }
 
 TEST(Reader, FontFlags) {

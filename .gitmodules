@@ -13,3 +13,6 @@
 [submodule "vendor/freetype"]
 	path = vendor/freetype
 	url = git@github.com:freetype/freetype.git
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = git@github.com:gabime/spdlog.git
