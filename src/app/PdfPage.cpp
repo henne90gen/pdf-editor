@@ -1,5 +1,7 @@
 #include "PdfPage.h"
+
 #include <pdf/renderer.h>
+#include <spdlog/spdlog.h>
 
 PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
     box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
@@ -119,7 +121,12 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     }
 }
 
-PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) { add_events(Gdk::SMOOTH_SCROLL_MASK); }
+PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) {
+    set_can_focus(true);
+    set_focus_on_click(true);
+    add_events(Gdk::SMOOTH_SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK |
+               Gdk::KEY_RELEASE_MASK);
+}
 
 bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->scale(zoom, zoom);
@@ -134,12 +141,35 @@ bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 }
 
 bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
-    zoom += event->delta_y * zoomSpeed;
-    queue_draw();
+    if (isCtrlPressed) {
+        zoom += event->delta_y * zoomSpeed;
+        if (zoom <= 0.1) {
+            zoom = 0.1;
+        }
+
+        queue_draw();
+
+        return false;
+    }
+
+    return false;
+}
+
+bool PdfWidget::on_key_press_event(GdkEventKey *key_event) {
+    if (key_event->keyval == GDK_KEY_Control_L) {
+        isCtrlPressed = true;
+    }
+    return false;
+}
+
+bool PdfWidget::on_key_release_event(GdkEventKey *key_event) {
+    if (key_event->keyval == GDK_KEY_Control_L) {
+        isCtrlPressed = false;
+    }
     return false;
 }
 
 bool PdfWidget::on_button_press_event(GdkEventButton *button_event) {
-    std::cout << "Button pressed" << std::endl;
+    grab_focus();
     return false;
 }

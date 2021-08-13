@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include <spdlog/spdlog.h>
+
 #include "operator_parser.h"
 #include "util.h"
 
@@ -187,26 +189,7 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     stateStack.back().textState.textFont.type     = FontType::TRUE_TYPE;
     stateStack.back().textState.textFont.trueType = font;
 
-    std::cout << "Base Font: " << font->baseFont()->value << std::endl;
-    std::cout << "First Char: " << font->firstChar()->value << std::endl;
-    std::cout << "Last Char: " << font->lastChar()->value << std::endl;
-
-    std::cout << "Widths: ";
-    for (auto &value : font->widths(page->document)->values) {
-        std::cout << value->as<Integer>()->value << ", ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Font Descriptor:" << std::endl;
-    for (auto &entry : font->fontDescriptor(page->document)->values) {
-        std::cout << "  " << entry.first << ": " << entry.second << std::endl;
-    }
-
-    std::cout << "Has Name: " << font->name().has_value() << std::endl;
-    std::cout << "Has Encoding: " << font->encoding(page->document).has_value() << std::endl;
     auto toUnicodeOpt = font->toUnicode(page->document);
-    std::cout << "Has ToUnicode: " << toUnicodeOpt.has_value() << std::endl;
-    // TODO getting the ToUnicode table crashes the following object load operation
     if (toUnicodeOpt.has_value()) {
         auto toUnicode          = toUnicodeOpt.value();
         const char *cmapFilePtr = toUnicode->to_string().data();
@@ -215,7 +198,7 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
 
     std::optional<Stream *> fontFileOpt = font->fontDescriptor(page->document)->fontFile2(page->document);
     if (!fontFileOpt.has_value()) {
-        std::cerr << "Could not find embedded font file" << std::endl;
+        spdlog::error("Failed to find embedded font!");
         return;
     }
 
@@ -225,7 +208,7 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     FT_Library library;
     auto error = FT_Init_FreeType(&library);
     if (error != FT_Err_Ok) {
-        std::cerr << "Failed to initialize freetype!" << std::endl;
+        spdlog::error("Failed to initialize freetype!");
         return;
     }
 
@@ -235,25 +218,13 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     auto size    = (int64_t)view.length();
     error        = FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte *>(basePtr), size, faceIndex, &face);
     if (error != FT_Err_Ok) {
-        std::cerr << "Failed to load font" << std::endl;
+        spdlog::error("Failed to load embedded font!");
         return;
     }
-    std::cout << "Num Glyphs: " << face->num_glyphs << std::endl;
 
     stateStack.back().textState.textFont.ftFace = face;
     stateStack.back().textState.textFont.cairoFace =
           Cairo::RefPtr(new Cairo::FontFace(cairo_ft_font_face_create_for_ft_face(face, 0)));
-
-    for (int i = 0; i < face->num_charmaps; i++) {
-        FT_Set_Charmap(face, face->charmaps[i]);
-        for (unsigned long code = 1; code <= 0xFFFF; code++) {
-            unsigned long glyph_index = FT_Get_Char_Index(face, code);
-            /* 0 = .notdef */
-            if (glyph_index != 0) {
-                std::cout << glyph_index << " - " << code << std::endl;
-            }
-        }
-    }
 }
 
 } // namespace pdf
