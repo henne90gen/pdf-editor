@@ -158,17 +158,17 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     cr->set_font_face(textState.textFont.cairoFace);
     cr->set_source_rgb(0.0, 0.0, 0.0);
 
-    auto values                      = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
-    std::vector<Cairo::Glyph> glyphs = {};
-    double xOffset                   = 0;
+    auto values    = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
+    auto glyphs    = std::vector<Cairo::Glyph>();
+    double xOffset = 0;
     for (auto value : values) {
         if (value->is<Integer>()) {
             auto i = value->as<Integer>();
-            xOffset += static_cast<double>(i->value) / 1000.0;
+            xOffset -= static_cast<double>(i->value) / 1000.0;
         } else if (value->is<HexadecimalString>()) {
             auto str = value->as<HexadecimalString>()->to_string();
             for (char c : str) {
-                auto i = static_cast<unsigned long>(c);
+                auto i             = static_cast<unsigned long>(c);
                 Cairo::Glyph glyph = {.index = i, .x = xOffset, .y = 0.0};
                 glyphs.push_back(glyph);
 

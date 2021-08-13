@@ -119,16 +119,27 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     }
 }
 
-PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) {
-    signal_draw().connect(sigc::mem_fun(*this, &PdfWidget::on_draw));
-}
+PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) { add_events(Gdk::SMOOTH_SCROLL_MASK); }
 
 bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
+    cr->scale(zoom, zoom);
+
     auto pages = file.pages();
     for (auto page : pages) {
         pdf::renderer renderer(page);
         renderer.render(cr);
     }
 
+    return false;
+}
+
+bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
+    zoom += event->delta_y * zoomSpeed;
+    queue_draw();
+    return false;
+}
+
+bool PdfWidget::on_button_press_event(GdkEventButton *button_event) {
+    std::cout << "Button pressed" << std::endl;
     return false;
 }

@@ -60,10 +60,10 @@ TEST(OperationParser, HelloWorld) {
         ASSERT_FLOAT_EQ(op->data.Td_MoveStartOfNextLine.x, 56.8);
         ASSERT_FLOAT_EQ(op->data.Td_MoveStartOfNextLine.y, 724.1);
     });
-    assertNextOp(parser, pdf::Operator::Type::Tf_SetTextFont, [](auto op) {
-        auto fontName = std::string_view(op->data.Tf_SetTextFont.fontNameData, op->data.Tf_SetTextFont.fontNameLength);
+    assertNextOp(parser, pdf::Operator::Type::Tf_SetTextFontAndSize, [](auto op) {
+        auto fontName = std::string_view(op->data.Tf_SetTextFontAndSize.fontNameData, op->data.Tf_SetTextFontAndSize.fontNameLength);
         ASSERT_EQ(fontName, "/F1");
-        ASSERT_EQ(op->data.Tf_SetTextFont.fontSize, 12);
+        ASSERT_EQ(op->data.Tf_SetTextFontAndSize.fontSize, 12);
     });
     assertNextOp(parser, pdf::Operator::Type::TJ_ShowOneOrMoreTextStrings, [](auto op) {
         pdf::Array *objects = op->data.TJ_ShowOneOrMoreTextStrings.objects;

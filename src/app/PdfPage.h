@@ -17,10 +17,14 @@ class PdfWidget : public Gtk::DrawingArea {
   public:
     explicit PdfWidget(pdf::Document &file);
 
-    bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr);
+    bool on_draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
+    bool on_scroll_event(GdkEventScroll *event) override;
+    bool on_button_press_event(GdkEventButton *button_event) override;
 
   private:
     pdf::Document &file;
+    double zoom      = 1.0;
+    double zoomSpeed = 0.5;
 };
 
 class PdfPage : public Gtk::ScrolledWindow {

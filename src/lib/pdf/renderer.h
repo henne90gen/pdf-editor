@@ -61,7 +61,7 @@ struct TextFont {
 struct TextState {
     double characterSpacing            = 0.0;
     double wordSpacing                 = 0.0;
-    double horizontalScalingPercentage = 100;
+    double horizontalScalingPercentage = 1.0;
     double leadingUnscaled; // TODO default unclear, not sure whether this should be a double or an int
     TextFont textFont;
     double textFontSize;
