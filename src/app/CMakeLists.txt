@@ -11,6 +11,6 @@ endfunction()
 
 add_executable(pdf-app MainWindow.cpp PdfPage.cpp)
 target_link_gtk3(pdf-app)
-target_link_libraries(pdf-app PRIVATE pdf-lib)
+target_link_libraries(pdf-app PRIVATE pdf-lib spdlog::spdlog)
 
 add_subdirectory(gtk-examples)

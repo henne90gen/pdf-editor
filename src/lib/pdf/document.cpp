@@ -1,6 +1,9 @@
 #include "document.h"
 
+#include <spdlog/spdlog.h>
 #include <fstream>
+
+#include "page.h"
 
 namespace pdf {
 
@@ -91,14 +94,6 @@ PageTreeNode *PageTreeNode::parent(Document &document) {
         return nullptr;
     }
     return document.get<PageTreeNode>(itr->second);
-}
-
-int64_t Page::rotate() {
-    const std::optional<Integer *> &rot = node->attribute<Integer>(document, "Rotate", true);
-    if (!rot.has_value()) {
-        return 0;
-    }
-    return rot.value()->value;
 }
 
 Dictionary *parseDict(char *start, size_t length) {
@@ -201,6 +196,7 @@ bool Document::loadFromFile(const std::string &filePath, Document &document) {
 
     if (!is.is_open()) {
         // TODO logging
+        spdlog::info("Welcome to spdlog!");
         std::cerr << "Failed to open pdf file." << std::endl;
         return false;
     }

@@ -2,7 +2,7 @@
 
 #include <cairomm/cairomm.h>
 
-#include "document.h"
+#include "page.h"
 #include "operator_parser.h"
 
 namespace pdf {

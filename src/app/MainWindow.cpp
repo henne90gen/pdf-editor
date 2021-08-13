@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
@@ -57,6 +58,7 @@ class MainWindow : public Gtk::ApplicationWindow {
     void add_pdf_page(const std::string &filePath) {
         auto &document = documents.emplace_back();
         if (!pdf::Document::loadFromFile(filePath, document)) {
+            spdlog::error("Could not load pdf file");
             return;
         }
 

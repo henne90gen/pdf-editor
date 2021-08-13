@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <pdf/document.h>
+#include <pdf/page.h>
 
 TEST(Reader, Blank) {
     pdf::Document document;
