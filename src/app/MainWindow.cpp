@@ -29,8 +29,9 @@ class MainWindow : public Gtk::ApplicationWindow {
             notebook->remove_page(i);
         }
 
-//        add_pdf_page("../../../test-files/blank.pdf");
         add_pdf_page("../../../test-files/hello-world.pdf");
+        add_pdf_page("../../../test-files/two-pages.pdf");
+        add_pdf_page("../../../test-files/blank.pdf");
         notebook->show_all();
     }
 
@@ -74,10 +75,12 @@ class MainWindow : public Gtk::ApplicationWindow {
 
     // using std::list here, because the stored objects have to have stable addresses
     std::list<pdf::Document> documents = {};
-    std::list<PdfPage> pages   = {};
+    std::list<PdfPage> pages           = {};
 };
 
 int main(int argc, char *argv[]) {
+    spdlog::set_level(spdlog::level::trace);
+
     auto app = Gtk::Application::create(argc, argv, "de.henne90gen.pdf_editor");
 
     try {

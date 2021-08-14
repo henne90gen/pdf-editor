@@ -7,9 +7,13 @@ PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
     box.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
     add(box);
 
-    box.pack_start(treeView, false, true);
-    box.pack_start(pdfWidget);
-    set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+    leftScrolledWindow.add(treeView);
+
+    rightScrolledWindow.set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
+    rightScrolledWindow.add(pdfWidget);
+
+    box.pack_start(leftScrolledWindow, false, true);
+    box.pack_start(rightScrolledWindow);
 
     treeStore = Gtk::TreeStore::create(columns);
     treeView.set_model(treeStore);
@@ -121,26 +125,41 @@ Gtk::TreeModel::Row PdfPage::createRow(Gtk::TreeRow *parentRow) {
     }
 }
 
-PdfWidget::PdfWidget(pdf::Document &_file) : file(_file) {
+PdfWidget::PdfWidget(pdf::Document &_file)
+    : Gtk::Viewport(Glib::RefPtr<Gtk::Adjustment>(), Glib::RefPtr<Gtk::Adjustment>()), file(_file) {
+    this->set_hadjustment(hadjustment);
+    this->set_vadjustment(vadjustment);
+    hadjustment->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWidget::hadjustment_changed));
+    vadjustment->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWidget::vadjustment_changed));
+
     set_can_focus(true);
     set_focus_on_click(true);
+
+    drawingArea.signal_draw().connect(sigc::mem_fun(*this, &PdfWidget::my_on_draw));
     add_events(Gdk::SMOOTH_SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK |
                Gdk::KEY_RELEASE_MASK);
+    add(drawingArea);
 }
 
-bool PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
+bool PdfWidget::my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
+    spdlog::trace("PdfWidget: draw");
+
     cr->scale(zoom, zoom);
 
     auto pages = file.pages();
     for (auto page : pages) {
         pdf::renderer renderer(page);
         renderer.render(cr);
+
+        // TODO maybe add some padding between the pages
+        cr->translate(0, page->height());
     }
 
     return false;
 }
 
 bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
+    spdlog::trace("PdfWidget: scroll event");
     if (isCtrlPressed) {
         zoom += event->delta_y * zoomSpeed;
         if (zoom <= 0.1) {
@@ -156,6 +175,7 @@ bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
 }
 
 bool PdfWidget::on_key_press_event(GdkEventKey *key_event) {
+    spdlog::trace("PdfWidget: key press event");
     if (key_event->keyval == GDK_KEY_Control_L) {
         isCtrlPressed = true;
     }
@@ -163,6 +183,7 @@ bool PdfWidget::on_key_press_event(GdkEventKey *key_event) {
 }
 
 bool PdfWidget::on_key_release_event(GdkEventKey *key_event) {
+    spdlog::trace("PdfWidget: key release event");
     if (key_event->keyval == GDK_KEY_Control_L) {
         isCtrlPressed = false;
     }
@@ -170,6 +191,38 @@ bool PdfWidget::on_key_release_event(GdkEventKey *key_event) {
 }
 
 bool PdfWidget::on_button_press_event(GdkEventButton *button_event) {
+    spdlog::trace("PdfWidget: button press event");
     grab_focus();
     return false;
+}
+
+void PdfWidget::update_adjustments(Gtk::Allocation &allocation) {
+    double width  = 0;
+    double height = 0;
+    auto pages    = file.pages();
+    for (auto page : pages) {
+        double currentWidth = page->width();
+        if (currentWidth > width) {
+            width = currentWidth;
+        }
+        // TODO maybe add some padding between the pages
+        height += page->height();
+    }
+
+    auto scaled_width  = width * zoom;
+    auto scaled_height = height * zoom;
+
+    auto page_size_x = allocation.get_width() * 1.0 / scaled_width;
+    hadjustment->configure(hadjustment->get_value(), 0.0, 1.0, 0.1, 0.5, page_size_x);
+
+    auto page_size_y = allocation.get_height() * 1.0 / scaled_height;
+    vadjustment->configure(vadjustment->get_value(), 0.0, 1.0, 0.1, 0.5, page_size_y);
+
+    drawingArea.set_size_request(static_cast<int>(width), static_cast<int>(height));
+}
+
+void PdfWidget::on_size_allocate(Gtk::Allocation &allocation) {
+    spdlog::trace("PdfWidget: size allocate");
+    update_adjustments(allocation);
+    Viewport::on_size_allocate(allocation);
 }

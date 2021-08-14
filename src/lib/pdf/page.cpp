@@ -10,4 +10,8 @@ int64_t Page::rotate() {
     return rot.value()->value;
 }
 
+double Page::width() { return cropBox()->width(); }
+
+double Page::height() { return cropBox()->height(); }
+
 } // namespace pdf

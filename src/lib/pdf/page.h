@@ -55,6 +55,8 @@ struct Page {
     std::optional<Dictionary *> boxColorInfo() { return node->attribute<Dictionary>(document, "BoxColorInfo", false); }
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
     int64_t rotate();
+    double width();
+    double height();
 
     Document &document;
     PageTreeNode *node;

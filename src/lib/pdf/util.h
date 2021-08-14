@@ -1,6 +1,6 @@
 #pragma once
 
-#ifndef __has_builtin      // Optional of course.
+#ifndef __has_builtin
 #define __has_builtin(x) 0 // Compatibility with non-clang compilers.
 #endif
 
@@ -14,6 +14,7 @@
     if (!(x))                                                                                                          \
     __builtin_trap()
 #else
+#define ASSERT(x)
 #endif
 #endif
 
@@ -23,5 +24,6 @@
 #if __has_builtin(__builtin_trap)
 #define TODO(x) printf("TODO: %s\n", x)
 #else
+#define TODO(x)
 #endif
 #endif
