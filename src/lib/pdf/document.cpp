@@ -1,7 +1,7 @@
 #include "document.h"
 
-#include <spdlog/spdlog.h>
 #include <fstream>
+#include <spdlog/spdlog.h>
 
 #include "page.h"
 
@@ -107,11 +107,11 @@ Dictionary *parseDict(char *start, size_t length) {
     return result->as<Dictionary>();
 }
 
-void readTrailer(Document &file) {
+bool readTrailer(Document &file) {
     char *startOfEofMarker = file.data + (file.sizeInBytes - 6);
     if (std::string(startOfEofMarker, 6) != "%%EOF\n") {
-        std::cerr << "Last line did not have '%%EOF'" << std::endl;
-        return;
+        spdlog::error("Last line did not have '%%EOF'");
+        return false;
     }
 
     char *lastCrossRefStartPtr = startOfEofMarker - 2;
@@ -119,8 +119,8 @@ void readTrailer(Document &file) {
         lastCrossRefStartPtr--;
     }
     if (file.data == lastCrossRefStartPtr) {
-        std::cerr << "ERROR: reached start of file" << std::endl;
-        return;
+        spdlog::error("Unexpectedly reached start of file");
+        return false;
     }
     lastCrossRefStartPtr++;
 
@@ -129,36 +129,46 @@ void readTrailer(Document &file) {
               std::stoll(std::string(lastCrossRefStartPtr, startOfEofMarker - 1 - lastCrossRefStartPtr));
     } catch (std::invalid_argument &err) {
         // TODO add logging
+        return false;
     } catch (std::out_of_range &err) {
         // TODO add logging
+        return false;
     }
 
-    char *startxrefPtr = lastCrossRefStartPtr - 10;
-    auto startxrefLine = std::string(startxrefPtr, 9);
-    if (startxrefLine != "startxref") {
-        std::cerr << "Expected startxref" << std::endl;
-        return;
-    }
+    const auto xrefKeyword = std::string_view(file.data + file.trailer.lastCrossRefStart, 4);
+    if (xrefKeyword != "xref") {
+        // TODO parse cross reference stream
+        spdlog::warn("Cross reference streams are not supported yet");
+        return false;
+    } else {
+        char *startxrefPtr = lastCrossRefStartPtr - 10;
+        auto startxrefLine = std::string_view(startxrefPtr, 9);
+        if (startxrefLine != "startxref") {
+            spdlog::error("Expected 'startxref', but got '{}'", startxrefLine);
+            return false;
+        }
 
-    char *startOfTrailerPtr = startxrefPtr;
-    while (std::string(startOfTrailerPtr, 7) != "trailer" && file.data < startOfTrailerPtr) {
-        startOfTrailerPtr--;
-    }
-    if (file.data == startOfTrailerPtr) {
-        std::cerr << "ERROR: reached start of file" << std::endl;
-        return;
-    }
+        char *startOfTrailerPtr = startxrefPtr;
+        while (std::string_view(startOfTrailerPtr, 7) != "trailer" && file.data < startOfTrailerPtr) {
+            startOfTrailerPtr--;
+        }
+        if (file.data == startOfTrailerPtr) {
+            spdlog::error("Unexpectedly reached start of file");
+            return false;
+        }
 
-    startOfTrailerPtr += 8;
-    auto lengthOfTrailerDict = startxrefPtr - 1 - startOfTrailerPtr;
-    file.trailer.dict        = parseDict(startOfTrailerPtr, lengthOfTrailerDict);
+        startOfTrailerPtr += 8;
+        auto lengthOfTrailerDict = startxrefPtr - 1 - startOfTrailerPtr;
+        file.trailer.dict        = parseDict(startOfTrailerPtr, lengthOfTrailerDict);
+        return true;
+    }
 }
 
-void readCrossReferenceTable(Document &file) {
+bool readCrossReferenceTable(Document &file) {
     char *crossRefPtr = file.data + file.trailer.lastCrossRefStart;
     if (std::string(crossRefPtr, 5) != "xref\n") {
         std::cerr << "Expected xref" << std::endl;
-        return;
+        return false;
     }
     crossRefPtr += 5;
 
@@ -188,6 +198,7 @@ void readCrossReferenceTable(Document &file) {
         beginTable += 20;
     }
     file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
+    return true;
 }
 
 bool Document::loadFromFile(const std::string &filePath, Document &document) {
@@ -207,8 +218,12 @@ bool Document::loadFromFile(const std::string &filePath, Document &document) {
     is.seekg(0);
     is.read(document.data, document.sizeInBytes);
 
-    readTrailer(document);
-    readCrossReferenceTable(document);
+    if (!readTrailer(document)) {
+        return false;
+    }
+    if (!readCrossReferenceTable(document)) {
+        return false;
+    }
 
     return true;
 }
