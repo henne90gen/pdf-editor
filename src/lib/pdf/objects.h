@@ -22,7 +22,8 @@ namespace pdf {
     O(INDIRECT_REFERENCE)                                                                                              \
     O(INDIRECT_OBJECT)                                                                                                 \
     O(STREAM)                                                                                                          \
-    O(NULL_OBJECT)
+    O(NULL_OBJECT)                                                                                                     \
+    O(OBJECT_STREAM_CONTENT)
 
 struct Object {
     enum class Type {
@@ -126,7 +127,7 @@ struct IndirectReference : public Object {
         : Object(staticType()), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
 };
 
-struct IndirectObject : Object {
+struct IndirectObject : public Object {
     static Type staticType() { return Type::INDIRECT_OBJECT; }
 
     int64_t objectNumber     = 0;
@@ -139,7 +140,7 @@ struct IndirectObject : Object {
 
 class OperatorParser;
 
-struct Stream : Object {
+struct Stream : public Object {
     static Type staticType() { return Type::STREAM; }
 
     Dictionary *dictionary = nullptr;
@@ -152,10 +153,14 @@ struct Stream : Object {
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 
-struct Null : Object {
+struct Null : public Object {
     static Type staticType() { return Type::NULL_OBJECT; }
 
     explicit Null() : Object(staticType()) {}
+};
+
+struct ObjectStreamContent : public Object {
+    static Type staticType() { return Type::OBJECT_STREAM_CONTENT; }
 };
 
 std::ostream &operator<<(std::ostream &os, Object::Type &type);

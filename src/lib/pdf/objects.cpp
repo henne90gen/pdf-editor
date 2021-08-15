@@ -3,8 +3,6 @@
 #include <cstring>
 #include <zlib.h>
 
-#include "operator_parser.h"
-
 namespace pdf {
 
 std::ostream &operator<<(std::ostream &os, Object::Type &type) {
@@ -38,14 +36,14 @@ std::vector<std::string> Stream::filters() const {
     result.reserve(array->values.size());
     for (auto filter : array->values) {
         // TODO is this conversion to a string really necessary?
-        result.push_back(std::string(filter->as<Name>()->value));
+        result.emplace_back(filter->as<Name>()->value);
     }
     return result;
 }
 
 std::string_view Stream::to_string() const {
-    const char *output      = data.data();
-    size_t outputSize = data.length();
+    const char *output = data.data();
+    size_t outputSize  = data.length();
 
     auto fs = filters();
     if (fs.empty()) {
@@ -55,10 +53,10 @@ std::string_view Stream::to_string() const {
     for (const auto &filter : fs) {
         if (filter == "FlateDecode") {
             // TODO this works, but is not optimal
-            const char *input      = output;
-            size_t inputSize = outputSize;
+            const char *input = output;
+            size_t inputSize  = outputSize;
 
-            outputSize = inputSize * 2;
+            outputSize = inputSize * 3;
             output     = (char *)malloc(outputSize);
 
             z_stream infstream;
@@ -75,6 +73,12 @@ std::string_view Stream::to_string() const {
             inflateEnd(&infstream);
 
             outputSize = infstream.total_out;
+
+            // copy the result into a buffer that fits exactly
+            char *tmp = (char *)malloc(outputSize);
+            memcpy(tmp, output, outputSize);
+            free((void *)output);
+            output = tmp;
         } else {
             std::cerr << "Unknown filter: " << filter << std::endl;
         }

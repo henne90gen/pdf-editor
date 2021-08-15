@@ -186,10 +186,10 @@ TEST(Parser, Stream) {
 }
 
 TEST(Parser, StreamIndirectLength) {
-    const std::string input = "<</Length 0 0 R/Filter/FlateDecode>>\n"
-                              "stream\n"
-                              "some bytes\n"
-                              "endstream";
+    const std::string input                 = "<</Length 0 0 R/Filter/FlateDecode>>\n"
+                                              "stream\n"
+                                              "some bytes\n"
+                                              "endstream";
     std::vector<pdf::IndirectObject *> refs = {new pdf::IndirectObject(3, 0, new pdf::Integer(10))};
     assertParsesWithReferenceResolver<pdf::Stream>(input, new TestReferenceResolver(refs), [](pdf::Stream *result) {
         ASSERT_EQ(result->data.length(), 10);
@@ -210,4 +210,25 @@ TEST(Parser, CatalogDict) {
                                       ">>\n"
                                       "endobj",
                                       [](pdf::IndirectObject *result) {});
+}
+
+TEST(Parser, MultipleObjects) {
+    auto textProvider = pdf::StringTextProvider("5\n 6 7");
+    auto lexer        = pdf::TextLexer(textProvider);
+    auto parser       = pdf::Parser(lexer);
+
+    auto result = parser.parse();
+    ASSERT_NE(result, nullptr);
+    ASSERT_EQ(result->type, pdf::Object::Type::INTEGER);
+    ASSERT_EQ(result->as<pdf::Integer>()->value, 5);
+
+    result = parser.parse();
+    ASSERT_NE(result, nullptr);
+    ASSERT_EQ(result->type, pdf::Object::Type::INTEGER);
+    ASSERT_EQ(result->as<pdf::Integer>()->value, 6);
+
+    result = parser.parse();
+    ASSERT_NE(result, nullptr);
+    ASSERT_EQ(result->type, pdf::Object::Type::INTEGER);
+    ASSERT_EQ(result->as<pdf::Integer>()->value, 7);
 }

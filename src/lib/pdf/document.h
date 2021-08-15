@@ -10,14 +10,41 @@ struct PageTreeNode;
 struct Page;
 
 struct Trailer {
+    Dictionary *root(Document &document) const;
+    Dictionary *get_dict() { return dict; }
+    void set_dict(Dictionary *_dict) { this->dict = _dict; }
+    Stream *get_stream() { return stream; }
+    void set_stream(Stream *_stream) { this->stream = _stream; }
+
     int64_t lastCrossRefStart = {};
-    Dictionary *dict          = nullptr;
+
+  private:
+    Dictionary *dict = nullptr;
+    Stream *stream   = nullptr;
+};
+
+enum class CrossReferenceEntryType {
+    FREE=0,
+    NORMAL=1,
+    COMPRESSED=2,
 };
 
 struct CrossReferenceEntry {
-    int64_t byteOffset       = 0;
-    int64_t generationNumber = 0;
-    bool isFree              = false;
+    CrossReferenceEntryType type;
+    union {
+        struct {
+            uint64_t nextFreeObjectNumber;
+            uint64_t nextFreeObjectGenerationNumber;
+        } free;
+        struct {
+            uint64_t byteOffset;
+            uint64_t generationNumber;
+        } normal;
+        struct {
+            uint64_t objectNumberOfStream;
+            uint64_t indexInStream;
+        } compressed;
+    };
 };
 
 struct CrossReferenceTable {
@@ -61,8 +88,8 @@ struct Document : public ReferenceResolver {
     static bool loadFromFile(const std::string &filePath, Document &document);
 
   private:
-    IndirectObject *getObject(int64_t objectNumber);
-    [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber) const;
+    IndirectObject *getObject(uint64_t objectNumber);
+    [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber);
 };
 
 } // namespace pdf

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <list>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <list>
 
 #include "lexer.h"
 #include "objects.h"
@@ -35,9 +35,10 @@ class Parser {
   private:
     Lexer &lexer;
     ReferenceResolver *referenceResolver;
-    // TODO this is very inefficient, but we need stable pointers (this should be replaced with a custom data structure)
+
     std::vector<Token> tokens = {};
     int currentTokenIdx       = 0;
+
     [[nodiscard]] bool currentTokenIs(Token::Type type);
 
     Object *parseObject();
@@ -54,4 +55,5 @@ class Parser {
     IndirectObject *parseIndirectObject();
     Object *parseStreamOrDictionary();
 };
+
 } // namespace pdf

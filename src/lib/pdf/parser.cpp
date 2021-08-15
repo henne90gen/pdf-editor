@@ -326,6 +326,10 @@ Object *Parser::parseStreamOrDictionary() {
 }
 
 Object *Parser::parseObject() {
+    while (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
+
     auto boolean = parseBoolean();
     if (boolean != nullptr) {
         return boolean;
