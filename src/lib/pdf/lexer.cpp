@@ -8,10 +8,7 @@ namespace pdf {
 
 // NOTE pre-computing the regex increased performance 15x
 // NOTE moving regex evaluation to the back of findToken increased performance 2x
-auto indirectReferenceRegex = std::regex("^[0-9]+ [0-9]+ R");
 auto objectStartRegex       = std::regex("^[0-9]+ [0-9]+ obj");
-auto floatRegex             = std::regex("^[+-]?[0-9]+\\.[0-9]+");
-auto intRegex               = std::regex("^[+-]?[0-9]+");
 auto hexadecimalRegex       = std::regex("^<[0-9a-fA-F]*>");
 auto nameRegex              = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
 
@@ -31,9 +28,63 @@ std::optional<Token> matchRegex(const std::string_view &word, const std::regex &
         auto content = static_cast<std::string>((*itr).str());
         // TODO I hope this ensures that we still point to the original data stream
         auto token = Token(tokenType, word.substr(0, content.length()));
-        return std::optional<Token>(token);
+        return {token};
     }
     return {};
+}
+
+bool is_digit(char c) {
+    for (char d = '0'; d <= '9'; d++) {
+        if (c == d) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::optional<Token> matchInt(const std::string_view &word) {
+    if (word.empty()) {
+        return {};
+    }
+
+    int idx = 0;
+    if (word[idx] == '+' || word[idx] == '-') {
+        idx++;
+    }
+
+    if (idx >= word.length() || !is_digit(word[idx])) {
+        return {};
+    }
+    idx++;
+
+    while (idx < word.length() && is_digit(word[idx])) {
+        idx++;
+    }
+
+    return Token(Token::Type::INTEGER, word.substr(0, idx));
+}
+
+std::optional<Token> matchFloatOrInt(const std::string_view &word) {
+    auto result = matchInt(word);
+    if (!result.has_value()) {
+        return {};
+    }
+    auto idx = result.value().content.length();
+    if (idx >= word.length() || word[idx] != '.') {
+        return result;
+    }
+    idx++;
+
+    if (idx >= word.length() || !is_digit(word[idx])) {
+        return {};
+    }
+    idx++;
+
+    while (idx < word.length() && is_digit(word[idx])) {
+        idx++;
+    }
+
+    return Token(Token::Type::REAL, word.substr(0, idx));
 }
 
 std::optional<Token> matchWordToken(const std::string_view &word) {
@@ -181,6 +232,37 @@ std::optional<Token> matchOperator(const std::string_view &word) {
     return {};
 }
 
+std::optional<Token> matchIndirectReference(const std::string_view &word) {
+    auto num1 = matchInt(word);
+    if (!num1.has_value()) {
+        return {};
+    }
+
+    auto idx = num1.value().content.length();
+    if (idx >= word.length() || word[idx] != ' ') {
+        return {};
+    }
+    idx++;
+
+    auto num2 = matchInt(word.substr(idx));
+    if (!num2.has_value()) {
+        return {};
+    }
+
+    idx += num2.value().content.length();
+    if (idx >= word.length() || word[idx] != ' ') {
+        return {};
+    }
+    idx++;
+
+    if (idx >= word.length() || word[idx] != 'R') {
+        return {};
+    }
+    idx++;
+
+    return Token(Token::Type::INDIRECT_REFERENCE, word.substr(0, idx));
+}
+
 std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
@@ -189,48 +271,44 @@ std::optional<Token> findToken(const std::string_view &word) {
 
     auto charToken = matchCharToken(word);
     if (charToken.has_value()) {
-        return charToken.value();
+        return charToken;
     }
 
     auto wordToken = matchWordToken(word);
     if (wordToken.has_value()) {
-        return wordToken.value();
+        return wordToken;
     }
 
     auto operatorToken = matchOperator(word);
     if (operatorToken.has_value()) {
-        return operatorToken.value();
+        return operatorToken;
     }
 
-    auto indirectReferenceToken = matchRegex(word, indirectReferenceRegex, Token::Type::INDIRECT_REFERENCE);
+    // NOTE indirect reference and object start have to be lexed before float or int
+    auto indirectReferenceToken = matchIndirectReference(word);
     if (indirectReferenceToken.has_value()) {
-        return indirectReferenceToken.value();
+        return indirectReferenceToken;
     }
 
     auto objectStartToken = matchRegex(word, objectStartRegex, Token::Type::OBJECT_START);
     if (objectStartToken.has_value()) {
-        return objectStartToken.value();
+        return objectStartToken;
     }
 
-    auto floatToken = matchRegex(word, floatRegex, Token::Type::REAL);
-    if (floatToken.has_value()) {
-        return floatToken.value();
-    }
-
-    auto intToken = matchRegex(word, intRegex, Token::Type::INTEGER);
-    if (intToken.has_value()) {
-        return intToken.value();
+    auto floatOrIntToken = matchFloatOrInt(word);
+    if (floatOrIntToken.has_value()) {
+        return floatOrIntToken;
     }
 
     auto hexadecimalString = matchRegex(word, hexadecimalRegex, Token::Type::HEXADECIMAL_STRING);
     if (hexadecimalString.has_value()) {
-        return hexadecimalString.value();
+        return hexadecimalString;
     }
 
     // TODO check with the standard again
     auto nameToken = matchRegex(word, nameRegex, Token::Type::NAME);
     if (nameToken.has_value()) {
-        return nameToken.value();
+        return nameToken;
     }
 
     return {};
