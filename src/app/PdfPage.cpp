@@ -138,7 +138,7 @@ PdfWidget::PdfWidget(pdf::Document &_file)
     drawingArea.signal_draw().connect(sigc::mem_fun(*this, &PdfWidget::my_on_draw));
     add_events(Gdk::SMOOTH_SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK |
                Gdk::KEY_RELEASE_MASK);
-    add(drawingArea);
+    Gtk::Container::add(drawingArea);
 }
 
 bool PdfWidget::my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
@@ -161,14 +161,14 @@ bool PdfWidget::my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
 bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
     spdlog::trace("PdfWidget: scroll event");
     if (isCtrlPressed) {
-        zoom += event->delta_y * zoomSpeed;
+        zoom -= event->delta_y * zoomSpeed;
         if (zoom <= 0.1) {
             zoom = 0.1;
         }
 
         queue_draw();
 
-        return false;
+        return true;
     }
 
     return false;
