@@ -14,3 +14,5 @@ target_link_gtk3(pdf-app)
 target_link_libraries(pdf-app PRIVATE pdf-lib spdlog::spdlog)
 
 add_subdirectory(gtk-examples)
+
+install(TARGETS pdf-app DESTINATION bin)
