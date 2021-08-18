@@ -18,12 +18,4 @@
 #endif
 #endif
 
-#ifdef _MSC_VER
 #define TODO(x) printf("TODO: %s\n", x)
-#else
-#if __has_builtin(__builtin_trap)
-#define TODO(x) printf("TODO: %s\n", x)
-#else
-#define TODO(x)
-#endif
-#endif

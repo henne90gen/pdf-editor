@@ -140,13 +140,17 @@ Stream *parseStream(char *start, size_t length) {
 }
 
 bool readTrailer(Document &file) {
-    char *startOfEofMarker = file.data + (file.sizeInBytes - 6);
-    if (std::string(startOfEofMarker, 6) != "%%EOF\n") {
+    size_t eofMarkerLength = 5;
+    char *eofMarkerStart   = file.data + (file.sizeInBytes - eofMarkerLength);
+    if (file.data[file.sizeInBytes - 1] == '\n') {
+        eofMarkerStart -= 1;
+    }
+    if (std::string(eofMarkerStart, eofMarkerLength) != "%%EOF") {
         spdlog::error("Last line did not have '%%EOF'");
         return false;
     }
 
-    char *lastCrossRefStartPtr = startOfEofMarker - 2;
+    char *lastCrossRefStartPtr = eofMarkerStart - 2;
     while (*lastCrossRefStartPtr != '\n' && file.data < lastCrossRefStartPtr) {
         lastCrossRefStartPtr--;
     }
@@ -158,7 +162,7 @@ bool readTrailer(Document &file) {
 
     try {
         file.trailer.lastCrossRefStart =
-              std::stoll(std::string(lastCrossRefStartPtr, startOfEofMarker - 1 - lastCrossRefStartPtr));
+              std::stoll(std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr));
     } catch (std::invalid_argument &err) {
         spdlog::error("Failed to parse byte offset of cross reference table: {}", err.what());
         return false;
@@ -177,6 +181,10 @@ bool readTrailer(Document &file) {
     } else {
         char *startxrefPtr = lastCrossRefStartPtr - 10;
         auto startxrefLine = std::string_view(startxrefPtr, 9);
+        if (startxrefLine == "tartxref\r") {
+            startxrefPtr -= 1;
+            startxrefLine = std::string_view(startxrefPtr, 9);
+        }
         if (startxrefLine != "startxref") {
             spdlog::error("Expected 'startxref', but got '{}'", startxrefLine);
             return false;
@@ -192,7 +200,13 @@ bool readTrailer(Document &file) {
         }
 
         startOfTrailerPtr += 8;
-        auto lengthOfTrailerDict = startxrefPtr - 1 - startOfTrailerPtr;
+        if (*(startxrefPtr - 1) == '\n') {
+            startxrefPtr--;
+        }
+        if (*(startxrefPtr - 1) == '\r') {
+            startxrefPtr--;
+        }
+        auto lengthOfTrailerDict = startxrefPtr - startOfTrailerPtr;
         file.trailer.set_dict(parseDict(startOfTrailerPtr, lengthOfTrailerDict));
         return true;
     }
@@ -205,11 +219,17 @@ bool readCrossReferenceTable(Document &file) {
 
     if (file.trailer.get_dict() != nullptr) {
         char *crossRefPtr = file.data + file.trailer.lastCrossRefStart;
-        if (std::string(crossRefPtr, 5) != "xref\n") {
+        if (std::string(crossRefPtr, 4) != "xref") {
             std::cerr << "Expected xref" << std::endl;
             return false;
         }
-        crossRefPtr += 5;
+        crossRefPtr += 4;
+        if (*crossRefPtr == '\r') {
+            crossRefPtr++;
+        }
+        if (*crossRefPtr == '\n') {
+            crossRefPtr++;
+        }
 
         int64_t spaceLocation = -1;
         char *tmp             = crossRefPtr;
@@ -331,6 +351,7 @@ bool Document::loadFromFile(const std::string &filePath, Document &document) {
 
     is.seekg(0);
     is.read(document.data, document.sizeInBytes);
+    is.close();
 
     if (!readTrailer(document)) {
         return false;

@@ -169,6 +169,9 @@ std::optional<Token> matchCharToken(const std::string_view &word) {
     if (!word.empty() && word[0] == '\n') {
         return Token(Token::Type::NEW_LINE, "\n");
     }
+    if (STARTS_WITH(word, "\r\n")) {
+        return Token(Token::Type::NEW_LINE, "\r\n");
+    }
     if (!word.empty() && word[0] == '[') {
         return Token(Token::Type::ARRAY_START, "[");
     }
@@ -344,7 +347,7 @@ std::optional<Token> TextLexer::getToken() {
 
     if (!currentWord.empty()) {
         std::cerr << "Found an invalid token: '" << currentWord << "'" << std::endl;
-        return std::optional(Token(Token::Type::INVALID, currentWord));
+        return Token(Token::Type::INVALID, currentWord);
     }
 
     return {};

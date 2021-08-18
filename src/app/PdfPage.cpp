@@ -20,7 +20,7 @@ PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
 
     auto root = file.root();
     ASSERT(root != nullptr);
-    addRows(root, 0);
+//    addRows(root, 0);
 
     treeView.append_column("Name", columns.m_col_name);
     treeView.append_column("Value", columns.m_col_value);

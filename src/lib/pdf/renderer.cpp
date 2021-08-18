@@ -27,8 +27,8 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     } else if (content->is<Array>()) {
         auto arr     = content->as<Array>();
         auto streams = std::vector<Stream *>(arr->values.size());
-        for (auto val : arr->values) {
-            streams.push_back(val->as<Stream>());
+        for (int i = 0; i < arr->values.size(); i++) {
+            streams[i] = page->document.get<Stream>(arr->values[i]);
         }
         render(cr, streams);
     } else {

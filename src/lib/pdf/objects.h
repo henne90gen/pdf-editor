@@ -40,7 +40,7 @@ struct Object {
         ASSERT(T::staticType() == type || T::staticType() == Type::OBJECT);
         return (T *)this;
     }
-    template <typename T> bool is() { return T::staticType() == type; }
+    template <typename T> bool is() { return T::staticType() == type || T::staticType() == Type::OBJECT; }
 };
 
 struct Boolean : public Object {
