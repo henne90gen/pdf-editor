@@ -140,13 +140,7 @@ void renderer::setTextFontAndSize(Operator *op) {
     }
 
     auto font = fontOpt.value();
-
-    if (font->isTrueType()) {
-        loadTrueTypeFont(font->as<TrueTypeFont>());
-    } else {
-        TODO("implement loading of other fonts");
-        ASSERT(false);
-    }
+    loadFont(font);
 }
 
 void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
@@ -160,9 +154,10 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     cr->set_font_face(textState.textFont.cairoFace);
     cr->set_source_rgb(0.0, 0.0, 0.0);
 
-    auto values    = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
-    auto glyphs    = std::vector<Cairo::Glyph>();
-    double xOffset = 0;
+    auto scaledFont = cr->get_scaled_font();
+    auto values     = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
+    auto glyphs     = std::vector<Cairo::Glyph>();
+    double xOffset  = 0;
     for (auto value : values) {
         if (value->is<Integer>()) {
             auto i = value->as<Integer>();
@@ -174,9 +169,20 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
                 Cairo::Glyph glyph = {.index = i, .x = xOffset, .y = 0.0};
                 glyphs.push_back(glyph);
 
-                auto scaledFont = cr->get_scaled_font();
                 Cairo::TextExtents extents;
                 cairo_scaled_font_glyph_extents(scaledFont->cobj(), &glyph, 1, &extents);
+                xOffset += static_cast<double>(extents.x_advance);
+            }
+        } else if (value->is<LiteralString>()) {
+            auto utf8     = std::string(value->as<LiteralString>()->value);
+            auto clusters = std::vector<Cairo::TextCluster>();
+            Cairo::TextClusterFlags flags;
+            std::vector<Cairo::Glyph> newGlyphs = {};
+            scaledFont->text_to_glyphs(xOffset, 0.0, utf8, newGlyphs, clusters, flags);
+            for (auto &g : newGlyphs) {
+                glyphs.push_back(g);
+                Cairo::TextExtents extents;
+                cairo_scaled_font_glyph_extents(scaledFont->cobj(), &g, 1, &extents);
                 xOffset += static_cast<double>(extents.x_advance);
             }
         }
@@ -185,9 +191,8 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     cr->show_glyphs(glyphs);
 }
 
-void renderer::loadTrueTypeFont(TrueTypeFont *font) {
-    stateStack.back().textState.textFont.type     = FontType::TRUE_TYPE;
-    stateStack.back().textState.textFont.trueType = font;
+void renderer::loadFont(Font *font) {
+    stateStack.back().textState.textFont.font = font;
 
     auto toUnicodeOpt = font->toUnicode(page->document);
     if (toUnicodeOpt.has_value()) {
@@ -196,9 +201,9 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
         // TODO read in cmap file
     }
 
-    std::optional<Stream *> fontFileOpt = font->fontDescriptor(page->document)->fontFile2(page->document);
+    std::optional<Stream *> fontFileOpt = font->fontProgram(page->document);
     if (!fontFileOpt.has_value()) {
-        spdlog::error("Failed to find embedded font!");
+        spdlog::error("Failed to find embedded font program!");
         return;
     }
 
@@ -218,7 +223,7 @@ void renderer::loadTrueTypeFont(TrueTypeFont *font) {
     auto size    = (int64_t)view.length();
     error        = FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte *>(basePtr), size, faceIndex, &face);
     if (error != FT_Err_Ok) {
-        spdlog::error("Failed to load embedded font!");
+        spdlog::error("Failed to load embedded font program!");
         return;
     }
 

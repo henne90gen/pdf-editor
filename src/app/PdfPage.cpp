@@ -166,6 +166,8 @@ bool PdfWidget::on_scroll_event(GdkEventScroll *event) {
             zoom = 0.1;
         }
 
+        Gtk::Allocation allocation = get_allocation();
+        update_adjustments(allocation);
         queue_draw();
 
         return true;
@@ -196,7 +198,7 @@ bool PdfWidget::on_button_press_event(GdkEventButton *button_event) {
     return false;
 }
 
-void PdfWidget::update_adjustments(Gtk::Allocation &allocation) {
+void PdfWidget::update_adjustments(const Gtk::Allocation &allocation) {
     double width  = 0;
     double height = 0;
     auto pages    = file.pages();

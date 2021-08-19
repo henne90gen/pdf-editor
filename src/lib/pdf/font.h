@@ -58,9 +58,6 @@ struct Font : public Dictionary {
     bool isTrueType() { return type()->value == "TrueType"; }
     bool isCIDFontType0() { return type()->value == "CIDFontType0"; }
     bool isCIDFontType2() { return type()->value == "CIDFontType2"; }
-};
-
-struct TrueTypeFont : public Font {
     std::optional<Name *> name() { return find<Name>("Name"); }
     Name *baseFont() { return values["BaseFont"]->as<Name>(); }
     Integer *firstChar() { return values["FirstChar"]->as<Integer>(); }
@@ -69,6 +66,7 @@ struct TrueTypeFont : public Font {
     FontDescriptor *fontDescriptor(Document &document);
     std::optional<Object *> encoding(Document &document);
     std::optional<CMapStream *> toUnicode(Document &document);
+    std::optional<Stream *> fontProgram(Document &document);
 };
 
 struct FontMap : public Dictionary {

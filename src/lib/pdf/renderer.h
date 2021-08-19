@@ -53,7 +53,7 @@ enum class FontType {
 
 struct TextFont {
     FontType type;
-    TrueTypeFont *trueType;
+    Font *font;
     FT_Face ftFace;
     Cairo::RefPtr<Cairo::FontFace> cairoFace;
 };
@@ -107,7 +107,7 @@ struct renderer {
     void moveStartOfNextLine(Operator *op);
     void setTextFontAndSize(Operator *op);
     void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *pOperator);
-    void loadTrueTypeFont(TrueTypeFont *font);
+    void loadFont(Font *font);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;

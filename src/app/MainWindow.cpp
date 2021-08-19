@@ -29,6 +29,7 @@ class MainWindow : public Gtk::ApplicationWindow {
             notebook->remove_page(i);
         }
 
+        add_pdf_page("../../../test-files/object-stream.pdf");
         add_pdf_page("../../../test-files/hello-world.pdf");
         add_pdf_page("../../../test-files/two-pages.pdf");
         add_pdf_page("../../../test-files/blank.pdf");

@@ -29,7 +29,7 @@ class PdfWidget : public Gtk::Viewport {
 
     void hadjustment_changed() const { spdlog::info("hadjustment value changed"); }
     void vadjustment_changed() const { spdlog::info("vadjustment value changed"); }
-    void update_adjustments(Gtk::Allocation &allocation);
+    void update_adjustments(const Gtk::Allocation &allocation);
 
   private:
     pdf::Document &file;
