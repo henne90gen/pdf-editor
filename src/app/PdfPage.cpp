@@ -151,8 +151,8 @@ bool PdfWidget::my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr) {
         pdf::renderer renderer(page);
         renderer.render(cr);
 
-        // TODO maybe add some padding between the pages
-        cr->translate(0, page->height());
+        int padding = 10;
+        cr->translate(0, page->height() + padding);
     }
 
     return false;
