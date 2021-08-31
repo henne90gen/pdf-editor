@@ -174,7 +174,7 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
                 xOffset += static_cast<double>(extents.x_advance);
             }
         } else if (value->is<LiteralString>()) {
-            auto utf8     = std::string(value->as<LiteralString>()->value);
+            auto utf8     = std::string(value->as<LiteralString>()->value());
             auto clusters = std::vector<Cairo::TextCluster>();
             Cairo::TextClusterFlags flags;
             std::vector<Cairo::Glyph> newGlyphs = {};

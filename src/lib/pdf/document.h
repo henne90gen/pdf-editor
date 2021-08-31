@@ -8,9 +8,20 @@ namespace pdf {
 
 struct PageTreeNode;
 struct Page;
+struct Document;
+
+struct DocumentCatalog : Dictionary {
+    PageTreeNode *page_tree_root(Document &document);
+    /*
+        Object *outline_hierarchy();
+        Object *article_threads();
+        Object *named_destinations();
+        Object *interactive_form();
+    */
+};
 
 struct Trailer {
-    Dictionary *root(Document &document) const;
+    DocumentCatalog *catalog(Document &document) const;
     Dictionary *get_dict() { return dict; }
     void set_dict(Dictionary *_dict) { this->dict = _dict; }
     Stream *get_stream() { return stream; }
@@ -24,9 +35,9 @@ struct Trailer {
 };
 
 enum class CrossReferenceEntryType {
-    FREE=0,
-    NORMAL=1,
-    COMPRESSED=2,
+    FREE       = 0,
+    NORMAL     = 1,
+    COMPRESSED = 2,
 };
 
 struct CrossReferenceEntry {
@@ -60,14 +71,20 @@ struct Document : public ReferenceResolver {
     CrossReferenceTable crossReferenceTable = {};
     std::vector<IndirectObject *> objects   = {};
 
-    Dictionary *root();
+    std::vector<std::string_view> deleted_sections = {};
+
+    DocumentCatalog *catalog();
     std::vector<Page *> pages();
-    std::vector<IndirectObject *> getAllObjects();
+    size_t page_count();
+    std::vector<IndirectObject *> get_all_objects();
     IndirectObject *resolve(const IndirectReference *ref) override;
+
+    bool delete_page(size_t pageNum);
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
-            return resolve(object->as<IndirectReference>())->object->as<T>();
+            auto resolvedObject = resolve(object->as<IndirectReference>());
+            return resolvedObject->object->as<T>();
         } else if (object->is<IndirectObject>()) {
             return object->as<IndirectObject>()->object->as<T>();
         } else if (object->is<T>()) {
@@ -88,7 +105,7 @@ struct Document : public ReferenceResolver {
     static bool loadFromFile(const std::string &filePath, Document &document);
 
   private:
-    IndirectObject *getObject(uint64_t objectNumber);
+    IndirectObject *getObject(int64_t objectNumber);
     [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber);
 };
 

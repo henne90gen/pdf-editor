@@ -6,10 +6,10 @@
 TEST(Reader, Blank) {
     pdf::Document document;
     pdf::Document::loadFromFile("../../../test-files/blank.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
+    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
     ASSERT_EQ(objects.size(), 8);
 
-    auto root = document.root();
+    auto root = document.catalog();
     ASSERT_NE(root, nullptr);
 
     auto pages = document.pages();
@@ -20,18 +20,18 @@ TEST(Reader, Blank) {
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
-    auto stream  = contents->as<pdf::Stream>();
-    auto str     = stream->to_string();
+    auto stream = contents->as<pdf::Stream>();
+    auto str    = stream->to_string();
     ASSERT_EQ(str.size(), 42);
 }
 
 TEST(Reader, HelloWorldGeneral) {
     pdf::Document document;
     pdf::Document::loadFromFile("../../../test-files/hello-world.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
+    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
     ASSERT_EQ(objects.size(), 13);
 
-    auto root = document.root();
+    auto root = document.catalog();
     ASSERT_NE(root, nullptr);
 
     auto pages = document.pages();
@@ -42,8 +42,8 @@ TEST(Reader, HelloWorldGeneral) {
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
-    auto stream  = contents->as<pdf::Stream>();
-    auto str     = stream->to_string();
+    auto stream = contents->as<pdf::Stream>();
+    auto str    = stream->to_string();
     ASSERT_EQ(str.size(), 139);
 }
 
@@ -65,13 +65,13 @@ TEST(Reader, HelloWorldFont) {
 
     auto font = fontOpt.value();
     ASSERT_NE(font, nullptr);
-    ASSERT_EQ(font->type()->value, "TrueType");
+    ASSERT_EQ(font->type(), "TrueType");
     ASSERT_TRUE(font->isTrueType());
-    ASSERT_EQ(font->baseFont()->value, "BAAAAA+LiberationSerif");
+    ASSERT_EQ(font->baseFont()->value(), "BAAAAA+LiberationSerif");
 
-    auto fontDescriptor =font->fontDescriptor(document);
+    auto fontDescriptor = font->fontDescriptor(document);
     ASSERT_NE(fontDescriptor, nullptr);
-    ASSERT_EQ(fontDescriptor->fontName()->value, "BAAAAA+LiberationSerif");
+    ASSERT_EQ(fontDescriptor->fontName()->value(), "BAAAAA+LiberationSerif");
 
     auto flags = fontDescriptor->flags();
     ASSERT_TRUE(flags->symbolic());
@@ -108,7 +108,7 @@ TEST(Reader, HelloWorldCmap) {
 }
 
 TEST(Reader, FontFlags) {
-    auto i = new pdf::Integer(262178);
+    auto i = new pdf::Integer("262178", 262178);
     auto f = i->as<pdf::FontFlags>();
     ASSERT_TRUE(f->serif());
     ASSERT_TRUE(f->nonsymbolic());
@@ -118,10 +118,10 @@ TEST(Reader, FontFlags) {
 TEST(Reader, ObjectStream) {
     pdf::Document document;
     pdf::Document::loadFromFile("../../../test-files/object-stream.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.getAllObjects();
+    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
     ASSERT_EQ(objects.size(), 16);
 
-    auto root = document.root();
+    auto root = document.catalog();
     ASSERT_NE(root, nullptr);
 
     auto pages = document.pages();
@@ -132,7 +132,7 @@ TEST(Reader, ObjectStream) {
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
-    auto stream  = contents->as<pdf::Stream>();
-    auto str     = stream->to_string();
+    auto stream = contents->as<pdf::Stream>();
+    auto str    = stream->to_string();
     ASSERT_EQ(str.size(), 117);
 }

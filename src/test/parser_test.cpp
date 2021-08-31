@@ -59,7 +59,7 @@ TEST(Parser, Real) {
 
 TEST(Parser, Name) {
     assertParses<pdf::Name>("/SomeName", [](auto *result) {
-        ASSERT_EQ(result->value, "SomeName"); //
+        ASSERT_EQ(result->value(), "SomeName"); //
     });
 }
 
@@ -90,15 +90,15 @@ TEST(Parser, DictionaryEmpty) {
 TEST(Parser, DictionaryWithValues) {
     assertParses<pdf::Dictionary>("<< /Type /Hello \n /Key /Value \n >>", [](pdf::Dictionary *result) {
         ASSERT_EQ(result->values.size(), 2); //
-        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value, "Hello");
-        ASSERT_EQ(result->values["Key"]->as<pdf::Name>()->value, "Value");
+        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value(), "Hello");
+        ASSERT_EQ(result->values["Key"]->as<pdf::Name>()->value(), "Value");
     });
 }
 
 TEST(Parser, DictionaryNested) {
     assertParses<pdf::Dictionary>("<< /Type /Hello \n /Dict << /Key /Value \n >> \n >>", [](pdf::Dictionary *result) {
         ASSERT_EQ(result->values.size(), 2);
-        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value, "Hello");
+        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value(), "Hello");
         ASSERT_EQ(result->values["Dict"]->as<pdf::Dictionary>()->values.size(), 1);
     });
 }
@@ -112,17 +112,17 @@ TEST(Parser, IndirectReference) {
 
 TEST(Parser, HexadecimalString) {
     assertParses<pdf::HexadecimalString>("<949FFBA879E60749D38B89A33E0DD9E7>", [](pdf::HexadecimalString *result) {
-        ASSERT_EQ(result->value, "949FFBA879E60749D38B89A33E0DD9E7");
+        ASSERT_EQ(result->data, "949FFBA879E60749D38B89A33E0DD9E7");
     });
     assertParses<pdf::HexadecimalString>("<48656c6c6f>", [](pdf::HexadecimalString *result) {
-        ASSERT_EQ(result->value, "48656c6c6f");
+        ASSERT_EQ(result->data, "48656c6c6f");
         ASSERT_EQ(result->to_string(), "Hello");
     });
 }
 
 TEST(Parser, LiteralString) {
     assertParses<pdf::LiteralString>("(This is a string)", [](pdf::LiteralString *result) {
-        ASSERT_EQ(result->value, "This is a string"); //
+        ASSERT_EQ(result->value(), "This is a string"); //
     });
 }
 
@@ -139,11 +139,11 @@ TEST(Parser, DictionaryTrailer) {
         ASSERT_EQ(result->values["Info"]->as<pdf::IndirectReference>()->objectNumber, 8);
         ASSERT_EQ(result->values["Info"]->as<pdf::IndirectReference>()->generationNumber, 0);
         ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values.size(), 2);
-        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[0]->as<pdf::HexadecimalString>()->value,
+        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[0]->as<pdf::HexadecimalString>()->data,
                   "949FFBA879E60749D38B89A33E0DD9E7");
-        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[1]->as<pdf::HexadecimalString>()->value,
+        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[1]->as<pdf::HexadecimalString>()->data,
                   "949FFBA879E60749D38B89A33E0DD9E7");
-        ASSERT_EQ(result->values["DocChecksum"]->as<pdf::Name>()->value, "87E47BA8C63C8BA796458FA05DBE8C32");
+        ASSERT_EQ(result->values["DocChecksum"]->as<pdf::Name>()->value(), "87E47BA8C63C8BA796458FA05DBE8C32");
     });
 }
 
@@ -170,7 +170,7 @@ TEST(Parser, IndirectObject) {
     assertParses<pdf::IndirectObject>("12 1 obj \n /MyName \n endobj", [](pdf::IndirectObject *result) {
         ASSERT_EQ(result->objectNumber, 12);
         ASSERT_EQ(result->generationNumber, 1);
-        ASSERT_EQ(result->object->as<pdf::Name>()->value, "MyName");
+        ASSERT_EQ(result->object->as<pdf::Name>()->value(), "MyName");
     });
 }
 
@@ -179,9 +179,11 @@ TEST(Parser, Stream) {
                               "stream\n"
                               "some bytes\n"
                               "endstream";
-    assertParses<pdf::Stream>(input, [](pdf::Stream *result) {
-        ASSERT_EQ(result->data.length(), 10);
-        ASSERT_EQ(result->data, "some bytes");
+    assertParses<pdf::Stream>(input, [&input](pdf::Stream *result) {
+        ASSERT_EQ(result->data.length(), 61);
+        ASSERT_EQ(result->data, input);
+        ASSERT_EQ(result->stream_data.length(), 10);
+        ASSERT_EQ(result->stream_data, "some bytes");
     });
 }
 
@@ -190,11 +192,14 @@ TEST(Parser, StreamIndirectLength) {
                                               "stream\n"
                                               "some bytes\n"
                                               "endstream";
-    std::vector<pdf::IndirectObject *> refs = {new pdf::IndirectObject(3, 0, new pdf::Integer(10))};
-    assertParsesWithReferenceResolver<pdf::Stream>(input, new TestReferenceResolver(refs), [](pdf::Stream *result) {
-        ASSERT_EQ(result->data.length(), 10);
-        ASSERT_EQ(result->data, "some bytes");
-    });
+    std::vector<pdf::IndirectObject *> refs = {new pdf::IndirectObject("3 0 R", 3, 0, new pdf::Integer("10", 10))};
+    assertParsesWithReferenceResolver<pdf::Stream>(input, new TestReferenceResolver(refs),
+                                                   [&input](pdf::Stream *result) {
+                                                       ASSERT_EQ(result->data.length(), 64);
+                                                       ASSERT_EQ(result->data, input);
+                                                       ASSERT_EQ(result->stream_data.length(), 10);
+                                                       ASSERT_EQ(result->stream_data, "some bytes");
+                                                   });
 }
 
 TEST(Parser, Null) {

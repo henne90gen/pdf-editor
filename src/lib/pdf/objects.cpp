@@ -1,7 +1,10 @@
 #include "objects.h"
 
 #include <cstring>
+#include <spdlog/spdlog.h>
 #include <zlib.h>
+
+#include "document.h"
 
 namespace pdf {
 
@@ -28,7 +31,7 @@ std::vector<std::string> Stream::filters() const {
 
     if (itr->second->is<Name>()) {
         // TODO is this conversion to a string really necessary?
-        return {std::string(itr->second->as<Name>()->value)};
+        return {std::string(itr->second->as<Name>()->value())};
     }
 
     auto array  = itr->second->as<Array>();
@@ -36,18 +39,18 @@ std::vector<std::string> Stream::filters() const {
     result.reserve(array->values.size());
     for (auto filter : array->values) {
         // TODO is this conversion to a string really necessary?
-        result.emplace_back(filter->as<Name>()->value);
+        result.emplace_back(filter->as<Name>()->value());
     }
     return result;
 }
 
 std::string_view Stream::to_string() const {
-    const char *output = data.data();
-    size_t outputSize  = data.length();
+    const char *output = stream_data.data();
+    size_t outputSize  = stream_data.length();
 
     auto fs = filters();
     if (fs.empty()) {
-        return data;
+        return stream_data;
     }
 
     for (const auto &filter : fs) {
@@ -80,18 +83,19 @@ std::string_view Stream::to_string() const {
             free((void *)output);
             output = tmp;
         } else {
-            std::cerr << "Unknown filter: " << filter << std::endl;
+            spdlog::error("Unknown filter: {}", filter);
+            ASSERT(false);
         }
         // TODO handle more filters
     }
 
-    return std::string_view(output, outputSize);
+    return {output, outputSize};
 }
 
 std::string HexadecimalString::to_string() const {
     // TODO this is quite hacky
     // TODO is this conversion to a string really necessary?
-    std::string tmp = std::string(value);
+    std::string tmp = std::string(data);
     if (tmp.size() % 2 == 1) {
         tmp += "0";
     }
@@ -114,6 +118,12 @@ std::string HexadecimalString::to_string() const {
 
     free(buf);
     return result;
+}
+
+void Array::remove_element(Document &document, size_t index) {
+    ASSERT(index < values.size());
+    document.deleted_sections.push_back(values[index]->data);
+    values.erase(values.begin() + static_cast<int64_t>(index));
 }
 
 } // namespace pdf

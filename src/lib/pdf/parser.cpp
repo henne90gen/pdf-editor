@@ -36,7 +36,7 @@ Boolean *Parser::parseBoolean() {
     } else {
         // TODO add logging
     }
-    return new Boolean(value);
+    return new Boolean(content, value);
 }
 
 Integer *Parser::parseInteger() {
@@ -49,7 +49,7 @@ Integer *Parser::parseInteger() {
         // TODO is this conversion to a string really necessary?
         int64_t value = std::stoll(std::string(content));
         currentTokenIdx++;
-        return new Integer(value);
+        return new Integer(content, value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -68,7 +68,7 @@ Real *Parser::parseReal() {
         // TODO is this conversion to a string really necessary?
         double value = std::stod(std::string(content));
         currentTokenIdx++;
-        return new Real(value);
+        return new Real(content, value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -82,8 +82,9 @@ Null *Parser::parseNullObject() {
         return nullptr;
     }
 
+    auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new Null();
+    return new Null(content);
 }
 
 LiteralString *Parser::parseLiteralString() {
@@ -93,7 +94,7 @@ LiteralString *Parser::parseLiteralString() {
 
     auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new LiteralString(content.substr(1, content.size() - 2));
+    return new LiteralString(content);
 }
 
 HexadecimalString *Parser::parseHexadecimalString() {
@@ -120,7 +121,8 @@ Array *Parser::parseArray() {
         return nullptr;
     }
 
-    auto beforeTokenIdx = currentTokenIdx;
+    auto &objectStartContent = tokens[currentTokenIdx].content;
+    auto beforeTokenIdx      = currentTokenIdx;
     currentTokenIdx++;
 
     std::vector<Object *> objects = {};
@@ -142,8 +144,12 @@ Array *Parser::parseArray() {
         objects.push_back(object);
     }
 
+    auto &lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new Array(objects);
+    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+    auto dataLength = tokenDiff + lastTokenContent.size();
+    auto data       = std::string_view(objectStartContent.data(), dataLength);
+    return new Array(data, objects);
 }
 
 Dictionary *Parser::parseDictionary() {
@@ -151,7 +157,8 @@ Dictionary *Parser::parseDictionary() {
         return nullptr;
     }
 
-    auto beforeTokenIdx = currentTokenIdx;
+    auto &objectStartContent = tokens[currentTokenIdx].content;
+    auto beforeTokenIdx      = currentTokenIdx;
     currentTokenIdx++;
 
     if (currentTokenIs(Token::Type::NEW_LINE)) {
@@ -182,11 +189,15 @@ Dictionary *Parser::parseDictionary() {
         }
 
         // TODO is this conversion to a string really necessary?
-        objects[std::string(key->value)] = value;
+        objects[std::string(key->value())] = value;
     }
 
+    auto &lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new Dictionary(objects);
+    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+    auto dataLength = tokenDiff + lastTokenContent.size();
+    auto data       = std::string_view(objectStartContent.data(), dataLength);
+    return new Dictionary(data, objects);
 }
 
 IndirectReference *Parser::parseIndirectReference() {
@@ -203,7 +214,7 @@ IndirectReference *Parser::parseIndirectReference() {
         const size_t pos2              = content.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(content.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
-        return new IndirectReference(objectNumber, generationNumber);
+        return new IndirectReference(content, objectNumber, generationNumber);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -216,8 +227,8 @@ IndirectObject *Parser::parseIndirectObject() {
     if (!currentTokenIs(Token::Type::OBJECT_START)) {
         return nullptr;
     }
-    auto objectStartContent = tokens[currentTokenIdx].content;
 
+    auto objectStartContent = tokens[currentTokenIdx].content;
     auto beforeTokenIndex = currentTokenIdx;
     currentTokenIdx++;
     while (currentTokenIs(Token::Type::NEW_LINE)) {
@@ -245,8 +256,13 @@ IndirectObject *Parser::parseIndirectObject() {
         const int64_t objectNumber     = std::stoll(std::string(objectStartContent.substr(0, pos1)));
         const size_t pos2              = objectStartContent.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(objectStartContent.substr(pos1 + 1, pos2)));
+
+        auto &lastTokenContent = tokens[currentTokenIdx].content;
         currentTokenIdx++;
-        return new IndirectObject(objectNumber, generationNumber, object);
+        auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+        auto dataLength = tokenDiff + lastTokenContent.size();
+        auto data       = std::string_view(objectStartContent.data(), dataLength);
+        return new IndirectObject(data, objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -256,8 +272,9 @@ IndirectObject *Parser::parseIndirectObject() {
 }
 
 Object *Parser::parseStreamOrDictionary() {
-    auto beforeTokenIdx = currentTokenIdx;
-    auto dictionary     = parseDictionary();
+    auto objectStartContent = tokens[currentTokenIdx].content;
+    auto beforeTokenIdx     = currentTokenIdx;
+    auto dictionary         = parseDictionary();
     if (dictionary == nullptr) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
@@ -311,7 +328,7 @@ Object *Parser::parseStreamOrDictionary() {
         return nullptr;
     }
 
-    auto content = lexer.advanceStream(length);
+    auto streamData = lexer.advanceStream(length);
     if (currentTokenIs(Token::Type::NEW_LINE)) {
         currentTokenIdx++;
     }
@@ -320,9 +337,13 @@ Object *Parser::parseStreamOrDictionary() {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
-    currentTokenIdx++;
 
-    return new Stream(dictionary, content);
+    auto &lastTokenContent = tokens[currentTokenIdx].content;
+    currentTokenIdx++;
+    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+    auto dataLength = tokenDiff + lastTokenContent.size();
+    auto data       = std::string_view(objectStartContent.data(), dataLength);
+    return new Stream(data, dictionary, streamData);
 }
 
 Object *Parser::parseObject() {

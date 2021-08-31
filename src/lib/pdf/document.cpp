@@ -2,6 +2,7 @@
 
 #include <bitset>
 #include <fstream>
+#include <functional>
 #include <spdlog/spdlog.h>
 
 #include "page.h"
@@ -32,7 +33,8 @@ IndirectObject *Document::loadObject(int64_t objectNumber) {
         return result->as<IndirectObject>();
     } else {
         auto stream = getObject(entry.compressed.objectNumberOfStream)->object->as<Stream>();
-        ASSERT(stream->dictionary->values["Type"]->as<Name>()->value == "ObjStm");
+        ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
+
         auto content       = stream->to_string();
         auto textProvider  = StringTextProvider(content);
         auto lexer         = TextLexer(textProvider);
@@ -40,21 +42,21 @@ IndirectObject *Document::loadObject(int64_t objectNumber) {
         int64_t N          = stream->dictionary->values["N"]->as<Integer>()->value;
         auto objectNumbers = std::vector<int64_t>(N);
         for (int i = 0; i < N; i++) {
-            auto objectNumber = parser.parse()->as<Integer>();
-            objectNumbers[i]  = objectNumber->value;
-            auto byteOffset   = parser.parse();
+            auto objNum      = parser.parse()->as<Integer>();
+            objectNumbers[i] = objNum->value;
+            auto byteOffset  = parser.parse(); // TODO what is this for?
         }
-        auto objects = std::vector<Object *>(N);
+        auto objs = std::vector<Object *>(N);
         for (int i = 0; i < N; i++) {
-            auto obj   = parser.parse();
-            objects[i] = obj;
+            auto obj = parser.parse();
+            objs[i]  = obj;
         }
-        return new IndirectObject(objectNumbers[entry.compressed.indexInStream], 0,
-                                  objects[entry.compressed.indexInStream]);
+        return new IndirectObject(content, objectNumbers[entry.compressed.indexInStream], 0,
+                                  objs[entry.compressed.indexInStream]);
     }
 }
 
-IndirectObject *Document::getObject(uint64_t objectNumber) {
+IndirectObject *Document::getObject(int64_t objectNumber) {
     if (objects[objectNumber] != nullptr) {
         return objects[objectNumber];
     }
@@ -64,39 +66,9 @@ IndirectObject *Document::getObject(uint64_t objectNumber) {
     return object;
 }
 
-Dictionary *Document::root() { return trailer.root(*this); }
-
-std::vector<Page *> Document::pages() {
-    auto root         = this->root();
-    auto pageTreeRoot = get<PageTreeNode>(root->values["Pages"]);
-
-    if (pageTreeRoot->isPage()) {
-        return {new Page(*this, pageTreeRoot)};
-    }
-
-    auto result = std::vector<Page *>();
-
-    std::vector<PageTreeNode *> queue = {pageTreeRoot};
-    while (!queue.empty()) {
-        PageTreeNode *current = queue.back();
-        queue.pop_back();
-
-        for (auto kid : current->kids()->values) {
-            auto resolvedKid = get<PageTreeNode>(kid);
-            if (resolvedKid->isPage()) {
-                result.push_back(new Page(*this, resolvedKid));
-            } else {
-                queue.push_back(resolvedKid);
-            }
-        }
-    }
-
-    return result;
-}
-
 IndirectObject *Document::resolve(const IndirectReference *ref) { return getObject(ref->objectNumber); }
 
-std::vector<IndirectObject *> Document::getAllObjects() {
+std::vector<IndirectObject *> Document::get_all_objects() {
     std::vector<IndirectObject *> result = {};
     for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
         auto &entry = crossReferenceTable.entries[i];
@@ -307,21 +279,21 @@ bool readCrossReferenceTable(Document &file) {
             switch (type) {
             case 0: {
                 CrossReferenceEntry entry                 = {};
-                entry.type                                = CrossReferenceEntryType ::FREE;
+                entry.type                                = CrossReferenceEntryType::FREE;
                 entry.free.nextFreeObjectNumber           = field1;
                 entry.free.nextFreeObjectGenerationNumber = field2;
                 file.crossReferenceTable.entries.push_back(entry);
             } break;
             case 1: {
                 CrossReferenceEntry entry     = {};
-                entry.type                    = CrossReferenceEntryType ::NORMAL;
+                entry.type                    = CrossReferenceEntryType::NORMAL;
                 entry.normal.byteOffset       = field1;
                 entry.normal.generationNumber = field2;
                 file.crossReferenceTable.entries.push_back(entry);
             } break;
             case 2: {
                 CrossReferenceEntry entry             = {};
-                entry.type                            = CrossReferenceEntryType ::COMPRESSED;
+                entry.type                            = CrossReferenceEntryType::COMPRESSED;
                 entry.compressed.objectNumberOfStream = field1;
                 entry.compressed.indexInStream        = field2;
                 file.crossReferenceTable.entries.push_back(entry);
@@ -372,18 +344,113 @@ bool Document::saveToFile(const std::string &filePath) const {
         return false;
     }
 
+    // TODO remove deleted sections
     os.write(data, sizeInBytes);
 
     return true;
 }
 
-Dictionary *Trailer::root(Document &document) const {
-    if (dict != nullptr) {
-        return document.get<Dictionary>(dict->values["Root"]);
-    } else {
-        Object *root = stream->dictionary->values["Root"];
-        return document.get<Dictionary>(root);
+/**
+ * Iterates over all the pages in the document, until 'func' returns 'false'.
+ */
+void for_each_page(Document &document, const std::function<bool(Page *)> &func) {
+    auto c            = document.catalog();
+    auto pageTreeRoot = c->page_tree_root(document);
+
+    if (pageTreeRoot->isPage()) {
+        func(new Page(document, pageTreeRoot));
+        return;
     }
+
+    std::vector<PageTreeNode *> queue = {pageTreeRoot};
+    while (!queue.empty()) {
+        PageTreeNode *current = queue.back();
+        queue.pop_back();
+
+        for (auto kid : current->kids()->values) {
+            auto resolvedKid = document.get<PageTreeNode>(kid);
+            if (resolvedKid->isPage()) {
+                if (!func(new Page(document, resolvedKid))) {
+                    // stop iterating
+                    return;
+                }
+            } else {
+                queue.push_back(resolvedKid);
+            }
+        }
+    }
+}
+
+DocumentCatalog *Document::catalog() { return trailer.catalog(*this); }
+
+std::vector<Page *> Document::pages() {
+    auto result = std::vector<Page *>();
+    for_each_page(*this, [&result](auto page) {
+        result.push_back(page);
+        return true;
+    });
+    return result;
+}
+
+size_t Document::page_count() {
+    size_t result = 0;
+    for_each_page(*this, [&result](auto) {
+        result++;
+        return true;
+    });
+    return result;
+}
+
+bool Document::delete_page(size_t pageNum) {
+    auto count = page_count();
+    if (count == 1) {
+        spdlog::warn("Cannot delete last page of document");
+        return false;
+    }
+
+    if (pageNum < 1 || pageNum > count) {
+        spdlog::warn("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum, count);
+        return false;
+    }
+
+    size_t currentPageNum = 1;
+    for_each_page(*this, [&currentPageNum, &pageNum, this](Page *page) {
+        if (currentPageNum != pageNum) {
+            currentPageNum++;
+            return true;
+        }
+
+        auto parent = page->node->parent(*this);
+        ASSERT(parent != nullptr);
+        if (parent->kids()->values.size() == 1) {
+            // TODO deal with this case
+        } else {
+            // TODO find the index of the child to delete
+            size_t childToDeleteIndex = 0;
+            for (auto kid : parent->kids()->values) {
+                // if (kid->as<IndirectReference>()->objectNumber == page->node.) {}
+            }
+            parent->kids()->remove_element(*this, childToDeleteIndex);
+        }
+
+        return false;
+    });
+
+    return true;
+}
+
+DocumentCatalog *Trailer::catalog(Document &document) const {
+    Object *root;
+    if (dict != nullptr) {
+        root = dict->values["Root"];
+    } else {
+        root = stream->dictionary->values["Root"];
+    }
+    return document.get<DocumentCatalog>(root);
+}
+
+PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
+    return document.get<PageTreeNode>(values["Pages"]);
 }
 
 } // namespace pdf

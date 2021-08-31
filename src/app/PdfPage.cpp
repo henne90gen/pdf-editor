@@ -18,7 +18,7 @@ PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
     treeStore = Gtk::TreeStore::create(columns);
     treeView.set_model(treeStore);
 
-    auto root = file.root();
+    auto root = file.catalog();
     ASSERT(root != nullptr);
 //    addRows(root, 0);
 
@@ -61,17 +61,17 @@ void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRo
     case pdf::Object::Type::HEXADECIMAL_STRING: {
         ASSERT(parentRow != nullptr);
         auto *hexString                   = obj->as<pdf::HexadecimalString>();
-        (*parentRow)[columns.m_col_value] = std::string(hexString->value) + " (" + hexString->to_string() + ")";
+        (*parentRow)[columns.m_col_value] = std::string(hexString->data) + " (" + hexString->to_string() + ")";
         break;
     }
     case pdf::Object::Type::LITERAL_STRING: {
         ASSERT(parentRow != nullptr);
-        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::LiteralString>()->value);
+        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::LiteralString>()->value());
         break;
     }
     case pdf::Object::Type::NAME: {
         ASSERT(parentRow != nullptr);
-        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Name>()->value);
+        (*parentRow)[columns.m_col_value] = std::string(obj->as<pdf::Name>()->value());
         break;
     }
     case pdf::Object::Type::ARRAY:

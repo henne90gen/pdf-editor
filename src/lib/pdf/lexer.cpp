@@ -8,9 +8,9 @@ namespace pdf {
 
 // NOTE pre-computing the regex increased performance 15x
 // NOTE moving regex evaluation to the back of findToken increased performance 2x
-auto objectStartRegex       = std::regex("^[0-9]+ [0-9]+ obj");
-auto hexadecimalRegex       = std::regex("^<[0-9a-fA-F]*>");
-auto nameRegex              = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
+auto objectStartRegex = std::regex("^[0-9]+ [0-9]+ obj");
+auto hexadecimalRegex = std::regex("^<[0-9a-fA-F]*>");
+auto nameRegex        = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
 
 std::string_view removeLeadingWhitespace(const std::string_view &str) {
     std::string_view result = str;
@@ -91,98 +91,98 @@ std::optional<Token> matchWordToken(const std::string_view &word) {
     // TODO combine common prefixes for better performance (begin, end)
 #define STARTS_WITH(word, search) word.find(search) == 0
     if (STARTS_WITH(word, "true")) {
-        return Token(Token::Type::BOOLEAN, "true");
+        return Token(Token::Type::BOOLEAN, word.substr(0, 4));
     }
     if (STARTS_WITH(word, "false")) {
-        return Token(Token::Type::BOOLEAN, "false");
+        return Token(Token::Type::BOOLEAN, word.substr(0, 5));
     }
     if (STARTS_WITH(word, "endobj")) {
-        return Token(Token::Type::OBJECT_END, "endobj");
+        return Token(Token::Type::OBJECT_END, word.substr(0, 6));
     }
     if (STARTS_WITH(word, "stream")) {
-        return Token(Token::Type::STREAM_START, "stream");
+        return Token(Token::Type::STREAM_START, word.substr(0, 6));
     }
     if (STARTS_WITH(word, "endstream")) {
-        return Token(Token::Type::STREAM_END, "endstream");
+        return Token(Token::Type::STREAM_END, word.substr(0, 9));
     }
     if (STARTS_WITH(word, "null")) {
-        return Token(Token::Type::NULL_OBJ, "null");
+        return Token(Token::Type::NULL_OBJ, word.substr(0, 4));
     }
     if (STARTS_WITH(word, "begincmap")) {
-        return Token(Token::Type::CMAP_BEGIN, "begincmap");
+        return Token(Token::Type::CMAP_BEGIN, word.substr(0, 9));
     }
     if (STARTS_WITH(word, "endcmap")) {
-        return Token(Token::Type::CMAP_END, "endcmap");
+        return Token(Token::Type::CMAP_END, word.substr(0, 7));
     }
     if (STARTS_WITH(word, "usecmap")) {
-        return Token(Token::Type::CMAP_USE, "usecmap");
+        return Token(Token::Type::CMAP_USE, word.substr(0, 7));
     }
     if (STARTS_WITH(word, "begincodespacerange")) {
-        return Token(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE, "begincodespacerange");
+        return Token(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE, word.substr(0, 19));
     }
     if (STARTS_WITH(word, "endcodespacerange")) {
-        return Token(Token::Type::CMAP_END_CODE_SPACE_RANGE, "endcodespacerange");
+        return Token(Token::Type::CMAP_END_CODE_SPACE_RANGE, word.substr(0, 17));
     }
     if (STARTS_WITH(word, "usefont")) {
-        return Token(Token::Type::CMAP_USE_FONT, "usefont");
+        return Token(Token::Type::CMAP_USE_FONT, word.substr(0, 7));
     }
     if (STARTS_WITH(word, "beginbfchar")) {
-        return Token(Token::Type::CMAP_BEGIN_BF_CHAR, "beginbfchar");
+        return Token(Token::Type::CMAP_BEGIN_BF_CHAR, word.substr(0, 11));
     }
     if (STARTS_WITH(word, "endbfchar")) {
-        return Token(Token::Type::CMAP_END_BF_CHAR, "endbfchar");
+        return Token(Token::Type::CMAP_END_BF_CHAR, word.substr(0, 9));
     }
     if (STARTS_WITH(word, "beginbfrange")) {
-        return Token(Token::Type::CMAP_BEGIN_BF_RANGE, "beginbfrange");
+        return Token(Token::Type::CMAP_BEGIN_BF_RANGE, word.substr(0, 12));
     }
     if (STARTS_WITH(word, "endbfrange")) {
-        return Token(Token::Type::CMAP_END_BF_RANGE, "endbfrange");
+        return Token(Token::Type::CMAP_END_BF_RANGE, word.substr(0, 10));
     }
     if (STARTS_WITH(word, "begincidchar")) {
-        return Token(Token::Type::CMAP_BEGIN_CID_CHAR, "begincidchar");
+        return Token(Token::Type::CMAP_BEGIN_CID_CHAR, word.substr(0, 12));
     }
     if (STARTS_WITH(word, "endcidchar")) {
-        return Token(Token::Type::CMAP_END_CID_CHAR, "endcidchar");
+        return Token(Token::Type::CMAP_END_CID_CHAR, word.substr(0, 10));
     }
     if (STARTS_WITH(word, "begincidrange")) {
-        return Token(Token::Type::CMAP_BEGIN_CID_RANGE, "begincidrange");
+        return Token(Token::Type::CMAP_BEGIN_CID_RANGE, word.substr(0, 13));
     }
     if (STARTS_WITH(word, "endcidrange")) {
-        return Token(Token::Type::CMAP_END_CID_RANGE, "endcidrange");
+        return Token(Token::Type::CMAP_END_CID_RANGE, word.substr(0, 11));
     }
     if (STARTS_WITH(word, "beginnotdefchar")) {
-        return Token(Token::Type::CMAP_BEGIN_NOTDEF_CHAR, "beginnotdefchar");
+        return Token(Token::Type::CMAP_BEGIN_NOTDEF_CHAR, word.substr(0, 15));
     }
     if (STARTS_WITH(word, "endnotdefchar")) {
-        return Token(Token::Type::CMAP_END_NOTDEF_CHAR, "endnotdefchar");
+        return Token(Token::Type::CMAP_END_NOTDEF_CHAR, word.substr(0, 13));
     }
     if (STARTS_WITH(word, "beginnotdefrange")) {
-        return Token(Token::Type::CMAP_BEGIN_NOTDEF_RANGE, "beginnotdefrange");
+        return Token(Token::Type::CMAP_BEGIN_NOTDEF_RANGE, word.substr(0, 16));
     }
     if (STARTS_WITH(word, "endnotdefrange")) {
-        return Token(Token::Type::CMAP_END_NOTDEF_RANGE, "endnotdefrange");
+        return Token(Token::Type::CMAP_END_NOTDEF_RANGE, word.substr(0, 14));
     }
     return {};
 }
 
 std::optional<Token> matchCharToken(const std::string_view &word) {
     if (!word.empty() && word[0] == '\n') {
-        return Token(Token::Type::NEW_LINE, "\n");
+        return Token(Token::Type::NEW_LINE, word.substr(0, 1));
     }
     if (STARTS_WITH(word, "\r\n")) {
-        return Token(Token::Type::NEW_LINE, "\r\n");
+        return Token(Token::Type::NEW_LINE, word.substr(0, 2));
     }
     if (!word.empty() && word[0] == '[') {
-        return Token(Token::Type::ARRAY_START, "[");
+        return Token(Token::Type::ARRAY_START, word.substr(0, 1));
     }
     if (!word.empty() && word[0] == ']') {
-        return Token(Token::Type::ARRAY_END, "]");
+        return Token(Token::Type::ARRAY_END, word.substr(0, 1));
     }
     if (STARTS_WITH(word, "<<")) {
-        return Token(Token::Type::DICTIONARY_START, "<<");
+        return Token(Token::Type::DICTIONARY_START, word.substr(0, 2));
     }
     if (STARTS_WITH(word, ">>")) {
-        return Token(Token::Type::DICTIONARY_END, ">>");
+        return Token(Token::Type::DICTIONARY_END, word.substr(0, 2));
     }
     return {};
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rectangle.h"
 #include "cmap.h"
+#include "rectangle.h"
 
 namespace pdf {
 
@@ -50,14 +50,14 @@ struct FontDescriptor : public Dictionary {
 };
 
 struct Font : public Dictionary {
-    Name *type() { return values["Subtype"]->as<Name>(); }
-    bool isType0() { return type()->value == "Type0"; }
-    bool isType1() { return type()->value == "Type1"; }
-    bool isMMType1() { return type()->value == "MMType1"; }
-    bool isType3() { return type()->value == "Type3"; }
-    bool isTrueType() { return type()->value == "TrueType"; }
-    bool isCIDFontType0() { return type()->value == "CIDFontType0"; }
-    bool isCIDFontType2() { return type()->value == "CIDFontType2"; }
+    std::string_view type() { return values["Subtype"]->as<Name>()->value(); }
+    bool isType0() { return type() == "Type0"; }
+    bool isType1() { return type() == "Type1"; }
+    bool isMMType1() { return type() == "MMType1"; }
+    bool isType3() { return type() == "Type3"; }
+    bool isTrueType() { return type() == "TrueType"; }
+    bool isCIDFontType0() { return type() == "CIDFontType0"; }
+    bool isCIDFontType2() { return type() == "CIDFontType2"; }
     std::optional<Name *> name() { return find<Name>("Name"); }
     Name *baseFont() { return values["BaseFont"]->as<Name>(); }
     Integer *firstChar() { return values["FirstChar"]->as<Integer>(); }
