@@ -64,6 +64,7 @@ Operator *OperatorParser::getOperator() {
 Operator *OperatorParser::createOperator_w(Operator *result) {
     auto &content = tokens[currentTokenIdx - 2].content;
     // TODO is this conversion to a string really necessary?
+    // TODO catch exception
     auto lineWidth                        = std::stod(std::string(content));
     result->data.w_SetLineWidth.lineWidth = lineWidth;
     return result;
@@ -73,6 +74,7 @@ Operator *OperatorParser::createOperator_re(Operator *result) {
     for (int i = 0; i < 4; i++) {
         auto &content = tokens[currentTokenIdx - 1 - (4 - i)].content;
         // TODO is this conversion to a string really necessary?
+        // TODO catch exception
         auto d                                  = std::stod(std::string(content));
         result->data.re_AppendRectangle.rect[i] = d;
     }
@@ -85,6 +87,7 @@ Operator *OperatorParser::createOperator_rg(Operator *result) {
     auto &contentB = tokens[currentTokenIdx - 2].content;
 
     // TODO is this conversion to a string really necessary?
+    // TODO catch exception
     result->data.rg_SetNonStrokingColorRGB.r = std::stod(std::string(contentR));
     result->data.rg_SetNonStrokingColorRGB.g = std::stod(std::string(contentG));
     result->data.rg_SetNonStrokingColorRGB.b = std::stod(std::string(contentB));
@@ -101,13 +104,13 @@ Operator *OperatorParser::createOperator_TJ(Operator *result) {
     }
     ASSERT(arrayStartIndex != -1);
 
-    int objectCount             = currentTokenIdx - 2 - arrayStartIndex;
-    const auto first            = tokens.begin() + arrayStartIndex;
-    const auto last             = first + objectCount + 1;
-    const std::vector<Token> ts = std::vector<Token>(first, last);
-    auto l                      = TokenLexer(ts);
-    auto p                      = Parser(l);
-    auto arr                    = p.parse()->as<Array>();
+    int objectCount  = currentTokenIdx - 2 - arrayStartIndex;
+    const auto first = tokens.begin() + arrayStartIndex;
+    const auto last  = first + objectCount + 1;
+    const auto ts    = std::vector<Token>(first, last);
+    auto l           = TokenLexer(ts);
+    auto p           = Parser(l);
+    auto arr         = p.parse()->as<Array>();
 
     ASSERT(arr != nullptr);
     result->data.TJ_ShowOneOrMoreTextStrings.objects = arr;
@@ -115,12 +118,13 @@ Operator *OperatorParser::createOperator_TJ(Operator *result) {
 }
 
 Operator *OperatorParser::createOperator_Tf(Operator *result) {
-    auto contentFontName                       = tokens[currentTokenIdx - 3].content;
+    auto contentFontName                              = tokens[currentTokenIdx - 3].content;
     result->data.Tf_SetTextFontAndSize.fontNameData   = contentFontName.data();
     result->data.Tf_SetTextFontAndSize.fontNameLength = contentFontName.length();
 
     auto contentFontSize = tokens[currentTokenIdx - 2].content;
     // TODO is this conversion to a string really necessary?
+    // TODO catch exception
     result->data.Tf_SetTextFontAndSize.fontSize = std::stod(std::string(contentFontSize));
     return result;
 }
@@ -129,6 +133,7 @@ Operator *OperatorParser::createOperator_Td(Operator *result) {
     auto &contentX = tokens[currentTokenIdx - 3].content;
     auto &contentY = tokens[currentTokenIdx - 2].content;
     // TODO is this conversion to a string really necessary?
+    // TODO catch exception
     result->data.Td_MoveStartOfNextLine.x = std::stod(std::string(contentX));
     result->data.Td_MoveStartOfNextLine.y = std::stod(std::string(contentY));
     return result;

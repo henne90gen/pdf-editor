@@ -23,7 +23,7 @@ namespace pdf {
     O(Tw, SetWordSpacing)                                                                                              \
     O(Tz, SetHorizontalScaling)                                                                                        \
     O(TL, SetTextLeading)                                                                                              \
-    O(Tf, SetTextFontAndSize)                                                                                                 \
+    O(Tf, SetTextFontAndSize)                                                                                          \
     O(Tr, SetRenderingMode)                                                                                            \
     O(Ts, SetTextRise)                                                                                                 \
     /* Text Showing Operators */                                                                                       \

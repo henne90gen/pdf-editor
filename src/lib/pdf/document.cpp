@@ -423,7 +423,7 @@ bool Document::delete_page(size_t pageNum) {
         auto parent = page->node->parent(*this);
         ASSERT(parent != nullptr);
         if (parent->kids()->values.size() == 1) {
-            // TODO deal with this case
+            // TODO deal with this case by deleting parent nodes until there are more than one kid
         } else {
             // TODO find the index of the child to delete
             size_t childToDeleteIndex = 0;
