@@ -2,7 +2,6 @@
 
 #include <bitset>
 #include <fstream>
-#include <functional>
 #include <spdlog/spdlog.h>
 
 #include "page.h"
@@ -309,7 +308,7 @@ bool readCrossReferenceTable(Document &file) {
     return true;
 }
 
-bool Document::loadFromFile(const std::string &filePath, Document &document) {
+bool Document::load_from_file(const std::string &filePath, Document &document) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
@@ -335,7 +334,7 @@ bool Document::loadFromFile(const std::string &filePath, Document &document) {
     return true;
 }
 
-bool Document::saveToFile(const std::string &filePath) const {
+bool Document::save_to_file(const std::string &filePath) {
     auto os = std::ofstream();
     os.open(filePath, std::ios::out | std::ios::binary);
 
@@ -344,21 +343,64 @@ bool Document::saveToFile(const std::string &filePath) const {
         return false;
     }
 
-    // TODO remove deleted sections
-    os.write(data, sizeInBytes);
+    if (change_sections.empty()) {
+        os.write(data, sizeInBytes);
+        os.close();
+        return true;
+    }
+
+    std::sort(change_sections.begin(), change_sections.end(), [](const ChangeSection &a, const ChangeSection &b) {
+        if (a.type == ChangeSectionType::ADDED && b.type == ChangeSectionType::ADDED) {
+            return a.added.insertion_point < b.added.insertion_point;
+        }
+        if (a.type == ChangeSectionType::ADDED && b.type == ChangeSectionType::DELETED) {
+            return a.added.insertion_point < b.deleted.deleted_area.data();
+        }
+        if (a.type == ChangeSectionType::DELETED && b.type == ChangeSectionType::ADDED) {
+            return a.deleted.deleted_area.data() < b.added.insertion_point;
+        }
+        if (a.type == ChangeSectionType::DELETED && b.type == ChangeSectionType::DELETED) {
+            return a.deleted.deleted_area.data() < b.deleted.deleted_area.data();
+        }
+        ASSERT(false);
+    });
+
+    auto ptr = data;
+    for (const auto &section : change_sections) {
+        if (section.type == ChangeSectionType::DELETED) {
+            auto size = section.deleted.deleted_area.data() - ptr;
+            os.write(ptr, size);
+            ptr += size;
+            ptr += section.deleted.deleted_area.size();
+            continue;
+        }
+        if (section.type == ChangeSectionType::ADDED) {
+            auto size = section.added.insertion_point - ptr;
+            if (size < 0) {
+                size = 0;
+            }
+            os.write(ptr, size);
+            ptr += size;
+            os.write(section.added.new_content, static_cast<std::streamsize>(section.added.new_content_length));
+            continue;
+        }
+        ASSERT(false);
+    }
+
+    auto size = sizeInBytes - (ptr - data);
+    os.write(ptr, size);
+
+    os.close();
 
     return true;
 }
 
-/**
- * Iterates over all the pages in the document, until 'func' returns 'false'.
- */
-void for_each_page(Document &document, const std::function<bool(Page *)> &func) {
-    auto c            = document.catalog();
-    auto pageTreeRoot = c->page_tree_root(document);
+void Document::for_each_page(const std::function<bool(Page *)> &func) {
+    auto c            = catalog();
+    auto pageTreeRoot = c->page_tree_root(*this);
 
     if (pageTreeRoot->isPage()) {
-        func(new Page(document, pageTreeRoot));
+        func(new Page(*this, pageTreeRoot));
         return;
     }
 
@@ -368,9 +410,9 @@ void for_each_page(Document &document, const std::function<bool(Page *)> &func) 
         queue.pop_back();
 
         for (auto kid : current->kids()->values) {
-            auto resolvedKid = document.get<PageTreeNode>(kid);
+            auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->isPage()) {
-                if (!func(new Page(document, resolvedKid))) {
+                if (!func(new Page(*this, resolvedKid))) {
                     // stop iterating
                     return;
                 }
@@ -385,7 +427,7 @@ DocumentCatalog *Document::catalog() { return trailer.catalog(*this); }
 
 std::vector<Page *> Document::pages() {
     auto result = std::vector<Page *>();
-    for_each_page(*this, [&result](auto page) {
+    for_each_page([&result](auto page) {
         result.push_back(page);
         return true;
     });
@@ -394,7 +436,7 @@ std::vector<Page *> Document::pages() {
 
 size_t Document::page_count() {
     size_t result = 0;
-    for_each_page(*this, [&result](auto) {
+    for_each_page([&result](auto) {
         result++;
         return true;
     });
@@ -414,7 +456,7 @@ bool Document::delete_page(size_t pageNum) {
     }
 
     size_t currentPageNum = 1;
-    for_each_page(*this, [&currentPageNum, &pageNum, this](Page *page) {
+    for_each_page([&currentPageNum, &pageNum, this](Page *page) {
         if (currentPageNum != pageNum) {
             currentPageNum++;
             return true;
@@ -424,19 +466,46 @@ bool Document::delete_page(size_t pageNum) {
         ASSERT(parent != nullptr);
         if (parent->kids()->values.size() == 1) {
             // TODO deal with this case by deleting parent nodes until there are more than one kid
+            TODO("deletion of page tree parent nodes is not implemented");
         } else {
-            // TODO find the index of the child to delete
+            IndirectObject *o = nullptr;
+            for (auto obj : objects) {
+                if (obj == nullptr) {
+                    continue;
+                }
+                if (page->node == obj->object) {
+                    o = obj;
+                }
+            }
+            ASSERT(o != nullptr);
+
             size_t childToDeleteIndex = 0;
             for (auto kid : parent->kids()->values) {
-                // if (kid->as<IndirectReference>()->objectNumber == page->node.) {}
+                // TODO should the generation number also be compared?
+                if (kid->as<IndirectReference>()->objectNumber == o->objectNumber) {
+                    break;
+                }
+                childToDeleteIndex++;
             }
             parent->kids()->remove_element(*this, childToDeleteIndex);
+            parent->count()->set(*this, static_cast<int64_t>(parent->kids()->values.size()));
         }
 
         return false;
     });
 
     return true;
+}
+
+void Document::delete_raw_section(std::string_view d) {
+    change_sections.push_back({.type = ChangeSectionType::DELETED, .deleted = {.deleted_area = d}});
+}
+
+void Document::add_raw_section(char *insertionPoint, char *newContent, size_t newContentLength) {
+    change_sections.push_back({.type  = ChangeSectionType::ADDED,
+                               .added = {.insertion_point    = insertionPoint,
+                                         .new_content        = newContent,
+                                         .new_content_length = newContentLength}});
 }
 
 DocumentCatalog *Trailer::catalog(Document &document) const {

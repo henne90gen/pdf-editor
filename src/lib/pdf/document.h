@@ -4,6 +4,8 @@
 #include "objects.h"
 #include "parser.h"
 
+#include <functional>
+
 namespace pdf {
 
 struct PageTreeNode;
@@ -64,6 +66,26 @@ struct CrossReferenceTable {
     std::vector<CrossReferenceEntry> entries = {};
 };
 
+enum class ChangeSectionType {
+    NONE,
+    ADDED,
+    DELETED,
+};
+
+struct ChangeSection {
+    ChangeSectionType type = ChangeSectionType::NONE;
+    union {
+        struct {
+            std::string_view deleted_area;
+        } deleted;
+        struct {
+            char *insertion_point;
+            char *new_content;
+            size_t new_content_length;
+        } added = {};
+    };
+};
+
 struct Document : public ReferenceResolver {
     char *data                              = nullptr;
     int64_t sizeInBytes                     = 0;
@@ -71,7 +93,7 @@ struct Document : public ReferenceResolver {
     CrossReferenceTable crossReferenceTable = {};
     std::vector<IndirectObject *> objects   = {};
 
-    std::vector<std::string_view> deleted_sections = {};
+    std::vector<ChangeSection> change_sections = {};
 
     DocumentCatalog *catalog();
     std::vector<Page *> pages();
@@ -101,12 +123,20 @@ struct Document : public ReferenceResolver {
         return {};
     }
 
-    [[nodiscard]] bool saveToFile(const std::string &filePath) const;
-    static bool loadFromFile(const std::string &filePath, Document &document);
+    [[nodiscard]] bool save_to_file(const std::string &filePath);
+    static bool load_from_file(const std::string &filePath, Document &document);
+
+    void delete_raw_section(std::string_view d);
+    void add_raw_section(char *insertion_point, char *new_content, size_t new_content_length);
 
   private:
     IndirectObject *getObject(int64_t objectNumber);
     [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber);
+
+    /**
+     * Iterates over all the pages in the document, until 'func' returns 'false'.
+     */
+    void for_each_page(const std::function<bool(Page *)> &func);
 };
 
 } // namespace pdf

@@ -122,8 +122,26 @@ std::string HexadecimalString::to_string() const {
 
 void Array::remove_element(Document &document, size_t index) {
     ASSERT(index < values.size());
-    document.deleted_sections.push_back(values[index]->data);
+    document.delete_raw_section(values[index]->data);
     values.erase(values.begin() + static_cast<int64_t>(index));
+}
+
+void Integer::set(Document &document, int64_t i) {
+    value = i;
+    document.delete_raw_section(data);
+
+    // TODO avoid allocating twice here
+    auto s            = std::to_string(i);
+    char *new_content = reinterpret_cast<char *>(malloc(s.size()));
+    memcpy(new_content, s.data(), s.size());
+
+    // TODO can we do this without const-casting here?
+    char *insertionPoint = const_cast<char *>(data.data());
+
+    // NOTE: moving to the end of the data section, because it gets deleted right before insertion
+    insertionPoint += data.size();
+
+    document.add_raw_section(insertionPoint, new_content, s.size());
 }
 
 } // namespace pdf

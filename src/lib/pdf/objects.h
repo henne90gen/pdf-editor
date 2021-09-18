@@ -61,6 +61,8 @@ struct Integer : public Object {
     int64_t value = 0;
 
     explicit Integer(std::string_view data, int64_t i) : Object(staticType(), data), value(i) {}
+
+    void set(Document&document, int64_t i);
 };
 
 struct Real : public Object {

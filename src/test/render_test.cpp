@@ -5,7 +5,7 @@
 
 TEST(Renderer, Blank) {
     pdf::Document document;
-    pdf::Document::loadFromFile("../../../test-files/blank.pdf", document);
+    pdf::Document::load_from_file("../../../test-files/blank.pdf", document);
 
     auto surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, 100, 100);
     auto cr      = Cairo::Context::create(surface);
@@ -19,7 +19,7 @@ TEST(Renderer, Blank) {
 
 TEST(Renderer, HelloWorld) {
     pdf::Document document;
-    pdf::Document::loadFromFile("../../../test-files/hello-world.pdf", document);
+    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
     for (int i = 0; i < pages.size(); i++) {
