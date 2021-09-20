@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <stdexcept>
+#include <spdlog/spdlog.h>
 
 namespace pdf {
 

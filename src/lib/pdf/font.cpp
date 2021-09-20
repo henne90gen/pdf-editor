@@ -1,5 +1,7 @@
 #include "font.h"
 
+#include <spdlog/spdlog.h>
+
 #include "document.h"
 #include "objects.h"
 

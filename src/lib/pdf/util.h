@@ -18,4 +18,4 @@
 #endif
 #endif
 
-#define TODO(x) printf("TODO: %s\n", x)
+#define TODO(x) spdlog::warn("TODO: {}", x)

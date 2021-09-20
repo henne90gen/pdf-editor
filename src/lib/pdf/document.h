@@ -88,20 +88,18 @@ struct ChangeSection {
 
 struct Document : public ReferenceResolver {
     char *data                              = nullptr;
-    int64_t sizeInBytes                     = 0;
+    size_t sizeInBytes                      = 0;
     Trailer trailer                         = {};
     CrossReferenceTable crossReferenceTable = {};
     std::vector<IndirectObject *> objects   = {};
 
-    std::vector<ChangeSection> change_sections = {};
+    std::vector<ChangeSection> changeSections = {};
 
     DocumentCatalog *catalog();
     std::vector<Page *> pages();
     size_t page_count();
     std::vector<IndirectObject *> get_all_objects();
     IndirectObject *resolve(const IndirectReference *ref) override;
-
-    bool delete_page(size_t pageNum);
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
@@ -123,19 +121,31 @@ struct Document : public ReferenceResolver {
         return {};
     }
 
+    /// Saves the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] bool save_to_file(const std::string &filePath);
+    /// Loads the PDF-document specified by the given filePath, returns 0 on success
     static bool load_from_file(const std::string &filePath, Document &document);
+
+    /// Saves the PDF-document to a newly allocated buffer, returns 0 on success
+    [[nodiscard]] bool save_to_memory(char *&buffer, size_t &size);
+    /// Loads the PDF-document from the given buffer, returns 0 on success
+    static bool load_from_memory(char *buffer, size_t size, Document &document);
+
+    /// Deletes the page with the given page number, returns 0 on success
+    bool delete_page(size_t pageNum);
 
     void delete_raw_section(std::string_view d);
     void add_raw_section(char *insertion_point, char *new_content, size_t new_content_length);
 
   private:
-    IndirectObject *getObject(int64_t objectNumber);
-    [[nodiscard]] IndirectObject *loadObject(int64_t objectNumber);
+    IndirectObject *get_object(int64_t objectNumber);
+    [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
-    /**
-     * Iterates over all the pages in the document, until 'func' returns 'false'.
-     */
+    bool write_to_stream(std::ostream &s);
+    void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
+    void write_new_cross_ref_table(std::ostream &s, char *ptr, size_t bytesWrittenUntilXref);
+
+    /// Iterates over all the pages in the document, until 'func' returns 'false'.
     void for_each_page(const std::function<bool(Page *)> &func);
 };
 
