@@ -61,7 +61,7 @@ struct CrossReferenceEntry {
 };
 
 struct CrossReferenceTable {
-    int64_t firstObjectId                    = 0;
+    int64_t firstObjectNumber                = 0;
     int64_t objectCount                      = 0;
     std::vector<CrossReferenceEntry> entries = {};
 };
@@ -143,7 +143,8 @@ struct Document : public ReferenceResolver {
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
-    void write_new_cross_ref_table(std::ostream &s, char *ptr, size_t bytesWrittenUntilXref);
+    void write_new_cross_ref_table(std::ostream &s);
+    void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref);
 
     /// Iterates over all the pages in the document, until 'func' returns 'false'.
     void for_each_page(const std::function<bool(Page *)> &func);

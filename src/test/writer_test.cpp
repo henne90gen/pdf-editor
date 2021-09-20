@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <gtest/gtest.h>
+#include <iostream>
 
 #include <pdf/document.h>
 
@@ -16,7 +17,7 @@ TEST(Writer, HelloWorld) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
     std::string filePath = "hello-world.pdf";
-    auto error          = document.save_to_file(filePath);
+    auto error           = document.save_to_file(filePath);
     ASSERT_FALSE(error);
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
 }
@@ -46,8 +47,8 @@ TEST(Writer, DeletePageSecond) {
     ASSERT_FALSE(document.delete_page(2));
     ASSERT_EQ(document.page_count(), 1);
 
-    char *buffer    = nullptr;
-    size_t size     = 0;
+    char *buffer = nullptr;
+    size_t size  = 0;
     ASSERT_FALSE(document.save_to_memory(buffer, size));
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);

@@ -214,8 +214,8 @@ bool readCrossReferenceTable(Document &file) {
         auto beginTable = tmp + 1;
         auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
         // TODO catch exceptions
-        file.crossReferenceTable.firstObjectId = std::stoll(metaData.substr(0, spaceLocation));
-        file.crossReferenceTable.objectCount   = std::stoll(metaData.substr(spaceLocation));
+        file.crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
+        file.crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
         for (int i = 0; i < file.crossReferenceTable.objectCount; i++) {
             // nnnnnnnnnn ggggg f__
             auto s = std::string(beginTable, 20);
@@ -365,11 +365,18 @@ bool Document::write_to_stream(std::ostream &s) {
         return true;
     }
 
-    write_new_cross_ref_table(s, ptr, bytesWrittenUntilXref);
+    // NOTE write everything up until the cross-reference table
+    ASSERT(ptr <= data + trailer.lastCrossRefStart);
+    auto size = trailer.lastCrossRefStart - (ptr - data);
+    s.write(ptr, static_cast<std::streamsize>(size));
+    bytesWrittenUntilXref += size;
+
+    write_new_cross_ref_table(s);
+    write_trailer_dict(s, bytesWrittenUntilXref);
     return s.bad();
 }
 
-void Document::write_content(std::ostream &s, char*&ptr, size_t &bytesWrittenUntilXref) {
+void Document::write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref) {
     for (const auto &section : changeSections) {
         if (section.type == ChangeSectionType::DELETED) {
             auto size = section.deleted.deleted_area.data() - ptr;
@@ -407,48 +414,142 @@ void Document::write_content(std::ostream &s, char*&ptr, size_t &bytesWrittenUnt
     }
 }
 
-void Document::write_new_cross_ref_table(std::ostream &s, char *ptr, size_t bytesWrittenUntilXref) {
-    return;
-    int changeSectionIndex = 0;
-    int crossRefIndex      = 0;
-    size_t offset          = 0;
-    while (crossRefIndex < crossReferenceTable.entries.size() && changeSectionIndex < changeSections.size()) {
-        auto &crossRefEntry = crossReferenceTable.entries[crossRefIndex];
-        if (crossRefEntry.type == CrossReferenceEntryType::COMPRESSED) {
-            TODO("Implement support for rewriting compressed cross reference entries");
-            crossRefIndex++;
-            continue;
-        }
-        if (crossRefEntry.type == CrossReferenceEntryType::FREE) {
-            // TODO is there something that needs to be done here?
-            crossRefIndex++;
-            continue;
-        }
-        ASSERT(crossRefEntry.type == CrossReferenceEntryType::NORMAL);
-        auto &changeSection = changeSections[changeSectionIndex];
-        if (changeSection.type == ChangeSectionType::DELETED) {
-            if (changeSection.deleted.deleted_area.data() - data > crossRefEntry.normal.byteOffset) {
-                crossRefIndex++;
-                continue;
-            }
-        }
-        if (changeSection.type == ChangeSectionType::ADDED) {}
+void write_zero_padded_number(std::ostream &s, uint64_t num, int64_t maxNumDigits) {
+    int64_t numDigits = 0;
+    if (num != 0) {
+        numDigits = static_cast<int64_t>(std::log10(num) + 1);
+    }
+    ASSERT(numDigits <= maxNumDigits);
+
+    for (int i = 0; i < maxNumDigits - numDigits; i++) {
+        s.write("0", 1);
     }
 
-    // FIXME update byte offset for 'startxref' at the end of the document
-    // FIXME update byte offsets in the cross-reference table
+    if (num != 0) {
+        auto tmp = std::to_string(num);
+        s.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
+    }
+}
 
-    // IDEA
-    // - go through existing cross-reference table in parallel with the change_sections
-    // - update byte offsets as you go along
-    // - generate new cross-reference table and trailer from updated infos
+void Document::write_new_cross_ref_table(std::ostream &s) {
+    struct TempXRefEntry {
+        int64_t objectNumber      = 0;
+        CrossReferenceEntry entry = {};
+    };
 
-    ASSERT(ptr <= data + trailer.lastCrossRefStart);
-    auto size = trailer.lastCrossRefStart - (ptr - data);
-    s.write(ptr, static_cast<std::streamsize>(size));
-    bytesWrittenUntilXref += size;
+    auto crossReferenceEntries = std::vector<TempXRefEntry>(crossReferenceTable.entries.size());
+    for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
+        crossReferenceEntries[i] = {.objectNumber = i, .entry = crossReferenceTable.entries[i]};
+    }
 
-    // FIXME write new cross-reference table and trailer
+    std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
+              [](const TempXRefEntry &a, const TempXRefEntry &b) {
+                  if (a.entry.type == CrossReferenceEntryType::FREE ||
+                      b.entry.type == CrossReferenceEntryType::COMPRESSED) {
+                      return true;
+                  }
+                  if (b.entry.type == CrossReferenceEntryType::FREE ||
+                      a.entry.type == CrossReferenceEntryType::COMPRESSED) {
+                      return false;
+                  }
+                  ASSERT(a.entry.type == CrossReferenceEntryType::NORMAL &&
+                         b.entry.type == CrossReferenceEntryType::NORMAL);
+                  return a.entry.normal.byteOffset < b.entry.normal.byteOffset;
+              });
+
+    /*
+     *      ↓       ↓
+     * |---------------------|
+     *        ↑___
+     */
+
+    int changeSectionIndex = 0;
+    int64_t offset         = 0;
+    for (int crossRefIndex = 0; crossRefIndex < crossReferenceEntries.size(); crossRefIndex++) {
+        auto &crossRefEntry = crossReferenceEntries[crossRefIndex];
+        if (crossRefEntry.entry.type == CrossReferenceEntryType::COMPRESSED) {
+            TODO("Implement support for rewriting compressed cross reference entries");
+            continue;
+        }
+
+        if (crossRefEntry.entry.type == CrossReferenceEntryType::FREE) {
+            // TODO is there something that needs to be done here?
+            continue;
+        }
+
+        ASSERT(crossRefEntry.entry.type == CrossReferenceEntryType::NORMAL);
+
+        while (changeSectionIndex < changeSections.size()) {
+            auto &changeSection = changeSections[changeSectionIndex];
+            if (changeSection.type == ChangeSectionType::DELETED) {
+                size_t deletedOffset = changeSection.deleted.deleted_area.data() - data;
+                if (deletedOffset > crossRefEntry.entry.normal.byteOffset) {
+                    crossRefEntry.entry.normal.byteOffset += offset;
+                    break;
+                }
+
+                offset -= static_cast<int64_t>(changeSection.deleted.deleted_area.size());
+                changeSectionIndex++;
+                continue;
+            }
+            if (changeSection.type == ChangeSectionType::ADDED) {
+                size_t addedOffset = changeSection.added.insertion_point - data;
+                if (addedOffset > crossRefEntry.entry.normal.byteOffset) {
+                    crossRefEntry.entry.normal.byteOffset += offset;
+                    break;
+                }
+
+                offset += static_cast<int64_t>(changeSection.added.new_content_length);
+                changeSectionIndex++;
+                continue;
+            }
+            break;
+        }
+
+        if (changeSectionIndex >= changeSections.size()) {
+            crossRefEntry.entry.normal.byteOffset += offset;
+            continue;
+        }
+    }
+
+    auto xrefKeyword = "xref\n";
+    s.write(xrefKeyword, 5);
+    auto firstObjectNumberStr = std::to_string(crossReferenceTable.firstObjectNumber);
+    s.write(firstObjectNumberStr.c_str(), static_cast<std::streamsize>(firstObjectNumberStr.size()));
+    s.write(" ", 1);
+    auto objectCountStr = std::to_string(crossReferenceTable.objectCount);
+    s.write(objectCountStr.c_str(), static_cast<std::streamsize>(objectCountStr.size()));
+    s.write("\n", 1);
+
+    std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
+              [](const TempXRefEntry &a, const TempXRefEntry &b) { return a.objectNumber < b.objectNumber; });
+    for (auto &entry : crossReferenceEntries) {
+        // TODO iterate over all entries and write them to the output stream
+        if (entry.entry.type == CrossReferenceEntryType::NORMAL) {
+            write_zero_padded_number(s, entry.entry.normal.byteOffset, 10);
+            s.write(" ", 1);
+            write_zero_padded_number(s, entry.entry.normal.generationNumber, 5);
+            s.write(" n \n", 4);
+            continue;
+        }
+        if (entry.entry.type == CrossReferenceEntryType::FREE) {
+            write_zero_padded_number(s, entry.entry.free.nextFreeObjectNumber, 10);
+            s.write(" ", 1);
+            write_zero_padded_number(s, entry.entry.free.nextFreeObjectGenerationNumber, 5);
+            s.write(" f \n", 4);
+            continue;
+        }
+        ASSERT(false);
+    }
+}
+
+void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) {
+    s.write("trailer\n", 8);
+    s.write(trailer.get_dict()->data.data(), trailer.get_dict()->data.size());
+    s.write("startxref\n", 10);
+    auto tmp = std::to_string(bytesWrittenUntilXref);
+    s.write(tmp.c_str(), tmp.size());
+    s.write("\n%%EOF", 6);
 }
 
 bool Document::save_to_file(const std::string &filePath) {

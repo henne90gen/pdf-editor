@@ -39,6 +39,7 @@ class Parser {
     std::vector<Token> tokens = {};
     int currentTokenIdx       = 0;
 
+    [[nodiscard]] bool ensureTokensHaveBeenLexed();
     [[nodiscard]] bool currentTokenIs(Token::Type type);
 
     Object *parseObject();

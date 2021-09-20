@@ -1,21 +1,31 @@
 #include "parser.h"
 
 #include <cstring>
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 
 namespace pdf {
 
+bool Parser::ensureTokensHaveBeenLexed() {
+    if (currentTokenIdx < tokens.size()) {
+        return true;
+    }
+
+    std::optional<Token> token = lexer.getToken();
+    if (!token.has_value()) {
+        return false;
+    }
+    if (token.value().type == Token::Type::INVALID) {
+        return false;
+    }
+
+    tokens.push_back(token.value());
+    return true;
+}
+
 bool Parser::currentTokenIs(Token::Type type) {
-    if (currentTokenIdx >= tokens.size()) {
-        std::optional<Token> token = lexer.getToken();
-        if (!token.has_value()) {
-            return false;
-        }
-        if (token.value().type == Token::Type::INVALID) {
-            return false;
-        }
-        tokens.push_back(token.value());
+    if (!ensureTokensHaveBeenLexed()) {
+        return false;
     }
 
     return tokens[currentTokenIdx].type == type;
@@ -230,7 +240,7 @@ IndirectObject *Parser::parseIndirectObject() {
     }
 
     auto objectStartContent = tokens[currentTokenIdx].content;
-    auto beforeTokenIndex = currentTokenIdx;
+    auto beforeTokenIndex   = currentTokenIdx;
     currentTokenIdx++;
     while (currentTokenIs(Token::Type::NEW_LINE)) {
         currentTokenIdx++;
@@ -273,6 +283,10 @@ IndirectObject *Parser::parseIndirectObject() {
 }
 
 Object *Parser::parseStreamOrDictionary() {
+    if (!ensureTokensHaveBeenLexed()) {
+        return nullptr;
+    }
+
     auto objectStartContent = tokens[currentTokenIdx].content;
     auto beforeTokenIdx     = currentTokenIdx;
     auto dictionary         = parseDictionary();
