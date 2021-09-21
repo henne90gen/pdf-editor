@@ -91,15 +91,9 @@ struct Document : public ReferenceResolver {
     size_t sizeInBytes                      = 0;
     Trailer trailer                         = {};
     CrossReferenceTable crossReferenceTable = {};
-    std::vector<IndirectObject *> objects   = {};
+    std::vector<IndirectObject *> objectList   = {};
 
     std::vector<ChangeSection> changeSections = {};
-
-    DocumentCatalog *catalog();
-    std::vector<Page *> pages();
-    size_t page_count();
-    std::vector<IndirectObject *> get_all_objects();
-    IndirectObject *resolve(const IndirectReference *ref) override;
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
@@ -120,6 +114,19 @@ struct Document : public ReferenceResolver {
         }
         return {};
     }
+
+    IndirectObject *resolve(const IndirectReference *ref) override;
+
+    DocumentCatalog *catalog();
+    /// List of pages
+    std::vector<Page *> pages();
+    /// List of objects
+    std::vector<IndirectObject *> objects();
+
+    /// Number of pages
+    size_t page_count();
+    /// Number of indirect objects
+    size_t object_count();
 
     /// Saves the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] bool save_to_file(const std::string &filePath);

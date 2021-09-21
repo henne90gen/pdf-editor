@@ -6,7 +6,7 @@
 TEST(Reader, Blank) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/blank.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
+    std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 8);
 
     auto root = document.catalog();
@@ -28,7 +28,7 @@ TEST(Reader, Blank) {
 TEST(Reader, HelloWorldGeneral) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
+    std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 13);
 
     auto root = document.catalog();
@@ -118,7 +118,7 @@ TEST(Reader, FontFlags) {
 TEST(Reader, ObjectStream) {
     pdf::Document document;
     pdf::Document::load_from_file("../../../test-files/object-stream.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.get_all_objects();
+    std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 16);
 
     auto root = document.catalog();

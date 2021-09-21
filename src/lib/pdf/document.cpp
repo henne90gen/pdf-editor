@@ -57,18 +57,18 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
 }
 
 IndirectObject *Document::get_object(int64_t objectNumber) {
-    if (objects[objectNumber] != nullptr) {
-        return objects[objectNumber];
+    if (objectList[objectNumber] != nullptr) {
+        return objectList[objectNumber];
     }
 
     auto object           = load_object(objectNumber);
-    objects[objectNumber] = object;
+    objectList[objectNumber] = object;
     return object;
 }
 
 IndirectObject *Document::resolve(const IndirectReference *ref) { return get_object(ref->objectNumber); }
 
-std::vector<IndirectObject *> Document::get_all_objects() {
+std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
     for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
         auto &entry = crossReferenceTable.entries[i];
@@ -77,6 +77,18 @@ std::vector<IndirectObject *> Document::get_all_objects() {
             continue;
         }
         result.push_back(object);
+    }
+    return result;
+}
+
+size_t Document::object_count() {
+    size_t result = 0;
+    for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
+        auto &entry = crossReferenceTable.entries[i];
+        if (entry.type == CrossReferenceEntryType::FREE) {
+            continue;
+        }
+        result++;
     }
     return result;
 }
@@ -305,7 +317,7 @@ bool readCrossReferenceTable(Document &file) {
         }
     }
 
-    file.objects.resize(file.crossReferenceTable.entries.size(), nullptr);
+    file.objectList.resize(file.crossReferenceTable.entries.size(), nullptr);
     return false;
 }
 
@@ -668,7 +680,7 @@ bool Document::delete_page(size_t pageNum) {
             TODO("deletion of page tree parent nodes is not implemented");
         } else {
             IndirectObject *o = nullptr;
-            for (auto obj : objects) {
+            for (auto obj : objectList) {
                 if (obj == nullptr) {
                     continue;
                 }
