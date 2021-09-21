@@ -16,6 +16,7 @@ add_library(pdf-lib
         pdf/lexer.cpp
         pdf/parser.cpp
         pdf/document.cpp
+        pdf/document_io.cpp
         pdf/font.cpp
         pdf/page.cpp
         pdf/objects.cpp

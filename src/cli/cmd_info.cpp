@@ -2,7 +2,7 @@
 
 int cmd_info(std::string &s) {
     pdf::Document document;
-    if (pdf::Document::load_from_memory(s.data(), s.size(), document)) {
+    if (pdf::Document::read_from_memory(s.data(), s.size(), document)) {
         spdlog::error("Failed to load PDF document");
         return 1;
     }

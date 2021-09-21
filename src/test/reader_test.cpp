@@ -5,7 +5,7 @@
 
 TEST(Reader, Blank) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/blank.pdf", document);
+    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 8);
 
@@ -27,7 +27,7 @@ TEST(Reader, Blank) {
 
 TEST(Reader, HelloWorldGeneral) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 13);
 
@@ -49,7 +49,7 @@ TEST(Reader, HelloWorldGeneral) {
 
 TEST(Reader, HelloWorldFont) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
     ASSERT_EQ(pages.size(), 1);
@@ -85,7 +85,7 @@ TEST(Reader, HelloWorldFont) {
 
 TEST(Reader, HelloWorldCmap) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/hello-world.pdf", document);
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
     ASSERT_EQ(pages.size(), 1);
@@ -117,7 +117,7 @@ TEST(Reader, FontFlags) {
 
 TEST(Reader, ObjectStream) {
     pdf::Document document;
-    pdf::Document::load_from_file("../../../test-files/object-stream.pdf", document);
+    pdf::Document::read_from_file("../../../test-files/object-stream.pdf", document);
     std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 16);
 

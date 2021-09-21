@@ -117,6 +117,7 @@ struct Document : public ReferenceResolver {
 
     IndirectObject *resolve(const IndirectReference *ref) override;
 
+    /// The document catalog of this document
     DocumentCatalog *catalog();
     /// List of pages
     std::vector<Page *> pages();
@@ -128,18 +129,19 @@ struct Document : public ReferenceResolver {
     /// Number of indirect objects
     size_t object_count();
 
-    /// Saves the PDF-document to the given filePath, returns 0 on success
-    [[nodiscard]] bool save_to_file(const std::string &filePath);
-    /// Loads the PDF-document specified by the given filePath, returns 0 on success
-    static bool load_from_file(const std::string &filePath, Document &document);
-
-    /// Saves the PDF-document to a newly allocated buffer, returns 0 on success
-    [[nodiscard]] bool save_to_memory(char *&buffer, size_t &size);
-    /// Loads the PDF-document from the given buffer, returns 0 on success
-    static bool load_from_memory(char *buffer, size_t size, Document &document);
+    /// Writes the PDF-document to the given filePath, returns 0 on success
+    [[nodiscard]] bool write_to_file(const std::string &filePath);
+    /// Writes the PDF-document to a newly allocated buffer, returns 0 on success
+    [[nodiscard]] bool write_to_memory(char *&buffer, size_t &size);
+    /// Reads the PDF-document specified by the given filePath, returns 0 on success
+    static bool read_from_file(const std::string &filePath, Document &document);
+    /// Reads the PDF-document from the given buffer, returns 0 on success
+    static bool read_from_memory(char *buffer, size_t size, Document &document);
 
     /// Deletes the page with the given page number, returns 0 on success
     bool delete_page(size_t pageNum);
+    /// Insert another document into this one
+    bool insert_document(Document &otherDocument);
 
     void delete_raw_section(std::string_view d);
     void add_raw_section(char *insertion_point, char *new_content, size_t new_content_length);
@@ -147,6 +149,9 @@ struct Document : public ReferenceResolver {
   private:
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
+
+    bool read_trailer();
+    bool read_cross_reference_table();
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
