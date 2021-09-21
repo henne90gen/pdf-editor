@@ -8,7 +8,6 @@ namespace pdf {
 
 // NOTE pre-computing the regex increased performance 15x
 // NOTE moving regex evaluation to the back of findToken increased performance 2x
-auto objectStartRegex = std::regex("^[0-9]+ [0-9]+ obj");
 auto hexadecimalRegex = std::regex("^<[0-9a-fA-F]*>");
 auto nameRegex        = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
 
@@ -266,6 +265,34 @@ std::optional<Token> matchIndirectReference(const std::string_view &word) {
     return Token(Token::Type::INDIRECT_REFERENCE, word.substr(0, idx));
 }
 
+std::optional<Token> matchObjectStart(const std::string_view &word) {
+    int idx = 0;
+    while (is_digit(word[idx])) {
+        idx++;
+    }
+
+    if (word[idx] != ' ') {
+        return {};
+    }
+    idx++;
+
+    while (is_digit(word[idx])) {
+        idx++;
+    }
+
+    if (word[idx] != ' ') {
+        return {};
+    }
+    idx++;
+
+    if (word.substr(idx, 3) != "obj") {
+        return {};
+    }
+    idx += 3;
+
+    return Token(Token::Type::OBJECT_START, word.substr(0, idx));
+}
+
 std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
@@ -293,7 +320,11 @@ std::optional<Token> findToken(const std::string_view &word) {
         return indirectReferenceToken;
     }
 
+#if 1
+    auto objectStartToken = matchObjectStart(word);
+#else
     auto objectStartToken = matchRegex(word, objectStartRegex, Token::Type::OBJECT_START);
+#endif
     if (objectStartToken.has_value()) {
         return objectStartToken;
     }
