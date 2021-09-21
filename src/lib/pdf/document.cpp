@@ -465,8 +465,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
 
     int changeSectionIndex = 0;
     int64_t offset         = 0;
-    for (int crossRefIndex = 0; crossRefIndex < crossReferenceEntries.size(); crossRefIndex++) {
-        auto &crossRefEntry = crossReferenceEntries[crossRefIndex];
+    for (auto &crossRefEntry : crossReferenceEntries) {
         if (crossRefEntry.entry.type == CrossReferenceEntryType::COMPRESSED) {
             TODO("Implement support for rewriting compressed cross reference entries");
             continue;
@@ -545,10 +544,10 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
 
 void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) {
     s.write("trailer\n", 8);
-    s.write(trailer.get_dict()->data.data(), trailer.get_dict()->data.size());
-    s.write("startxref\n", 10);
+    s.write(trailer.get_dict()->data.data(), static_cast<std::streamsize>(trailer.get_dict()->data.size()));
+    s.write("\nstartxref\n", 11);
     auto tmp = std::to_string(bytesWrittenUntilXref);
-    s.write(tmp.c_str(), tmp.size());
+    s.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
     s.write("\n%%EOF", 6);
 }
 
