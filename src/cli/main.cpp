@@ -1,5 +1,6 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <unistd.h>
 
 #include "cmd_delete_page.cpp"
 #include "cmd_info.cpp"
@@ -39,6 +40,11 @@ int parse_delete_arguments(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
+    if (isatty(fileno(stdin))) {
+        spdlog::error("Usage: cat my-document.pdf | pdf-cli [COMMAND]");
+        return 1;
+    }
+
     std::stringstream ss;
     ss << std::cin.rdbuf();
     std::string s = ss.str();

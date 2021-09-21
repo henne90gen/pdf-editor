@@ -7,6 +7,13 @@ int cmd_info(std::string &s) {
         return 1;
     }
 
-    spdlog::info("Number of pages: {}", document.page_count());
+    spdlog::set_pattern("%v");
+
+    spdlog::info("Size in bytes:    {:>5}", document.sizeInBytes);
+    spdlog::info("Pages:            {:>5}", document.page_count());
+//    spdlog::ingo("Lines:         {:>5}", document.line_count());
+//    spdlog::info("Words:         {:>5}", document.word_count());
+//    spdlog::info("Characters:    {:>5}", document.character_count());
+    spdlog::info("Objects:          {:>5} ({} parsable)", document.object_count(), document.objects().size());
     return 0;
 }
