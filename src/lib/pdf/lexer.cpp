@@ -320,11 +320,7 @@ std::optional<Token> findToken(const std::string_view &word) {
         return indirectReferenceToken;
     }
 
-#if 1
     auto objectStartToken = matchObjectStart(word);
-#else
-    auto objectStartToken = matchRegex(word, objectStartRegex, Token::Type::OBJECT_START);
-#endif
     if (objectStartToken.has_value()) {
         return objectStartToken;
     }
