@@ -200,6 +200,8 @@ bool Document::delete_page(size_t pageNum) {
         return false;
     });
 
+    // TODO clean up objects that are no longer required
+
     return false;
 }
 
@@ -226,6 +228,11 @@ DocumentCatalog *Trailer::catalog(Document &document) const {
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
     return document.get<PageTreeNode>(values["Pages"]);
+}
+
+bool Document::insert_document(Document &otherDocument, size_t atPageNum) {
+    TODO("implement document insertion");
+    return true;
 }
 
 } // namespace pdf

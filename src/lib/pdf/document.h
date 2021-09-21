@@ -140,8 +140,8 @@ struct Document : public ReferenceResolver {
 
     /// Deletes the page with the given page number, returns 0 on success
     bool delete_page(size_t pageNum);
-    /// Insert another document into this one
-    bool insert_document(Document &otherDocument);
+    /// Insert another document into this one so that the first page of the other document has the given page number
+    bool insert_document(Document &otherDocument, size_t atPageNum);
 
     void delete_raw_section(std::string_view d);
     void add_raw_section(char *insertion_point, char *new_content, size_t new_content_length);
