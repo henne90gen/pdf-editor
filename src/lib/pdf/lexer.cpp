@@ -8,8 +8,12 @@ namespace pdf {
 
 // NOTE pre-computing the regex increased performance 15x
 // NOTE moving regex evaluation to the back of findToken increased performance 2x
-auto hexadecimalRegex = std::regex("^<[0-9a-fA-F]*>");
-auto nameRegex        = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
+auto nameRegex = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
+
+bool is_lower_letter(char c) { return c >= 'a' && c <= 'z'; }
+bool is_upper_letter(char c) { return c >= 'A' && c <= 'Z'; }
+bool is_letter(char c) { return is_lower_letter(c) || is_upper_letter(c); }
+bool is_digit(char c) { return c >= '0' && c <= '9'; }
 
 std::string_view removeLeadingWhitespace(const std::string_view &str) {
     std::string_view result = str;
@@ -30,15 +34,6 @@ std::optional<Token> matchRegex(const std::string_view &word, const std::regex &
         return {token};
     }
     return {};
-}
-
-bool is_digit(char c) {
-    for (char d = '0'; d <= '9'; d++) {
-        if (c == d) {
-            return true;
-        }
-    }
-    return false;
 }
 
 std::optional<Token> matchInt(const std::string_view &word) {
@@ -293,6 +288,24 @@ std::optional<Token> matchObjectStart(const std::string_view &word) {
     return Token(Token::Type::OBJECT_START, word.substr(0, idx));
 }
 
+std::optional<Token> matchHexadecimalString(const std::string_view &word) {
+    int idx = 0;
+    if (word[idx] != '<') {
+        return {};
+    }
+    idx++;
+
+    while (word[idx] != '>') {
+        if (!is_letter(word[idx]) && !is_digit(word[idx])) {
+            return {};
+        }
+        idx++;
+    }
+    idx++;
+
+    return Token(Token::Type::HEXADECIMAL_STRING, word.substr(0, idx));
+}
+
 std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
@@ -330,9 +343,9 @@ std::optional<Token> findToken(const std::string_view &word) {
         return floatOrIntToken;
     }
 
-    auto hexadecimalString = matchRegex(word, hexadecimalRegex, Token::Type::HEXADECIMAL_STRING);
-    if (hexadecimalString.has_value()) {
-        return hexadecimalString;
+    auto hexadecimalStringToken = matchHexadecimalString(word);
+    if (hexadecimalStringToken.has_value()) {
+        return hexadecimalStringToken;
     }
 
     // TODO check with the standard again

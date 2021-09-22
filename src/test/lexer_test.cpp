@@ -94,9 +94,11 @@ TEST(Lexer, IndirectReference) {
 }
 
 TEST(Lexer, HexadecimalString) {
-    auto textProvider = pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7>");
+    auto textProvider = pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7> <949ffba879e60749d38b89a33e0dd9e7> <>");
     auto lexer        = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949FFBA879E60749D38B89A33E0DD9E7>");
+    assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949ffba879e60749d38b89a33e0dd9e7>");
+    assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<>");
     assertNoMoreTokens(lexer);
 }
 
