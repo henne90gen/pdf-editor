@@ -10,7 +10,7 @@ function(target_link_gtk3 target)
     target_include_directories(${target} PRIVATE ${GTK3_INCLUDE_DIRS})
 endfunction()
 
-add_executable(pdf-app MainWindow.cpp PdfPage.cpp)
+add_executable(pdf-app main.cpp MainWindow.cpp PdfPage.cpp)
 target_link_gtk3(pdf-app)
 target_link_libraries(pdf-app PRIVATE pdf-lib spdlog::spdlog)
 

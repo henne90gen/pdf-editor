@@ -1,9 +1,12 @@
 #include <pdf/document.h>
 
-int cmd_info(std::string &s) {
+struct InfoArgs {
+    DocumentSource source={};
+};
+
+int cmd_info(const InfoArgs &args) {
     pdf::Document document;
-    if (pdf::Document::read_from_memory(s.data(), s.size(), document)) {
-        spdlog::error("Failed to load PDF document");
+    if (args.source.read_document(document)) {
         return 1;
     }
 
