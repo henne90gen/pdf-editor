@@ -1,14 +1,9 @@
 #include "lexer.h"
 
 #include <iostream>
-#include <regex>
 #include <string>
 
 namespace pdf {
-
-// NOTE pre-computing the regex increased performance 15x
-// NOTE moving regex evaluation to the back of findToken increased performance 2x
-auto nameRegex = std::regex(R"(^\/[^\r\n\t\f\v /<>\[\]\(\)\{\}]*)");
 
 bool is_lower_letter(char c) { return c >= 'a' && c <= 'z'; }
 bool is_upper_letter(char c) { return c >= 'A' && c <= 'Z'; }
@@ -21,19 +16,6 @@ std::string_view removeLeadingWhitespace(const std::string_view &str) {
         result = result.substr(1, result.length());
     }
     return result;
-}
-
-std::optional<Token> matchRegex(const std::string_view &word, const std::regex &regex, Token::Type tokenType) {
-    // TODO improve this, it is probably very inefficient
-    auto tmp = std::string(word);
-    auto itr = std::sregex_iterator(tmp.begin(), tmp.end(), regex);
-    if (itr != std::sregex_iterator()) {
-        auto content = static_cast<std::string>((*itr).str());
-        // TODO I hope this ensures that we still point to the original data stream
-        auto token = Token(tokenType, word.substr(0, content.length()));
-        return {token};
-    }
-    return {};
 }
 
 std::optional<Token> matchInt(const std::string_view &word) {
@@ -306,6 +288,22 @@ std::optional<Token> matchHexadecimalString(const std::string_view &word) {
     return Token(Token::Type::HEXADECIMAL_STRING, word.substr(0, idx));
 }
 
+std::optional<Token> matchName(const std::string_view &word) {
+    int idx = 0;
+    if (word[idx] != '/') {
+        return {};
+    }
+    idx++;
+
+    while (word[idx] != ' ' && word[idx] != '[' && word[idx] != ']' && word[idx] != '(' && word[idx] != ')' &&
+           word[idx] != '{' && word[idx] != '}' && word[idx] != '/' && word[idx] != '<' && word[idx] != '>' &&
+           word[idx] != '\r' && word[idx] != '\n' && word[idx] != '\t' && word[idx] != '\f' && word[idx] != '\v') {
+        idx++;
+    }
+
+    return Token(Token::Type::NAME, word.substr(0, idx));
+}
+
 std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
@@ -348,8 +346,7 @@ std::optional<Token> findToken(const std::string_view &word) {
         return hexadecimalStringToken;
     }
 
-    // TODO check with the standard again
-    auto nameToken = matchRegex(word, nameRegex, Token::Type::NAME);
+    auto nameToken = matchName(word);
     if (nameToken.has_value()) {
         return nameToken;
     }
