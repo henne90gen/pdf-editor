@@ -4,6 +4,12 @@
 #include <sstream>
 #include <unistd.h>
 
+void help() {
+    spdlog::error("Usage:");
+    spdlog::error("    cat my-document.pdf | pdf-app [COMMAND]");
+    spdlog::error("    pdf-app [COMMAND] [FILE_PATH]");
+}
+
 struct DocumentSource {
     bool fromStdin = false;
     std::string filePath;
@@ -62,12 +68,14 @@ CommandType parse_command_type(int argc, char **argv) {
 }
 
 int parse_document_source(int argc, char **argv, int firstArg, DocumentSource &documentSource) {
-    bool receiveFileFromStdin = isatty(fileno(stdin));
-    if (!receiveFileFromStdin && firstArg >= argc) {
+    bool isTerminal = isatty(fileno(stdin));
+    if (isTerminal && firstArg >= argc) {
+        spdlog::error("No PDF document source specified");
+        help();
         return 1;
     }
 
-    documentSource = {.fromStdin = receiveFileFromStdin, .filePath = ""};
+    documentSource = {.fromStdin = !isTerminal, .filePath = std::string(argv[firstArg])};
     return 0;
 }
 
@@ -93,11 +101,6 @@ int parse_delete_arguments(int argc, char **argv, DeleteArgs &result) {
 
 int parse_gui_args(int argc, char **argv, GuiArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
-}
-
-void help() {
-    // TODO improve help text
-    spdlog::error("Usage: cat my-document.pdf | pdf-cli [COMMAND]");
 }
 
 // pdf my.pdf                     -> opens gui
