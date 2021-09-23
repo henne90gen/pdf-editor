@@ -1,11 +1,10 @@
 #include "document.h"
 
-#include <spdlog/spdlog.h>
 #include <fstream>
+#include <spdlog/spdlog.h>
 #include <sstream>
 
 namespace pdf {
-
 
 Dictionary *parseDict(char *start, size_t length) {
     ASSERT(start != nullptr);
@@ -32,7 +31,7 @@ Stream *parseStream(char *start, size_t length) {
 bool Document::read_trailer() {
     size_t eofMarkerLength = 5;
     char *eofMarkerStart   = data + (sizeInBytes - eofMarkerLength);
-    if (data[sizeInBytes - 1] == '\n') {
+    if (data[sizeInBytes - 1] == '\n' || data[sizeInBytes - 1] == '\r') {
         eofMarkerStart -= 1;
     }
     if (std::string(eofMarkerStart, eofMarkerLength) != "%%EOF") {
@@ -41,7 +40,7 @@ bool Document::read_trailer() {
     }
 
     char *lastCrossRefStartPtr = eofMarkerStart - 2;
-    while (*lastCrossRefStartPtr != '\n' && data < lastCrossRefStartPtr) {
+    while ((*lastCrossRefStartPtr != '\n' && *lastCrossRefStartPtr != '\r') && data < lastCrossRefStartPtr) {
         lastCrossRefStartPtr--;
     }
     if (data == lastCrossRefStartPtr) {
@@ -123,7 +122,7 @@ bool Document::read_cross_reference_table() {
 
         int64_t spaceLocation = -1;
         char *tmp             = crossRefPtr;
-        while (*tmp != '\n') {
+        while (*tmp != '\n' && *tmp != '\r') {
             if (*tmp == ' ') {
                 spaceLocation = tmp - crossRefPtr;
             }
@@ -131,6 +130,7 @@ bool Document::read_cross_reference_table() {
         }
         auto beginTable = tmp + 1;
         auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
+        // TODO parse other cross-reference sections
         // TODO catch exceptions
         crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
         crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));

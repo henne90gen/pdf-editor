@@ -31,8 +31,9 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto parser = Parser(lexer, (ReferenceResolver *)this);
         auto result = parser.parse();
         return result->as<IndirectObject>();
-    } else {
-        auto stream = get_object(entry.compressed.objectNumberOfStream)->object->as<Stream>();
+    } else if (entry.type == CrossReferenceEntryType::COMPRESSED) {
+        auto streamObject = get_object(entry.compressed.objectNumberOfStream);
+        auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
 
         auto content       = stream->to_string();
@@ -54,6 +55,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         return new IndirectObject(content, objectNumbers[entry.compressed.indexInStream], 0,
                                   objs[entry.compressed.indexInStream]);
     }
+    ASSERT(false);
 }
 
 IndirectObject *Document::get_object(int64_t objectNumber) {
@@ -61,7 +63,7 @@ IndirectObject *Document::get_object(int64_t objectNumber) {
         return objectList[objectNumber];
     }
 
-    auto object           = load_object(objectNumber);
+    auto object              = load_object(objectNumber);
     objectList[objectNumber] = object;
     return object;
 }
