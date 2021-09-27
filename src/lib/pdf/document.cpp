@@ -178,11 +178,12 @@ bool Document::delete_page(size_t pageNum) {
         } else {
             IndirectObject *o = nullptr;
             for (auto obj : objectList) {
-                if (obj == nullptr) {
+                if (obj.second == nullptr) {
                     continue;
                 }
-                if (page->node == obj->object) {
-                    o = obj;
+                if (page->node == obj.second->object) {
+                    o = obj.second;
+                    break;
                 }
             }
             ASSERT(o != nullptr);

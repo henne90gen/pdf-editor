@@ -87,11 +87,11 @@ struct ChangeSection {
 };
 
 struct Document : public ReferenceResolver {
-    char *data                              = nullptr;
-    size_t sizeInBytes                      = 0;
-    Trailer trailer                         = {};
-    CrossReferenceTable crossReferenceTable = {};
-    std::vector<IndirectObject *> objectList   = {};
+    char *data                                                = nullptr;
+    size_t sizeInBytes                                        = 0;
+    Trailer trailer                                           = {};
+    CrossReferenceTable crossReferenceTable                   = {};
+    std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
     std::vector<ChangeSection> changeSections = {};
 
@@ -107,7 +107,6 @@ struct Document : public ReferenceResolver {
         ASSERT(false);
         return nullptr;
     }
-
     template <typename T> std::optional<T *> get(std::optional<Object *> object) {
         if (object.has_value()) {
             return get<T>(object.value());
@@ -151,7 +150,8 @@ struct Document : public ReferenceResolver {
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
     bool read_trailer();
-    bool read_cross_reference_table();
+    bool read_cross_reference_info();
+    bool read_cross_reference_table(char *crossRefPtr);
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);

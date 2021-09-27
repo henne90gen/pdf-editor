@@ -101,60 +101,68 @@ bool Document::read_trailer() {
     }
 }
 
-bool Document::read_cross_reference_table() {
+bool Document::read_cross_reference_table(char *crossRefPtr) {
+    if (std::string(crossRefPtr, 4) != "xref") {
+        spdlog::error("Expected keyword 'xref' at byte {}", crossRefPtr - data);
+        return true;
+    }
+
+    crossRefPtr += 4;
+    if (*crossRefPtr == '\r') {
+        crossRefPtr++;
+    }
+    if (*crossRefPtr == '\n') {
+        crossRefPtr++;
+    }
+
+    int64_t spaceLocation = -1;
+    char *tmp             = crossRefPtr;
+    while (*tmp != '\n' && *tmp != '\r') {
+        if (*tmp == ' ') {
+            spaceLocation = tmp - crossRefPtr;
+        }
+        tmp++;
+    }
+
+    auto beginTable = tmp + 1;
+    auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
+    // TODO parse other cross-reference sections
+    // TODO catch exceptions
+    crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
+    crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
+    for (int i = 0; i < crossReferenceTable.objectCount; i++) {
+        // nnnnnnnnnn ggggg f__
+        auto s = std::string(beginTable, 20);
+        // TODO catch exceptions
+        uint64_t num0 = std::stoll(s.substr(0, 10));
+        uint64_t num1 = std::stoll(s.substr(11, 16));
+
+        CrossReferenceEntry entry = {};
+        if (s[17] == 'f') {
+            entry.type                                = CrossReferenceEntryType ::FREE;
+            entry.free.nextFreeObjectNumber           = num0;
+            entry.free.nextFreeObjectGenerationNumber = num1;
+        } else {
+            entry.type                    = CrossReferenceEntryType::NORMAL;
+            entry.normal.byteOffset       = num0;
+            entry.normal.generationNumber = num1;
+        }
+
+        crossReferenceTable.entries.push_back(entry);
+        beginTable += 20;
+    }
+
+    return false;
+}
+
+bool Document::read_cross_reference_info() {
     // exactly one of 'stream' or 'dict' has to be non-null
     ASSERT(trailer.get_stream() != nullptr || trailer.get_dict() != nullptr);
     ASSERT(trailer.get_stream() == nullptr || trailer.get_dict() == nullptr);
 
     if (trailer.get_dict() != nullptr) {
         char *crossRefPtr = data + trailer.lastCrossRefStart;
-        if (std::string(crossRefPtr, 4) != "xref") {
-            spdlog::error("Expected keyword 'xref' at byte {}", trailer.lastCrossRefStart);
-            return true;
-        }
-        crossRefPtr += 4;
-        if (*crossRefPtr == '\r') {
-            crossRefPtr++;
-        }
-        if (*crossRefPtr == '\n') {
-            crossRefPtr++;
-        }
-
-        int64_t spaceLocation = -1;
-        char *tmp             = crossRefPtr;
-        while (*tmp != '\n' && *tmp != '\r') {
-            if (*tmp == ' ') {
-                spaceLocation = tmp - crossRefPtr;
-            }
-            tmp++;
-        }
-        auto beginTable = tmp + 1;
-        auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
-        // TODO parse other cross-reference sections
-        // TODO catch exceptions
-        crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
-        crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
-        for (int i = 0; i < crossReferenceTable.objectCount; i++) {
-            // nnnnnnnnnn ggggg f__
-            auto s = std::string(beginTable, 20);
-            // TODO catch exceptions
-            uint64_t num0 = std::stoll(s.substr(0, 10));
-            uint64_t num1 = std::stoll(s.substr(11, 16));
-
-            CrossReferenceEntry entry = {};
-            if (s[17] == 'f') {
-                entry.type                                = CrossReferenceEntryType ::FREE;
-                entry.free.nextFreeObjectNumber           = num0;
-                entry.free.nextFreeObjectGenerationNumber = num1;
-            } else {
-                entry.type                    = CrossReferenceEntryType::NORMAL;
-                entry.normal.byteOffset       = num0;
-                entry.normal.generationNumber = num1;
-            }
-
-            crossReferenceTable.entries.push_back(entry);
-            beginTable += 20;
-        }
+        return read_cross_reference_table(crossRefPtr);
     } else {
         Stream *stream  = trailer.get_stream();
         auto W          = stream->dictionary->values["W"]->as<Array>();
@@ -223,7 +231,6 @@ bool Document::read_cross_reference_table() {
         }
     }
 
-    objectList.resize(crossReferenceTable.entries.size(), nullptr);
     return false;
 }
 
@@ -246,7 +253,7 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
     if (document.read_trailer()) {
         return true;
     }
-    if (document.read_cross_reference_table()) {
+    if (document.read_cross_reference_info()) {
         return true;
     }
 
@@ -260,7 +267,7 @@ bool Document::read_from_memory(char *buffer, size_t size, Document &document) {
     if (document.read_trailer()) {
         return true;
     }
-    if (document.read_cross_reference_table()) {
+    if (document.read_cross_reference_info()) {
         return true;
     }
 
