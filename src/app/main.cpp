@@ -15,7 +15,7 @@ struct DocumentSource {
     std::string filePath;
 
     int read_document(pdf::Document &document) const {
-        if (!fromStdin) {
+        if (!fromStdin || !filePath.empty()) {
             if (pdf::Document::read_from_file(filePath, document)) {
                 spdlog::error("Failed to read document '{}'", filePath);
                 return 1;
@@ -30,6 +30,7 @@ struct DocumentSource {
             spdlog::error("Failed to read document from stdin");
             return 1;
         }
+
         return 0;
     }
 };
