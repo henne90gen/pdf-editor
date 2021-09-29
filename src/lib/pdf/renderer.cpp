@@ -8,11 +8,6 @@
 namespace pdf {
 
 void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
-    auto contentsOpt = page->contents();
-    if (!contentsOpt.has_value()) {
-        return;
-    }
-
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
@@ -21,23 +16,12 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->rectangle(0, 0, cropBox->width(), cropBox->height());
     cr->fill();
 
-    auto content = contentsOpt.value();
-    if (content->is<Stream>()) {
-        render(cr, {content->as<Stream>()});
-    } else if (content->is<Array>()) {
-        auto arr     = content->as<Array>();
-        auto streams = std::vector<Stream *>(arr->values.size());
-        for (int i = 0; i < arr->values.size(); i++) {
-            streams[i] = page->document.get<Stream>(arr->values[i]);
-        }
-        render(cr, streams);
-    } else {
-        // NOTE this should never be reached
-        ASSERT(false);
-    }
+    auto contentStreams = page->content_streams();
+    ASSERT(!contentStreams.empty());
+    render(cr, contentStreams);
 }
 
-void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<Stream *> &streams) {
+void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
         auto textProvider   = StringTextProvider(s->to_string());
         auto lexer          = TextLexer(textProvider);

@@ -123,10 +123,16 @@ struct Document : public ReferenceResolver {
     /// List of objects
     std::vector<IndirectObject *> objects();
 
-    /// Number of pages
-    size_t page_count();
     /// Number of indirect objects
     size_t object_count();
+    /// Number of pages
+    size_t page_count();
+    /// Number of lines
+    size_t line_count();
+    /// Number of words
+    size_t word_count();
+    /// Number of characters
+    size_t character_count();
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] bool write_to_file(const std::string &filePath);
@@ -139,7 +145,7 @@ struct Document : public ReferenceResolver {
 
     /// Deletes the page with the given page number, returns 0 on success
     bool delete_page(size_t pageNum);
-    /// Insert another document into this one so that the first page of the other document has the given page number
+    /// Insert another document into this one so that the first page of the inserted document has the given page number
     bool insert_document(Document &otherDocument, size_t atPageNum);
 
     void delete_raw_section(std::string_view d);

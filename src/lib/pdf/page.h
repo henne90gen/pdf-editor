@@ -2,6 +2,7 @@
 
 #include "document.h"
 #include "objects.h"
+#include "operator_parser.h"
 
 namespace pdf {
 
@@ -41,6 +42,10 @@ struct Resources : public Dictionary {
     std::optional<FontMap *> fonts(Document &document) { return document.get<FontMap>(find<Object>("Font")); }
 };
 
+struct ContentStream : public Stream {
+    void for_each_operator(const std::function<bool(Operator *)> &func);
+};
+
 struct Page {
     explicit Page(Document &_document, PageTreeNode *_node) : document(_document), node(_node) {}
 
@@ -54,6 +59,8 @@ struct Page {
     Rectangle *artBox() { return node->attribute<Rectangle>(document, "ArtBox", true).value_or(mediaBox()); }
     std::optional<Dictionary *> boxColorInfo() { return node->attribute<Dictionary>(document, "BoxColorInfo", false); }
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
+    std::vector<ContentStream *> content_streams();
+
     int64_t rotate();
     double width();
     double height();

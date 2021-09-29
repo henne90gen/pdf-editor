@@ -3,8 +3,8 @@
 #include <bitset>
 #include <fstream>
 #include <spdlog/spdlog.h>
-#include <sstream>
 
+#include "operator_parser.h"
 #include "page.h"
 
 namespace pdf {
@@ -236,6 +236,52 @@ PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
 bool Document::insert_document(Document &otherDocument, size_t atPageNum) {
     TODO("implement document insertion");
     return true;
+}
+
+size_t Document::line_count() { return 0; }
+
+size_t Document::word_count() { return 0; }
+
+size_t count_TJ_characters(Operator *op) {
+    // TODO skip whitespace characters
+    size_t result = 0;
+    for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
+        if (value->is<Integer>()) {
+            // do nothing
+        } else if (value->is<HexadecimalString>()) {
+            auto str = value->as<HexadecimalString>()->to_string();
+            for (int i = 0; i < str.size(); i++) {
+                result++;
+            }
+        } else if (value->is<LiteralString>()) {
+            auto str = std::string(value->as<LiteralString>()->value());
+            for (int i = 0; i < str.size(); i++) {
+                result++;
+            }
+        }
+    }
+    return result;
+}
+
+size_t Document::character_count() {
+    size_t result = 0;
+    for_each_page([&result](Page *page) {
+        auto contentStreams = page->content_streams();
+        for (auto contentStream : contentStreams) {
+            contentStream->for_each_operator([&result](Operator *op) {
+                if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
+                    result += count_TJ_characters(op);
+                }
+
+                // TODO also count other text operators
+
+                return true;
+            });
+        }
+        return true;
+    });
+
+    return result;
 }
 
 } // namespace pdf

@@ -97,7 +97,7 @@ struct renderer {
     Page *page;
     std::vector<GraphicsState> stateStack = {};
 
-    void render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<Stream *> &streams);
+    void render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams);
 
     void setNonStrokingColor(Operator *op);
     void endText();
