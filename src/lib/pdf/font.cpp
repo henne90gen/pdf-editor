@@ -46,4 +46,15 @@ std::optional<Font *> pdf::FontMap::get(pdf::Document &document, const std::stri
     return document.get<Font>(find<Object>(fontName));
 }
 
+std::optional<CMap *> Font::cmap(Document &document) {
+    // FIXME cache cmap object
+
+    auto cmapStreamOpt = toUnicode(document);
+    if (!cmapStreamOpt.has_value()) {
+        return {};
+    }
+
+    return cmapStreamOpt.value()->read_cmap();
+}
+
 } // namespace pdf

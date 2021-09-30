@@ -67,6 +67,9 @@ struct Font : public Dictionary {
     std::optional<Object *> encoding(Document &document);
     std::optional<CMapStream *> toUnicode(Document &document);
     std::optional<Stream *> fontProgram(Document &document);
+
+    /// Character mapping
+    std::optional<CMap *> cmap(Document &document);
 };
 
 struct FontMap : public Dictionary {

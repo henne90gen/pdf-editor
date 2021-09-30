@@ -108,16 +108,14 @@ void renderer::moveStartOfNextLine(Operator *op) {
 void renderer::setTextFontAndSize(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
-    auto fontName =
-          std::string_view(op->data.Tf_SetTextFontAndSize.fontNameData, op->data.Tf_SetTextFontAndSize.fontNameLength);
-    fontName        = fontName.substr(1); // remove leading "/"
     auto fontMapOpt = page->resources()->fonts(page->document);
     if (!fontMapOpt.has_value()) {
         TODO("logging");
         return;
     }
 
-    auto fontOpt = fontMapOpt.value()->get(page->document, std::string(fontName));
+    auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
+    auto fontOpt = fontMapOpt.value()->get(page->document, fontName);
     if (!fontOpt.has_value()) {
         TODO("logging");
         return;
@@ -149,7 +147,7 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
         } else if (value->is<HexadecimalString>()) {
             auto str = value->as<HexadecimalString>()->to_string();
             for (char c : str) {
-                auto i             = static_cast<unsigned long>(c);
+                auto i             = static_cast<uint8_t>(c);
                 Cairo::Glyph glyph = {.index = i, .x = xOffset, .y = 0.0};
                 glyphs.push_back(glyph);
 

@@ -9,13 +9,17 @@ namespace pdf {
 
 class CMap {
   public:
-    explicit CMap(std::unordered_map<uint8_t , std::string> _charmap) : charmap(std::move(_charmap)) {}
-    [[nodiscard]] std::optional<std::string> map_char_code(uint8_t  code) {
-        // TODO use 'find' here, to return empty optional
-        return charmap[code]; }
+    explicit CMap(std::unordered_map<uint8_t, std::string> _charmap) : charmap(std::move(_charmap)) {}
+    [[nodiscard]] std::optional<std::string> map_char_code(uint8_t code) {
+        auto itr = charmap.find(code);
+        if (itr == charmap.end()) {
+            return {};
+        }
+        return itr->second;
+    }
 
   private:
-    std::unordered_map<uint8_t , std::string> charmap = {};
+    std::unordered_map<uint8_t, std::string> charmap = {};
 };
 
 struct CMapParser {

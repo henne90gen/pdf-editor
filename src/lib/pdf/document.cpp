@@ -242,16 +242,19 @@ size_t Document::line_count() { return 0; }
 
 size_t Document::word_count() { return 0; }
 
-size_t count_TJ_characters(Operator *op) {
+size_t count_TJ_characters(CMap *cmap, Operator *op) {
     // TODO skip whitespace characters
     size_t result = 0;
     for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
         if (value->is<Integer>()) {
             // do nothing
         } else if (value->is<HexadecimalString>()) {
-            auto str = value->as<HexadecimalString>()->to_string();
-            for (int i = 0; i < str.size(); i++) {
-                result++;
+            auto codes = value->as<HexadecimalString>()->to_string();
+            for (char code : codes) {
+                auto strOpt = cmap->map_char_code(code);
+                if (strOpt.has_value()) {
+                    result += strOpt.value().size();
+                }
             }
         } else if (value->is<LiteralString>()) {
             auto str = std::string(value->as<LiteralString>()->value());
@@ -265,12 +268,33 @@ size_t count_TJ_characters(Operator *op) {
 
 size_t Document::character_count() {
     size_t result = 0;
-    for_each_page([&result](Page *page) {
+    for_each_page([&result, this](Page *page) {
         auto contentStreams = page->content_streams();
+        CMap *cmap = nullptr;
         for (auto contentStream : contentStreams) {
-            contentStream->for_each_operator([&result](Operator *op) {
+            contentStream->for_each_operator([&result, this, &page, &cmap](Operator *op) {
                 if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-                    result += count_TJ_characters(op);
+                    result += count_TJ_characters(cmap, op);
+                } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
+                    auto fontMapOpt = page->resources()->fonts(page->document);
+                    if (!fontMapOpt.has_value()) {
+                        TODO("logging");
+                        return true;
+                    }
+
+                    auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
+                    auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
+                    if (!fontOpt.has_value()) {
+                        TODO("logging");
+                        return true;
+                    }
+
+                    auto font    = fontOpt.value();
+                    auto cmapOpt = font->cmap(*this);
+                    if (!cmapOpt.has_value()) {
+                        return true;
+                    }
+                    cmap = cmapOpt.value();
                 }
 
                 // TODO also count other text operators

@@ -125,6 +125,11 @@ struct Operator {
             const char *fontNameData;
             size_t fontNameLength;
             double fontSize;
+            [[nodiscard]] std::string_view font_name() {
+                auto fontName = std::string_view(fontNameData, fontNameLength);
+                fontName      = fontName.substr(1); // remove leading "/"
+                return fontName;
+            }
         } Tf_SetTextFontAndSize;
         struct {
             Array *objects;

@@ -87,13 +87,13 @@ struct ChangeSection {
 };
 
 struct Document : public ReferenceResolver {
-    char *data                                                = nullptr;
-    size_t sizeInBytes                                        = 0;
-    Trailer trailer                                           = {};
-    CrossReferenceTable crossReferenceTable                   = {};
-    std::unordered_map<uint64_t, IndirectObject *> objectList = {};
+    char *data                              = nullptr;
+    size_t sizeInBytes                      = 0;
+    Trailer trailer                         = {};
+    CrossReferenceTable crossReferenceTable = {};
 
-    std::vector<ChangeSection> changeSections = {};
+    std::unordered_map<uint64_t, IndirectObject *> objectList = {};
+    std::vector<ChangeSection> changeSections                 = {};
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
