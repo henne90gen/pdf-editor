@@ -84,6 +84,27 @@ std::optional<Token> matchWordToken(const std::string_view &word) {
     if (STARTS_WITH(word, "null")) {
         return Token(Token::Type::NULL_OBJ, word.substr(0, 4));
     }
+    if (STARTS_WITH(word, "findresource")) {
+        return Token(Token::Type::FIND_RESOURCE, word.substr(0, 12));
+    }
+    if (STARTS_WITH(word, "defineresource")) {
+        return Token(Token::Type::DEFINE_RESOURCE, word.substr(0, 14));
+    }
+    if (STARTS_WITH(word, "def")) {
+        return Token(Token::Type::DEF, word.substr(0, 3));
+    }
+    if (STARTS_WITH(word, "dict")) {
+        return Token(Token::Type::DICT, word.substr(0, 4));
+    }
+    if (STARTS_WITH(word, "dup")) {
+        return Token(Token::Type::DUP, word.substr(0, 3));
+    }
+    if (STARTS_WITH(word, "pop")) {
+        return Token(Token::Type::POP, word.substr(0, 3));
+    }
+    if (STARTS_WITH(word, "currentdict")) {
+        return Token(Token::Type::CURRENT_DICT, word.substr(0, 11));
+    }
     if (STARTS_WITH(word, "begincmap")) {
         return Token(Token::Type::CMAP_BEGIN, word.substr(0, 9));
     }
@@ -137,6 +158,15 @@ std::optional<Token> matchWordToken(const std::string_view &word) {
     }
     if (STARTS_WITH(word, "endnotdefrange")) {
         return Token(Token::Type::CMAP_END_NOTDEF_RANGE, word.substr(0, 14));
+    }
+    if (STARTS_WITH(word, "begin")) {
+        return Token(Token::Type::BEGIN, word.substr(0, 5));
+    }
+    if (STARTS_WITH(word, "end")) {
+        return Token(Token::Type::END, word.substr(0, 3));
+    }
+    if (STARTS_WITH(word, "CMapName")) {
+        return Token(Token::Type::CMAP_NAME, word.substr(0, 8));
     }
     return {};
 }

@@ -28,6 +28,18 @@ struct Token {
         STREAM_END,
         NULL_OBJ,
         OPERATOR,
+
+        BEGIN,
+        END,
+        FIND_RESOURCE,
+        DEFINE_RESOURCE,
+        DEF,
+        DICT,
+        DUP,
+        POP,
+        CMAP_NAME,
+        CURRENT_DICT,
+
         CMAP_BEGIN,
         CMAP_END,
         CMAP_USE,

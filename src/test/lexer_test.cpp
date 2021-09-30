@@ -94,8 +94,9 @@ TEST(Lexer, IndirectReference) {
 }
 
 TEST(Lexer, HexadecimalString) {
-    auto textProvider = pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7> <949ffba879e60749d38b89a33e0dd9e7> <>");
-    auto lexer        = pdf::TextLexer(textProvider);
+    auto textProvider =
+          pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7> <949ffba879e60749d38b89a33e0dd9e7> <>");
+    auto lexer = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949FFBA879E60749D38B89A33E0DD9E7>");
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949ffba879e60749d38b89a33e0dd9e7>");
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<>");
@@ -229,11 +230,22 @@ TEST(Lexer, PathPaintingOperators) {
 }
 
 TEST(Lexer, CMap) {
-    auto textProvider = pdf::StringTextProvider("begincmap endcmap usecmap usefont begincodespacerange "
+    auto textProvider = pdf::StringTextProvider("begin end findresource defineresource CMapName currentdict pop def "
+                                                "dict dup begincmap endcmap usecmap usefont begincodespacerange "
                                                 "endcodespacerange beginbfchar endbfchar beginbfrange endbfrange "
                                                 "begincidchar endcidchar begincidrange endcidrange beginnotdefchar "
                                                 "endnotdefchar beginnotdefrange endnotdefrange");
     auto lexer        = pdf::TextLexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::BEGIN, "begin");
+    assertNextToken(lexer, pdf::Token::Type::END, "end");
+    assertNextToken(lexer, pdf::Token::Type::FIND_RESOURCE, "findresource");
+    assertNextToken(lexer, pdf::Token::Type::DEFINE_RESOURCE, "defineresource");
+    assertNextToken(lexer, pdf::Token::Type::CMAP_NAME, "CMapName");
+    assertNextToken(lexer, pdf::Token::Type::CURRENT_DICT, "currentdict");
+    assertNextToken(lexer, pdf::Token::Type::POP, "pop");
+    assertNextToken(lexer, pdf::Token::Type::DEF, "def");
+    assertNextToken(lexer, pdf::Token::Type::DICT, "dict");
+    assertNextToken(lexer, pdf::Token::Type::DUP, "dup");
     assertNextToken(lexer, pdf::Token::Type::CMAP_BEGIN, "begincmap");
     assertNextToken(lexer, pdf::Token::Type::CMAP_END, "endcmap");
     assertNextToken(lexer, pdf::Token::Type::CMAP_USE, "usecmap");

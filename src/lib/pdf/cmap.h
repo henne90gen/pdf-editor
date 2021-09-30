@@ -1,27 +1,41 @@
 #pragma once
 
-#include "objects.h"
+#include <utility>
+
 #include "lexer.h"
+#include "objects.h"
 
 namespace pdf {
 
-struct CMap {
-    explicit CMap(const std::string_view _data) : data(_data) {}
+class CMap {
+  public:
+    explicit CMap(std::unordered_map<uint8_t , std::string> _charmap) : charmap(std::move(_charmap)) {}
+    [[nodiscard]] std::optional<std::string> map_char_code(uint8_t  code) {
+        // TODO use 'find' here, to return empty optional
+        return charmap[code]; }
 
-    std::string_view data;
+  private:
+    std::unordered_map<uint8_t , std::string> charmap = {};
 };
 
 struct CMapParser {
     explicit CMapParser(Lexer &_lexer) : lexer(_lexer) {}
 
-    CMap *parse();
+    /// Attempts to parse a CMap from the given lexer
+    CMap *parse(); // TODO maybe return by value instead of a pointer
 
   private:
-    bool currentTokenIs(Token::Type type);
-
     Lexer &lexer;
     int currentTokenIdx       = 0;
     std::vector<Token> tokens = {};
+
+    void ignoreNewLineTokens();
+    [[nodiscard]] bool ensureTokensHaveBeenLexed();
+    [[nodiscard]] bool currentTokenIs(Token::Type type);
+
+    void parseCodeSpaceRange();
+    void parseBfChar(std::unordered_map<uint8_t, std::string> &charmap);
+    void parseBfRange(std::unordered_map<uint8_t, std::string> &charmap);
 };
 
 struct CMapStream : public Stream {

@@ -62,7 +62,7 @@ struct Integer : public Object {
 
     explicit Integer(std::string_view data, int64_t i) : Object(staticType(), data), value(i) {}
 
-    void set(Document&document, int64_t i);
+    void set(Document &document, int64_t i);
 };
 
 struct Real : public Object {
@@ -83,7 +83,11 @@ struct LiteralString : public Object {
 struct HexadecimalString : public Object {
     static Type staticType() { return Type::HEXADECIMAL_STRING; }
 
-    explicit HexadecimalString(std::string_view data) : Object(staticType(), data) {}
+    explicit HexadecimalString(std::string_view _data) : Object(staticType(), _data) {
+        if (data[0] == '<') {
+            data = data.substr(1, data.size() - 2);
+        }
+    }
 
     [[nodiscard]] std::string to_string() const;
 };

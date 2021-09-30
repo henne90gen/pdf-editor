@@ -108,10 +108,10 @@ std::string HexadecimalString::to_string() const {
 
     std::string result;
     for (int i = 0; i < tmp.size(); i += 2) {
-        *high         = tmp[i];
         *low          = tmp[i + 1];
-        auto highVal  = std::strtol(high, nullptr, 16);
+        *high         = tmp[i];
         auto lowVal   = std::strtol(low, nullptr, 16);
+        auto highVal  = std::strtol(high, nullptr, 16);
         char nextChar = (char)(lowVal + 16 * highVal);
         result += nextChar;
     }

@@ -147,10 +147,7 @@ Array *Parser::parseArray() {
             return nullptr;
         }
 
-        while (currentTokenIs(Token::Type::NEW_LINE)) {
-            // ignore NEW_LINE tokens
-            currentTokenIdx++;
-        }
+        ignoreNewLineTokens();
 
         objects.push_back(object);
     }
@@ -161,6 +158,12 @@ Array *Parser::parseArray() {
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
     return new Array(data, objects);
+}
+
+void Parser::ignoreNewLineTokens() {
+    while (currentTokenIs(Token::Type::NEW_LINE)) {
+        currentTokenIdx++;
+    }
 }
 
 Dictionary *Parser::parseDictionary() {
@@ -194,10 +197,7 @@ Dictionary *Parser::parseDictionary() {
             return nullptr;
         }
 
-        while (currentTokenIs(Token::Type::NEW_LINE)) {
-            // ignore NEW_LINE tokens
-            currentTokenIdx++;
-        }
+        ignoreNewLineTokens();
 
         // TODO is this conversion to a string really necessary?
         objects[std::string(key->value())] = value;
@@ -242,9 +242,8 @@ IndirectObject *Parser::parseIndirectObject() {
     auto objectStartContent = tokens[currentTokenIdx].content;
     auto beforeTokenIndex   = currentTokenIdx;
     currentTokenIdx++;
-    while (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+
+    ignoreNewLineTokens();
 
     auto object = parseObject();
     if (object == nullptr) {
@@ -252,9 +251,7 @@ IndirectObject *Parser::parseIndirectObject() {
         return nullptr;
     }
 
-    while (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+    ignoreNewLineTokens();
 
     if (!currentTokenIs(Token::Type::OBJECT_END)) {
         currentTokenIdx = beforeTokenIndex;
@@ -362,9 +359,7 @@ Object *Parser::parseStreamOrDictionary() {
 }
 
 Object *Parser::parseObject() {
-    while (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+    ignoreNewLineTokens();
 
     auto boolean = parseBoolean();
     if (boolean != nullptr) {
