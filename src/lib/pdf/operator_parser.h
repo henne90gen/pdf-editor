@@ -134,6 +134,15 @@ struct Operator {
         struct {
             Array *objects;
         } TJ_ShowOneOrMoreTextStrings;
+        struct {
+            LiteralString *string;
+        } Tj_ShowTextString;
+        struct {
+            int64_t lineCap;
+        } J_LineCapStyle;
+        struct {
+            double matrix[6];
+        }Tm_SetTextMatrixAndTextLineMatrix;
     } data;
 };
 
@@ -151,6 +160,26 @@ class OperatorParser {
     std::vector<Token> tokens = {};
     int currentTokenIdx       = 0;
 
+    /**
+     * Tries to parse the operand at the given index as the given type.
+     * Indexing works backwards: operand2 operand1 operand0 OPERATOR
+     */
+    template <typename T> T operand(int index) { ASSERT(false); }
+
+    template <> double operand(int index) {
+        auto &content = tokens[currentTokenIdx - (2 + index)].content;
+        // TODO is this conversion to a string really necessary?
+        // TODO catch exception
+        return std::stod(std::string(content));
+    }
+
+    template <> int64_t operand(int index) {
+        auto &content = tokens[currentTokenIdx - (2 + index)].content;
+        // TODO is this conversion to a string really necessary?
+        // TODO catch exception
+        return std::stoll(std::string(content));
+    }
+
     Operator *createOperator(Operator::Type type);
 
     Operator *createOperator_w(Operator *result);
@@ -159,6 +188,9 @@ class OperatorParser {
     Operator *createOperator_Td(Operator *result);
     Operator *createOperator_Tf(Operator *result);
     Operator *createOperator_TJ(Operator *result);
+    Operator *createOperator_J(Operator *result);
+    Operator *createOperator_Tm(Operator *result);
+    Operator *createOperator_Tj(Operator *result);
 };
 
 } // namespace pdf

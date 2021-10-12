@@ -62,11 +62,7 @@ Operator *OperatorParser::getOperator() {
 }
 
 Operator *OperatorParser::createOperator_w(Operator *result) {
-    auto &content = tokens[currentTokenIdx - 2].content;
-    // TODO is this conversion to a string really necessary?
-    // TODO catch exception
-    auto lineWidth                        = std::stod(std::string(content));
-    result->data.w_SetLineWidth.lineWidth = lineWidth;
+    result->data.w_SetLineWidth.lineWidth = operand<double>(0);
     return result;
 }
 
@@ -75,22 +71,15 @@ Operator *OperatorParser::createOperator_re(Operator *result) {
         auto &content = tokens[currentTokenIdx - 1 - (4 - i)].content;
         // TODO is this conversion to a string really necessary?
         // TODO catch exception
-        auto d                                  = std::stod(std::string(content));
-        result->data.re_AppendRectangle.rect[i] = d;
+        result->data.re_AppendRectangle.rect[i] = std::stod(std::string(content));
     }
     return result;
 }
 
 Operator *OperatorParser::createOperator_rg(Operator *result) {
-    auto &contentR = tokens[currentTokenIdx - 4].content;
-    auto &contentG = tokens[currentTokenIdx - 3].content;
-    auto &contentB = tokens[currentTokenIdx - 2].content;
-
-    // TODO is this conversion to a string really necessary?
-    // TODO catch exception
-    result->data.rg_SetNonStrokingColorRGB.r = std::stod(std::string(contentR));
-    result->data.rg_SetNonStrokingColorRGB.g = std::stod(std::string(contentG));
-    result->data.rg_SetNonStrokingColorRGB.b = std::stod(std::string(contentB));
+    result->data.rg_SetNonStrokingColorRGB.r = operand<double>(2);
+    result->data.rg_SetNonStrokingColorRGB.g = operand<double>(1);
+    result->data.rg_SetNonStrokingColorRGB.b = operand<double>(0);
     return result;
 }
 
@@ -121,21 +110,31 @@ Operator *OperatorParser::createOperator_Tf(Operator *result) {
     auto contentFontName                              = tokens[currentTokenIdx - 3].content;
     result->data.Tf_SetTextFontAndSize.fontNameData   = contentFontName.data();
     result->data.Tf_SetTextFontAndSize.fontNameLength = contentFontName.length();
-
-    auto contentFontSize = tokens[currentTokenIdx - 2].content;
-    // TODO is this conversion to a string really necessary?
-    // TODO catch exception
-    result->data.Tf_SetTextFontAndSize.fontSize = std::stod(std::string(contentFontSize));
+    result->data.Tf_SetTextFontAndSize.fontSize       = operand<double>(0);
     return result;
 }
 
 Operator *OperatorParser::createOperator_Td(Operator *result) {
-    auto &contentX = tokens[currentTokenIdx - 3].content;
-    auto &contentY = tokens[currentTokenIdx - 2].content;
-    // TODO is this conversion to a string really necessary?
-    // TODO catch exception
-    result->data.Td_MoveStartOfNextLine.x = std::stod(std::string(contentX));
-    result->data.Td_MoveStartOfNextLine.y = std::stod(std::string(contentY));
+    result->data.Td_MoveStartOfNextLine.x = operand<double>(1);
+    result->data.Td_MoveStartOfNextLine.y = operand<double>(0);
+    return result;
+}
+
+Operator *OperatorParser::createOperator_J(Operator *result) {
+    result->data.J_LineCapStyle.lineCap = operand<int64_t>(0);
+    return result;
+}
+
+Operator *OperatorParser::createOperator_Tm(Operator *result) {
+    // a b c d e f Tm
+    for (int i = 0; i < 6; i++) {
+        result->data.Tm_SetTextMatrixAndTextLineMatrix.matrix[i] = operand<double>(5 - i);
+    }
+    return result;
+}
+
+Operator *OperatorParser::createOperator_Tj(Operator *result) {
+    result->data.Tj_ShowTextString.string = new LiteralString(tokens[currentTokenIdx - 2].content);
     return result;
 }
 
@@ -164,8 +163,17 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     if (type == Operator::Type::Tf_SetTextFontAndSize) {
         return createOperator_Tf(result);
     }
+    if (type == Operator::Type::Tj_ShowTextString) {
+        return createOperator_Tj(result);
+    }
     if (type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
         return createOperator_TJ(result);
+    }
+    if (type == Operator::Type::J_SetLineCapStyle) {
+        return createOperator_J(result);
+    }
+    if (type == Operator::Type::Tm_SetTextMatrixAndTextLineMatrix) {
+        return createOperator_Tm(result);
     }
 
     std::cerr << "Failed to parse command of type: " << type << "\n";
