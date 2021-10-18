@@ -10,9 +10,10 @@ void assertNextToken(pdf::Lexer &lexer, pdf::Token::Type type, const std::string
     ASSERT_EQ(value.content, content);
 }
 
-#define assertNoMoreTokens(lexer)                                                                                      \
-    auto result = (lexer).getToken();                                                                                  \
-    ASSERT_FALSE(result.has_value()) << result.value().content
+void assertNoMoreTokens(pdf::Lexer &lexer) {
+    auto result = (lexer).getToken();
+    ASSERT_FALSE(result.has_value()) << result.value().content;
+}
 
 TEST(Lexer, Boolean) {
     auto textProvider = pdf::StringTextProvider("true false");
@@ -152,7 +153,8 @@ TEST(Lexer, LiteralString) {
           "(Strings may contain balanced parentheses ( ) and\nspecial characters (*!&}^% and so on).)"
           "(The following is an empty string.)"
           "()"
-          "(It has zero (0) length.)");
+          "(It has zero (0) length.)"
+          "(Escaped \\) parenthesis)");
     auto lexer = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(This is a string)");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(Strings may contain newlines\nand such.)");
@@ -161,6 +163,18 @@ TEST(Lexer, LiteralString) {
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(The following is an empty string.)");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "()");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(It has zero (0) length.)");
+    assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(Escaped \\) parenthesis)");
+    assertNoMoreTokens(lexer);
+}
+
+TEST(Lexer, Comment) {
+    auto textProvider = pdf::StringTextProvider("%This is a comment\n"
+                                                "%This is a comment\r\n");
+    auto lexer        = pdf::TextLexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::COMMENT, "%This is a comment");
+    assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\n");
+    assertNextToken(lexer, pdf::Token::Type::COMMENT, "%This is a comment");
+    assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\r\n");
     assertNoMoreTokens(lexer);
 }
 

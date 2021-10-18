@@ -39,7 +39,7 @@ bool Document::read_trailer() {
         return true;
     }
 
-    char *lastCrossRefStartPtr = eofMarkerStart - 2;
+    char *lastCrossRefStartPtr = eofMarkerStart - 3;
     while ((*lastCrossRefStartPtr != '\n' && *lastCrossRefStartPtr != '\r') && data < lastCrossRefStartPtr) {
         lastCrossRefStartPtr--;
     }
@@ -50,13 +50,13 @@ bool Document::read_trailer() {
     lastCrossRefStartPtr++;
 
     try {
-        trailer.lastCrossRefStart =
-              std::stoll(std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr));
+        const auto str            = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
+        trailer.lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table: {}", err.what());
+        spdlog::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}", err.what());
         return true;
     } catch (std::out_of_range &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table: {}", err.what());
+        spdlog::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}", err.what());
         return true;
     }
 

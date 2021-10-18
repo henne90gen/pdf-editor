@@ -205,7 +205,7 @@ std::optional<Token> matchString(const std::string_view &word) {
     for (int i = 1; i < word.size(); i++) {
         if (word[i] == '(') {
             openParenthesis++;
-        } else if (word[i] == ')') {
+        } else if (word[i] == ')' && word[i - 1] != '\\') {
             openParenthesis--;
         }
         if (openParenthesis == 0) {
@@ -219,6 +219,8 @@ std::optional<Token> matchString(const std::string_view &word) {
 
 std::optional<Token> matchOperator(const std::string_view &word) {
     std::vector<std::string> operators = {
+          // Unsorted Operators
+          "SC", "SCN", "sc", "scn",
           // Text Operators
           "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
           // Graphics Operators
@@ -230,7 +232,7 @@ std::optional<Token> matchOperator(const std::string_view &word) {
           // Clipping Path Operators
           "W*", "W",
           // Unsorted Operators
-          "Tj", "TJ", "d0", "d1", "CS", "SC", "SCN", "sc", "scn", "G", "g", "RG", "rg", "K",
+          "Tj", "TJ", "d0", "d1", "CS", "G", "g", "RG", "rg", "K",
           "k", //
     };
     for (auto &op : operators) {
@@ -334,6 +336,19 @@ std::optional<Token> matchName(const std::string_view &word) {
     return Token(Token::Type::NAME, word.substr(0, idx));
 }
 
+std::optional<Token> matchComment(const std::string_view &word) {
+    if (word[0] != '%') {
+        return {};
+    }
+
+    int idx = 1;
+    while (word[idx] != '\n' && word[idx] != '\r') {
+        idx++;
+    }
+
+    return Token(Token::Type::COMMENT, word.substr(0, idx));
+}
+
 std::optional<Token> findToken(const std::string_view &word) {
     auto literalString = matchString(word);
     if (literalString.has_value()) {
@@ -379,6 +394,11 @@ std::optional<Token> findToken(const std::string_view &word) {
     auto nameToken = matchName(word);
     if (nameToken.has_value()) {
         return nameToken;
+    }
+
+    auto commentToken = matchComment(word);
+    if (commentToken.has_value()) {
+        return commentToken;
     }
 
     return {};

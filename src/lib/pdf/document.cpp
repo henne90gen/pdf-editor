@@ -266,15 +266,19 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
     return result;
 }
 
+size_t count_Tj_characters(Operator *op) { return op->data.Tj_ShowTextString.string->value().size(); }
+
 size_t Document::character_count() {
     size_t result = 0;
     for_each_page([&result, this](Page *page) {
         auto contentStreams = page->content_streams();
-        CMap *cmap = nullptr;
+        CMap *cmap          = nullptr;
         for (auto contentStream : contentStreams) {
             contentStream->for_each_operator([&result, this, &page, &cmap](Operator *op) {
                 if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
                     result += count_TJ_characters(cmap, op);
+                } else if (op->type == Operator::Type::Tj_ShowTextString) {
+                    result += count_Tj_characters(op);
                 } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
                     auto fontMapOpt = page->resources()->fonts(page->document);
                     if (!fontMapOpt.has_value()) {

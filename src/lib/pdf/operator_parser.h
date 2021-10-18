@@ -39,7 +39,7 @@ namespace pdf {
     O(J, SetLineCapStyle)                                                                                              \
     O(j, SetLineJoinStyle)                                                                                             \
     O(M, SetMiterLimit)                                                                                                \
-    O(d, SetLineDashPatter)                                                                                            \
+    O(d, SetLineDashPattern)                                                                                           \
     O(ri, SetColorRenderingIntent)                                                                                     \
     O(i, SetFlatnessTolerance)                                                                                         \
     O(gs, SetParametersGraphicsState)                                                                                  \
@@ -142,11 +142,12 @@ struct Operator {
         } J_LineCapStyle;
         struct {
             double matrix[6];
-        }Tm_SetTextMatrixAndTextLineMatrix;
+        } Tm_SetTextMatrixAndTextLineMatrix;
     } data;
 };
 
 Operator::Type stringToOperatorType(const std::string &t);
+std::string operatorTypeToString(Operator::Type &type);
 std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
 class OperatorParser {
@@ -167,7 +168,12 @@ class OperatorParser {
     template <typename T> T operand(int index) { ASSERT(false); }
 
     template <> double operand(int index) {
-        auto &content = tokens[currentTokenIdx - (2 + index)].content;
+        Token &token = tokens[currentTokenIdx - (2 + index)];
+        if (token.type == Token::Type::NEW_LINE) {
+            index++;
+            token = tokens[currentTokenIdx - (2 + index)];
+        }
+        auto &content = token.content;
         // TODO is this conversion to a string really necessary?
         // TODO catch exception
         return std::stod(std::string(content));
@@ -180,6 +186,8 @@ class OperatorParser {
         return std::stoll(std::string(content));
     }
 
+    template <> std::string_view operand(int index) { return tokens[currentTokenIdx - (2 + index)].content; }
+
     Operator *createOperator(Operator::Type type);
 
     Operator *createOperator_w(Operator *result);
@@ -191,6 +199,18 @@ class OperatorParser {
     Operator *createOperator_J(Operator *result);
     Operator *createOperator_Tm(Operator *result);
     Operator *createOperator_Tj(Operator *result);
+    Operator *createOperator_cm(Operator *result);
+    Operator *createOperator_g(Operator *result);
+    Operator *createOperator_d(Operator *result);
+    Operator *createOperator_c(Operator *result);
+    Operator *createOperator_s(Operator *result);
+    Operator *createOperator_Tc(Operator *result);
+    Operator *createOperator_CS(Operator *result);
+    Operator *createOperator_S(Operator *result);
+    Operator *createOperator_sc(Operator *result);
+    Operator *createOperator_SC(Operator *result);
+    Operator *createOperator_m(Operator *result);
+    Operator *createOperator_B(Operator *result);
 };
 
 } // namespace pdf

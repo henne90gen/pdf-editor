@@ -28,6 +28,7 @@ struct Token {
         STREAM_END,
         NULL_OBJ,
         OPERATOR,
+        COMMENT, // TODO find out whether this is part of the pdf standard
 
         BEGIN,
         END,

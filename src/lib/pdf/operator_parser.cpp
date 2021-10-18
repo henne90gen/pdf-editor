@@ -1,6 +1,7 @@
 #include "operator_parser.h"
 
 #include <cstring>
+#include <spdlog/spdlog.h>
 
 #include "parser.h"
 #include "util.h"
@@ -41,6 +42,20 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type) {
     return os;
 }
 
+std::string operatorTypeToString(Operator::Type &type) {
+#define __BYTECODE_OP(Name, Description)                                                                               \
+    case Operator::Type::Name##_##Description:                                                                         \
+        return "Operator::Type::" #Name "_" #Description;                                                              \
+        break;
+
+    switch (type) {
+        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+    default:
+        ASSERT(false);
+    }
+#undef __BYTECODE_OP
+}
+
 Operator *OperatorParser::getOperator() {
     while (true) {
         while (currentTokenIdx >= tokens.size()) {
@@ -55,6 +70,11 @@ Operator *OperatorParser::getOperator() {
             const std::string_view &content = tokens[currentTokenIdx].content;
             currentTokenIdx++;
             return createOperator(stringToOperatorType(content));
+        }
+
+        if (tokens[currentTokenIdx].type == Token::Type::INVALID) {
+            spdlog::warn("Found an invalid token in the operator stream");
+            return nullptr;
         }
 
         currentTokenIdx++;
@@ -107,7 +127,7 @@ Operator *OperatorParser::createOperator_TJ(Operator *result) {
 }
 
 Operator *OperatorParser::createOperator_Tf(Operator *result) {
-    auto contentFontName                              = tokens[currentTokenIdx - 3].content;
+    auto contentFontName                              = operand<std::string_view>(1);
     result->data.Tf_SetTextFontAndSize.fontNameData   = contentFontName.data();
     result->data.Tf_SetTextFontAndSize.fontNameLength = contentFontName.length();
     result->data.Tf_SetTextFontAndSize.fontSize       = operand<double>(0);
@@ -134,7 +154,67 @@ Operator *OperatorParser::createOperator_Tm(Operator *result) {
 }
 
 Operator *OperatorParser::createOperator_Tj(Operator *result) {
-    result->data.Tj_ShowTextString.string = new LiteralString(tokens[currentTokenIdx - 2].content);
+    result->data.Tj_ShowTextString.string = new LiteralString(operand<std::string_view>(0));
+    return result;
+}
+
+Operator *OperatorParser::createOperator_cm(Operator *result) {
+    // FIXME parse operator 'cm'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_g(Operator *result) {
+    // FIXME parse operator 'g'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_d(Operator *result) {
+    // FIXME parse operator 'd'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_c(Operator *result) {
+    // FIXME parse operator 'c'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_s(Operator *result) {
+    // FIXME parse operator 's'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_Tc(Operator *result) {
+    // FIXME parse operator 'Tc'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_CS(Operator *result) {
+    // FIXME parse operator 'CS'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_S(Operator *result) {
+    // FIXME parse operator 'S'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_sc(Operator *result) {
+    // FIXME parse operator 'sc'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_SC(Operator *result) {
+    // FIXME parse operator 'SC'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_m(Operator *result) {
+    // FIXME parse operator 'm'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_B(Operator *result) {
+    // FIXME parse operator 'B'
     return result;
 }
 
@@ -175,8 +255,44 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     if (type == Operator::Type::Tm_SetTextMatrixAndTextLineMatrix) {
         return createOperator_Tm(result);
     }
+    if (type == Operator::Type::cm_ModifyCurrentTransformationMatrix) {
+        return createOperator_cm(result);
+    }
+    if (type == Operator::Type::g_SetNonStrokingColorGray) {
+        return createOperator_g(result);
+    }
+    if (type == Operator::Type::d_SetLineDashPattern) {
+        return createOperator_d(result);
+    }
+    if (type == Operator::Type::c_AppendCubicBezier) {
+        return createOperator_c(result);
+    }
+    if (type == Operator::Type::s_UNKNOWN) {
+        return createOperator_s(result);
+    }
+    if (type == Operator::Type::Tc_SetCharacterSpacing) {
+        return createOperator_Tc(result);
+    }
+    if (type == Operator::Type::CS_UNKNOWN) {
+        return createOperator_CS(result);
+    }
+    if (type == Operator::Type::S_UNKNOWN) {
+        return createOperator_S(result);
+    }
+    if (type == Operator::Type::sc_UNKNOWN) {
+        return createOperator_sc(result);
+    }
+    if (type == Operator::Type::SC_UNKNOWN) {
+        return createOperator_SC(result);
+    }
+    if (type == Operator::Type::m_AppendNewSubpath) {
+        return createOperator_m(result);
+    }
+    if (type == Operator::Type::B_UNKNOWN) {
+        return createOperator_B(result);
+    }
 
-    std::cerr << "Failed to parse command of type: " << type << "\n";
+    spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));
     ASSERT(false);
 
     return result;
