@@ -57,7 +57,7 @@ jobs:
 
       - name: Run Tests
         working-directory: ./build
-        run: ctest
+        run: ctest --output-on-failure
 
 #  build-windows:
 #    name: "Windows"
