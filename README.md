@@ -10,19 +10,30 @@
 
 - install gtkmm3
 - run cmake
-    - `mkdir build && cd build`
-    - `cmake .. -G Ninja`
-    - `cmake --build .`
+  - `mkdir build && cd build`
+  - `cmake .. -G Ninja`
+  - `cmake --build .`
 
 ### Windows
 
 - install MSYS2
 - install dependencies inside MSYS2 shell
-    - mingw-w64-x86_64-toolchain
-    - mingw-w64-x86_64-gtkmm3
-    - mingw-w64-x86_64-clang
+  - mingw-w64-x86_64-toolchain
+  - mingw-w64-x86_64-gtkmm3
+  - mingw-w64-x86_64-clang
 - add `<msys2-install-dir>/mingw64/bin` to PATH
 - run cmake
-    - `mkdir build && cd build`
-    - `cmake .. -G Ninja -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++`
-    - `cmake --build .`
+  - `mkdir build && cd build`
+  - `cmake .. -G Ninja -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++`
+  - `cmake --build .`
+
+## Test Files
+
+| PDF Standard | Hint        | Links                                                                                                                              |
+| ------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| PDF/VT       | Large files | https://www.pdfa.org/resource/cal-poly-pdfvt-test-suite/                                                                           |
+| PDF/A-1      |             | https://www.pdfa.org/resource/isartor-test-suite/ https://www.pdfa.org/wp-content/uploads/2011/08/isartor-pdfa-2008-08-13.zip      |
+| PDF/UA       |             | https://www.pdfa.org/resource/pdfua-reference-suite/                                                                               |
+| PDF/A        | Many files  | https://www.pdfa.org/resource/verapdf-test-suite/ https://github.com/veraPDF/veraPDF-corpus                                        |
+| PDF/UA-1     | Single file | https://www.pdfa.org/resource/the-matterhorn-protocol/ https://www.pdfa.org/wp-content/uploads/2021/04/Matterhorn-Protocol-1-1.pdf |
+|              |             | https://github.com/bfosupport/pdfa-testsuite                                                                                       |

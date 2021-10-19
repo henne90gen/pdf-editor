@@ -4,7 +4,7 @@ on: push
 
 jobs:
   build-ubuntu:
-    name: "Ubuntu"
+    name: "Build Ubuntu"
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +32,24 @@ jobs:
       - name: Build and Install
         working-directory: ./build
         run: cmake --build .
+
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: build-folder
+          path: build
+
+  test-ubuntu:
+    name: "Test Ubuntu"
+    runs-on: ubuntu-latest
+    needs: build-ubuntu
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/download-artifact@master
+        with:
+          name: build-folder
+          path: build
 
       - name: Run Tests
         working-directory: ./build
