@@ -33,11 +33,13 @@ jobs:
         working-directory: ./build
         run: cmake --build .
 
+      - name: Tar
+        run: tar -cvf build.tar build
 
       - uses: actions/upload-artifact@master
         with:
           name: build-folder
-          path: build
+          path: build.tar
 
   test-ubuntu:
     name: "Test Ubuntu"
@@ -49,7 +51,9 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: build-folder
-          path: build
+          path: build.tar
+      - name: Untar
+        run: tar -xvf build.tar
 
       - name: Run Tests
         working-directory: ./build
