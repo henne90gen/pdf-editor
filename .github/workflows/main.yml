@@ -51,9 +51,9 @@ jobs:
       - uses: actions/download-artifact@master
         with:
           name: build-folder
-          path: build.tar
+          path: build-folder
       - name: Untar
-        run: tar -xvf build.tar
+        run: tar -xvf build-folder/build.tar
 
       - name: Run Tests
         working-directory: ./build
