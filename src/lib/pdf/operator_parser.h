@@ -125,7 +125,7 @@ struct Operator {
             const char *fontNameData;
             size_t fontNameLength;
             double fontSize;
-            [[nodiscard]] std::string_view font_name() {
+            [[nodiscard]] std::string_view font_name() const {
                 auto fontName = std::string_view(fontNameData, fontNameLength);
                 fontName      = fontName.substr(1); // remove leading "/"
                 return fontName;
@@ -165,7 +165,7 @@ class OperatorParser {
      * Tries to parse the operand at the given index as the given type.
      * Indexing works backwards: operand2 operand1 operand0 OPERATOR
      */
-    template <typename T> T operand(int index) { ASSERT(false); }
+    template <typename T> T operand(int) { ASSERT(false); }
 
     template <> double operand(int index) {
         Token &token = tokens[currentTokenIdx - (2 + index)];

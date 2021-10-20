@@ -47,7 +47,10 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Install dependencies

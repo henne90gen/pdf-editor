@@ -40,6 +40,6 @@ if __name__ == "__main__":
             "Usage: python test_directory.py [path-to-executable] [path-to-test-folder]")
         exit(1)
 
-    executable = sys.argv[1]
-    test_folder = sys.argv[2]
-    test_directory(executable, test_folder)
+    exe = sys.argv[1]
+    folder = sys.argv[2]
+    test_directory(exe, folder)
