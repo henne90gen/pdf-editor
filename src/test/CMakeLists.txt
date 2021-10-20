@@ -17,6 +17,12 @@ add_executable(write_test writer_test.cpp)
 target_link_libraries(write_test gtest_main pdf-lib)
 gtest_discover_tests(write_test)
 
-add_custom_target(integration_test
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/integration_test.py $<TARGET_FILE:pdf-app> ${CMAKE_SOURCE_DIR}/test-files)
-add_dependencies(integration_test pdf-app)
+add_custom_target(test_files
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/test_directory.py $<TARGET_FILE:pdf-app> ${CMAKE_SOURCE_DIR}/test-files)
+add_dependencies(test_files pdf-app)
+
+add_custom_target(download_test_suites
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/download_test_suites.py ${CMAKE_CURRENT_BINARY_DIR}/test-suites)
+add_custom_target(test_suites
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/test_directory.py $<TARGET_FILE:pdf-app> ${CMAKE_CURRENT_BINARY_DIR}/test-suites)
+add_dependencies(test_suites pdf-app download_test_suites)

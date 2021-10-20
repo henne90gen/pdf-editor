@@ -35,5 +35,4 @@
 | PDF/A-1      |             | https://www.pdfa.org/resource/isartor-test-suite/ https://www.pdfa.org/wp-content/uploads/2011/08/isartor-pdfa-2008-08-13.zip      |
 | PDF/UA       |             | https://www.pdfa.org/resource/pdfua-reference-suite/                                                                               |
 | PDF/A        | Many files  | https://www.pdfa.org/resource/verapdf-test-suite/ https://github.com/veraPDF/veraPDF-corpus                                        |
-| PDF/UA-1     | Single file | https://www.pdfa.org/resource/the-matterhorn-protocol/ https://www.pdfa.org/wp-content/uploads/2021/04/Matterhorn-Protocol-1-1.pdf |
 |              |             | https://github.com/bfosupport/pdfa-testsuite                                                                                       |
