@@ -14,7 +14,7 @@ class TestSuite:
 
 
 suites = [
-    TestSuite("BFOSupport", "https://github.com/bfosupport/pdfa-testsuite"),
+    # TestSuite("BFOSupport", "https://github.com/bfosupport/pdfa-testsuite"),
     TestSuite("VeraPDF", "https://github.com/veraPDF/veraPDF-corpus"),
     TestSuite("Isartor", "https://www.pdfa.org/wp-content/uploads/2011/08/isartor-pdfa-2008-08-13.zip"),
 ]
@@ -60,5 +60,9 @@ def download_test_suites(target_folder: str):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python download_test_suites.py [path-to-test-suites-target-folder]")
+        exit(1)
+
     target_folder = sys.argv[1]
     download_test_suites(target_folder)
