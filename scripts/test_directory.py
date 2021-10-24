@@ -19,10 +19,10 @@ def test_file(executable: str, file_path: str) -> bool:
     sys.stdout.write("\033[F")  # Cursor up one line
     sys.stdout.write("\033[K")  # Clear to the end of line
     if process.returncode == 0:
-        print("✓", file_path)
+        # print("✓", file_path)
         return False
 
-    print("☓", file_path)
+    # print("☓", file_path)
     print()
     output = process.stdout.decode("utf-8")
     parts = output.split("\n")

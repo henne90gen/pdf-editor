@@ -23,6 +23,15 @@ add_dependencies(test_files pdf-app)
 
 add_custom_target(download_test_suites
         COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/download_test_suites.py ${CMAKE_CURRENT_BINARY_DIR}/test-suites)
-add_custom_target(test_suites
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/test_directory.py $<TARGET_FILE:pdf-app> ${CMAKE_CURRENT_BINARY_DIR}/test-suites)
-add_dependencies(test_suites pdf-app download_test_suites)
+
+add_custom_target(test_suite_verapdf
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py $<TARGET_FILE:pdf-app> ${CMAKE_CURRENT_BINARY_DIR}/test-suites VeraPDF)
+add_dependencies(test_suite_verapdf pdf-app download_test_suites)
+
+add_custom_target(test_suite_isartor
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py $<TARGET_FILE:pdf-app> ${CMAKE_CURRENT_BINARY_DIR}/test-suites Isartor)
+add_dependencies(test_suite_isartor pdf-app download_test_suites)
+
+add_custom_target(test_suite_bfosupport
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py $<TARGET_FILE:pdf-app> ${CMAKE_CURRENT_BINARY_DIR}/test-suites BFOSupport)
+add_dependencies(test_suite_bfosupport pdf-app download_test_suites)

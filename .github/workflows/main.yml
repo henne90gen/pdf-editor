@@ -73,4 +73,10 @@ jobs:
 
 #      - name:
 #        working-directory: ./build
-#        run: ninja test_suites
+#        run: ninja test_suite_verapdf
+#      - name:
+#        working-directory: ./build
+#        run: ninja test_suite_isartor
+#      - name:
+#        working-directory: ./build
+#        run: ninja test_suite_bfosupport
