@@ -218,6 +218,11 @@ Operator *OperatorParser::createOperator_B(Operator *result) {
     return result;
 }
 
+Operator *OperatorParser::createOperator_Tw(Operator *result) {
+    // FIXME parse operator 'Tw'
+    return result;
+}
+
 Operator *OperatorParser::createOperator(Operator::Type type) {
     auto result = new Operator(type);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
@@ -290,6 +295,9 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     }
     if (type == Operator::Type::B_UNKNOWN) {
         return createOperator_B(result);
+    }
+    if (type == Operator::Type::Tw_SetWordSpacing) {
+        return createOperator_Tw(result);
     }
 
     spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));

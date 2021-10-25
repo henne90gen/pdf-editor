@@ -178,6 +178,9 @@ std::optional<Token> matchCharToken(const std::string_view &word) {
     if (STARTS_WITH(word, "\r\n")) {
         return Token(Token::Type::NEW_LINE, word.substr(0, 2));
     }
+    if (STARTS_WITH(word, "\r")) {
+        return Token(Token::Type::NEW_LINE, word.substr(0, 1));
+    }
     if (!word.empty() && word[0] == '[') {
         return Token(Token::Type::ARRAY_START, word.substr(0, 1));
     }

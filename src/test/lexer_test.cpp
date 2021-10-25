@@ -81,9 +81,11 @@ TEST(Lexer, ArrayAndDict) {
 }
 
 TEST(Lexer, NewLine) {
-    auto textProvider = pdf::StringTextProvider("\n");
+    auto textProvider = pdf::StringTextProvider("\n \r\n \r");
     auto lexer        = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\n");
+    assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\r\n");
+    assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\r");
     assertNoMoreTokens(lexer);
 }
 

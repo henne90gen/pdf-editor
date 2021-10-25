@@ -237,3 +237,24 @@ TEST(Parser, MultipleObjects) {
     ASSERT_EQ(result->type, pdf::Object::Type::INTEGER);
     ASSERT_EQ(result->as<pdf::Integer>()->value, 7);
 }
+
+TEST(Parser, ComplexIndirectObject) {
+    auto textProvider = pdf::StringTextProvider(
+          "5 0 obj\n<<\n/Type /Metadata\n/Subtype /XML\n/Length 870>>\nstream\r\n<?xpacket begin='﻿' "
+          "id='W5M0MpCehiHzreSzNTczkc9d'?>\r<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\r  <rdf:RDF "
+          "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\r    <rdf:Description "
+          "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\r      <dc:creator>\r        <rdf:Seq>\r      "
+          "    <rdf:li>veraPDF Consortium</rdf:li>\r        </rdf:Seq>\r      </dc:creator>\r    </rdf:Description>\r  "
+          "  <rdf:Description xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" rdf:about=\"\" xmp:CreatorTool=\"veraPDF Test "
+          "Builder\" xmp:CreateDate=\"2015-03-10T17:19:21+01:00\" xmp:ModifyDate=\"2015-03-10T17:19:21+01:00\"/>\r    "
+          "<rdf:Description xmlns:pdf=\"http://ns.adobe.com/pdf/1.3/\" rdf:about=\"\" pdf:Producer=\"veraPDF Test "
+          "Builder 1.0 \"/>\r    <rdf:Description xmlns:pdfaid=\"http://www.aiim.org/pdfa/ns/id/\" rdf:about=\"\" "
+          "pdfaid:part=\"2\" pdfaid:conformance=\"B\"/>\r  </rdf:RDF>\r</x:xmpmeta>\r<?xpacket "
+          "end='w'?>\rendstream\nendobj");
+    auto lexer  = pdf::TextLexer(textProvider);
+    auto parser = pdf::Parser(lexer);
+
+    auto result = parser.parse();
+    ASSERT_NE(result, nullptr);
+    ASSERT_EQ(result->type, pdf::Object::Type::INDIRECT_OBJECT);
+}

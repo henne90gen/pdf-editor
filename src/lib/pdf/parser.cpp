@@ -171,20 +171,14 @@ Dictionary *Parser::parseDictionary() {
         return nullptr;
     }
 
-    auto &objectStartContent = tokens[currentTokenIdx].content;
-    auto beforeTokenIdx      = currentTokenIdx;
+    auto objectStartContent = tokens[currentTokenIdx].content.data();
+    auto beforeTokenIdx     = currentTokenIdx;
     currentTokenIdx++;
 
-    if (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+    ignoreNewLineTokens();
 
     std::unordered_map<std::string, Object *> objects = {};
-    while (true) {
-        if (currentTokenIs(Token::Type::DICTIONARY_END)) {
-            break;
-        }
-
+    while (!currentTokenIs(Token::Type::DICTIONARY_END)) {
         auto key = parseName();
         if (key == nullptr) {
             currentTokenIdx = beforeTokenIdx;
@@ -205,9 +199,9 @@ Dictionary *Parser::parseDictionary() {
 
     auto &lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+    auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
-    auto data       = std::string_view(objectStartContent.data(), dataLength);
+    auto data       = std::string_view(objectStartContent, dataLength);
     return new Dictionary(data, objects);
 }
 
@@ -284,7 +278,7 @@ Object *Parser::parseStreamOrDictionary() {
         return nullptr;
     }
 
-    auto objectStartContent = tokens[currentTokenIdx].content;
+    auto objectStartContent = tokens[currentTokenIdx].content.data();
     auto beforeTokenIdx     = currentTokenIdx;
     auto dictionary         = parseDictionary();
     if (dictionary == nullptr) {
@@ -292,21 +286,17 @@ Object *Parser::parseStreamOrDictionary() {
         return nullptr;
     }
 
-    if (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+    ignoreNewLineTokens();
 
     if (!currentTokenIs(Token::Type::STREAM_START)) {
         return dictionary;
     }
-
     currentTokenIdx++;
 
     if (!currentTokenIs(Token::Type::NEW_LINE)) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
-
     currentTokenIdx++;
 
     auto itr = dictionary->values.find("Length");
@@ -341,9 +331,7 @@ Object *Parser::parseStreamOrDictionary() {
     }
 
     auto streamData = lexer.advanceStream(length);
-    if (currentTokenIs(Token::Type::NEW_LINE)) {
-        currentTokenIdx++;
-    }
+    ignoreNewLineTokens();
 
     if (!currentTokenIs(Token::Type::STREAM_END)) {
         currentTokenIdx = beforeTokenIdx;
@@ -352,9 +340,9 @@ Object *Parser::parseStreamOrDictionary() {
 
     auto &lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
+    auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
-    auto data       = std::string_view(objectStartContent.data(), dataLength);
+    auto data       = std::string_view(objectStartContent, dataLength);
     return new Stream(data, dictionary, streamData);
 }
 
