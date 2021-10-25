@@ -30,6 +30,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto lexer  = TextLexer(text);
         auto parser = Parser(lexer, (ReferenceResolver *)this);
         auto result = parser.parse();
+        ASSERT(result != nullptr);
         return result->as<IndirectObject>();
     } else if (entry.type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = get_object(entry.compressed.objectNumberOfStream);

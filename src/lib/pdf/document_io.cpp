@@ -124,12 +124,20 @@ bool Document::read_cross_reference_table(char *crossRefPtr) {
         tmp++;
     }
 
-    auto beginTable = tmp + 1;
-    auto metaData   = std::string(crossRefPtr, (beginTable)-crossRefPtr);
+    auto metaData   = std::string(crossRefPtr, tmp-crossRefPtr);
     // TODO parse other cross-reference sections
     // TODO catch exceptions
     crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
     crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
+
+    auto beginTable = tmp;
+    if (*beginTable == '\r') {
+        beginTable++;
+    }
+    if (*beginTable == '\n') {
+        beginTable++;
+    }
+
     for (int i = 0; i < crossReferenceTable.objectCount; i++) {
         // nnnnnnnnnn ggggg f__
         auto s = std::string(beginTable, 20);
