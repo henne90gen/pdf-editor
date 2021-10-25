@@ -206,7 +206,7 @@ std::optional<Token> matchString(const std::string_view &word) {
     int openParenthesis = 1;
     int stringLength    = -1;
     for (int i = 1; i < word.size(); i++) {
-        if (word[i] == '(') {
+        if (word[i] == '(' && word[i - 1] != '\\') {
             openParenthesis++;
         } else if (word[i] == ')' && word[i - 1] != '\\') {
             openParenthesis--;
@@ -313,7 +313,14 @@ std::optional<Token> matchHexadecimalString(const std::string_view &word) {
     idx++;
 
     while (word[idx] != '>') {
-        if (!is_letter(word[idx]) && !is_digit(word[idx])) {
+        if (!is_letter(word[idx])   //
+            && !is_digit(word[idx]) //
+            && word[idx] != ' '     //
+            && word[idx] != '\r'    //
+            && word[idx] != '\n'    //
+            && word[idx] != '\t'    //
+            && word[idx] != '\f'    //
+            && word[idx] != '\000') {
             return {};
         }
         idx++;

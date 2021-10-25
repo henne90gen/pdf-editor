@@ -124,7 +124,7 @@ bool Document::read_cross_reference_table(char *crossRefPtr) {
         tmp++;
     }
 
-    auto metaData   = std::string(crossRefPtr, tmp-crossRefPtr);
+    auto metaData = std::string(crossRefPtr, tmp - crossRefPtr);
     // TODO parse other cross-reference sections
     // TODO catch exceptions
     crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
@@ -181,8 +181,9 @@ bool Document::read_cross_reference_info() {
         auto contentPtr = content.data();
 
         // verify that the content of the stream matches the size in the dictionary
-        ASSERT(stream->dictionary->values["Size"]->as<Integer>()->value ==
-               content.size() / (sizeField0 + sizeField1 + sizeField2));
+        size_t sizeInDict        = stream->dictionary->values["Size"]->as<Integer>()->value;
+        size_t actualContentSize = content.size() / (sizeField0 + sizeField1 + sizeField2);
+        ASSERT(sizeInDict == actualContentSize);
 
         for (size_t i = 0; i < content.size(); i += sizeField0 + sizeField1 + sizeField2) {
             auto tmp      = contentPtr + i;

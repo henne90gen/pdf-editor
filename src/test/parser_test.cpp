@@ -238,7 +238,7 @@ TEST(Parser, MultipleObjects) {
     ASSERT_EQ(result->as<pdf::Integer>()->value, 7);
 }
 
-TEST(Parser, ComplexIndirectObject) {
+TEST(Parser, IndirectObject1) {
     auto textProvider = pdf::StringTextProvider(
           "5 0 obj\n<<\n/Type /Metadata\n/Subtype /XML\n/Length 870>>\nstream\r\n<?xpacket begin='﻿' "
           "id='W5M0MpCehiHzreSzNTczkc9d'?>\r<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\r  <rdf:RDF "

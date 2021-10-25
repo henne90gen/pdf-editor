@@ -223,6 +223,26 @@ Operator *OperatorParser::createOperator_Tw(Operator *result) {
     return result;
 }
 
+Operator *OperatorParser::createOperator_G(Operator *result) {
+    // FIXME parse operator 'G'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_Tz(Operator *result) {
+    // FIXME parse operator 'Tz'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_f(Operator *result) {
+    // FIXME parse operator 'f'
+    return result;
+}
+
+Operator *OperatorParser::createOperator_gs(Operator *result) {
+    // FIXME parse operator 'gs'
+    return result;
+}
+
 Operator *OperatorParser::createOperator(Operator::Type type) {
     auto result = new Operator(type);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
@@ -298,6 +318,18 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     }
     if (type == Operator::Type::Tw_SetWordSpacing) {
         return createOperator_Tw(result);
+    }
+    if (type == Operator::Type::G_SetStrokingColorGray) {
+        return createOperator_G(result);
+    }
+    if (type == Operator::Type::Tz_SetHorizontalScaling) {
+        return createOperator_Tz(result);
+    }
+    if (type == Operator::Type::f_UNKNOWN) {
+        return createOperator_f(result);
+    }
+    if (type == Operator::Type::gs_SetParametersGraphicsState) {
+        return createOperator_gs(result);
     }
 
     spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));

@@ -212,6 +212,10 @@ class OperatorParser {
     Operator *createOperator_m(Operator *result);
     Operator *createOperator_B(Operator *result);
     Operator *createOperator_Tw(Operator *result);
+    Operator *createOperator_G(Operator *result);
+    Operator *createOperator_Tz(Operator *result);
+    Operator *createOperator_f(Operator *result);
+    Operator *createOperator_gs(Operator *result);
 };
 
 } // namespace pdf

@@ -98,11 +98,15 @@ TEST(Lexer, IndirectReference) {
 
 TEST(Lexer, HexadecimalString) {
     auto textProvider =
-          pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7> <949ffba879e60749d38b89a33e0dd9e7> <>");
+          pdf::StringTextProvider("<949FFBA879E60749D38B89A33E0DD9E7> <949ffba879e60749d38b89a33e0dd9e7> <> "
+                                  "<76\r65\t72 61\f504446  2074\n61> "
+                                  "<54\000\066\070\066\065\062\060\066\071\066c652>");
     auto lexer = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949FFBA879E60749D38B89A33E0DD9E7>");
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<949ffba879e60749d38b89a33e0dd9e7>");
     assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<>");
+    assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<76\r65\t72 61\f504446  2074\n61>");
+    assertNextToken(lexer, pdf::Token::Type::HEXADECIMAL_STRING, "<54\000\066\070\066\065\062\060\066\071\066c652>");
     assertNoMoreTokens(lexer);
 }
 
@@ -156,7 +160,7 @@ TEST(Lexer, LiteralString) {
           "(The following is an empty string.)"
           "()"
           "(It has zero (0) length.)"
-          "(Escaped \\) parenthesis)");
+          "(Escaped \\) \\( parenthesis)");
     auto lexer = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(This is a string)");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(Strings may contain newlines\nand such.)");
@@ -165,7 +169,7 @@ TEST(Lexer, LiteralString) {
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(The following is an empty string.)");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "()");
     assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(It has zero (0) length.)");
-    assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(Escaped \\) parenthesis)");
+    assertNextToken(lexer, pdf::Token::Type::LITERAL_STRING, "(Escaped \\) \\( parenthesis)");
     assertNoMoreTokens(lexer);
 }
 

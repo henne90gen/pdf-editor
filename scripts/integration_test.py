@@ -1,6 +1,5 @@
 import os
 import sys
-from typing import Optional
 import subprocess
 import multiprocessing
 
@@ -8,7 +7,7 @@ NUM_PROCESSES = 10
 ACTIVATED_TESTS = {"VeraPDF": ["6.1 File structure"]}
 
 
-def test_file(executable: str, file_path: str):
+def test_file(executable: str, file_path: str) -> bool:
     try:
         process = subprocess.run([executable, "info", file_path], capture_output=True, timeout=1)
     except:
@@ -34,18 +33,20 @@ def integration_test(executable: str, test_suites_folder: str, test_suite_name: 
         for f in files:
             if not f.endswith(".pdf"):
                 continue
+
             file_path = directory + "/" + f
             for activated_test in ACTIVATED_TESTS[test_suite_name]:
                 if activated_test in file_path:
                     test_files.append(file_path)
+                    break
 
     with multiprocessing.Pool(NUM_PROCESSES) as p:
         result = p.starmap(test_file, map(lambda f: (executable, f), test_files))
 
     total = 0
     successful = 0
-    for res in result:
-        if not res:
+    for err in result:
+        if not err:
             successful += 1
         total += 1
 
