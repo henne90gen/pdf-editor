@@ -221,6 +221,7 @@ void Document::add_raw_section(char *insertionPoint, char *newContent, size_t ne
 }
 
 DocumentCatalog *Trailer::catalog(Document &document) const {
+    // FIXME check whether the two dictionaries actually contain the key 'Root'
     Object *root;
     if (dict != nullptr) {
         root = dict->values["Root"];

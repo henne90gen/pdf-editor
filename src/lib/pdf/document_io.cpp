@@ -14,6 +14,7 @@ Dictionary *parseDict(char *start, size_t length) {
     auto lexer                   = TextLexer(text);
     auto parser                  = Parser(lexer);
     auto result                  = parser.parse();
+    ASSERT(result != nullptr);
     return result->as<Dictionary>();
 }
 
@@ -25,16 +26,20 @@ Stream *parseStream(char *start, size_t length) {
     auto lexer                   = TextLexer(text);
     auto parser                  = Parser(lexer);
     auto result                  = parser.parse();
+    ASSERT(result != nullptr);
     return result->as<IndirectObject>()->object->as<Stream>();
 }
 
 bool Document::read_trailer() {
     size_t eofMarkerLength = 5;
-    char *eofMarkerStart   = data + (sizeInBytes - eofMarkerLength);
-    if (data[sizeInBytes - 1] == '\n' || data[sizeInBytes - 1] == '\r') {
-        eofMarkerStart -= 1;
+    auto eofMarkerStart    = data + (sizeInBytes - eofMarkerLength);
+    if (data[sizeInBytes - 1] == '\n') {
+        eofMarkerStart--;
     }
-    if (std::string(eofMarkerStart, eofMarkerLength) != "%%EOF") {
+    if (data[sizeInBytes - 2] == '\r') {
+        eofMarkerStart--;
+    }
+    if (std::string_view(eofMarkerStart, eofMarkerLength) != "%%EOF") {
         spdlog::error("Last line did not have '%%EOF'");
         return true;
     }

@@ -35,6 +35,10 @@ def integration_test(executable: str, test_suites_folder: str, test_suite_name: 
                 continue
 
             file_path = directory + "/" + f
+
+            if "fail" in file_path:
+                continue
+
             for activated_test in ACTIVATED_TESTS[test_suite_name]:
                 if activated_test in file_path:
                     test_files.append(file_path)
@@ -51,6 +55,9 @@ def integration_test(executable: str, test_suites_folder: str, test_suite_name: 
         total += 1
 
     print(successful, "/", total)
+
+    if successful != total:
+        exit(1)
 
 
 if __name__ == "__main__":
