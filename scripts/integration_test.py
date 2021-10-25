@@ -1,23 +1,46 @@
 import os
 import sys
 from typing import Optional
+import subprocess
 import multiprocessing
-import queue
-import test_directory
 
 NUM_PROCESSES = 10
+ACTIVATED_TESTS = {"VeraPDF": ["6.1 File structure"]}
 
 
-def integration_test(executable: str, test_suites_folder: str, test_suite_name: Optional[str]):
+def test_file(executable: str, file_path: str):
+    try:
+        process = subprocess.run([executable, "info", file_path], capture_output=True, timeout=1)
+    except:
+        return True
+
+    if "fail" in file_path:
+        has_error = process.returncode == 0
+    else:
+        has_error = process.returncode != 0
+
+    if has_error:
+        print(file_path)
+        output = process.stdout.decode("utf-8")
+        parts = output.split("\n")
+        for part in parts:
+            print("   ", part)
+    return has_error
+
+
+def integration_test(executable: str, test_suites_folder: str, test_suite_name: str):
     test_files = []
     for directory, _, files in os.walk(test_suites_folder + "/" + test_suite_name):
         for f in files:
             if not f.endswith(".pdf"):
                 continue
-            test_files.append(directory + "/" + f)
+            file_path = directory + "/" + f
+            for activated_test in ACTIVATED_TESTS[test_suite_name]:
+                if activated_test in file_path:
+                    test_files.append(file_path)
 
     with multiprocessing.Pool(NUM_PROCESSES) as p:
-        result = p.starmap(test_directory.test_file, map(lambda f: (executable, f), test_files))
+        result = p.starmap(test_file, map(lambda f: (executable, f), test_files))
 
     total = 0
     successful = 0
