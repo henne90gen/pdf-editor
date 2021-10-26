@@ -98,6 +98,7 @@ struct Document : public ReferenceResolver {
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
             auto resolvedObject = resolve(object->as<IndirectReference>());
+            ASSERT(resolvedObject != nullptr);
             return resolvedObject->object->as<T>();
         } else if (object->is<IndirectObject>()) {
             return object->as<IndirectObject>()->object->as<T>();
@@ -156,7 +157,8 @@ struct Document : public ReferenceResolver {
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
     bool read_data();
-    bool read_cross_reference_stream();
+    bool read_trailers(char *crossRefStartPtr);
+    bool read_cross_reference_stream(Stream *stream);
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);

@@ -39,8 +39,7 @@ Stream *parseStream(char *start, size_t length) {
     return result->as<IndirectObject>()->object->as<Stream>();
 }
 
-bool Document::read_cross_reference_stream() {
-    Stream *stream  = trailer.get_stream();
+bool Document::read_cross_reference_stream(Stream *stream) {
     auto W          = stream->dictionary->values["W"]->as<Array>();
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
@@ -110,58 +109,22 @@ bool Document::read_cross_reference_stream() {
     return false;
 }
 
-bool Document::read_data() {
-    // parse eof
-    size_t eofMarkerLength = 5;
-    auto eofMarkerStart    = data + (sizeInBytes - eofMarkerLength);
-    if (data[sizeInBytes - 1] == '\n') {
-        eofMarkerStart--;
-    }
-    if (data[sizeInBytes - 2] == '\r') {
-        eofMarkerStart--;
-    }
-    if (std::string_view(eofMarkerStart, eofMarkerLength) != "%%EOF") {
-        spdlog::error("Last line did not have '%%EOF'");
-        return true;
-    }
-
-    char *lastCrossRefStartPtr = eofMarkerStart - 3;
-    while ((*lastCrossRefStartPtr != '\n' && *lastCrossRefStartPtr != '\r') && data < lastCrossRefStartPtr) {
-        lastCrossRefStartPtr--;
-    }
-    if (data == lastCrossRefStartPtr) {
-        spdlog::error("Unexpectedly reached start of file");
-        return true;
-    }
-    lastCrossRefStartPtr++;
-
-    // parse startxref
-    try {
-        const auto str            = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
-        trailer.lastCrossRefStart = std::stoll(str);
-    } catch (std::invalid_argument &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}", err.what());
-        return true;
-    } catch (std::out_of_range &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}", err.what());
-        return true;
-    }
-
+bool Document::read_trailers(char *crossRefStartPtr) {
     // decide whether xref stream or table
-    const auto xrefKeyword = std::string_view(data + trailer.lastCrossRefStart, 4);
+    const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
         //  stream -> parse stream
-        auto startxrefPtr  = lastCrossRefStartPtr - 10;
-        auto startOfStream = data + trailer.lastCrossRefStart;
-        // TODO verify that the object stream is always exactly between 'startxref' and the byte offset given by
-        //  'startxref'
+        // TODO how long is the stream? (just using the end of the file for parsing purposes)
+        auto startxrefPtr  = data + sizeInBytes;
+        auto startOfStream = crossRefStartPtr;
         size_t lengthOfStream = startxrefPtr - startOfStream;
-        trailer.set_stream(parseStream(startOfStream, lengthOfStream));
-        return read_cross_reference_stream();
+        Stream *stream        = parseStream(startOfStream, lengthOfStream);
+        trailer.set_stream(stream);
+        return read_cross_reference_stream(stream);
     }
 
     //  table -> parse table and parse trailer dict
-    auto crossRefPtr = data + trailer.lastCrossRefStart + 4;
+    auto crossRefPtr = crossRefStartPtr + 4;
     ignoreNewLines(crossRefPtr);
 
     int64_t spaceLocation = -1;
@@ -223,7 +186,53 @@ bool Document::read_data() {
     }
 
     trailer.set_dict(parseDict(currentReadPtr, lengthOfTrailerDict));
+    auto itr = trailer.get_dict()->values.find("Prev");
+    if (itr != trailer.get_dict()->values.end()) {
+        return read_trailers(data + itr->second->as<Integer>()->value);
+    }
     return false;
+}
+
+bool Document::read_data() {
+    // parse eof
+    size_t eofMarkerLength = 5;
+    auto eofMarkerStart    = data + (sizeInBytes - eofMarkerLength);
+    if (data[sizeInBytes - 1] == '\n') {
+        eofMarkerStart--;
+    }
+    if (data[sizeInBytes - 2] == '\r') {
+        eofMarkerStart--;
+    }
+    if (std::string_view(eofMarkerStart, eofMarkerLength) != "%%EOF") {
+        spdlog::error("Last line did not have '%%EOF'");
+        return true;
+    }
+
+    char *lastCrossRefStartPtr = eofMarkerStart - 3;
+    while ((*lastCrossRefStartPtr != '\n' && *lastCrossRefStartPtr != '\r') && data < lastCrossRefStartPtr) {
+        lastCrossRefStartPtr--;
+    }
+    if (data == lastCrossRefStartPtr) {
+        spdlog::error("Unexpectedly reached start of file");
+        return true;
+    }
+    lastCrossRefStartPtr++;
+
+    // parse startxref
+    try {
+        const auto str            = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
+        trailer.lastCrossRefStart = std::stoll(str);
+    } catch (std::invalid_argument &err) {
+        spdlog::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}", err.what());
+        return true;
+    } catch (std::out_of_range &err) {
+        spdlog::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}", err.what());
+        return true;
+    }
+
+    auto crossRefStartPtr = data + trailer.lastCrossRefStart;
+
+    return read_trailers(crossRefStartPtr);
 }
 
 bool Document::read_from_file(const std::string &filePath, Document &document) {
