@@ -6,6 +6,15 @@
 
 namespace pdf {
 
+void ignoreNewLines(char *&ptr) {
+    if (*ptr == '\r') {
+        ptr++;
+    }
+    if (*ptr == '\n') {
+        ptr++;
+    }
+}
+
 Dictionary *parseDict(char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
@@ -30,7 +39,79 @@ Stream *parseStream(char *start, size_t length) {
     return result->as<IndirectObject>()->object->as<Stream>();
 }
 
-bool Document::read_trailer() {
+bool Document::read_cross_reference_stream() {
+    Stream *stream  = trailer.get_stream();
+    auto W          = stream->dictionary->values["W"]->as<Array>();
+    auto sizeField0 = W->values[0]->as<Integer>()->value;
+    auto sizeField1 = W->values[1]->as<Integer>()->value;
+    auto sizeField2 = W->values[2]->as<Integer>()->value;
+    auto content    = stream->to_string();
+    auto contentPtr = content.data();
+
+    // verify that the content of the stream matches the size in the dictionary
+    size_t sizeInDict        = stream->dictionary->values["Size"]->as<Integer>()->value;
+    size_t actualContentSize = content.size() / (sizeField0 + sizeField1 + sizeField2);
+    ASSERT(sizeInDict == actualContentSize);
+
+    for (size_t i = 0; i < content.size(); i += sizeField0 + sizeField1 + sizeField2) {
+        auto tmp      = contentPtr + i;
+        uint64_t type = 0;
+        if (sizeField0 == 0) {
+            type = 1; // default value for type
+        }
+        for (int j = 0; j < sizeField0; j++) {
+            uint8_t c      = *(tmp + j);
+            uint64_t shift = (sizeField0 - (j + 1)) * 8;
+            type |= c << shift;
+        }
+
+        uint64_t field1 = 0;
+        for (int j = 0; j < sizeField1; j++) {
+            uint8_t c      = *(tmp + j + sizeField0);
+            uint64_t shift = (sizeField1 - (j + 1)) * 8;
+            field1 |= c << shift;
+        }
+
+        uint64_t field2 = 0;
+        for (int j = 0; j < sizeField2; j++) {
+            uint8_t c      = *(tmp + j + sizeField0 + sizeField1);
+            uint64_t shift = (sizeField2 - (j + 1)) * 8;
+            field2 |= c << shift;
+        }
+
+        switch (type) {
+        case 0: {
+            CrossReferenceEntry entry                 = {};
+            entry.type                                = CrossReferenceEntryType::FREE;
+            entry.free.nextFreeObjectNumber           = field1;
+            entry.free.nextFreeObjectGenerationNumber = field2;
+            crossReferenceTable.entries.push_back(entry);
+        } break;
+        case 1: {
+            CrossReferenceEntry entry     = {};
+            entry.type                    = CrossReferenceEntryType::NORMAL;
+            entry.normal.byteOffset       = field1;
+            entry.normal.generationNumber = field2;
+            crossReferenceTable.entries.push_back(entry);
+        } break;
+        case 2: {
+            CrossReferenceEntry entry             = {};
+            entry.type                            = CrossReferenceEntryType::COMPRESSED;
+            entry.compressed.objectNumberOfStream = field1;
+            entry.compressed.indexInStream        = field2;
+            crossReferenceTable.entries.push_back(entry);
+        } break;
+        default:
+            spdlog::warn("Encountered unknown cross reference stream entry field type: {}", type);
+            break;
+        }
+    }
+
+    return false;
+}
+
+bool Document::read_data() {
+    // parse eof
     size_t eofMarkerLength = 5;
     auto eofMarkerStart    = data + (sizeInBytes - eofMarkerLength);
     if (data[sizeInBytes - 1] == '\n') {
@@ -54,6 +135,7 @@ bool Document::read_trailer() {
     }
     lastCrossRefStartPtr++;
 
+    // parse startxref
     try {
         const auto str            = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
         trailer.lastCrossRefStart = std::stoll(str);
@@ -65,87 +147,43 @@ bool Document::read_trailer() {
         return true;
     }
 
+    // decide whether xref stream or table
     const auto xrefKeyword = std::string_view(data + trailer.lastCrossRefStart, 4);
     if (xrefKeyword != "xref") {
-        char *startxrefPtr    = lastCrossRefStartPtr - 10;
-        auto startOfStream    = data + trailer.lastCrossRefStart;
+        //  stream -> parse stream
+        auto startxrefPtr  = lastCrossRefStartPtr - 10;
+        auto startOfStream = data + trailer.lastCrossRefStart;
+        // TODO verify that the object stream is always exactly between 'startxref' and the byte offset given by
+        //  'startxref'
         size_t lengthOfStream = startxrefPtr - startOfStream;
         trailer.set_stream(parseStream(startOfStream, lengthOfStream));
-        return false;
-    } else {
-        char *startxrefPtr = lastCrossRefStartPtr - 10;
-        auto startxrefLine = std::string_view(startxrefPtr, 9);
-        if (startxrefLine == "tartxref\r") {
-            startxrefPtr -= 1;
-            startxrefLine = std::string_view(startxrefPtr, 9);
-        }
-        if (startxrefLine != "startxref") {
-            spdlog::error("Expected 'startxref', but got '{}'", startxrefLine);
-            return true;
-        }
-
-        char *startOfTrailerPtr = startxrefPtr;
-        while (std::string_view(startOfTrailerPtr, 7) != "trailer" && data < startOfTrailerPtr) {
-            startOfTrailerPtr--;
-        }
-        if (data == startOfTrailerPtr) {
-            spdlog::error("Unexpectedly reached start of file");
-            return true;
-        }
-
-        startOfTrailerPtr += 8;
-        if (*(startxrefPtr - 1) == '\n') {
-            startxrefPtr--;
-        }
-        if (*(startxrefPtr - 1) == '\r') {
-            startxrefPtr--;
-        }
-        auto lengthOfTrailerDict = startxrefPtr - startOfTrailerPtr;
-        trailer.set_dict(parseDict(startOfTrailerPtr, lengthOfTrailerDict));
-        return false;
-    }
-}
-
-bool Document::read_cross_reference_table(char *crossRefPtr) {
-    if (std::string(crossRefPtr, 4) != "xref") {
-        spdlog::error("Expected keyword 'xref' at byte {}", crossRefPtr - data);
-        return true;
+        return read_cross_reference_stream();
     }
 
-    crossRefPtr += 4;
-    if (*crossRefPtr == '\r') {
-        crossRefPtr++;
-    }
-    if (*crossRefPtr == '\n') {
-        crossRefPtr++;
-    }
+    //  table -> parse table and parse trailer dict
+    auto crossRefPtr = data + trailer.lastCrossRefStart + 4;
+    ignoreNewLines(crossRefPtr);
 
     int64_t spaceLocation = -1;
-    char *tmp             = crossRefPtr;
-    while (*tmp != '\n' && *tmp != '\r') {
-        if (*tmp == ' ') {
-            spaceLocation = tmp - crossRefPtr;
+    char *currentReadPtr  = crossRefPtr;
+    while (*currentReadPtr != '\n' && *currentReadPtr != '\r') {
+        if (*currentReadPtr == ' ') {
+            spaceLocation = currentReadPtr - crossRefPtr;
         }
-        tmp++;
+        currentReadPtr++;
     }
 
-    auto metaData = std::string(crossRefPtr, tmp - crossRefPtr);
+    auto metaData = std::string(crossRefPtr, currentReadPtr - crossRefPtr);
     // TODO parse other cross-reference sections
     // TODO catch exceptions
     crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
     crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
 
-    auto beginTable = tmp;
-    if (*beginTable == '\r') {
-        beginTable++;
-    }
-    if (*beginTable == '\n') {
-        beginTable++;
-    }
+    ignoreNewLines(currentReadPtr);
 
     for (int i = 0; i < crossReferenceTable.objectCount; i++) {
         // nnnnnnnnnn ggggg f__
-        auto s = std::string(beginTable, 20);
+        auto s = std::string(currentReadPtr, 20);
         // TODO catch exceptions
         uint64_t num0 = std::stoll(s.substr(0, 10));
         uint64_t num1 = std::stoll(s.substr(11, 16));
@@ -162,89 +200,29 @@ bool Document::read_cross_reference_table(char *crossRefPtr) {
         }
 
         crossReferenceTable.entries.push_back(entry);
-        beginTable += 20;
+        currentReadPtr += 20;
     }
 
-    return false;
-}
+    ignoreNewLines(currentReadPtr);
 
-bool Document::read_cross_reference_info() {
-    // exactly one of 'stream' or 'dict' has to be non-null
-    ASSERT(trailer.get_stream() != nullptr || trailer.get_dict() != nullptr);
-    ASSERT(trailer.get_stream() == nullptr || trailer.get_dict() == nullptr);
+    // parse trailer dict
+    if (std::string_view(currentReadPtr, 7) != "trailer") {
+        spdlog::error("Expected 'trailer' keyword");
+        return false;
+    }
+    currentReadPtr += 7;
+    ignoreNewLines(currentReadPtr);
 
-    if (trailer.get_dict() != nullptr) {
-        char *crossRefPtr = data + trailer.lastCrossRefStart;
-        return read_cross_reference_table(crossRefPtr);
-    } else {
-        Stream *stream  = trailer.get_stream();
-        auto W          = stream->dictionary->values["W"]->as<Array>();
-        auto sizeField0 = W->values[0]->as<Integer>()->value;
-        auto sizeField1 = W->values[1]->as<Integer>()->value;
-        auto sizeField2 = W->values[2]->as<Integer>()->value;
-        auto content    = stream->to_string();
-        auto contentPtr = content.data();
-
-        // verify that the content of the stream matches the size in the dictionary
-        size_t sizeInDict        = stream->dictionary->values["Size"]->as<Integer>()->value;
-        size_t actualContentSize = content.size() / (sizeField0 + sizeField1 + sizeField2);
-        ASSERT(sizeInDict == actualContentSize);
-
-        for (size_t i = 0; i < content.size(); i += sizeField0 + sizeField1 + sizeField2) {
-            auto tmp      = contentPtr + i;
-            uint64_t type = 0;
-            if (sizeField0 == 0) {
-                type = 1; // default value for type
-            }
-            for (int j = 0; j < sizeField0; j++) {
-                uint8_t c      = *(tmp + j);
-                uint64_t shift = (sizeField0 - (j + 1)) * 8;
-                type |= c << shift;
-            }
-
-            uint64_t field1 = 0;
-            for (int j = 0; j < sizeField1; j++) {
-                uint8_t c      = *(tmp + j + sizeField0);
-                uint64_t shift = (sizeField1 - (j + 1)) * 8;
-                field1 |= c << shift;
-            }
-
-            uint64_t field2 = 0;
-            for (int j = 0; j < sizeField2; j++) {
-                uint8_t c      = *(tmp + j + sizeField0 + sizeField1);
-                uint64_t shift = (sizeField2 - (j + 1)) * 8;
-                field2 |= c << shift;
-            }
-
-            switch (type) {
-            case 0: {
-                CrossReferenceEntry entry                 = {};
-                entry.type                                = CrossReferenceEntryType::FREE;
-                entry.free.nextFreeObjectNumber           = field1;
-                entry.free.nextFreeObjectGenerationNumber = field2;
-                crossReferenceTable.entries.push_back(entry);
-            } break;
-            case 1: {
-                CrossReferenceEntry entry     = {};
-                entry.type                    = CrossReferenceEntryType::NORMAL;
-                entry.normal.byteOffset       = field1;
-                entry.normal.generationNumber = field2;
-                crossReferenceTable.entries.push_back(entry);
-            } break;
-            case 2: {
-                CrossReferenceEntry entry             = {};
-                entry.type                            = CrossReferenceEntryType::COMPRESSED;
-                entry.compressed.objectNumberOfStream = field1;
-                entry.compressed.indexInStream        = field2;
-                crossReferenceTable.entries.push_back(entry);
-            } break;
-            default:
-                spdlog::warn("Encountered unknown cross reference stream entry field type: {}", type);
-                break;
-            }
+    size_t lengthOfTrailerDict = 1;
+    while (std::string_view(currentReadPtr + lengthOfTrailerDict, 9) != "startxref") {
+        lengthOfTrailerDict++;
+        if (data + sizeInBytes < currentReadPtr + lengthOfTrailerDict) {
+            spdlog::error("Unexpectedly reached end of file");
+            return true;
         }
     }
 
+    trailer.set_dict(parseDict(currentReadPtr, lengthOfTrailerDict));
     return false;
 }
 
@@ -264,28 +242,14 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
     is.read(document.data, static_cast<std::streamsize>(document.sizeInBytes));
     is.close();
 
-    if (document.read_trailer()) {
-        return true;
-    }
-    if (document.read_cross_reference_info()) {
-        return true;
-    }
-
-    return false;
+    return document.read_data();
 }
 
 bool Document::read_from_memory(char *buffer, size_t size, Document &document) {
     document.data        = buffer;
     document.sizeInBytes = size;
 
-    if (document.read_trailer()) {
-        return true;
-    }
-    if (document.read_cross_reference_info()) {
-        return true;
-    }
-
-    return false;
+    return document.read_data();
 }
 
 bool Document::write_to_stream(std::ostream &s) {

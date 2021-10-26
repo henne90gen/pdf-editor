@@ -155,9 +155,8 @@ struct Document : public ReferenceResolver {
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
-    bool read_trailer();
-    bool read_cross_reference_info();
-    bool read_cross_reference_table(char *crossRefPtr);
+    bool read_data();
+    bool read_cross_reference_stream();
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);

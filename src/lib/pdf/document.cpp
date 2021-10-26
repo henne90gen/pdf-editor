@@ -107,6 +107,10 @@ PageTreeNode *PageTreeNode::parent(Document &document) {
 void Document::for_each_page(const std::function<bool(Page *)> &func) {
     auto c            = catalog();
     auto pageTreeRoot = c->page_tree_root(*this);
+    if (pageTreeRoot == nullptr) {
+        spdlog::warn("Document did not have any pages");
+        return;
+    }
 
     if (pageTreeRoot->isPage()) {
         func(new Page(*this, pageTreeRoot));
@@ -221,18 +225,23 @@ void Document::add_raw_section(char *insertionPoint, char *newContent, size_t ne
 }
 
 DocumentCatalog *Trailer::catalog(Document &document) const {
-    // FIXME check whether the two dictionaries actually contain the key 'Root'
-    Object *root;
+    std::unordered_map<std::string, Object *>::iterator itr;
     if (dict != nullptr) {
-        root = dict->values["Root"];
+        itr = dict->values.find("Root");
+        ASSERT(itr != dict->values.end());
     } else {
-        root = stream->dictionary->values["Root"];
+        itr = stream->dictionary->values.find("Root");
+        ASSERT(itr != stream->dictionary->values.end());
     }
-    return document.get<DocumentCatalog>(root);
+    return document.get<DocumentCatalog>(itr->second);
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
-    return document.get<PageTreeNode>(values["Pages"]);
+    auto itr = values.find("Pages");
+    if (itr == values.end()) {
+        return nullptr;
+    }
+    return document.get<PageTreeNode>(itr->second);
 }
 
 bool Document::insert_document(Document &otherDocument, size_t atPageNum) {
