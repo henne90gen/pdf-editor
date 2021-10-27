@@ -4,3 +4,4 @@ build
 cmake-build-*
 *.glade~
 \#*.glade#
+__pycache__/
