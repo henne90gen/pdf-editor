@@ -22,20 +22,6 @@ struct DocumentCatalog : Dictionary {
     */
 };
 
-struct Trailer {
-    DocumentCatalog *catalog(Document &document) const;
-    Dictionary *get_dict() { return dict; }
-    void set_dict(Dictionary *_dict) { this->dict = _dict; }
-    Stream *get_stream() { return stream; }
-    void set_stream(Stream *_stream) { this->stream = _stream; }
-
-    int64_t lastCrossRefStart = {};
-
-  private:
-    Dictionary *dict = nullptr;
-    Stream *stream   = nullptr;
-};
-
 enum class CrossReferenceEntryType {
     FREE       = 0,
     NORMAL     = 1,
@@ -66,6 +52,15 @@ struct CrossReferenceTable {
     std::vector<CrossReferenceEntry> entries = {};
 };
 
+struct Trailer {
+    Dictionary *dict                        = nullptr;
+    CrossReferenceTable crossReferenceTable = {};
+    Stream *stream                          = nullptr;
+    Trailer *prev                           = nullptr;
+
+    DocumentCatalog *catalog(Document &document) const;
+};
+
 enum class ChangeSectionType {
     NONE,
     ADDED,
@@ -87,10 +82,10 @@ struct ChangeSection {
 };
 
 struct Document : public ReferenceResolver {
-    char *data                              = nullptr;
-    size_t sizeInBytes                      = 0;
-    Trailer trailer                         = {};
-    CrossReferenceTable crossReferenceTable = {};
+    char *data                = nullptr;
+    size_t sizeInBytes        = 0;
+    int64_t lastCrossRefStart = {};
+    Trailer trailer           = {};
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
     std::vector<ChangeSection> changeSections                 = {};
@@ -157,8 +152,8 @@ struct Document : public ReferenceResolver {
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
     bool read_data();
-    bool read_trailers(char *crossRefStartPtr);
-    bool read_cross_reference_stream(Stream *stream);
+    bool read_trailers(char *crossRefStartPtr, Trailer *currentTrailer);
+    bool read_cross_reference_stream(Stream *stream, Trailer *currentTrailer);
 
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);

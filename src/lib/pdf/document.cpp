@@ -10,13 +10,24 @@
 namespace pdf {
 
 IndirectObject *Document::load_object(int64_t objectNumber) {
-    auto &entry = crossReferenceTable.entries[objectNumber];
-    if (entry.type == CrossReferenceEntryType::FREE) {
+    CrossReferenceEntry *entry = nullptr;
+    for (Trailer *t = &trailer; t != nullptr; t = t->prev) {
+        if (objectNumber >= t->crossReferenceTable.firstObjectNumber &&
+            objectNumber < t->crossReferenceTable.objectCount) {
+            entry = &t->crossReferenceTable.entries[objectNumber - t->crossReferenceTable.firstObjectNumber];
+            break;
+        }
+    }
+
+    if (entry == nullptr) {
+        return nullptr;
+    }
+    if (entry->type == CrossReferenceEntryType::FREE) {
         return nullptr;
     }
 
-    if (entry.type == CrossReferenceEntryType::NORMAL) {
-        auto start = data + entry.normal.byteOffset;
+    if (entry->type == CrossReferenceEntryType::NORMAL) {
+        auto start = data + entry->normal.byteOffset;
 
         // TODO this is dangerous (it might read past the end of the stream)
         size_t length = 0;
@@ -32,8 +43,8 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto result = parser.parse();
         ASSERT(result != nullptr);
         return result->as<IndirectObject>();
-    } else if (entry.type == CrossReferenceEntryType::COMPRESSED) {
-        auto streamObject = get_object(entry.compressed.objectNumberOfStream);
+    } else if (entry->type == CrossReferenceEntryType::COMPRESSED) {
+        auto streamObject = get_object(entry->compressed.objectNumberOfStream);
         auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
 
@@ -53,8 +64,8 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
             auto obj = parser.parse();
             objs[i]  = obj;
         }
-        return new IndirectObject(content, objectNumbers[entry.compressed.indexInStream], 0,
-                                  objs[entry.compressed.indexInStream]);
+        return new IndirectObject(content, objectNumbers[entry->compressed.indexInStream], 0,
+                                  objs[entry->compressed.indexInStream]);
     }
     ASSERT(false);
 }
@@ -73,8 +84,8 @@ IndirectObject *Document::resolve(const IndirectReference *ref) { return get_obj
 
 std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
-    for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
-        auto &entry = crossReferenceTable.entries[i];
+    for (int i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
+        auto &entry = trailer.crossReferenceTable.entries[i];
         auto object = get_object(i);
         if (object == nullptr) {
             continue;
@@ -86,8 +97,7 @@ std::vector<IndirectObject *> Document::objects() {
 
 size_t Document::object_count() {
     size_t result = 0;
-    for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
-        auto &entry = crossReferenceTable.entries[i];
+    for (auto &entry : trailer.crossReferenceTable.entries) {
         if (entry.type == CrossReferenceEntryType::FREE) {
             continue;
         }

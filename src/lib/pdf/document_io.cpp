@@ -39,41 +39,61 @@ Stream *parseStream(char *start, size_t length) {
     return result->as<IndirectObject>()->object->as<Stream>();
 }
 
-bool Document::read_cross_reference_stream(Stream *stream) {
+bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrailer) {
     auto W          = stream->dictionary->values["W"]->as<Array>();
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
     auto sizeField2 = W->values[2]->as<Integer>()->value;
     auto content    = stream->to_string();
-    auto contentPtr = content.data();
 
     // verify that the content of the stream matches the size in the dictionary
-    size_t sizeInDict        = stream->dictionary->values["Size"]->as<Integer>()->value;
-    size_t actualContentSize = content.size() / (sizeField0 + sizeField1 + sizeField2);
-    ASSERT(sizeInDict == actualContentSize);
+    size_t countInDict        = stream->dictionary->values["Size"]->as<Integer>()->value - 1;
+    size_t crossRefEntryCount = content.size() / (sizeField0 + sizeField1 + sizeField2);
+    if (countInDict != crossRefEntryCount) {
+        spdlog::warn(
+              "Cross reference stream has mismatched entry counts: {} (count in dictionary) vs {} (actual count)",
+              countInDict, crossRefEntryCount);
+    }
 
-    for (size_t i = 0; i < content.size(); i += sizeField0 + sizeField1 + sizeField2) {
-        auto tmp      = contentPtr + i;
+    auto indexOpt = stream->dictionary->find<Array>("Index");
+    if (indexOpt.has_value()) {
+        auto index = indexOpt.value();
+        if (index->values.size() == 2) {
+            currentTrailer->crossReferenceTable.firstObjectNumber = index->values[0]->as<Integer>()->value;
+            // TODO the second value is the number of entries and not necessarily the number of objects
+            currentTrailer->crossReferenceTable.objectCount = index->values[1]->as<Integer>()->value;
+        } else {
+            // TODO streams can define subsections of entries
+            TODO("cross reference stream subsections are not implemented yet");
+        }
+    } else {
+        currentTrailer->crossReferenceTable.firstObjectNumber = 0;
+        currentTrailer->crossReferenceTable.objectCount       = static_cast<int64_t>(countInDict);
+    }
+
+    for (auto contentPtr = content.data(); contentPtr < content.data() + content.size();
+         contentPtr += sizeField0 + sizeField1 + sizeField2) {
         uint64_t type = 0;
         if (sizeField0 == 0) {
             type = 1; // default value for type
         }
+
         for (int j = 0; j < sizeField0; j++) {
-            uint8_t c      = *(tmp + j);
+            uint8_t c      = *(contentPtr + j);
             uint64_t shift = (sizeField0 - (j + 1)) * 8;
             type |= c << shift;
         }
 
         uint64_t field1 = 0;
         for (int j = 0; j < sizeField1; j++) {
-            uint8_t c      = *(tmp + j + sizeField0);
+            uint8_t c      = *(contentPtr + j + sizeField0);
             uint64_t shift = (sizeField1 - (j + 1)) * 8;
             field1 |= c << shift;
         }
 
         uint64_t field2 = 0;
         for (int j = 0; j < sizeField2; j++) {
-            uint8_t c      = *(tmp + j + sizeField0 + sizeField1);
+            uint8_t c      = *(contentPtr + j + sizeField0 + sizeField1);
             uint64_t shift = (sizeField2 - (j + 1)) * 8;
             field2 |= c << shift;
         }
@@ -84,21 +104,21 @@ bool Document::read_cross_reference_stream(Stream *stream) {
             entry.type                                = CrossReferenceEntryType::FREE;
             entry.free.nextFreeObjectNumber           = field1;
             entry.free.nextFreeObjectGenerationNumber = field2;
-            crossReferenceTable.entries.push_back(entry);
+            currentTrailer->crossReferenceTable.entries.push_back(entry);
         } break;
         case 1: {
             CrossReferenceEntry entry     = {};
             entry.type                    = CrossReferenceEntryType::NORMAL;
             entry.normal.byteOffset       = field1;
             entry.normal.generationNumber = field2;
-            crossReferenceTable.entries.push_back(entry);
+            currentTrailer->crossReferenceTable.entries.push_back(entry);
         } break;
         case 2: {
             CrossReferenceEntry entry             = {};
             entry.type                            = CrossReferenceEntryType::COMPRESSED;
             entry.compressed.objectNumberOfStream = field1;
             entry.compressed.indexInStream        = field2;
-            crossReferenceTable.entries.push_back(entry);
+            currentTrailer->crossReferenceTable.entries.push_back(entry);
         } break;
         default:
             spdlog::warn("Encountered unknown cross reference stream entry field type: {}", type);
@@ -106,21 +126,26 @@ bool Document::read_cross_reference_stream(Stream *stream) {
         }
     }
 
-    return false;
+    auto itr = stream->dictionary->values.find("Prev");
+    if (itr == stream->dictionary->values.end()) {
+        return false;
+    }
+
+    currentTrailer->prev = new Trailer();
+    return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
 }
 
-bool Document::read_trailers(char *crossRefStartPtr) {
+bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     // decide whether xref stream or table
     const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
         //  stream -> parse stream
         // TODO how long is the stream? (just using the end of the file for parsing purposes)
-        auto startxrefPtr  = data + sizeInBytes;
-        auto startOfStream = crossRefStartPtr;
-        size_t lengthOfStream = startxrefPtr - startOfStream;
-        Stream *stream        = parseStream(startOfStream, lengthOfStream);
-        trailer.set_stream(stream);
-        return read_cross_reference_stream(stream);
+        auto startxrefPtr      = data + sizeInBytes;
+        auto startOfStream     = crossRefStartPtr;
+        size_t lengthOfStream  = startxrefPtr - startOfStream;
+        currentTrailer->stream = parseStream(startOfStream, lengthOfStream);
+        return read_cross_reference_stream(currentTrailer->stream, currentTrailer);
     }
 
     //  table -> parse table and parse trailer dict
@@ -139,12 +164,12 @@ bool Document::read_trailers(char *crossRefStartPtr) {
     auto metaData = std::string(crossRefPtr, currentReadPtr - crossRefPtr);
     // TODO parse other cross-reference sections
     // TODO catch exceptions
-    crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
-    crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
+    currentTrailer->crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
+    currentTrailer->crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
 
     ignoreNewLines(currentReadPtr);
 
-    for (int i = 0; i < crossReferenceTable.objectCount; i++) {
+    for (int i = 0; i < currentTrailer->crossReferenceTable.objectCount; i++) {
         // nnnnnnnnnn ggggg f__
         auto s = std::string(currentReadPtr, 20);
         // TODO catch exceptions
@@ -162,7 +187,7 @@ bool Document::read_trailers(char *crossRefStartPtr) {
             entry.normal.generationNumber = num1;
         }
 
-        crossReferenceTable.entries.push_back(entry);
+        currentTrailer->crossReferenceTable.entries.push_back(entry);
         currentReadPtr += 20;
     }
 
@@ -185,12 +210,14 @@ bool Document::read_trailers(char *crossRefStartPtr) {
         }
     }
 
-    trailer.set_dict(parseDict(currentReadPtr, lengthOfTrailerDict));
-    auto itr = trailer.get_dict()->values.find("Prev");
-    if (itr != trailer.get_dict()->values.end()) {
-        return read_trailers(data + itr->second->as<Integer>()->value);
+    currentTrailer->dict = parseDict(currentReadPtr, lengthOfTrailerDict);
+    auto itr             = currentTrailer->dict->values.find("Prev");
+    if (!(itr != currentTrailer->dict->values.end())) {
+        return false;
     }
-    return false;
+
+    currentTrailer->prev = new Trailer();
+    return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
 }
 
 bool Document::read_data() {
@@ -220,8 +247,8 @@ bool Document::read_data() {
 
     // parse startxref
     try {
-        const auto str            = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
-        trailer.lastCrossRefStart = std::stoll(str);
+        const auto str    = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
+        lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
         spdlog::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}", err.what());
         return true;
@@ -230,9 +257,8 @@ bool Document::read_data() {
         return true;
     }
 
-    auto crossRefStartPtr = data + trailer.lastCrossRefStart;
-
-    return read_trailers(crossRefStartPtr);
+    auto crossRefStartPtr = data + lastCrossRefStart;
+    return read_trailers(crossRefStartPtr, &trailer);
 }
 
 bool Document::read_from_file(const std::string &filePath, Document &document) {
@@ -292,8 +318,8 @@ bool Document::write_to_stream(std::ostream &s) {
     }
 
     // NOTE write everything up until the cross-reference table
-    ASSERT(ptr <= data + trailer.lastCrossRefStart);
-    auto size = trailer.lastCrossRefStart - (ptr - data);
+    ASSERT(ptr <= data + lastCrossRefStart);
+    auto size = lastCrossRefStart - (ptr - data);
     s.write(ptr, static_cast<std::streamsize>(size));
     bytesWrittenUntilXref += size;
 
@@ -363,9 +389,9 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
         CrossReferenceEntry entry = {};
     };
 
-    auto crossReferenceEntries = std::vector<TempXRefEntry>(crossReferenceTable.entries.size());
-    for (int i = 0; i < crossReferenceTable.entries.size(); i++) {
-        crossReferenceEntries[i] = {.objectNumber = i, .entry = crossReferenceTable.entries[i]};
+    auto crossReferenceEntries = std::vector<TempXRefEntry>(trailer.crossReferenceTable.entries.size());
+    for (int i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
+        crossReferenceEntries[i] = {.objectNumber = i, .entry = trailer.crossReferenceTable.entries[i]};
     }
 
     std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
@@ -439,10 +465,10 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
 
     auto xrefKeyword = "xref\n";
     s.write(xrefKeyword, 5);
-    auto firstObjectNumberStr = std::to_string(crossReferenceTable.firstObjectNumber);
+    auto firstObjectNumberStr = std::to_string(trailer.crossReferenceTable.firstObjectNumber);
     s.write(firstObjectNumberStr.c_str(), static_cast<std::streamsize>(firstObjectNumberStr.size()));
     s.write(" ", 1);
-    auto objectCountStr = std::to_string(crossReferenceTable.objectCount);
+    auto objectCountStr = std::to_string(trailer.crossReferenceTable.objectCount);
     s.write(objectCountStr.c_str(), static_cast<std::streamsize>(objectCountStr.size()));
     s.write("\n", 1);
 
@@ -470,7 +496,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
 
 void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) {
     s.write("trailer\n", 8);
-    s.write(trailer.get_dict()->data.data(), static_cast<std::streamsize>(trailer.get_dict()->data.size()));
+    s.write(trailer.dict->data.data(), static_cast<std::streamsize>(trailer.dict->data.size()));
     s.write("\nstartxref\n", 11);
     auto tmp = std::to_string(bytesWrittenUntilXref);
     s.write(tmp.c_str(), static_cast<std::streamsize>(tmp.size()));
