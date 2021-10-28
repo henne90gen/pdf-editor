@@ -194,10 +194,14 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     ignoreNewLines(currentReadPtr);
 
     // parse trailer dict
-    if (std::string_view(currentReadPtr, 7) != "trailer") {
-        spdlog::error("Expected 'trailer' keyword");
-        return false;
+    while (std::string_view(currentReadPtr, 7) != "trailer") {
+        currentReadPtr++;
+        if (data + sizeInBytes < currentReadPtr + 7) {
+            spdlog::error("Unexpectedly reached end of file");
+            return true;
+        }
     }
+
     currentReadPtr += 7;
     ignoreNewLines(currentReadPtr);
 

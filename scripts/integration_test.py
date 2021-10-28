@@ -8,15 +8,17 @@ ACTIVATED_TESTS = {"VeraPDF": ["6.1 File structure"]}
 
 
 def test_file(executable: str, file_path: str) -> bool:
+    has_error = False
     try:
         process = subprocess.run([executable, "info", file_path], capture_output=True, timeout=1)
     except:
-        return True
+        has_error = True
 
-    if "fail" in file_path:
-        has_error = process.returncode == 0
-    else:
-        has_error = process.returncode != 0
+    if not has_error:
+        if "fail" in file_path:
+            has_error = process.returncode == 0
+        else:
+            has_error = process.returncode != 0
 
     if has_error:
         print(file_path)
