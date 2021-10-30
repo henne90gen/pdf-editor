@@ -20,16 +20,15 @@ class PdfWidget : public Gtk::Viewport {
   public:
     explicit PdfWidget(pdf::Document &file);
 
-    bool my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr);
-    bool on_scroll_event(GdkEventScroll *event) override;
-    bool on_button_press_event(GdkEventButton *button_event) override;
-    bool on_key_press_event(GdkEventKey *key_event) override;
-    bool on_key_release_event(GdkEventKey *key_event) override;
-    void on_size_allocate(Gtk::Allocation &allocation) override;
+    void my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
+    //    bool on_scroll_event(GdkEventScroll *event) override;
+    //    bool on_button_press_event(GdkEventButton *button_event) override;
+    //    bool on_key_press_event(GdkEventKey *key_event) override;
+    //    bool on_key_release_event(GdkEventKey *key_event) override;
 
-    void hadjustment_changed() const { spdlog::info("hadjustment value changed"); }
-    void vadjustment_changed() const { spdlog::info("vadjustment value changed"); }
-    void update_adjustments(const Gtk::Allocation &allocation);
+  protected:
+    void size_allocate_vfunc(int w, int h, int baseline) override;
+    void update_adjustments(int w, int h);
 
   private:
     pdf::Document &file;
