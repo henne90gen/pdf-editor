@@ -34,7 +34,7 @@ target_link_gtk3(pdf-editor)
 target_link_libraries(pdf-editor PRIVATE pdf-lib spdlog::spdlog)
 target_include_directories(pdf-editor PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-embed_file(debugger/debugger.glade debugger_glade)
+embed_file(debugger/debugger.xml debugger_glade)
 add_executable(pdf-debugger
         debugger/main.cpp
         debugger/DebugApplication.cpp

@@ -10,28 +10,28 @@ ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
     spdlog::trace("ContentArea::on_draw(width={}, height={})", w, h);
 
-    int width        = BYTES_PER_ROW * PIXELS_PER_BYTE;
-    int fullRowCount = static_cast<int>(document.sizeInBytes) / BYTES_PER_ROW;
-    int coreHeight   = fullRowCount * PIXELS_PER_BYTE;
-    cr->set_source_rgb(1, 1, 1);
-    cr->rectangle(0, 0, width, coreHeight);
+    highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
-    int overlap = static_cast<int>(document.sizeInBytes) - (fullRowCount * BYTES_PER_ROW);
-    cr->rectangle(0, coreHeight, overlap * PIXELS_PER_BYTE, PIXELS_PER_BYTE);
-
-    //    auto *currentTrailer = &document.trailer;
-    //    while (currentTrailer!= nullptr) {
-    //
-    //        cr->rectangle();
-    //    }
-
-    cr->fill();
+    auto *currentTrailer = &document.trailer;
+    while (currentTrailer != nullptr) {
+        if (currentTrailer->dict != nullptr) {
+            auto start = currentTrailer->dict->data.data();
+            auto size  = currentTrailer->dict->data.size();
+            highlight_range(cr, start, size, 0, 0, 1);
+        } else {
+            auto start = currentTrailer->stream->data.data();
+            auto size  = currentTrailer->stream->data.size();
+            highlight_range(cr, start, size, 0, 0, 1);
+        }
+        currentTrailer = currentTrailer->prev;
+    }
 
     cr->set_source_rgb(0, 0, 0);
     cr->set_font_size(PIXELS_PER_BYTE);
     cr->move_to(0, PIXELS_PER_BYTE);
 
-    for (int row = 0; row < fullRowCount + 1; row++) {
+    auto rowCount = static_cast<int>(document.sizeInBytes) / BYTES_PER_ROW + 1;
+    for (int row = 0; row < rowCount; row++) {
         for (int col = 0; col < BYTES_PER_ROW; col++) {
             auto byteOffset = row * BYTES_PER_ROW + col;
             if (byteOffset >= document.sizeInBytes) {
@@ -53,4 +53,40 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
             cr->show_text_glyphs(str, glyphs, clusters, clusterFlags);
         }
     }
+}
+
+void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t lengthIn,
+                                  double r, double g, double b) const {
+    cr->set_source_rgb(r, g, b);
+
+    int startByte = static_cast<int>(startPtr - document.data);
+    int length    = static_cast<int>(lengthIn);
+    if (startByte % BYTES_PER_ROW != 0) {
+        int x     = startByte % BYTES_PER_ROW;
+        int y     = startByte / BYTES_PER_ROW;
+        int width = std::min(BYTES_PER_ROW - (startByte % BYTES_PER_ROW), static_cast<int>(length));
+        cr->rectangle(x * PIXELS_PER_BYTE, y * PIXELS_PER_BYTE, width * PIXELS_PER_BYTE, PIXELS_PER_BYTE);
+
+        startByte += width;
+        length -= width;
+    }
+
+    if (length >= BYTES_PER_ROW) {
+        int y        = startByte / BYTES_PER_ROW;
+        int width    = BYTES_PER_ROW;
+        int rowCount = static_cast<int>(length) / BYTES_PER_ROW;
+        int height   = rowCount;
+        cr->rectangle(0, y * PIXELS_PER_BYTE, width * PIXELS_PER_BYTE, rowCount * PIXELS_PER_BYTE);
+
+        length -= BYTES_PER_ROW * rowCount;
+        startByte += BYTES_PER_ROW * rowCount;
+    }
+
+    if (length > 0) {
+        int y     = startByte / BYTES_PER_ROW;
+        int width = static_cast<int>(length);
+        cr->rectangle(0, y * PIXELS_PER_BYTE, width * PIXELS_PER_BYTE, PIXELS_PER_BYTE);
+    }
+
+    cr->fill();
 }

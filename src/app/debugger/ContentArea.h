@@ -14,6 +14,8 @@ class ContentArea : public Gtk::DrawingArea {
                                  pdf::Document &_document);
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) const;
+    void highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t length, double r,
+                         double g, double b) const;
 
   private:
     pdf::Document &document;

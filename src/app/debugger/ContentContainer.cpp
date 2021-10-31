@@ -1,13 +1,15 @@
 #include "ContentContainer.h"
 
-#include <gtkmm/overlay.h>
 #include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/overlay.h>
+#include <spdlog/spdlog.h>
 
 ContentContainer::ContentContainer(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder,
                                    pdf::Document &_document)
     : Gtk::Viewport(obj), document(_document) {
     auto contentOverlayContainer = _builder->get_widget<Gtk::Overlay>("ContentOverlay");
     contentOverlayContainer->add_overlay(byteHighlightOverlay);
+    signal_selected_byte().connect(sigc::mem_fun(byteHighlightOverlay, &ByteHighlightOverlay::set_highlighted_byte));
 
     contentArea = Gtk::Builder::get_widget_derived<ContentArea>(_builder, "ContentArea", document);
 
@@ -34,7 +36,7 @@ void ContentContainer::size_allocate_vfunc(int w, int h, int baseline) {
     Widget::size_allocate_vfunc(w, h, baseline);
 }
 
-void ContentContainer::on_mouse_leave() { byteHighlightOverlay.set_highlighted_byte(-1); }
+void ContentContainer::on_mouse_leave() { signalSelectedByte.emit(-1); }
 
 void ContentContainer::on_mouse_enter(double x, double y) { updateHighlightedByte(x, y); }
 
@@ -50,5 +52,7 @@ void ContentContainer::updateHighlightedByte(double x, double y) {
     auto byteY   = static_cast<int>(canvasY) / PIXELS_PER_BYTE;
 
     auto highlightedByte = byteY * BYTES_PER_ROW + byteX;
-    byteHighlightOverlay.set_highlighted_byte(static_cast<int>(highlightedByte));
+
+    spdlog::trace("ContentContainer::updateHighlightedByte(x={}, y={}): highlightedByte={}", x, y, highlightedByte);
+    signalSelectedByte.emit(highlightedByte);
 }

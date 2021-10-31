@@ -5,6 +5,10 @@
 #include "ContentArea.h"
 
 void ByteHighlightOverlay::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) const {
+    if (highlightedByte == -1) {
+        return;
+    }
+
     spdlog::trace("ByteHighlightOverlay::on_draw(width={}, height={})", width, height);
 
     cr->set_source_rgb(1, 0, 0);
