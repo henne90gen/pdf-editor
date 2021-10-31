@@ -39,7 +39,9 @@ add_executable(pdf-debugger
         debugger/main.cpp
         debugger/DebugApplication.cpp
         debugger/DebugWindow.cpp
+        debugger/ContentContainer.cpp
         debugger/ContentArea.cpp
+        debugger/ByteHighlightOverlay.cpp
         ${debugger_glade})
 target_link_gtk3(pdf-debugger)
 target_link_libraries(pdf-debugger PRIVATE pdf-lib spdlog::spdlog)

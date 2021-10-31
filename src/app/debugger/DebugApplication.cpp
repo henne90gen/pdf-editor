@@ -15,7 +15,7 @@ DebugApplication::DebugApplication()
 void DebugApplication::on_activate() { spdlog::trace("Activating application"); }
 
 void DebugApplication::on_open(const Gio::Application::type_vec_files &files, const Glib::ustring &hint) {
-    spdlog::trace("Opening files");
+    spdlog::info("Opening {} files", files.size());
 
     if (files.empty()) {
         spdlog::warn("There were no files");
