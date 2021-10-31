@@ -2,8 +2,27 @@
 
 #include <iostream>
 #include <string>
+#include <array>
 
 namespace pdf {
+
+static std::array<std::string, 58> operators = {
+      // Unsorted Operators
+      "SC", "SCN", "sc", "scn",
+      // Text Operators
+      "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
+      // Graphics Operators
+      "q", "Q", "cm", "w", "J", "j", "M", "d", "ri", "i", "gs",
+      // Path Construction Operators
+      "m", "l", "c", "v", "y", "h", "re",
+      // Path Painting Operators
+      "S", "s", "f*", "F", "f", "B*", "B", "b*", "b", "n",
+      // Clipping Path Operators
+      "W*", "W",
+      // Unsorted Operators
+      "Tj", "TJ", "d0", "d1", "CS", "G", "g", "RG", "rg", "K",
+      "k", //
+};
 
 bool is_lower_letter(char c) { return c >= 'a' && c <= 'z'; }
 bool is_upper_letter(char c) { return c >= 'A' && c <= 'Z'; }
@@ -178,7 +197,7 @@ std::optional<Token> matchCharToken(const std::string_view &word) {
     if (STARTS_WITH(word, "\r\n")) {
         return Token(Token::Type::NEW_LINE, word.substr(0, 2));
     }
-    if (STARTS_WITH(word, "\r")) {
+    if (STARTS_WITH(word, '\r')) {
         return Token(Token::Type::NEW_LINE, word.substr(0, 1));
     }
     if (!word.empty() && word[0] == '[') {
@@ -219,23 +238,6 @@ std::optional<Token> matchString(const std::string_view &word) {
 }
 
 std::optional<Token> matchOperator(const std::string_view &word) {
-    std::vector<std::string> operators = {
-          // Unsorted Operators
-          "SC", "SCN", "sc", "scn",
-          // Text Operators
-          "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
-          // Graphics Operators
-          "q", "Q", "cm", "w", "J", "j", "M", "d", "ri", "i", "gs",
-          // Path Construction Operators
-          "m", "l", "c", "v", "y", "h", "re",
-          // Path Painting Operators
-          "S", "s", "f*", "F", "f", "B*", "B", "b*", "b", "n",
-          // Clipping Path Operators
-          "W*", "W",
-          // Unsorted Operators
-          "Tj", "TJ", "d0", "d1", "CS", "G", "g", "RG", "rg", "K",
-          "k", //
-    };
     for (auto &op : operators) {
         if (STARTS_WITH(word, op)) {
             return Token(Token::Type::OPERATOR, word.substr(0, op.size()));
