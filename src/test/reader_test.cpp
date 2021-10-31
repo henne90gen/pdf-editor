@@ -103,8 +103,8 @@ TEST(Reader, HelloWorldCmap) {
     ASSERT_NE(font, nullptr);
     auto toUnicodeOpt = font->toUnicode(document);
     ASSERT_TRUE(toUnicodeOpt.has_value());
-    auto toUnicode = toUnicodeOpt.value();
-    auto cmap      = toUnicode->read_cmap();
+//    auto toUnicode = toUnicodeOpt.value();
+//    auto cmap      = toUnicode->read_cmap();
 }
 
 TEST(Reader, FontFlags) {

@@ -30,7 +30,7 @@ struct CMapParser {
 
   private:
     Lexer &lexer;
-    int currentTokenIdx       = 0;
+    size_t currentTokenIdx       = 0;
     std::vector<Token> tokens = {};
 
     void ignoreNewLineTokens();

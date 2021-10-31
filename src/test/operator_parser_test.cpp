@@ -11,7 +11,7 @@ void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type, std::fu
 }
 
 void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type) {
-    assertNextOp(parser, type, [](auto op) {});
+    assertNextOp(parser, type, [](auto /*op*/) {});
 }
 
 TEST(OperationParser, Simple) {

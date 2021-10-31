@@ -107,7 +107,7 @@ std::string HexadecimalString::to_string() const {
     high[1]    = '\0';
 
     std::string result;
-    for (int i = 0; i < tmp.size(); i += 2) {
+    for (size_t i = 0; i < tmp.size(); i += 2) {
         *low          = tmp[i + 1];
         *high         = tmp[i];
         auto lowVal   = std::strtol(low, nullptr, 16);

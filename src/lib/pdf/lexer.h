@@ -119,11 +119,11 @@ class TokenLexer : public Lexer {
         return tokens[currentTokenIdx++];
     }
 
-    std::string_view advanceStream(size_t characters) override { return ""; }
+    std::string_view advanceStream(size_t /*characters*/) override { return ""; }
 
   private:
     const std::vector<Token> &tokens;
-    int currentTokenIdx = 0;
+    size_t currentTokenIdx = 0;
 };
 
 } // namespace pdf

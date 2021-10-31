@@ -110,7 +110,7 @@ void PdfPage::addRows(const pdf::Dictionary *dict, int depth, Gtk::TreeModel::Ro
 }
 
 void PdfPage::addRows(const pdf::Array *arr, int depth, Gtk::TreeModel::Row *parentRow) {
-    for (int i = 0; i < arr->values.size(); i++) {
+    for (size_t i = 0; i < arr->values.size(); i++) {
         auto row                = createRow(parentRow);
         row[columns.m_col_name] = std::to_string(i);
         addRows(arr->values[i], depth + 1, &row);
@@ -133,14 +133,14 @@ PdfWidget::PdfWidget(pdf::Document &_file)
     set_can_focus(true);
     set_focus_on_click(true);
 
-    drawingArea.set_draw_func(sigc::mem_fun(*this, &PdfWidget::my_on_draw));
+    drawingArea.set_draw_func(sigc::mem_fun(*this, &PdfWidget::on_draw));
     //    add_events(Gdk::SMOOTH_SCROLL_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::KEY_PRESS_MASK |
     //               Gdk::KEY_RELEASE_MASK);
     set_child(drawingArea);
 }
 
-void PdfWidget::my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) {
-    spdlog::trace("PdfWidget: draw");
+void PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) {
+    spdlog::trace("PdfWidget::on_draw(width={}, height={})", width, height);
 
     cr->scale(zoom, zoom);
 

@@ -159,7 +159,7 @@ class OperatorParser {
   private:
     Lexer &lexer;
     std::vector<Token> tokens = {};
-    int currentTokenIdx       = 0;
+    size_t currentTokenIdx    = 0;
 
     /**
      * Tries to parse the operand at the given index as the given type.

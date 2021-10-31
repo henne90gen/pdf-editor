@@ -20,7 +20,7 @@ class PdfWidget : public Gtk::Viewport {
   public:
     explicit PdfWidget(pdf::Document &file);
 
-    void my_on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
+    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     //    bool on_scroll_event(GdkEventScroll *event) override;
     //    bool on_button_press_event(GdkEventButton *button_event) override;
     //    bool on_key_press_event(GdkEventKey *key_event) override;
@@ -36,9 +36,9 @@ class PdfWidget : public Gtk::Viewport {
     Glib::RefPtr<Gtk::Adjustment> vadjustment = Gtk::Adjustment::create(0, 0, 1);
     Gtk::DrawingArea drawingArea;
 
-    bool isCtrlPressed = false;
-    double zoom        = 1.0;
-    double zoomSpeed   = 0.1;
+    [[maybe_unused]] bool isCtrlPressed = false;
+    double zoom                         = 1.0;
+    [[maybe_unused]] double zoomSpeed   = 0.1;
 };
 
 class PdfPage : public Gtk::Frame {

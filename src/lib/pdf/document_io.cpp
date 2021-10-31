@@ -394,7 +394,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
     };
 
     auto crossReferenceEntries = std::vector<TempXRefEntry>(trailer.crossReferenceTable.entries.size());
-    for (int i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
+    for (int i = 0; i < static_cast<int>(trailer.crossReferenceTable.entries.size()); i++) {
         crossReferenceEntries[i] = {.objectNumber = i, .entry = trailer.crossReferenceTable.entries[i]};
     }
 
@@ -419,8 +419,8 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
      *        ↑___
      */
 
-    int changeSectionIndex = 0;
-    int64_t offset         = 0;
+    size_t changeSectionIndex = 0;
+    int64_t offset            = 0;
     for (auto &crossRefEntry : crossReferenceEntries) {
         if (crossRefEntry.entry.type == CrossReferenceEntryType::COMPRESSED) {
             TODO("Implement support for rewriting compressed cross reference entries");

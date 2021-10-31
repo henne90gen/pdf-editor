@@ -27,7 +27,7 @@ jobs:
 
       - name: Run CMake
         working-directory: ./build
-        run: cmake .. -G Ninja -D CMAKE_C_COMPILER=/usr/bin/clang-12 -D CMAKE_CXX_COMPILER=/usr/bin/clang++-12
+        run: cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=/usr/bin/clang-12 -D CMAKE_CXX_COMPILER=/usr/bin/clang++-12
 
       - name: Build and Install
         working-directory: ./build

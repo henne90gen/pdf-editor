@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder, pdf::Document &_document)
+ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
     : Gtk::DrawingArea(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &ContentArea::on_draw));
 }
@@ -33,7 +33,7 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     auto rowCount = static_cast<int>(document.sizeInBytes) / BYTES_PER_ROW + 1;
     for (int row = 0; row < rowCount; row++) {
         for (int col = 0; col < BYTES_PER_ROW; col++) {
-            auto byteOffset = row * BYTES_PER_ROW + col;
+            size_t byteOffset = row * BYTES_PER_ROW + col;
             if (byteOffset >= document.sizeInBytes) {
                 break;
             }
@@ -75,7 +75,6 @@ void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const
         int y        = startByte / BYTES_PER_ROW;
         int width    = BYTES_PER_ROW;
         int rowCount = static_cast<int>(length) / BYTES_PER_ROW;
-        int height   = rowCount;
         cr->rectangle(0, y * PIXELS_PER_BYTE, width * PIXELS_PER_BYTE, rowCount * PIXELS_PER_BYTE);
 
         length -= BYTES_PER_ROW * rowCount;

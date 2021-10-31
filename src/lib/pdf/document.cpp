@@ -57,7 +57,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         for (int i = 0; i < N; i++) {
             auto objNum      = parser.parse()->as<Integer>();
             objectNumbers[i] = objNum->value;
-            auto byteOffset  = parser.parse(); // TODO what is this for?
+            //            auto byteOffset  = parser.parse(); // TODO what is this for?
         }
         auto objs = std::vector<Object *>(N);
         for (int i = 0; i < N; i++) {
@@ -84,8 +84,9 @@ IndirectObject *Document::resolve(const IndirectReference *ref) { return get_obj
 
 std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
-    for (int i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
-        auto &entry = trailer.crossReferenceTable.entries[i];
+    for (size_t i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
+        // TODO what should 'entry' be used for?
+        //        auto &entry = trailer.crossReferenceTable.entries[i];
         auto object = get_object(i);
         if (object == nullptr) {
             continue;
@@ -254,7 +255,7 @@ PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
     return document.get<PageTreeNode>(itr->second);
 }
 
-bool Document::insert_document(Document &otherDocument, size_t atPageNum) {
+bool Document::insert_document(Document & /*otherDocument*/, size_t /*atPageNum*/) {
     TODO("implement document insertion");
     return true;
 }
@@ -279,7 +280,7 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
             }
         } else if (value->is<LiteralString>()) {
             auto str = std::string(value->as<LiteralString>()->value());
-            for (int i = 0; i < str.size(); i++) {
+            for (size_t i = 0; i < str.size(); i++) {
                 result++;
             }
         }

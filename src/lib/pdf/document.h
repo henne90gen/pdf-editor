@@ -28,21 +28,27 @@ enum class CrossReferenceEntryType {
     COMPRESSED = 2,
 };
 
+struct CrossReferenceEntryFree {
+    uint64_t nextFreeObjectNumber;
+    uint64_t nextFreeObjectGenerationNumber;
+};
+
+struct CrossReferenceEntryNormal {
+    uint64_t byteOffset;
+    uint64_t generationNumber;
+};
+
+struct CrossReferenceEntryCompressed {
+    uint64_t objectNumberOfStream;
+    uint64_t indexInStream;
+};
+
 struct CrossReferenceEntry {
     CrossReferenceEntryType type;
     union {
-        struct {
-            uint64_t nextFreeObjectNumber;
-            uint64_t nextFreeObjectGenerationNumber;
-        } free;
-        struct {
-            uint64_t byteOffset;
-            uint64_t generationNumber;
-        } normal;
-        struct {
-            uint64_t objectNumberOfStream;
-            uint64_t indexInStream;
-        } compressed;
+        CrossReferenceEntryFree free;
+        CrossReferenceEntryNormal normal;
+        CrossReferenceEntryCompressed compressed;
     };
 };
 
@@ -67,17 +73,21 @@ enum class ChangeSectionType {
     DELETED,
 };
 
+struct ChangeSectionDeleted {
+    std::string_view deleted_area;
+};
+
+struct ChangeSectionAdded {
+    char *insertion_point;
+    char *new_content;
+    size_t new_content_length;
+};
+
 struct ChangeSection {
     ChangeSectionType type = ChangeSectionType::NONE;
     union {
-        struct {
-            std::string_view deleted_area;
-        } deleted;
-        struct {
-            char *insertion_point;
-            char *new_content;
-            size_t new_content_length;
-        } added = {};
+        ChangeSectionDeleted deleted;
+        ChangeSectionAdded added;
     };
 };
 
@@ -89,6 +99,8 @@ struct Document : public ReferenceResolver {
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
     std::vector<ChangeSection> changeSections                 = {};
+
+    virtual ~Document() = default;
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {

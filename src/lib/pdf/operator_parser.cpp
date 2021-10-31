@@ -105,7 +105,7 @@ Operator *OperatorParser::createOperator_rg(Operator *result) {
 
 Operator *OperatorParser::createOperator_TJ(Operator *result) {
     int arrayStartIndex = -1;
-    for (int i = 0; i < currentTokenIdx; i++) {
+    for (size_t i = 0; i < currentTokenIdx; i++) {
         if (tokens[currentTokenIdx - i].type == Token::Type::ARRAY_START) {
             arrayStartIndex = currentTokenIdx - i;
             break;

@@ -58,7 +58,7 @@ void CMapParser::parseCodeSpaceRange() {
             return;
         }
 
-        auto &rangeStart = tokens[currentTokenIdx];
+//        auto &rangeStart = tokens[currentTokenIdx];
 
         currentTokenIdx++;
         if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
@@ -66,7 +66,7 @@ void CMapParser::parseCodeSpaceRange() {
             return;
         }
 
-        auto &rangeEnd = tokens[currentTokenIdx];
+//        auto &rangeEnd = tokens[currentTokenIdx];
 
         // FIXME save range start and range end somehow
 
@@ -178,7 +178,7 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
 
         currentTokenIdx++;
         if (currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
-            auto &dstCode = tokens[currentTokenIdx];
+//            auto &dstCode = tokens[currentTokenIdx];
             // FIXME use dstCode somehow
 
         } else if (currentTokenIs(Token::Type::ARRAY_START)) {

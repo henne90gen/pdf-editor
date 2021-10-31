@@ -23,7 +23,7 @@ std::optional<Token> matchInt(const std::string_view &word) {
         return {};
     }
 
-    int idx = 0;
+    size_t idx = 0;
     if (word[idx] == '+' || word[idx] == '-') {
         idx++;
     }
@@ -201,11 +201,9 @@ std::optional<Token> matchString(const std::string_view &word) {
         return {};
     }
 
-    // TODO implement backslash handling
-
     int openParenthesis = 1;
     int stringLength    = -1;
-    for (int i = 1; i < word.size(); i++) {
+    for (int i = 1; i < static_cast<int>(word.size()); i++) {
         if (word[i] == '(' && word[i - 1] != '\\') {
             openParenthesis++;
         } else if (word[i] == ')' && word[i - 1] != '\\') {

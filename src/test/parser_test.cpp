@@ -7,7 +7,7 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
     explicit TestReferenceResolver(const std::vector<pdf::IndirectObject *> &refs) : references(refs) {}
 
     pdf::IndirectObject *resolve(const pdf::IndirectReference *reference) override {
-        if (reference->objectNumber >= references.size()) {
+        if (reference->objectNumber >= static_cast<int>(references.size())) {
             return nullptr;
         }
         return references[reference->objectNumber];
@@ -204,7 +204,7 @@ TEST(Parser, StreamIndirectLength) {
 
 TEST(Parser, Null) {
     const std::string input = "null";
-    assertParses<pdf::Null>(input, [](pdf::Null *result) {});
+    assertParses<pdf::Null>(input, [](pdf::Null * /*result*/) {});
 }
 
 TEST(Parser, CatalogDict) {
@@ -214,7 +214,7 @@ TEST(Parser, CatalogDict) {
                                       "/Lang(en-US)\n"
                                       ">>\n"
                                       "endobj",
-                                      [](pdf::IndirectObject *result) {});
+                                      [](pdf::IndirectObject * /*result*/) {});
 }
 
 TEST(Parser, MultipleObjects) {

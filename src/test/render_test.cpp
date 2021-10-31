@@ -22,7 +22,7 @@ TEST(Renderer, HelloWorld) {
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 
     auto pages = document.pages();
-    for (int i = 0; i < pages.size(); i++) {
+    for (size_t i = 0; i < pages.size(); i++) {
         auto page     = pages[i];
         auto cropBox  = page->cropBox();
         auto width    = cropBox->width();

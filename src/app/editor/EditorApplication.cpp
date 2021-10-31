@@ -14,8 +14,8 @@ EditorApplication::EditorApplication()
 
 void EditorApplication::on_activate() { spdlog::trace("Activating application"); }
 
-void EditorApplication::on_open(const Gio::Application::type_vec_files &files, const Glib::ustring &hint) {
-    spdlog::trace("Opening files");
+void EditorApplication::on_open(const Gio::Application::type_vec_files &files, const Glib::ustring & /*hint*/) {
+    spdlog::info("Opening files");
 
     if (files.empty()) {
         spdlog::warn("There were no files");

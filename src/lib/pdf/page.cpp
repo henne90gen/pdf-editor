@@ -28,7 +28,7 @@ std::vector<ContentStream *> Page::content_streams() {
     } else if (content->is<Array>()) {
         auto arr = content->as<Array>();
         result.resize(arr->values.size());
-        for (int i = 0; i < arr->values.size(); i++) {
+        for (size_t i = 0; i < arr->values.size(); i++) {
             result[i] = document.get<ContentStream>(arr->values[i]);
         }
     }

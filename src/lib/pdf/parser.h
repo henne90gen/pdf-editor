@@ -20,7 +20,7 @@ class ReferenceResolver {
 
 class NoopReferenceResolver : public ReferenceResolver {
   public:
-    IndirectObject *resolve(const IndirectReference *reference) override { return nullptr; }
+    IndirectObject *resolve(const IndirectReference * /*reference*/) override { return nullptr; }
 };
 
 class Parser {
@@ -37,7 +37,7 @@ class Parser {
     ReferenceResolver *referenceResolver;
 
     std::vector<Token> tokens = {};
-    int currentTokenIdx       = 0;
+    size_t currentTokenIdx    = 0;
 
     void ignoreNewLineTokens();
     [[nodiscard]] bool ensureTokensHaveBeenLexed();

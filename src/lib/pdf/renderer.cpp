@@ -115,7 +115,7 @@ void renderer::setTextFontAndSize(Operator *op) {
     }
 
     auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
-    auto fontOpt = fontMapOpt.value()->get(page->document, fontName);
+    auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
     if (!fontOpt.has_value()) {
         TODO("logging");
         return;
@@ -178,8 +178,8 @@ void renderer::loadFont(Font *font) {
 
     auto toUnicodeOpt = font->toUnicode(page->document);
     if (toUnicodeOpt.has_value()) {
-        auto toUnicode          = toUnicodeOpt.value();
-        const char *cmapFilePtr = toUnicode->to_string().data();
+        //        auto toUnicode = toUnicodeOpt.value();
+        //        auto cmapFilePtr = toUnicode->to_string().data();
         // TODO read in cmap file
     }
 
