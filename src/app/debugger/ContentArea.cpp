@@ -12,6 +12,13 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
 
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
+    highlight_trailers(cr);
+    highlight_object_starts(cr);
+
+    draw_text(cr);
+}
+
+void ContentArea::highlight_trailers(const Cairo::RefPtr<Cairo::Context> &cr) const {
     auto *currentTrailer = &document.trailer;
     while (currentTrailer != nullptr) {
         if (currentTrailer->dict != nullptr) {
@@ -25,7 +32,21 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
         }
         currentTrailer = currentTrailer->prev;
     }
+}
 
+void ContentArea::highlight_object_starts(const Cairo::RefPtr<Cairo::Context> &cr) const {
+    auto objects     = document.objects();
+    auto objectCount = objects.size();
+    for (size_t i = 0; i < objectCount; i++) {
+        auto &object = objects[i];
+        double g     = static_cast<double>(i + 1) / static_cast<double>(objectCount);
+        g *= 0.5;
+        g += 0.5;
+        highlight_range(cr, object->data.data(), object->data.size(), 0, g, 0);
+    }
+}
+
+void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {
     cr->set_source_rgb(0, 0, 0);
     cr->set_font_size(PIXELS_PER_BYTE);
     cr->move_to(0, PIXELS_PER_BYTE);

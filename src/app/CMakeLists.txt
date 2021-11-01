@@ -22,7 +22,7 @@ endfunction()
 add_executable(pdf-cli cli/main.cpp util.cpp)
 target_link_libraries(pdf-cli PRIVATE pdf-lib spdlog::spdlog)
 
-embed_file(editor/editor.glade editor_glade)
+embed_file(editor/editor.xml editor_glade)
 add_executable(pdf-editor
         editor/main.cpp
         editor/EditorApplication.cpp

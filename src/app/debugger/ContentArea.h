@@ -18,5 +18,9 @@ class ContentArea : public Gtk::DrawingArea {
                          double g, double b) const;
 
   private:
+    void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;
+    void highlight_trailers(const Cairo::RefPtr<Cairo::Context> &cr) const;
+    void highlight_object_starts(const Cairo::RefPtr<Cairo::Context> &cr) const;
+
     pdf::Document &document;
 };

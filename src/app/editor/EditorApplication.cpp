@@ -7,7 +7,7 @@
 #include <pdf/document.h>
 
 #include "EditorWindow.h"
-#include "editor.glade.h"
+#include "editor.xml.h"
 
 EditorApplication::EditorApplication()
     : Gtk::Application("de.henne90gen.pdf.editor", Gio::Application::Flags::HANDLES_OPEN) {}
@@ -30,7 +30,7 @@ void EditorApplication::on_open(const Gio::Application::type_vec_files &files, c
 
     if (!appWindow) {
         try {
-            auto builderString = std::string((char *)editor_glade_data, editor_glade_size);
+            auto builderString = std::string((char *)editor_xml_data, editor_xml_size);
             auto builder       = Gtk::Builder::create_from_string(builderString);
             appWindow          = Gtk::Builder::get_widget_derived<EditorWindow>(builder, "EditorWindow");
             add_window(*appWindow);
