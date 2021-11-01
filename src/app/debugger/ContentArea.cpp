@@ -1,5 +1,6 @@
 #include "ContentArea.h"
 
+#include <random>
 #include <spdlog/spdlog.h>
 
 ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
@@ -35,14 +36,15 @@ void ContentArea::highlight_trailers(const Cairo::RefPtr<Cairo::Context> &cr) co
 }
 
 void ContentArea::highlight_object_starts(const Cairo::RefPtr<Cairo::Context> &cr) const {
-    auto objects     = document.objects();
-    auto objectCount = objects.size();
-    for (size_t i = 0; i < objectCount; i++) {
-        auto &object = objects[i];
-        double g     = static_cast<double>(i + 1) / static_cast<double>(objectCount);
-        g *= 0.5;
-        g += 0.5;
-        highlight_range(cr, object->data.data(), object->data.size(), 0, g, 0);
+    std::mt19937 engine; // NOLINT(cert-msc51-cpp)
+    auto dist = std::uniform_real_distribution(0.0, 1.0);
+
+    auto objects = document.objects();
+    for (auto &object : objects) {
+        double r = dist(engine);
+        double g = dist(engine);
+        double b = dist(engine);
+        highlight_range(cr, object->data.data(), object->data.size(), r, g, b);
     }
 }
 
