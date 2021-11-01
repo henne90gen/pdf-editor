@@ -39,13 +39,13 @@ void ContentArea::highlight_object_starts(const Cairo::RefPtr<Cairo::Context> &c
     std::mt19937 engine; // NOLINT(cert-msc51-cpp)
     auto dist = std::uniform_real_distribution(0.0, 1.0);
 
-    auto objects = document.objects();
-    for (auto &object : objects) {
+    document.for_each_object([&](pdf::IndirectObject *object) {
         double r = dist(engine);
         double g = dist(engine);
         double b = dist(engine);
         highlight_range(cr, object->data.data(), object->data.size(), r, g, b);
-    }
+        return true;
+    });
 }
 
 void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {

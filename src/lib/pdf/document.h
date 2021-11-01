@@ -128,11 +128,15 @@ struct Document : public ReferenceResolver {
     DocumentCatalog *catalog();
     /// List of pages
     std::vector<Page *> pages();
+    /// Iterates over all pages in the document, until 'func' returns 'false'
+    void for_each_page(const std::function<bool(Page *)> &func);
     /// List of objects
     std::vector<IndirectObject *> objects();
+    /// Iterates over all objects in the document, until 'func' returns 'false'
+    void for_each_object(const std::function<bool(IndirectObject *)> &func);
 
     /// Number of indirect objects
-    size_t object_count();
+    size_t object_count(bool parseObjects = true);
     /// Number of pages
     size_t page_count();
     /// Number of lines
@@ -171,9 +175,6 @@ struct Document : public ReferenceResolver {
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
     void write_new_cross_ref_table(std::ostream &s);
     void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref);
-
-    /// Iterates over all the pages in the document, until 'func' returns 'false'.
-    void for_each_page(const std::function<bool(Page *)> &func);
 };
 
 } // namespace pdf

@@ -84,25 +84,41 @@ IndirectObject *Document::resolve(const IndirectReference *ref) { return get_obj
 
 std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
-    for (size_t i = 0; i < trailer.crossReferenceTable.entries.size(); i++) {
-        // TODO what should 'entry' be used for?
-        //        auto &entry = trailer.crossReferenceTable.entries[i];
+    for_each_object([&result](IndirectObject *obj) {
+        result.push_back(obj);
+        return true;
+    });
+    return result;
+}
+
+void Document::for_each_object(const std::function<bool(IndirectObject *)> &func) {
+    // FIXME this does not consider objects from 'Prev'-ious trailers
+    for (int64_t i = 0; i < static_cast<int64_t>(trailer.crossReferenceTable.entries.size()); i++) {
         auto object = get_object(i);
         if (object == nullptr) {
             continue;
         }
-        result.push_back(object);
+
+        if (!func(object)) {
+            break;
+        }
     }
-    return result;
 }
 
-size_t Document::object_count() {
+size_t Document::object_count(const bool parseObjects) {
     size_t result = 0;
-    for (auto &entry : trailer.crossReferenceTable.entries) {
-        if (entry.type == CrossReferenceEntryType::FREE) {
-            continue;
+    if (parseObjects) {
+        for_each_object([&result](IndirectObject *) {
+            result++;
+            return true;
+        });
+    } else {
+        for (auto &entry : trailer.crossReferenceTable.entries) {
+            if (entry.type == CrossReferenceEntryType::FREE) {
+                continue;
+            }
+            result++;
         }
-        result++;
     }
     return result;
 }

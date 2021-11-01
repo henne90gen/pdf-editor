@@ -17,6 +17,6 @@ int cmd_info(const InfoArgs &args) {
     spdlog::info("Lines:         {:>5}", document.line_count());
     spdlog::info("Words:         {:>5}", document.word_count());
     spdlog::info("Characters:    {:>5}", document.character_count());
-    spdlog::info("Objects:       {:>5} ({} parsable)", document.object_count(), document.objects().size());
+    spdlog::info("Objects:       {:>5} ({} parsable)", document.object_count(false), document.objects().size());
     return 0;
 }
