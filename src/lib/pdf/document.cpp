@@ -271,7 +271,7 @@ PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
     return document.get<PageTreeNode>(itr->second);
 }
 
-bool Document::insert_document(Document & /*otherDocument*/, size_t /*atPageNum*/) {
+[[maybe_unused]] bool Document::insert_document(Document & /*otherDocument*/, size_t /*atPageNum*/) {
     TODO("implement document insertion");
     return true;
 }
