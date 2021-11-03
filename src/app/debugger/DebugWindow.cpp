@@ -6,11 +6,18 @@
 
 #include "ContentContainer.h"
 
-DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document _document)
-    : Gtk::ApplicationWindow(obj), document(std::move(_document)) {
+DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const pdf::Document &_document)
+    : Gtk::ApplicationWindow(obj), document(_document) {
     byteLabel        = builder->get_widget<Gtk::Label>("ByteLabel");
+    trailerHighlight = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
+    objectsHighlight = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
+
     contentContainer = Gtk::Builder::get_widget_derived<ContentContainer>(builder, "ContentContainer", document);
     contentContainer->signal_selected_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_byte_label));
+
+    auto contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
+    trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
+    objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
 }
 
 void DebugWindow::update_byte_label(int b) {

@@ -4,14 +4,14 @@
 #include <gtkmm/overlay.h>
 #include <spdlog/spdlog.h>
 
-ContentContainer::ContentContainer(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder,
+ContentContainer::ContentContainer(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
                                    pdf::Document &_document)
     : Gtk::Viewport(obj), document(_document) {
-    auto contentOverlayContainer = _builder->get_widget<Gtk::Overlay>("ContentOverlay");
+    auto contentOverlayContainer = builder->get_widget<Gtk::Overlay>("ContentOverlay");
     contentOverlayContainer->add_overlay(byteHighlightOverlay);
     signal_selected_byte().connect(sigc::mem_fun(byteHighlightOverlay, &ByteHighlightOverlay::set_highlighted_byte));
 
-    contentArea = Gtk::Builder::get_widget_derived<ContentArea>(_builder, "ContentArea", document);
+    contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
 
     auto motionCtrl = Gtk::EventControllerMotion::create();
     motionCtrl->signal_leave().connect(sigc::mem_fun(*this, &ContentContainer::on_mouse_leave));

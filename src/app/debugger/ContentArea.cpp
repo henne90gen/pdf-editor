@@ -13,13 +13,17 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
 
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
-    highlight_trailers(cr);
-    highlight_object_starts(cr);
+    highlight_trailer(cr);
+    highlight_objects(cr);
 
     draw_text(cr);
 }
 
-void ContentArea::highlight_trailers(const Cairo::RefPtr<Cairo::Context> &cr) const {
+void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const {
+    if (!shouldHighlightTrailer) {
+        return;
+    }
+
     auto *currentTrailer = &document.trailer;
     while (currentTrailer != nullptr) {
         if (currentTrailer->dict != nullptr) {
@@ -35,7 +39,11 @@ void ContentArea::highlight_trailers(const Cairo::RefPtr<Cairo::Context> &cr) co
     }
 }
 
-void ContentArea::highlight_object_starts(const Cairo::RefPtr<Cairo::Context> &cr) const {
+void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const {
+    if (!shouldHighlightObjects) {
+        return;
+    }
+
     std::mt19937 engine; // NOLINT(cert-msc51-cpp)
     auto dist = std::uniform_real_distribution(0.0, 1.0);
 
