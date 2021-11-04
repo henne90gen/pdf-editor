@@ -24,6 +24,12 @@ class ContentArea : public Gtk::DrawingArea {
         queue_draw();
     }
 
+    void resize_and_set_offsets(int width, int height, double x, double y) {
+        offsetX = x;
+        offsetY = y;
+        set_size_request(width, height);
+    }
+
   private:
     void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;
     void highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const;
@@ -32,6 +38,8 @@ class ContentArea : public Gtk::DrawingArea {
                          double g, double b) const;
 
     pdf::Document &document;
+    double offsetX = 0.0;
+    double offsetY = 0.0;
     bool shouldHighlightTrailer = false;
     bool shouldHighlightObjects = false;
 };

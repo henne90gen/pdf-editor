@@ -11,12 +11,17 @@ ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
     spdlog::trace("ContentArea::on_draw(width={}, height={})", w, h);
 
+    cr->save();
+    cr->translate(offsetX, offsetY);
+
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
     highlight_trailer(cr);
     highlight_objects(cr);
 
     draw_text(cr);
+
+    cr->restore();
 }
 
 void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const {

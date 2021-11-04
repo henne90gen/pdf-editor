@@ -31,7 +31,7 @@ void ContentContainer::size_allocate_vfunc(int w, int h, int baseline) {
     hadjustment->configure(hadjustment->get_value(), 0.0, width, 1.0, 10.0, 0.0);
     vadjustment->configure(vadjustment->get_value(), 0.0, height, 1.0, 10.0, 0.0);
 
-    contentArea->set_size_request(width, height);
+    contentArea->resize_and_set_offsets(w, h, hadjustment->get_value(), vadjustment->get_value());
 
     Widget::size_allocate_vfunc(w, h, baseline);
 }
