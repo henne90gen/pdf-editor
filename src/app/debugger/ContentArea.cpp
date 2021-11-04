@@ -38,6 +38,7 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
         return;
     }
 
+    // TODO maybe skip highlighting trailers that are currently not visible
     auto *currentTrailer = &document.trailer;
     while (currentTrailer != nullptr) {
         if (currentTrailer->dict != nullptr) {
@@ -61,6 +62,7 @@ void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) con
     std::mt19937 engine; // NOLINT(cert-msc51-cpp)
     auto dist = std::uniform_real_distribution(0.0, 1.0);
 
+    // TODO this might be slow for large files -> don't highlight objects that are not visible
     document.for_each_object([&](pdf::IndirectObject *object) {
         double r = dist(engine);
         double g = dist(engine);
@@ -75,6 +77,7 @@ void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {
     cr->set_font_size(PIXELS_PER_BYTE);
     cr->move_to(0, PIXELS_PER_BYTE);
 
+    // TODO only go over the rows that will actually show up in the final output
     auto rowCount = static_cast<int>(document.sizeInBytes) / BYTES_PER_ROW + 1;
     for (int row = 0; row < rowCount; row++) {
         for (int col = 0; col < BYTES_PER_ROW; col++) {
