@@ -17,7 +17,7 @@
 ### Windows
 
 - install MSYS2
-- install dependencies inside MSYS2 shell
+- install dependencies inside MSYS2 shell using pacman
   - mingw-w64-x86_64-toolchain
   - mingw-w64-x86_64-gtkmm3
   - mingw-w64-x86_64-clang

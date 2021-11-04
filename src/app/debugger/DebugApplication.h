@@ -1,6 +1,9 @@
 #pragma once
 
+// TODO this is a hack to get the gtkmm4 code to compile on Windows
+#undef WIN32
 #include <gtkmm/application.h>
+#include <gtkmm/window.h>
 
 class DebugApplication : public Gtk::Application {
   public:

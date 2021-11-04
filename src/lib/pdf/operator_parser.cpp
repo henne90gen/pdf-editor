@@ -4,9 +4,29 @@
 #include <spdlog/spdlog.h>
 
 #include "parser.h"
-#include "util.h"
 
 namespace pdf {
+
+template <> double OperatorParser::operand(int index) {
+    Token &token = tokens[currentTokenIdx - (2 + index)];
+    if (token.type == Token::Type::NEW_LINE) {
+        index++;
+        token = tokens[currentTokenIdx - (2 + index)];
+    }
+    auto &content = token.content;
+    // TODO is this conversion to a string really necessary?
+    // TODO catch exception
+    return std::stod(std::string(content));
+}
+
+template <> int64_t OperatorParser::operand(int index) {
+    auto &content = tokens[currentTokenIdx - (2 + index)].content;
+    // TODO is this conversion to a string really necessary?
+    // TODO catch exception
+    return std::stoll(std::string(content));
+}
+
+template <> std::string_view OperatorParser::operand(int index) { return tokens[currentTokenIdx - (2 + index)].content; }
 
 std::string replace(std::string str, const std::string &from, const std::string &to) {
     size_t start_pos = str.find(from);
