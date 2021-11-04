@@ -1,18 +1,25 @@
 #include "ContentArea.h"
 
+#include <gtkmm/eventcontrollermotion.h>
 #include <random>
 #include <spdlog/spdlog.h>
 
 ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
     : Gtk::DrawingArea(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &ContentArea::on_draw));
+
+    auto motionCtrl = Gtk::EventControllerMotion::create();
+    motionCtrl->signal_leave().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_leave));
+    motionCtrl->signal_enter().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_enter));
+    motionCtrl->signal_motion().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_motion));
+    add_controller(motionCtrl);
 }
 
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
-    spdlog::trace("ContentArea::on_draw(width={}, height={})", w, h);
+    spdlog::trace("ContentArea::on_draw(width={}, height={}) offsetX={} offsetY={}", w, h, offsetX, offsetY);
 
     cr->save();
-    cr->translate(offsetX, offsetY);
+    cr->translate(-offsetX, -offsetY);
 
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
@@ -20,6 +27,8 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     highlight_objects(cr);
 
     draw_text(cr);
+
+    highlight_hovered_byte(cr);
 
     cr->restore();
 }
@@ -124,4 +133,50 @@ void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const
     }
 
     cr->fill();
+}
+
+void ContentArea::highlight_hovered_byte(const Cairo::RefPtr<Cairo::Context> &cr) const {
+    if (hoveredByte == -1) {
+        return;
+    }
+
+    cr->set_source_rgb(1, 0, 0);
+    int x = hoveredByte % BYTES_PER_ROW;
+    int y = hoveredByte / BYTES_PER_ROW;
+    cr->rectangle(x * PIXELS_PER_BYTE, y * PIXELS_PER_BYTE, PIXELS_PER_BYTE, PIXELS_PER_BYTE);
+    cr->stroke();
+}
+
+void ContentArea::on_mouse_leave() { signalHoveredByte.emit(-1); }
+
+void ContentArea::on_mouse_enter(double x, double y) { update_highlighted_byte(x, y); }
+
+void ContentArea::on_mouse_motion(double x, double y) { update_highlighted_byte(x, y); }
+
+void ContentArea::update_highlighted_byte(double x, double y) {
+    auto canvasX = x + offsetX;
+    auto canvasY = y + offsetY;
+    auto byteX   = static_cast<int>(canvasX) / PIXELS_PER_BYTE;
+    auto byteY   = static_cast<int>(canvasY) / PIXELS_PER_BYTE;
+    hoveredByte  = byteY * BYTES_PER_ROW + byteX;
+
+    spdlog::trace("ContentArea::update_highlighted_byte(x={}, y={}) hoveredByte={}", x, y, hoveredByte);
+    signalHoveredByte.emit(hoveredByte);
+    queue_draw();
+}
+
+void ContentArea::toggle_highlight_trailer() {
+    shouldHighlightTrailer = !shouldHighlightTrailer;
+    queue_draw();
+}
+
+void ContentArea::toggle_highlight_objects() {
+    shouldHighlightObjects = !shouldHighlightObjects;
+    queue_draw();
+}
+
+void ContentArea::set_offsets(double x, double y) {
+    offsetX = x;
+    offsetY = y;
+    queue_draw();
 }

@@ -39,7 +39,7 @@ add_executable(pdf-debugger
         debugger/main.cpp
         debugger/DebugApplication.cpp
         debugger/DebugWindow.cpp
-        debugger/ContentContainer.cpp
+        debugger/ContentWindow.cpp
         debugger/ContentArea.cpp
         debugger/ByteHighlightOverlay.cpp
         ${debugger_glade})

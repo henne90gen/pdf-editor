@@ -16,21 +16,17 @@ class ContentArea : public Gtk::DrawingArea {
                                  pdf::Document &_document);
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) const;
+    void on_mouse_leave();
+    void on_mouse_enter(double x, double y);
+    void on_mouse_motion(double x, double y);
 
-    void toggle_highlight_trailer() {
-        shouldHighlightTrailer = !shouldHighlightTrailer;
-        queue_draw();
-    }
-    void toggle_highlight_objects() {
-        shouldHighlightObjects = !shouldHighlightObjects;
-        queue_draw();
-    }
+    using type_signal_selected_byte = sigc::signal<void(int)>;
+    type_signal_selected_byte signal_hovered_byte() { return signalHoveredByte; }
 
-    void resize_and_set_offsets(int width, int height, double x, double y) {
-        offsetX = x;
-        offsetY = y;
-        set_size_request(width, height);
-    }
+    void toggle_highlight_trailer();
+    void toggle_highlight_objects();
+
+    void set_offsets(double x, double y);
 
   private:
     void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;
@@ -38,10 +34,15 @@ class ContentArea : public Gtk::DrawingArea {
     void highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const;
     void highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t length, double r,
                          double g, double b) const;
+    void highlight_hovered_byte(const Cairo::RefPtr<Cairo::Context> &cr) const;
+    void update_highlighted_byte(double x, double y);
 
     pdf::Document &document;
-    double offsetX = 0.0;
-    double offsetY = 0.0;
+    double offsetX              = 0.0;
+    double offsetY              = 0.0;
     bool shouldHighlightTrailer = false;
     bool shouldHighlightObjects = false;
+    int hoveredByte             = -1;
+
+    type_signal_selected_byte signalHoveredByte;
 };
