@@ -16,6 +16,8 @@ class ContentWindow : public Gtk::ScrolledWindow {
     [[maybe_unused]] ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
                                    pdf::Document &document);
 
+    void scroll_to_byte(int byte);
+
   protected:
     void size_allocate_vfunc(int width, int height, int baseline) override;
 

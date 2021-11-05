@@ -1,6 +1,7 @@
 #include "ContentArea.h"
 
 #include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/gestureclick.h>
 #include <random>
 #include <spdlog/spdlog.h>
 
@@ -13,6 +14,10 @@ ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     motionCtrl->signal_enter().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_enter));
     motionCtrl->signal_motion().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_motion));
     add_controller(motionCtrl);
+
+    auto gestureClick = Gtk::GestureClick::create();
+    gestureClick->signal_released().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_click));
+    add_controller(gestureClick);
 }
 
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
@@ -28,7 +33,8 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
 
     draw_text(cr);
 
-    highlight_hovered_byte(cr);
+    highlight_byte(cr, hoveredByte, 0.2, 0.2, 0.2);
+    highlight_byte(cr, selectedByte, 1.0, 0, 0);
 
     cr->restore();
 }
@@ -138,32 +144,47 @@ void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const
     cr->fill();
 }
 
-void ContentArea::highlight_hovered_byte(const Cairo::RefPtr<Cairo::Context> &cr) const {
-    if (hoveredByte == -1) {
+void ContentArea::highlight_byte(const Cairo::RefPtr<Cairo::Context> &cr, int byte, double r, double g, double b) {
+    if (byte == -1) {
         return;
     }
 
-    cr->set_source_rgb(1, 0, 0);
-    int x = hoveredByte % BYTES_PER_ROW;
-    int y = hoveredByte / BYTES_PER_ROW;
+    cr->set_source_rgb(r, g, b);
+    int x = byte % BYTES_PER_ROW;
+    int y = byte / BYTES_PER_ROW;
     cr->rectangle(x * PIXELS_PER_BYTE, y * PIXELS_PER_BYTE, PIXELS_PER_BYTE, PIXELS_PER_BYTE);
     cr->stroke();
 }
 
 void ContentArea::on_mouse_leave() { signalHoveredByte.emit(-1); }
 
-void ContentArea::on_mouse_enter(double x, double y) { update_highlighted_byte(x, y); }
+void ContentArea::on_mouse_enter(double x, double y) { update_hovered_byte(x, y); }
 
-void ContentArea::on_mouse_motion(double x, double y) { update_highlighted_byte(x, y); }
+void ContentArea::on_mouse_motion(double x, double y) { update_hovered_byte(x, y); }
 
-void ContentArea::update_highlighted_byte(double x, double y) {
+void ContentArea::on_mouse_click(int numPress, double x, double y) {
+    spdlog::info("ContentArea::on_mouse_click(numPress={}, x={}, y={})", numPress, x, y);
+    if (numPress != 1) {
+        return;
+    }
+
+    selectedByte = find_byte(x, y);
+    spdlog::trace("ContentArea::on_mouse_click(x={}, y={}) selectedByte={}", x, y, selectedByte);
+    signalSelectedByte.emit(selectedByte);
+    queue_draw();
+}
+
+int ContentArea::find_byte(double x, double y) const {
     auto canvasX = x + offsetX;
     auto canvasY = y + offsetY;
     auto byteX   = static_cast<int>(canvasX) / PIXELS_PER_BYTE;
     auto byteY   = static_cast<int>(canvasY) / PIXELS_PER_BYTE;
-    hoveredByte  = byteY * BYTES_PER_ROW + byteX;
+    return byteY * BYTES_PER_ROW + byteX;
+}
 
-    spdlog::trace("ContentArea::update_highlighted_byte(x={}, y={}) hoveredByte={}", x, y, hoveredByte);
+void ContentArea::update_hovered_byte(double x, double y) {
+    hoveredByte = find_byte(x, y);
+    spdlog::trace("ContentArea::update_hovered_byte(x={}, y={}) hoveredByte={}", x, y, hoveredByte);
     signalHoveredByte.emit(hoveredByte);
     queue_draw();
 }

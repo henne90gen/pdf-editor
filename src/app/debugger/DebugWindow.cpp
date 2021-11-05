@@ -1,5 +1,6 @@
 #include "DebugWindow.h"
 
+#include <gtkmm/dialog.h>
 #include <gtkmm/eventcontrollermotion.h>
 #include <spdlog/spdlog.h>
 
@@ -7,23 +8,58 @@
 
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const pdf::Document &_document)
     : Gtk::ApplicationWindow(obj), document(_document) {
-    byteLabel        = builder->get_widget<Gtk::Label>("ByteLabel");
-    trailerHighlight = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
-    objectsHighlight = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
+    selectedByteLabel = builder->get_widget<Gtk::Label>("SelectedByteLabel");
+    hoveredByteLabel  = builder->get_widget<Gtk::Label>("HoveredByteLabel");
+    trailerHighlight  = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
+    objectsHighlight  = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
+    jumpToByteButton  = builder->get_widget<Gtk::Button>("JumpToByteButton");
 
-    auto contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
+    contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
     objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
-    contentArea->signal_hovered_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_byte_label));
+    contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_selected_byte_label));
+    contentArea->signal_hovered_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_hovered_byte_label));
 
-    Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+    jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
+
+    contentWindow = Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
 }
 
-void DebugWindow::update_byte_label(int b) {
+void DebugWindow::update_selected_byte_label(int b) {
     if (b == -1) {
-        byteLabel->set_text("");
+        selectedByteLabel->set_text("");
     } else {
         std::string str = std::to_string(b);
-        byteLabel->set_text(str);
+        selectedByteLabel->set_text(str);
     }
+}
+
+void DebugWindow::update_hovered_byte_label(int b) {
+    if (b == -1) {
+        hoveredByteLabel->set_text("");
+    } else {
+        std::string str = std::to_string(b);
+        hoveredByteLabel->set_text("(" + str + ")");
+    }
+}
+
+void DebugWindow::open_jump_to_byte_dialog() {
+    jumpToByteDialog = new JumpToByteDialog(*this);
+    jumpToByteDialog->signal_response().connect(sigc::mem_fun(*this, &DebugWindow::response_jump_to_byte_dialog));
+    jumpToByteDialog->show();
+}
+
+void DebugWindow::response_jump_to_byte_dialog(int response) {
+    if (jumpToByteDialog == nullptr) {
+        spdlog::warn("'jumpToByteDialog' is unexpectedly a nullptr");
+        return;
+    }
+
+    if (response == Gtk::ResponseType::APPLY) {
+        auto byte = jumpToByteDialog->get_byte_value();
+        contentArea->set_selected_byte(byte);
+    }
+
+    delete jumpToByteDialog;
+    jumpToByteDialog = nullptr;
 }

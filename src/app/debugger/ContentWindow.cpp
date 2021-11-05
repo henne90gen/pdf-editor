@@ -8,6 +8,7 @@ ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builde
     contentArea      = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     get_hadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &ContentWindow::scroll_value_changed));
     get_vadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &ContentWindow::scroll_value_changed));
+    contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &ContentWindow::scroll_to_byte));
 
     int width = BYTES_PER_ROW * PIXELS_PER_BYTE;
     int numRows =
@@ -28,4 +29,13 @@ void ContentWindow::scroll_value_changed() {
     spdlog::trace("ContentWindow::scroll_value_changed() x={}, y={}", x, y);
     contentContainer->move(*contentArea, x, y);
     contentArea->set_offsets(x, y);
+}
+
+void ContentWindow::scroll_to_byte(int byte) {
+    int byteX      = byte % BYTES_PER_ROW;
+    int byteY      = byte / BYTES_PER_ROW;
+    double offsetX = byteX * PIXELS_PER_BYTE;
+    double offsetY = byteY * PIXELS_PER_BYTE;
+    get_hadjustment()->set_value(offsetX);
+    get_vadjustment()->set_value(offsetY);
 }
