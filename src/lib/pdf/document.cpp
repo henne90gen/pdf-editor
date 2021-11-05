@@ -53,17 +53,22 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto lexer         = TextLexer(textProvider);
         auto parser        = Parser(lexer, this);
         int64_t N          = stream->dictionary->values["N"]->as<Integer>()->value;
+
+        // TODO cache objectNumbers and corresponding objects
         auto objectNumbers = std::vector<int64_t>(N);
         for (int i = 0; i < N; i++) {
             auto objNum      = parser.parse()->as<Integer>();
             objectNumbers[i] = objNum->value;
-            //            auto byteOffset  = parser.parse(); // TODO what is this for?
+            // parse the byteOffset as well
+            parser.parse();
         }
+
         auto objs = std::vector<Object *>(N);
         for (int i = 0; i < N; i++) {
             auto obj = parser.parse();
             objs[i]  = obj;
         }
+
         return new IndirectObject(content, objectNumbers[entry->compressed.indexInStream], 0,
                                   objs[entry->compressed.indexInStream]);
     }
