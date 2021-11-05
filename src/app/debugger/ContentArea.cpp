@@ -59,8 +59,8 @@ void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) con
         return;
     }
 
-    std::mt19937 engine; // NOLINT(cert-msc51-cpp)
-    auto dist = std::uniform_real_distribution(0.0, 1.0);
+    auto engine = std::mt19937(1337); // NOLINT(cert-msc51-cpp)
+    auto dist   = std::uniform_real_distribution(0.0, 1.0);
 
     // TODO this might be slow for large files -> don't highlight objects that are not visible
     document.for_each_object([&](pdf::IndirectObject *object) {
