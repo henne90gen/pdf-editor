@@ -29,12 +29,15 @@ class ContentArea : public Gtk::DrawingArea {
         signalSelectedByte.emit(selectedByte);
     }
 
+    void update_zoom(double d);
+
   protected:
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) const;
     void on_mouse_leave();
     void on_mouse_enter(double x, double y);
     void on_mouse_motion(double x, double y);
     void on_mouse_click(int numPress, double x, double y);
+    bool on_scroll(double x, double y);
 
   private:
     void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;
@@ -50,6 +53,7 @@ class ContentArea : public Gtk::DrawingArea {
     pdf::Document &document;
     double offsetX              = 0.0;
     double offsetY              = 0.0;
+    double zoom                 = 1.0;
     bool shouldHighlightTrailer = false;
     bool shouldHighlightObjects = false;
     int hoveredByte             = -1;

@@ -2,7 +2,6 @@
 <interface>
     <requires lib="gtk+" version="4.5.0"/>
     <object class="GtkApplicationWindow" id="DebugWindow">
-        <property name="can-focus">False</property>
         <property name="default-width">400</property>
         <property name="default-height">600</property>
         <child>
@@ -58,16 +57,22 @@
                     <object class="GtkScrolledWindow" id="ContentWindow">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="focusable">True</property>
+                        <property name="focus-on-click">True</property>
                         <property name="vexpand">True</property>
                         <property name="hexpand">True</property>
                         <child>
-                            <object class="GtkFixed" id="ContentContainer">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
+                            <object class="GtkViewport" id="ContentViewport">
                                 <child>
-                                    <object class="GtkDrawingArea" id="ContentArea">
+                                    <object class="GtkFixed" id="ContentContainer">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
+                                        <child>
+                                            <object class="GtkDrawingArea" id="ContentArea">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                            </object>
+                                        </child>
                                     </object>
                                 </child>
                             </object>

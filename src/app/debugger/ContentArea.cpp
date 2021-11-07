@@ -1,6 +1,7 @@
 #include "ContentArea.h"
 
 #include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/eventcontrollerscroll.h>
 #include <gtkmm/gestureclick.h>
 #include <random>
 #include <spdlog/spdlog.h>
@@ -18,6 +19,10 @@ ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     auto gestureClick = Gtk::GestureClick::create();
     gestureClick->signal_released().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_click));
     add_controller(gestureClick);
+
+    auto scrollCtrl = Gtk::EventControllerScroll::create();
+    scrollCtrl->signal_scroll().connect(sigc::mem_fun(*this, &ContentArea::on_scroll), false);
+    add_controller(scrollCtrl);
 }
 
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
@@ -25,6 +30,7 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
 
     cr->save();
     cr->translate(-offsetX, -offsetY);
+    cr->scale(zoom, zoom);
 
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
@@ -174,6 +180,11 @@ void ContentArea::on_mouse_click(int numPress, double x, double y) {
     queue_draw();
 }
 
+bool ContentArea::on_scroll(double x, double y) {
+    spdlog::info("ContentArea::on_scroll(x={}, y={})", x, y);
+    return false;
+}
+
 int ContentArea::find_byte(double x, double y) const {
     auto canvasX = x + offsetX;
     auto canvasY = y + offsetY;
@@ -202,5 +213,15 @@ void ContentArea::toggle_highlight_objects() {
 void ContentArea::set_offsets(double x, double y) {
     offsetX = x;
     offsetY = y;
+    queue_draw();
+}
+
+void ContentArea::update_zoom(double /*d*/) {
+    zoom += 0.01;
+    if (zoom < 0.1) {
+        zoom = 0.1;
+    } else if (zoom > 10.0) {
+        zoom = 10.0;
+    }
     queue_draw();
 }

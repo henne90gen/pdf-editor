@@ -26,6 +26,9 @@ class DebugWindow : public Gtk::ApplicationWindow {
     void open_jump_to_byte_dialog();
     void response_jump_to_byte_dialog(int response);
 
+  protected:
+    static bool on_scroll(double dx, double dy);
+
   private:
     pdf::Document document;
     ContentWindow *contentWindow;

@@ -2,6 +2,7 @@
 
 #include <gtkmm/dialog.h>
 #include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/eventcontrollerscroll.h>
 #include <spdlog/spdlog.h>
 
 #include "ContentWindow.h"
@@ -23,6 +24,10 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
 
     contentWindow = Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+
+    auto scrollCtrl = Gtk::EventControllerScroll::create();
+    scrollCtrl->signal_scroll().connect(sigc::mem_fun(*this, &DebugWindow::on_scroll), false);
+    add_controller(scrollCtrl);
 }
 
 void DebugWindow::update_selected_byte_label(int b) {
@@ -62,4 +67,9 @@ void DebugWindow::response_jump_to_byte_dialog(int response) {
 
     delete jumpToByteDialog;
     jumpToByteDialog = nullptr;
+}
+
+bool DebugWindow::on_scroll(double /*dx*/, double /*dy*/) {
+    spdlog::error("Scrolling window");
+    return true;
 }

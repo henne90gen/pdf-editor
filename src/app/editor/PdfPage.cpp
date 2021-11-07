@@ -9,7 +9,6 @@ PdfPage::PdfPage(pdf::Document &_file) : file(_file), pdfWidget(_file) {
 
     leftScrolledWindow.set_child(treeView);
 
-    rightScrolledWindow.set_policy(Gtk::PolicyType::ALWAYS, Gtk::PolicyType::ALWAYS);
     rightScrolledWindow.set_child(pdfWidget);
 
     box.append(leftScrolledWindow);

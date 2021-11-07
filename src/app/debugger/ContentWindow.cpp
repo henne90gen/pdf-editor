@@ -1,5 +1,8 @@
 #include "ContentWindow.h"
 
+#include <gtkmm/eventcontrollerkey.h>
+#include <gtkmm/eventcontrollerscroll.h>
+#include <gtkmm/viewport.h>
 #include <spdlog/spdlog.h>
 
 ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document)
@@ -15,6 +18,23 @@ ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builde
           static_cast<int>(std::ceil((static_cast<double>(document.sizeInBytes) / static_cast<double>(BYTES_PER_ROW))));
     int height = numRows * PIXELS_PER_BYTE;
     contentContainer->set_size_request(width, height);
+
+    auto keyCtrl = Gtk::EventControllerKey::create();
+    keyCtrl->signal_key_pressed().connect(sigc::mem_fun(*this, &ContentWindow::on_key_pressed), false);
+    keyCtrl->signal_key_released().connect(sigc::mem_fun(*this, &ContentWindow::on_key_released), false);
+    add_controller(keyCtrl);
+
+    auto addScrollCtrl = [this](Widget *w) {
+        auto scrollCtrl = Gtk::EventControllerScroll::create();
+        scrollCtrl->signal_scroll().connect(sigc::mem_fun(*this, &ContentWindow::on_scroll), false);
+        w->add_controller(scrollCtrl);
+    };
+
+    auto viewport = builder->get_widget<Gtk::Viewport>("ContentViewport");
+    addScrollCtrl(viewport);
+    addScrollCtrl(contentContainer);
+    addScrollCtrl(contentArea);
+    addScrollCtrl(this);
 }
 
 void ContentWindow::size_allocate_vfunc(int width, int height, int baseline) {
@@ -24,11 +44,28 @@ void ContentWindow::size_allocate_vfunc(int width, int height, int baseline) {
 }
 
 void ContentWindow::scroll_value_changed() {
-    double x = get_hadjustment()->get_value();
-    double y = get_vadjustment()->get_value();
+    const auto &hadjustment = get_hadjustment();
+    const auto &vadjustment = get_vadjustment();
+    const auto x            = hadjustment->get_value();
+    const auto y            = vadjustment->get_value();
     spdlog::trace("ContentWindow::scroll_value_changed() x={}, y={}", x, y);
+    if (x == previousHAdjustment && y == previousVAdjustment) {
+        return;
+    }
+
+    if (isControlDown) {
+        auto dy = y - previousVAdjustment;
+        hadjustment->set_value(previousHAdjustment);
+        vadjustment->set_value(previousVAdjustment);
+        contentContainer->move(*contentArea, previousHAdjustment, previousVAdjustment);
+        contentArea->update_zoom(dy);
+        return;
+    }
+
     contentContainer->move(*contentArea, x, y);
     contentArea->set_offsets(x, y);
+    previousHAdjustment = x;
+    previousVAdjustment = y;
 }
 
 void ContentWindow::scroll_to_byte(int byte) {
@@ -38,4 +75,24 @@ void ContentWindow::scroll_to_byte(int byte) {
     double offsetY = byteY * PIXELS_PER_BYTE;
     get_hadjustment()->set_value(offsetX);
     get_vadjustment()->set_value(offsetY);
+}
+
+bool ContentWindow::on_key_pressed(guint keyValue, guint /*keyCode*/, Gdk::ModifierType /*state*/) {
+    if (keyValue == GDK_KEY_Control_L) {
+        isControlDown = true;
+        spdlog::trace("ContentWindow::on_key_pressed(): Control down");
+    }
+    return false;
+}
+
+void ContentWindow::on_key_released(guint keyValue, guint /*keyCode*/, Gdk::ModifierType /*state*/) {
+    if (keyValue == GDK_KEY_Control_L) {
+        isControlDown = false;
+        spdlog::trace("ContentWindow::on_key_released(): Control up");
+    }
+}
+
+bool ContentWindow::on_scroll(double /*dx*/, double /*dy*/) const {
+    spdlog::error("Scrolling");
+    return isControlDown;
 }
