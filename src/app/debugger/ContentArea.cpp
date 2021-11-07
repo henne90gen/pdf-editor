@@ -19,10 +19,6 @@ ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     auto gestureClick = Gtk::GestureClick::create();
     gestureClick->signal_released().connect(sigc::mem_fun(*this, &ContentArea::on_mouse_click));
     add_controller(gestureClick);
-
-    auto scrollCtrl = Gtk::EventControllerScroll::create();
-    scrollCtrl->signal_scroll().connect(sigc::mem_fun(*this, &ContentArea::on_scroll), false);
-    add_controller(scrollCtrl);
 }
 
 void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h) const {
@@ -178,11 +174,6 @@ void ContentArea::on_mouse_click(int numPress, double x, double y) {
     spdlog::trace("ContentArea::on_mouse_click(x={}, y={}) selectedByte={}", x, y, selectedByte);
     signalSelectedByte.emit(selectedByte);
     queue_draw();
-}
-
-bool ContentArea::on_scroll(double x, double y) {
-    spdlog::info("ContentArea::on_scroll(x={}, y={})", x, y);
-    return false;
 }
 
 int ContentArea::find_byte(double x, double y) const {

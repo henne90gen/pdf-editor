@@ -37,7 +37,6 @@ class ContentArea : public Gtk::DrawingArea {
     void on_mouse_enter(double x, double y);
     void on_mouse_motion(double x, double y);
     void on_mouse_click(int numPress, double x, double y);
-    bool on_scroll(double x, double y);
 
   private:
     void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;

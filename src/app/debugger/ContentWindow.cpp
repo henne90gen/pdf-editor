@@ -1,8 +1,6 @@
 #include "ContentWindow.h"
 
 #include <gtkmm/eventcontrollerkey.h>
-#include <gtkmm/eventcontrollerscroll.h>
-#include <gtkmm/viewport.h>
 #include <spdlog/spdlog.h>
 
 ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document)
@@ -23,18 +21,6 @@ ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builde
     keyCtrl->signal_key_pressed().connect(sigc::mem_fun(*this, &ContentWindow::on_key_pressed), false);
     keyCtrl->signal_key_released().connect(sigc::mem_fun(*this, &ContentWindow::on_key_released), false);
     add_controller(keyCtrl);
-
-    auto addScrollCtrl = [this](Widget *w) {
-        auto scrollCtrl = Gtk::EventControllerScroll::create();
-        scrollCtrl->signal_scroll().connect(sigc::mem_fun(*this, &ContentWindow::on_scroll), false);
-        w->add_controller(scrollCtrl);
-    };
-
-    auto viewport = builder->get_widget<Gtk::Viewport>("ContentViewport");
-    addScrollCtrl(viewport);
-    addScrollCtrl(contentContainer);
-    addScrollCtrl(contentArea);
-    addScrollCtrl(this);
 }
 
 void ContentWindow::size_allocate_vfunc(int width, int height, int baseline) {
@@ -90,9 +76,4 @@ void ContentWindow::on_key_released(guint keyValue, guint /*keyCode*/, Gdk::Modi
         isControlDown = false;
         spdlog::trace("ContentWindow::on_key_released(): Control up");
     }
-}
-
-bool ContentWindow::on_scroll(double /*dx*/, double /*dy*/) const {
-    spdlog::error("Scrolling");
-    return isControlDown;
 }
