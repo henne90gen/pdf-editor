@@ -1,12 +1,12 @@
 #include "lexer.h"
 
+#include <array>
 #include <iostream>
 #include <string>
-#include <array>
 
 namespace pdf {
 
-static std::array<std::string, 58> operators = {
+static std::array<std::string, 59> operators = {
       // Unsorted Operators
       "SC", "SCN", "sc", "scn",
       // Text Operators
@@ -20,8 +20,8 @@ static std::array<std::string, 58> operators = {
       // Clipping Path Operators
       "W*", "W",
       // Unsorted Operators
-      "Tj", "TJ", "d0", "d1", "CS", "G", "g", "RG", "rg", "K",
-      "k", //
+      "Tj", "TJ", "d0", "d1", "CS", "G", "g", "RG", "rg", "K", "k",
+      "Do", //
 };
 
 bool is_lower_letter(char c) { return c >= 'a' && c <= 'z'; }

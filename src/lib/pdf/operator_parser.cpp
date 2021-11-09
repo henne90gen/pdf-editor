@@ -26,7 +26,9 @@ template <> int64_t OperatorParser::operand(int index) {
     return std::stoll(std::string(content));
 }
 
-template <> std::string_view OperatorParser::operand(int index) { return tokens[currentTokenIdx - (2 + index)].content; }
+template <> std::string_view OperatorParser::operand(int index) {
+    return tokens[currentTokenIdx - (2 + index)].content;
+}
 
 std::string replace(std::string str, const std::string &from, const std::string &to) {
     size_t start_pos = str.find(from);
@@ -263,6 +265,12 @@ Operator *OperatorParser::createOperator_gs(Operator *result) {
     return result;
 }
 
+Operator *OperatorParser::createOperator_Do(Operator *result) {
+    auto name = operand<std::string_view>(0);
+    result->data.Do_PaintXObject.name = new Name(name);
+    return result;
+}
+
 Operator *OperatorParser::createOperator(Operator::Type type) {
     auto result = new Operator(type);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
@@ -350,6 +358,9 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
     }
     if (type == Operator::Type::gs_SetParametersGraphicsState) {
         return createOperator_gs(result);
+    }
+    if (type == Operator::Type::Do_PaintXObject) {
+        return createOperator_Do(result);
     }
 
     spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));

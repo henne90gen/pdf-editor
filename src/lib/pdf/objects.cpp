@@ -23,6 +23,61 @@ std::ostream &operator<<(std::ostream &os, Object::Type &type) {
     return os;
 }
 
+std::string to_string(Object *object) {
+    if (object == nullptr) {
+        return "null";
+    }
+
+    switch (object->type) {
+    case Object::Type::LITERAL_STRING:
+    case Object::Type::BOOLEAN:
+    case Object::Type::INTEGER:
+    case Object::Type::HEXADECIMAL_STRING:
+    case Object::Type::NAME:
+    case Object::Type::REAL:
+    case Object::Type::NULL_OBJECT:
+    case Object::Type::INDIRECT_REFERENCE:
+        return std::string(object->data);
+    case Object::Type::ARRAY: {
+        std::string result = "[ ";
+        for (auto &entry : object->as<Array>()->values) {
+            result += to_string(entry);
+            result += ", ";
+        }
+        result += "]";
+        return result;
+    }
+    case Object::Type::DICTIONARY: {
+        std::string result = "<<\n";
+        auto entries       = std::vector<std::pair<std::string, Object *>>();
+        entries.reserve(object->as<Dictionary>()->values.size());
+        for (auto &entry : object->as<Dictionary>()->values) {
+            entries.emplace_back(entry);
+        }
+        std::sort(entries.begin(), entries.end(),
+                  [](const std::pair<std::string, Object *> &a, const std::pair<std::string, Object *> &b) {
+                      return a.first < b.first;
+                  });
+        for (auto &entry : entries) {
+            result += "  ";
+            result += entry.first;
+            result += ": ";
+            result += to_string(entry.second);
+            result += "\n";
+        }
+        result += ">>";
+        return result;
+    }
+    case Object::Type::OBJECT:
+    case Object::Type::INDIRECT_OBJECT:
+    case Object::Type::STREAM:
+    case Object::Type::OBJECT_STREAM_CONTENT:
+        break;
+    }
+
+    return "";
+}
+
 std::vector<std::string> Stream::filters() const {
     auto itr = dictionary->values.find("Filter");
     if (itr == dictionary->values.end()) {

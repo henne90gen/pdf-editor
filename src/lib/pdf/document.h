@@ -3,6 +3,7 @@
 #include "font.h"
 #include "objects.h"
 #include "parser.h"
+#include "image.h"
 
 #include <functional>
 
@@ -144,6 +145,9 @@ struct Document : public ReferenceResolver {
     size_t word_count();
     /// Number of characters
     size_t character_count();
+
+    /// Iterates over all images in the document, until 'func' returns 'false'
+    void for_each_image(const std::function<bool(Image &)> &func);
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] bool write_to_file(const std::string &filePath);

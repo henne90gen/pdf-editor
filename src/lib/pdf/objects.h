@@ -178,4 +178,6 @@ struct ObjectStreamContent : public Object {
 
 std::ostream &operator<<(std::ostream &os, Object::Type &type);
 
+std::string to_string(Object *object);
+
 } // namespace pdf

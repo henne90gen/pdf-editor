@@ -48,11 +48,11 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
 
-        auto content       = stream->to_string();
-        auto textProvider  = StringTextProvider(content);
-        auto lexer         = TextLexer(textProvider);
-        auto parser        = Parser(lexer, this);
-        int64_t N          = stream->dictionary->values["N"]->as<Integer>()->value;
+        auto content      = stream->to_string();
+        auto textProvider = StringTextProvider(content);
+        auto lexer        = TextLexer(textProvider);
+        auto parser       = Parser(lexer, this);
+        int64_t N         = stream->dictionary->values["N"]->as<Integer>()->value;
 
         // TODO cache objectNumbers and corresponding objects
         auto objectNumbers = std::vector<int64_t>(N);
@@ -281,9 +281,15 @@ PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
     return true;
 }
 
-size_t Document::line_count() { return 0; }
+size_t Document::line_count() {
+    TODO("implement line count");
+    return 0;
+}
 
-size_t Document::word_count() { return 0; }
+size_t Document::word_count() {
+    TODO("implement word count");
+    return 0;
+}
 
 size_t count_TJ_characters(CMap *cmap, Operator *op) {
     // TODO skip whitespace characters
@@ -353,6 +359,50 @@ size_t Document::character_count() {
     });
 
     return result;
+}
+
+void Document::for_each_image(const std::function<bool(Image &)> &func) {
+    for_each_object([&func](IndirectObject *obj) {
+        if (!obj->object->is<Stream>()) {
+            return true;
+        }
+
+        const auto stream  = obj->object->as<Stream>();
+        const auto typeOpt = stream->dictionary->find<Name>("Type");
+        if (!typeOpt.has_value() || typeOpt.value()->value() != "XObject") {
+            return true;
+        }
+
+        const auto subtypeOpt = stream->dictionary->find<Name>("Subtype");
+        if (!subtypeOpt.has_value() || subtypeOpt.value()->value() != "Image") {
+            return true;
+        }
+
+        const auto widthOpt = stream->dictionary->find<Integer>("Width");
+        if (!widthOpt.has_value()) {
+            return true;
+        }
+
+        const auto heightOpt = stream->dictionary->find<Integer>("Height");
+        if (!heightOpt.has_value()) {
+            return true;
+        }
+
+        const auto bitsPerComponentOpt = stream->dictionary->find<Integer>("BitsPerComponent");
+        if (!bitsPerComponentOpt.has_value()) {
+            return true;
+        }
+
+        Image image = {
+              .width            = widthOpt.value()->value,
+              .height           = heightOpt.value()->value,
+              .bitsPerComponent = bitsPerComponentOpt.value()->value,
+              .stream           = stream,
+        };
+        func(image);
+
+        return true;
+    });
 }
 
 } // namespace pdf

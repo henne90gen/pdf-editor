@@ -88,7 +88,7 @@ namespace pdf {
     O(ID, UNKNOWN)                                                                                                     \
     O(EI, UNKNOWN)                                                                                                     \
     /* XObject Operators TODO add more descriptive names */                                                            \
-    O(Do, UNKNOWN)                                                                                                     \
+    O(Do, PaintXObject)                                                                                                \
     /* Marked Content Operators TODO add more descriptive names */                                                     \
     O(MP, UNKNOWN)                                                                                                     \
     O(DP, UNKNOWN)                                                                                                     \
@@ -143,6 +143,9 @@ struct Operator {
         struct {
             double matrix[6];
         } Tm_SetTextMatrixAndTextLineMatrix;
+        struct {
+            Name *name;
+        } Do_PaintXObject;
     } data;
 };
 
@@ -195,6 +198,7 @@ class OperatorParser {
     Operator *createOperator_Tz(Operator *result);
     Operator *createOperator_f(Operator *result);
     Operator *createOperator_gs(Operator *result);
+    Operator *createOperator_Do(Operator *result);
 };
 
 } // namespace pdf
