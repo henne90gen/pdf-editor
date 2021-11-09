@@ -6,6 +6,7 @@
 #include "../util.h"
 
 #include "cmd_delete_page.cpp"
+#include "cmd_images.cpp"
 #include "cmd_info.cpp"
 
 enum class CommandType {
@@ -13,6 +14,7 @@ enum class CommandType {
     INFO,
     DELETE_PAGE,
     CONCATENATE,
+    IMAGES,
 };
 
 CommandType parse_command_type(int argc, char **argv) {
@@ -26,6 +28,9 @@ CommandType parse_command_type(int argc, char **argv) {
         }
         if (arg == "concatenate") {
             return CommandType::CONCATENATE;
+        }
+        if (arg == "images") {
+            return CommandType::IMAGES;
         }
     }
 
@@ -64,6 +69,10 @@ int parse_delete_arguments(int argc, char **argv, DeleteArgs &result) {
     return 0;
 }
 
+int parse_images_arguments(int argc, char **argv, ImagesArgs &result) {
+    return parse_document_source(argc, argv, 2, result.source);
+}
+
 // pdf delete-page 1 my.pdf       -> deletes page 1 from my.pdf and dumps the result to stdout
 // cat my.pdf | pdf delete-page 1 -> deletes page 1 from my.pdf and dumps the result to stdout
 // pdf info my.pdf                -> shows info
@@ -91,5 +100,12 @@ int main(int argc, char **argv) {
     case CommandType::CONCATENATE:
         TODO("Concatenating PDF documents is not implemented yet");
         return 1;
+    case CommandType::IMAGES: {
+        ImagesArgs args;
+        if (parse_images_arguments(argc, argv, args)) {
+            return 1;
+        }
+        return cmd_images(args);
+    }
     }
 }
