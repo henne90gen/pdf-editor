@@ -26,6 +26,7 @@ def test_file(executable: str, file_path: str) -> bool:
         parts = output.split("\n")
         for part in parts:
             print("   ", part)
+        sys.stdout.flush()
     return has_error
 
 
