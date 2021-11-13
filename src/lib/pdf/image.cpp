@@ -36,19 +36,6 @@ struct BmpFile {
 };
 #pragma pack(pop)
 
-std::ostream &operator<<(std::ostream &os, BmpFile &f) {
-    size_t fileHeaderSize = sizeof(f.fileHeader);
-    os.write(reinterpret_cast<const char *>(&f.fileHeader), static_cast<std::streamsize>(fileHeaderSize));
-
-    size_t infoHeaderSize = sizeof(f.infoHeader);
-    os.write(reinterpret_cast<const char *>(&f.infoHeader), static_cast<std::streamsize>(infoHeaderSize));
-
-    uint32_t pixelSize = f.fileHeader.fileSizeInBytes - f.fileHeader.pixelOffset;
-    os.write(reinterpret_cast<const char *>(f.pixels), pixelSize);
-
-    return os;
-}
-
 bool Image::write_bmp(const std::string &fileName) const {
     BmpFileHeader fileHeader   = {};
     fileHeader.fileSizeInBytes = fileHeader.pixelOffset + width * height * 3;
@@ -56,6 +43,7 @@ bool Image::write_bmp(const std::string &fileName) const {
     BmpInfoHeader infoHeader = {};
     infoHeader.width         = static_cast<int32_t>(width);
     infoHeader.height        = static_cast<int32_t>(height);
+    infoHeader.bitsPerPixel  = 3 * stream->dictionary->values["BitsPerComponent"]->as<Integer>()->value;
     infoHeader.xPixelsPerM   = 0;
     infoHeader.yPixelsPerM   = 0;
     infoHeader.colorsUsed    = 0;
@@ -92,7 +80,13 @@ bool Image::write_bmp(const std::string &fileName) const {
     };
 
     std::ofstream file(fileName, std::ios::binary);
-    file << bmpFile;
+
+    size_t headerSize = sizeof(bmpFile.fileHeader) + sizeof(bmpFile.infoHeader);
+    file.write(reinterpret_cast<const char *>(&bmpFile), static_cast<std::streamsize>(headerSize));
+
+    uint32_t pixelSize = bmpFile.fileHeader.fileSizeInBytes - bmpFile.fileHeader.pixelOffset;
+    file.write(reinterpret_cast<const char *>(bmpFile.pixels), pixelSize);
+
     file.flush();
     file.close();
 
