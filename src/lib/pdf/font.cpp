@@ -38,7 +38,7 @@ std::optional<Stream *> Font::fontProgram(Document &document) {
     if (isType1()) {
         return fontDescriptor(document)->fontFile(document);
     }
-    TODO("Get font program for this type of font");
+    // TODO Get font program for this type of font
     return {};
 }
 

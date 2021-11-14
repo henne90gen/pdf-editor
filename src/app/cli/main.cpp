@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
         return cmd_delete_page(args);
     }
     case CommandType::CONCATENATE:
-        TODO("Concatenating PDF documents is not implemented yet");
+        // TODO implement concatenation of PDF documents
         return 1;
     case CommandType::IMAGES: {
         ImagesArgs args;

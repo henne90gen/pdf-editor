@@ -99,7 +99,7 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::to_string() const {
+std::string_view Stream::decode() const {
     const char *output = stream_data.data();
     size_t outputSize  = stream_data.length();
 
@@ -110,6 +110,9 @@ std::string_view Stream::to_string() const {
 
     for (const auto &filter : fs) {
         if (filter == "FlateDecode") {
+            // FIXME implement handling of "DecodeParms" from stream dictionary
+            //  Example values: Predictor=12, Columns=4
+
             // TODO this works, but is not optimal
             const char *input = output;
             size_t inputSize  = outputSize;

@@ -37,7 +37,7 @@ std::vector<ContentStream *> Page::content_streams() {
 }
 
 void ContentStream::for_each_operator(const std::function<bool(Operator*)> &func) {
-    auto textProvider   = StringTextProvider(to_string());
+    auto textProvider   = StringTextProvider(decode());
     auto lexer          = TextLexer(textProvider);
     auto operatorParser = OperatorParser(lexer);
     Operator *op        = operatorParser.getOperator();

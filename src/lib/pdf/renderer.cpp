@@ -23,7 +23,7 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
 
 void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
-        auto textProvider   = StringTextProvider(s->to_string());
+        auto textProvider   = StringTextProvider(s->decode());
         auto lexer          = TextLexer(textProvider);
         auto operatorParser = OperatorParser(lexer);
         Operator *op        = operatorParser.getOperator();
@@ -53,21 +53,22 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
             } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
                 showText(cr, op);
             } else {
-                TODO("unknown operator");
+                // TODO unknown operator
             }
             op = operatorParser.getOperator();
         }
     }
 }
 
-void renderer::appendRectangle() const { TODO("append rectangle to the current path"); }
+void renderer::appendRectangle() const { // TODO append rectangle to the current path
+}
 
-void renderer::modifyClippingPathUsingEvenOddRule() const { TODO("clipping path modification"); }
+void renderer::modifyClippingPathUsingEvenOddRule() const { // TODO clipping path modification
+}
 
 void renderer::endPathWithoutFillingOrStroking() const {
     // TODO this is a path painting no-op
     //  it does however set the clipping path, if a clipping path operator was used before it
-    TODO("path painting no-op");
 }
 
 void renderer::setNonStrokingColor(Operator *op) {
@@ -110,14 +111,14 @@ void renderer::setTextFontAndSize(Operator *op) {
 
     auto fontMapOpt = page->resources()->fonts(page->document);
     if (!fontMapOpt.has_value()) {
-        TODO("logging");
+        // TODO add logging
         return;
     }
 
     auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
     auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
     if (!fontOpt.has_value()) {
-        TODO("logging");
+        // TODO add logging
         return;
     }
 
@@ -200,7 +201,7 @@ void renderer::loadFont(Font *font) {
     }
 
     FT_Face face;
-    auto view    = fontFile->to_string();
+    auto view    = fontFile->decode();
     auto basePtr = view.data();
     auto size    = (int64_t)view.length();
     error        = FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte *>(basePtr), size, faceIndex, &face);

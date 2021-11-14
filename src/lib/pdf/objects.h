@@ -160,7 +160,7 @@ struct Stream : public Object {
     explicit Stream(std::string_view data, Dictionary *_dictionary, std::string_view _stream_data)
         : Object(staticType(), data), dictionary(_dictionary), stream_data(_stream_data) {}
 
-    [[nodiscard]] std::string_view to_string() const;
+    [[nodiscard]] std::string_view decode() const;
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

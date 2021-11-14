@@ -312,20 +312,20 @@ Object *Parser::parseStreamOrDictionary() {
     } else if (itr->second->is<IndirectReference>()) {
         auto obj = referenceResolver->resolve(itr->second->as<IndirectReference>());
         if (obj == nullptr) {
-            TODO("add logging");
+            // TODO add logging
             return nullptr;
         }
         if (!obj->is<IndirectObject>()) {
-            TODO("add logging");
+            // TODO add logging
             return nullptr;
         }
         if (!obj->as<IndirectObject>()->object->is<Integer>()) {
-            TODO("add logging");
+            // TODO add logging
             return nullptr;
         }
         length = obj->as<IndirectObject>()->object->as<Integer>()->value;
     } else {
-        TODO("add logging");
+        // TODO add logging
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }

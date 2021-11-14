@@ -48,7 +48,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
 
-        auto content      = stream->to_string();
+        auto content      = stream->decode();
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
         auto parser       = Parser(lexer, this);
@@ -211,7 +211,6 @@ bool Document::delete_page(size_t pageNum) {
         ASSERT(parent != nullptr);
         if (parent->kids()->values.size() == 1) {
             // TODO deal with this case by deleting parent nodes until there are more than one kid
-            TODO("deletion of page tree parent nodes is not implemented");
         } else {
             IndirectObject *o = nullptr;
             for (auto obj : objectList) {
@@ -277,17 +276,17 @@ PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
 }
 
 [[maybe_unused]] bool Document::insert_document(Document & /*otherDocument*/, size_t /*atPageNum*/) {
-    TODO("implement document insertion");
+    // TODO implement document insertion
     return true;
 }
 
 size_t Document::line_count() {
-    TODO("implement line count");
+    // TODO implement line count
     return 0;
 }
 
 size_t Document::word_count() {
-    TODO("implement word count");
+    // TODO implement word count
     return 0;
 }
 
@@ -331,14 +330,14 @@ size_t Document::character_count() {
                 } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
                     auto fontMapOpt = page->resources()->fonts(page->document);
                     if (!fontMapOpt.has_value()) {
-                        TODO("logging");
+                        // TODO add logging
                         return true;
                     }
 
                     auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
                     auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
                     if (!fontOpt.has_value()) {
-                        TODO("logging");
+                        // TODO add logging
                         return true;
                     }
 

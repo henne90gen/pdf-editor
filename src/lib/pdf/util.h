@@ -17,5 +17,3 @@
 #define ASSERT(x)
 #endif
 #endif
-
-#define TODO(x) spdlog::warn("TODO: {}", x)

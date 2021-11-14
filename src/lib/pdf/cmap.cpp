@@ -249,7 +249,7 @@ CMap *CMapParser::parse() {
 }
 
 std::optional<CMap *> CMapStream::read_cmap() {
-    auto data         = to_string();
+    auto data         = decode();
     auto textProvider = StringTextProvider(data);
     auto lexer        = TextLexer(textProvider);
     auto parser       = CMapParser(lexer);
