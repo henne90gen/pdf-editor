@@ -11,7 +11,7 @@ void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
-    auto cropBox = page->cropBox();
+    auto cropBox = page->crop_box();
     cr->set_source_rgb(1, 1, 1);
     cr->rectangle(0, 0, cropBox->width(), cropBox->height());
     cr->fill();
@@ -26,7 +26,7 @@ void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
         auto textProvider   = StringTextProvider(s->decode());
         auto lexer          = TextLexer(textProvider);
         auto operatorParser = OperatorParser(lexer, page->document.allocator);
-        Operator *op        = operatorParser.getOperator();
+        Operator *op        = operatorParser.get_operator();
         while (op != nullptr) {
             if (op->type == Operator::Type::w_SetLineWidth) {
                 stateStack.back().lineWidth = op->data.w_SetLineWidth.lineWidth;
@@ -55,7 +55,7 @@ void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
             } else {
                 // TODO unknown operator
             }
-            op = operatorParser.getOperator();
+            op = operatorParser.get_operator();
         }
     }
 }
@@ -177,14 +177,14 @@ void Renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
 void Renderer::loadFont(Font *font) {
     stateStack.back().textState.textFont.font = font;
 
-    auto toUnicodeOpt = font->toUnicode(page->document);
+    auto toUnicodeOpt = font->to_unicode(page->document);
     if (toUnicodeOpt.has_value()) {
         //        auto toUnicode = toUnicodeOpt.value();
         //        auto cmapFilePtr = toUnicode->to_string().data();
         // TODO read in cmap file
     }
 
-    std::optional<Stream *> fontFileOpt = font->fontProgram(page->document);
+    std::optional<Stream *> fontFileOpt = font->font_program(page->document);
     if (!fontFileOpt.has_value()) {
         spdlog::error("Failed to find embedded font program!");
         return;

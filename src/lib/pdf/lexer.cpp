@@ -414,11 +414,11 @@ std::optional<Token> findToken(const std::string_view &word) {
     return {};
 }
 
-std::optional<Token> TextLexer::getToken() {
+std::optional<Token> TextLexer::get_token() {
     std::string_view previousWord = currentWord;
     while (true) {
         if (currentWord.empty()) {
-            auto optionalCode = textProvider.getText();
+            auto optionalCode = textProvider.get_text();
             if (!optionalCode.has_value()) {
                 break;
             }
@@ -450,7 +450,7 @@ std::optional<Token> TextLexer::getToken() {
     return {};
 }
 
-std::string_view TextLexer::advanceStream(size_t characters) {
+std::string_view TextLexer::advance_stream(size_t characters) {
     auto tmp    = currentWord.substr(0, characters);
     currentWord = currentWord.substr(characters);
     return tmp;

@@ -22,8 +22,6 @@ add_library(pdf-lib
         pdf/page.cpp
         pdf/objects.cpp
         pdf/cmap.cpp
-        pdf/graphics.cpp
-        pdf/text.cpp
         pdf/operator_parser.cpp
         pdf/image.cpp
         pdf/renderer.cpp)

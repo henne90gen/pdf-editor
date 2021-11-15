@@ -8,65 +8,64 @@ namespace pdf {
 struct Document;
 
 struct FontFlags : public Integer {
-    // TODO add test for this
 #define GET_NTH_BIT(n) (value & (1 << (n))) >> (n)
-    bool fixedPitch() { return GET_NTH_BIT(0); }
+    bool fixed_pitch() { return GET_NTH_BIT(0); }
     bool serif() { return GET_NTH_BIT(1); }
     bool symbolic() { return GET_NTH_BIT(2); }
     bool script() { return GET_NTH_BIT(3); }
-    bool nonsymbolic() { return GET_NTH_BIT(5); }
+    bool non_symbolic() { return GET_NTH_BIT(5); }
     bool italic() { return GET_NTH_BIT(6); }
-    bool allCap() { return GET_NTH_BIT(16); }
-    bool smallCap() { return GET_NTH_BIT(17); }
-    bool forceBold() { return GET_NTH_BIT(18); }
+    bool all_cap() { return GET_NTH_BIT(16); }
+    bool small_cap() { return GET_NTH_BIT(17); }
+    bool force_bold() { return GET_NTH_BIT(18); }
 };
 
 struct FontDescriptor : public Dictionary {
-    Name *fontName() { return values["FontName"]->as<Name>(); }
+    Name *font_name() { return values["FontName"]->as<Name>(); }
     // TODO std::optional<std::string_view> fontFamily() {return find<>()}
-    std::optional<Name *> fontStretch() { return find<Name>("FontStretch"); }
-    std::optional<Real *> fontWeight() { return find<Real>("FontWeight"); }
+    std::optional<Name *> font_stretch() { return find<Name>("FontStretch"); }
+    std::optional<Real *> font_weight() { return find<Real>("FontWeight"); }
     FontFlags *flags() { return values["Flags"]->as<FontFlags>(); }
-    Rectangle *fontBBox() { return values["FontBBox"]->as<Rectangle>(); }
-    Real *italicAngle() { return values["ItalicAngle"]->as<Real>(); }
+    Rectangle *font_bbox() { return values["FontBBox"]->as<Rectangle>(); }
+    Real *italic_angle() { return values["ItalicAngle"]->as<Real>(); }
     Real *ascent() { return values["Ascent"]->as<Real>(); }
     Real *descent() { return values["Descent"]->as<Real>(); }
     std::optional<Real *> leading() { return find<Real>("Leading"); }
-    Real *capHeight() { return values["CapHeight"]->as<Real>(); }
-    std::optional<Real *> xHeight() { return find<Real>("XHeight"); }
-    Real *stemV() { return values["StemV"]->as<Real>(); }
-    std::optional<Real *> stemH() { return find<Real>("StemH"); }
-    std::optional<Real *> avgWidth() { return find<Real>("AvgWidth"); }
-    std::optional<Real *> maxWidth() { return find<Real>("MaxWidth"); }
-    std::optional<Real *> missingWidth() { return find<Real>("MissingWidth"); }
-    std::optional<Stream *> fontFile(Document &document);
-    std::optional<Stream *> fontFile2(Document &document);
-    std::optional<Stream *> fontFile3(Document &document);
+    Real *cap_height() { return values["CapHeight"]->as<Real>(); }
+    std::optional<Real *> x_height() { return find<Real>("XHeight"); }
+    Real *stem_v() { return values["StemV"]->as<Real>(); }
+    std::optional<Real *> stem_h() { return find<Real>("StemH"); }
+    std::optional<Real *> avg_width() { return find<Real>("AvgWidth"); }
+    std::optional<Real *> max_width() { return find<Real>("MaxWidth"); }
+    std::optional<Real *> missing_width() { return find<Real>("MissingWidth"); }
+    std::optional<Stream *> font_file(Document &document);
+    std::optional<Stream *> font_file2(Document &document);
+    std::optional<Stream *> font_file3(Document &document);
 
     /**
      * @return ASCII string or byte string
      */
-    std::optional<Object *> charSet() { return find<Object>("CharSet"); }
+    std::optional<Object *> char_set() { return find<Object>("CharSet"); }
 };
 
 struct Font : public Dictionary {
     std::string_view type() { return values["Subtype"]->as<Name>()->value(); }
-    bool isType0() { return type() == "Type0"; }
-    bool isType1() { return type() == "Type1"; }
-    bool isMMType1() { return type() == "MMType1"; }
-    bool isType3() { return type() == "Type3"; }
-    bool isTrueType() { return type() == "TrueType"; }
-    bool isCIDFontType0() { return type() == "CIDFontType0"; }
-    bool isCIDFontType2() { return type() == "CIDFontType2"; }
+    bool is_type0() { return type() == "Type0"; }
+    bool is_type1() { return type() == "Type1"; }
+    bool is_MM_type1() { return type() == "MMType1"; }
+    bool is_type3() { return type() == "Type3"; }
+    bool is_true_type() { return type() == "TrueType"; }
+    bool is_CID_font_type0() { return type() == "CIDFontType0"; }
+    bool is_CID_font_type2() { return type() == "CIDFontType2"; }
     std::optional<Name *> name() { return find<Name>("Name"); }
-    Name *baseFont() { return values["BaseFont"]->as<Name>(); }
-    Integer *firstChar() { return values["FirstChar"]->as<Integer>(); }
-    Integer *lastChar() { return values["LastChar"]->as<Integer>(); }
+    Name *base_font() { return values["BaseFont"]->as<Name>(); }
+    Integer *first_char() { return values["FirstChar"]->as<Integer>(); }
+    Integer *last_char() { return values["LastChar"]->as<Integer>(); }
     Array *widths(Document &document);
-    FontDescriptor *fontDescriptor(Document &document);
+    FontDescriptor *font_descriptor(Document &document);
     std::optional<Object *> encoding(Document &document);
-    std::optional<CMapStream *> toUnicode(Document &document);
-    std::optional<Stream *> fontProgram(Document &document);
+    std::optional<CMapStream *> to_unicode(Document &document);
+    std::optional<Stream *> font_program(Document &document);
 
     /// Character mapping
     std::optional<CMap *> cmap(Document &document);

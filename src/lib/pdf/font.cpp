@@ -7,21 +7,21 @@
 
 namespace pdf {
 
-std::optional<Stream *> pdf::FontDescriptor::fontFile(pdf::Document &document) {
+std::optional<Stream *> pdf::FontDescriptor::font_file(pdf::Document &document) {
     return document.get<Stream>(find<Object>("FontFile"));
 }
-std::optional<Stream *> pdf::FontDescriptor::fontFile2(pdf::Document &document) {
+std::optional<Stream *> pdf::FontDescriptor::font_file2(pdf::Document &document) {
     return document.get<Stream>(find<Object>("FontFile2"));
 }
-std::optional<Stream *> pdf::FontDescriptor::fontFile3(pdf::Document &document) {
+std::optional<Stream *> pdf::FontDescriptor::font_file3(pdf::Document &document) {
     return document.get<Stream>(find<Object>("FontFile3"));
 }
 
-std::optional<CMapStream *> pdf::Font::toUnicode(pdf::Document &document) {
+std::optional<CMapStream *> pdf::Font::to_unicode(pdf::Document &document) {
     return document.get<CMapStream>(find<Object>("ToUnicode"));
 }
 
-pdf::FontDescriptor *pdf::Font::fontDescriptor(pdf::Document &document) {
+pdf::FontDescriptor *pdf::Font::font_descriptor(pdf::Document &document) {
     return document.get<FontDescriptor>(values["FontDescriptor"]);
 }
 
@@ -31,12 +31,12 @@ std::optional<Object *> pdf::Font::encoding(pdf::Document &document) {
 
 pdf::Array *pdf::Font::widths(pdf::Document &document) { return document.get<Array>(values["Widths"]); }
 
-std::optional<Stream *> Font::fontProgram(Document &document) {
-    if (isTrueType()) {
-        return fontDescriptor(document)->fontFile2(document);
+std::optional<Stream *> Font::font_program(Document &document) {
+    if (is_true_type()) {
+        return font_descriptor(document)->font_file2(document);
     }
-    if (isType1()) {
-        return fontDescriptor(document)->fontFile(document);
+    if (is_type1()) {
+        return font_descriptor(document)->font_file(document);
     }
     // TODO Get font program for this type of font
     return {};
@@ -49,7 +49,7 @@ std::optional<Font *> pdf::FontMap::get(pdf::Document &document, const std::stri
 std::optional<CMap *> Font::cmap(Document &document) {
     // FIXME cache cmap object
 
-    auto cmapStreamOpt = toUnicode(document);
+    auto cmapStreamOpt = to_unicode(document);
     if (!cmapStreamOpt.has_value()) {
         return {};
     }

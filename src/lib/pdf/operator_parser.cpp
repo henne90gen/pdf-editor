@@ -78,10 +78,10 @@ std::string operatorTypeToString(Operator::Type &type) {
 #undef __BYTECODE_OP
 }
 
-Operator *OperatorParser::getOperator() {
+Operator *OperatorParser::get_operator() {
     while (true) {
         while (currentTokenIdx >= tokens.size()) {
-            auto t = lexer.getToken();
+            auto t = lexer.get_token();
             if (!t.has_value()) {
                 return nullptr;
             }
@@ -91,7 +91,7 @@ Operator *OperatorParser::getOperator() {
         if (tokens[currentTokenIdx].type == Token::Type::OPERATOR) {
             const std::string_view &content = tokens[currentTokenIdx].content;
             currentTokenIdx++;
-            return createOperator(stringToOperatorType(content));
+            return create_operator(stringToOperatorType(content));
         }
 
         if (tokens[currentTokenIdx].type == Token::Type::INVALID) {
@@ -103,12 +103,12 @@ Operator *OperatorParser::getOperator() {
     }
 }
 
-Operator *OperatorParser::createOperator_w(Operator *result) {
+Operator *OperatorParser::create_operator_w(Operator *result) {
     result->data.w_SetLineWidth.lineWidth = operand<double>(0);
     return result;
 }
 
-Operator *OperatorParser::createOperator_re(Operator *result) {
+Operator *OperatorParser::create_operator_re(Operator *result) {
     for (int i = 0; i < 4; i++) {
         auto &content = tokens[currentTokenIdx - 1 - (4 - i)].content;
         // TODO is this conversion to a string really necessary?
@@ -118,14 +118,14 @@ Operator *OperatorParser::createOperator_re(Operator *result) {
     return result;
 }
 
-Operator *OperatorParser::createOperator_rg(Operator *result) {
+Operator *OperatorParser::create_operator_rg(Operator *result) {
     result->data.rg_SetNonStrokingColorRGB.r = operand<double>(2);
     result->data.rg_SetNonStrokingColorRGB.g = operand<double>(1);
     result->data.rg_SetNonStrokingColorRGB.b = operand<double>(0);
     return result;
 }
 
-Operator *OperatorParser::createOperator_TJ(Operator *result) {
+Operator *OperatorParser::create_operator_TJ(Operator *result) {
     int arrayStartIndex = -1;
     for (size_t i = 0; i < currentTokenIdx; i++) {
         if (tokens[currentTokenIdx - i].type == Token::Type::ARRAY_START) {
@@ -148,7 +148,7 @@ Operator *OperatorParser::createOperator_TJ(Operator *result) {
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tf(Operator *result) {
+Operator *OperatorParser::create_operator_Tf(Operator *result) {
     auto contentFontName                              = operand<std::string_view>(1);
     result->data.Tf_SetTextFontAndSize.fontNameData   = contentFontName.data();
     result->data.Tf_SetTextFontAndSize.fontNameLength = contentFontName.length();
@@ -156,18 +156,18 @@ Operator *OperatorParser::createOperator_Tf(Operator *result) {
     return result;
 }
 
-Operator *OperatorParser::createOperator_Td(Operator *result) {
+Operator *OperatorParser::create_operator_Td(Operator *result) {
     result->data.Td_MoveStartOfNextLine.x = operand<double>(1);
     result->data.Td_MoveStartOfNextLine.y = operand<double>(0);
     return result;
 }
 
-Operator *OperatorParser::createOperator_J(Operator *result) {
+Operator *OperatorParser::create_operator_J(Operator *result) {
     result->data.J_LineCapStyle.lineCap = operand<int64_t>(0);
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tm(Operator *result) {
+Operator *OperatorParser::create_operator_Tm(Operator *result) {
     // a b c d e f Tm
     for (int i = 0; i < 6; i++) {
         result->data.Tm_SetTextMatrixAndTextLineMatrix.matrix[i] = operand<double>(5 - i);
@@ -175,103 +175,103 @@ Operator *OperatorParser::createOperator_Tm(Operator *result) {
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tj(Operator *result) {
+Operator *OperatorParser::create_operator_Tj(Operator *result) {
     result->data.Tj_ShowTextString.string = allocator.allocate<LiteralString>(operand<std::string_view>(0));
     return result;
 }
 
-Operator *OperatorParser::createOperator_cm(Operator *result) {
+Operator *OperatorParser::create_operator_cm(Operator *result) {
     // FIXME parse operator 'cm'
     return result;
 }
 
-Operator *OperatorParser::createOperator_g(Operator *result) {
+Operator *OperatorParser::create_operator_g(Operator *result) {
     // FIXME parse operator 'g'
     return result;
 }
 
-Operator *OperatorParser::createOperator_d(Operator *result) {
+Operator *OperatorParser::create_operator_d(Operator *result) {
     // FIXME parse operator 'd'
     return result;
 }
 
-Operator *OperatorParser::createOperator_c(Operator *result) {
+Operator *OperatorParser::create_operator_c(Operator *result) {
     // FIXME parse operator 'c'
     return result;
 }
 
-Operator *OperatorParser::createOperator_s(Operator *result) {
+Operator *OperatorParser::create_operator_s(Operator *result) {
     // FIXME parse operator 's'
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tc(Operator *result) {
+Operator *OperatorParser::create_operator_Tc(Operator *result) {
     // FIXME parse operator 'Tc'
     return result;
 }
 
-Operator *OperatorParser::createOperator_CS(Operator *result) {
+Operator *OperatorParser::create_operator_CS(Operator *result) {
     // FIXME parse operator 'CS'
     return result;
 }
 
-Operator *OperatorParser::createOperator_S(Operator *result) {
+Operator *OperatorParser::create_operator_S(Operator *result) {
     // FIXME parse operator 'S'
     return result;
 }
 
-Operator *OperatorParser::createOperator_sc(Operator *result) {
+Operator *OperatorParser::create_operator_sc(Operator *result) {
     // FIXME parse operator 'sc'
     return result;
 }
 
-Operator *OperatorParser::createOperator_SC(Operator *result) {
+Operator *OperatorParser::create_operator_SC(Operator *result) {
     // FIXME parse operator 'SC'
     return result;
 }
 
-Operator *OperatorParser::createOperator_m(Operator *result) {
+Operator *OperatorParser::create_operator_m(Operator *result) {
     // FIXME parse operator 'm'
     return result;
 }
 
-Operator *OperatorParser::createOperator_B(Operator *result) {
+Operator *OperatorParser::create_operator_B(Operator *result) {
     // FIXME parse operator 'B'
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tw(Operator *result) {
+Operator *OperatorParser::create_operator_Tw(Operator *result) {
     // FIXME parse operator 'Tw'
     return result;
 }
 
-Operator *OperatorParser::createOperator_G(Operator *result) {
+Operator *OperatorParser::create_operator_G(Operator *result) {
     // FIXME parse operator 'G'
     return result;
 }
 
-Operator *OperatorParser::createOperator_Tz(Operator *result) {
+Operator *OperatorParser::create_operator_Tz(Operator *result) {
     // FIXME parse operator 'Tz'
     return result;
 }
 
-Operator *OperatorParser::createOperator_f(Operator *result) {
+Operator *OperatorParser::create_operator_f(Operator *result) {
     // FIXME parse operator 'f'
     return result;
 }
 
-Operator *OperatorParser::createOperator_gs(Operator *result) {
+Operator *OperatorParser::create_operator_gs(Operator *result) {
     // FIXME parse operator 'gs'
     return result;
 }
 
-Operator *OperatorParser::createOperator_Do(Operator *result) {
+Operator *OperatorParser::create_operator_Do(Operator *result) {
     auto name                         = operand<std::string_view>(0);
     result->data.Do_PaintXObject.name = allocator.allocate<Name>(name);
     return result;
 }
 
-Operator *OperatorParser::createOperator(Operator::Type type) {
+Operator *OperatorParser::create_operator(Operator::Type type) {
     auto result = allocator.allocate<Operator>(type);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
         type == Operator::Type::W_ModifyClippingPathUsingNonZeroWindingNumberRule ||
@@ -282,85 +282,85 @@ Operator *OperatorParser::createOperator(Operator::Type type) {
         return result;
     }
     if (type == Operator::Type::w_SetLineWidth) {
-        return createOperator_w(result);
+        return create_operator_w(result);
     }
     if (type == Operator::Type::re_AppendRectangle) {
-        return createOperator_re(result);
+        return create_operator_re(result);
     }
     if (type == Operator::Type::rg_SetNonStrokingColorRGB) {
-        return createOperator_rg(result);
+        return create_operator_rg(result);
     }
     if (type == Operator::Type::Td_MoveStartOfNextLine) {
-        return createOperator_Td(result);
+        return create_operator_Td(result);
     }
     if (type == Operator::Type::Tf_SetTextFontAndSize) {
-        return createOperator_Tf(result);
+        return create_operator_Tf(result);
     }
     if (type == Operator::Type::Tj_ShowTextString) {
-        return createOperator_Tj(result);
+        return create_operator_Tj(result);
     }
     if (type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-        return createOperator_TJ(result);
+        return create_operator_TJ(result);
     }
     if (type == Operator::Type::J_SetLineCapStyle) {
-        return createOperator_J(result);
+        return create_operator_J(result);
     }
     if (type == Operator::Type::Tm_SetTextMatrixAndTextLineMatrix) {
-        return createOperator_Tm(result);
+        return create_operator_Tm(result);
     }
     if (type == Operator::Type::cm_ModifyCurrentTransformationMatrix) {
-        return createOperator_cm(result);
+        return create_operator_cm(result);
     }
     if (type == Operator::Type::g_SetNonStrokingColorGray) {
-        return createOperator_g(result);
+        return create_operator_g(result);
     }
     if (type == Operator::Type::d_SetLineDashPattern) {
-        return createOperator_d(result);
+        return create_operator_d(result);
     }
     if (type == Operator::Type::c_AppendCubicBezier) {
-        return createOperator_c(result);
+        return create_operator_c(result);
     }
     if (type == Operator::Type::s_UNKNOWN) {
-        return createOperator_s(result);
+        return create_operator_s(result);
     }
     if (type == Operator::Type::Tc_SetCharacterSpacing) {
-        return createOperator_Tc(result);
+        return create_operator_Tc(result);
     }
     if (type == Operator::Type::CS_UNKNOWN) {
-        return createOperator_CS(result);
+        return create_operator_CS(result);
     }
     if (type == Operator::Type::S_UNKNOWN) {
-        return createOperator_S(result);
+        return create_operator_S(result);
     }
     if (type == Operator::Type::sc_UNKNOWN) {
-        return createOperator_sc(result);
+        return create_operator_sc(result);
     }
     if (type == Operator::Type::SC_UNKNOWN) {
-        return createOperator_SC(result);
+        return create_operator_SC(result);
     }
     if (type == Operator::Type::m_AppendNewSubpath) {
-        return createOperator_m(result);
+        return create_operator_m(result);
     }
     if (type == Operator::Type::B_UNKNOWN) {
-        return createOperator_B(result);
+        return create_operator_B(result);
     }
     if (type == Operator::Type::Tw_SetWordSpacing) {
-        return createOperator_Tw(result);
+        return create_operator_Tw(result);
     }
     if (type == Operator::Type::G_SetStrokingColorGray) {
-        return createOperator_G(result);
+        return create_operator_G(result);
     }
     if (type == Operator::Type::Tz_SetHorizontalScaling) {
-        return createOperator_Tz(result);
+        return create_operator_Tz(result);
     }
     if (type == Operator::Type::f_UNKNOWN) {
-        return createOperator_f(result);
+        return create_operator_f(result);
     }
     if (type == Operator::Type::gs_SetParametersGraphicsState) {
-        return createOperator_gs(result);
+        return create_operator_gs(result);
     }
     if (type == Operator::Type::Do_PaintXObject) {
-        return createOperator_Do(result);
+        return create_operator_Do(result);
     }
 
     spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));

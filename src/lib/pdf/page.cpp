@@ -10,9 +10,9 @@ int64_t Page::rotate() {
     return rot.value()->value;
 }
 
-double Page::width() { return cropBox()->width(); }
+double Page::width() { return crop_box()->width(); }
 
-double Page::height() { return cropBox()->height(); }
+double Page::height() { return crop_box()->height(); }
 
 std::vector<ContentStream *> Page::content_streams() {
     auto contentsOpt = contents();
@@ -40,12 +40,12 @@ void ContentStream::for_each_operator(Allocator &allocator, const std::function<
     auto textProvider   = StringTextProvider(decode());
     auto lexer          = TextLexer(textProvider);
     auto operatorParser = OperatorParser(lexer, allocator);
-    Operator *op        = operatorParser.getOperator();
+    Operator *op        = operatorParser.get_operator();
     while (op != nullptr) {
         if (!func(op)) {
             break;
         }
-        op = operatorParser.getOperator();
+        op = operatorParser.get_operator();
     }
 }
 

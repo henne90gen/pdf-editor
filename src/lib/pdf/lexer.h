@@ -63,67 +63,60 @@ struct Token {
 
     Type type;
     std::string_view content;
+
     Token(Type _type, std::string_view _content) : type(_type), content(_content) {}
 };
 
-class TextProvider {
-  public:
-    virtual std::optional<std::string_view> getText() = 0;
+struct TextProvider {
+    virtual std::optional<std::string_view> get_text() = 0;
 };
 
-class StringTextProvider : public TextProvider {
-  public:
+struct StringTextProvider : public TextProvider {
+    std::string_view text;
+    bool hasBeenQueried = false;
+
     explicit StringTextProvider(const char *_text) : text(_text) {}
     explicit StringTextProvider(const std::string &_text) : text(_text) {}
     explicit StringTextProvider(const std::string_view &_text) : text(_text) {}
 
-    std::optional<std::string_view> getText() override {
+    std::optional<std::string_view> get_text() override {
         if (hasBeenQueried) {
             return {};
         }
         hasBeenQueried = true;
-        return std::optional(text);
+        return text;
     }
-
-  private:
-    std::string_view text;
-    bool hasBeenQueried = false;
 };
 
-class Lexer {
-  public:
-    virtual std::optional<Token> getToken()                   = 0;
-    virtual std::string_view advanceStream(size_t characters) = 0;
+struct Lexer {
+    virtual std::optional<Token> get_token()                   = 0;
+    virtual std::string_view advance_stream(size_t characters) = 0;
 };
 
-class TextLexer : public Lexer {
-  public:
-    explicit TextLexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
-
-    std::optional<Token> getToken() override;
-    std::string_view advanceStream(size_t characters) override;
-
-  private:
+struct TextLexer : public Lexer {
     TextProvider &textProvider;
     std::string_view currentWord;
+
+    explicit TextLexer(TextProvider &_textProvider) : textProvider(_textProvider) {}
+
+    std::optional<Token> get_token() override;
+    std::string_view advance_stream(size_t characters) override;
 };
 
-class TokenLexer : public Lexer {
-  public:
+struct TokenLexer : public Lexer {
+    const std::vector<Token> &tokens;
+    size_t currentTokenIdx = 0;
+
     explicit TokenLexer(const std::vector<Token> &_tokens) : tokens(_tokens) {}
 
-    std::optional<Token> getToken() override {
+    std::optional<Token> get_token() override {
         if (tokens.empty() || currentTokenIdx >= tokens.size()) {
             return {};
         }
         return tokens[currentTokenIdx++];
     }
 
-    std::string_view advanceStream(size_t /*characters*/) override { return ""; }
-
-  private:
-    const std::vector<Token> &tokens;
-    size_t currentTokenIdx = 0;
+    std::string_view advance_stream(size_t /*characters*/) override { return ""; }
 };
 
 } // namespace pdf

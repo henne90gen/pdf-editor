@@ -14,24 +14,15 @@
 
 namespace pdf {
 
-class ReferenceResolver {
-  public:
+struct ReferenceResolver {
     virtual IndirectObject *resolve(const IndirectReference *reference) = 0;
 };
 
-class NoopReferenceResolver : public ReferenceResolver {
-  public:
+struct NoopReferenceResolver : public ReferenceResolver {
     IndirectObject *resolve(const IndirectReference * /*reference*/) override { return nullptr; }
 };
 
-class Parser {
-  public:
-    explicit Parser(Lexer &_lexer, Allocator &_allocator);
-    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
-
-    Object *parse();
-
-  private:
+struct Parser {
     Lexer &lexer;
     Allocator &allocator;
     ReferenceResolver *referenceResolver;
@@ -39,22 +30,28 @@ class Parser {
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 
-    void ignoreNewLineTokens();
-    [[nodiscard]] bool ensureTokensHaveBeenLexed();
-    [[nodiscard]] bool currentTokenIs(Token::Type type);
+    explicit Parser(Lexer &_lexer, Allocator &_allocator);
+    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
 
-    Boolean *parseBoolean();
-    Integer *parseInteger();
-    Real *parseReal();
-    Null *parseNullObject();
-    LiteralString *parseLiteralString();
-    HexadecimalString *parseHexadecimalString();
-    Name *parseName();
-    Array *parseArray();
-    Dictionary *parseDictionary();
-    IndirectReference *parseIndirectReference();
-    IndirectObject *parseIndirectObject();
-    Object *parseStreamOrDictionary();
+    Object *parse();
+
+  private:
+    void ignore_new_line_tokens();
+    [[nodiscard]] bool ensure_tokens_have_been_lexed();
+    [[nodiscard]] bool current_token_is(Token::Type type);
+
+    Boolean *parse_boolean();
+    Integer *parse_integer();
+    Real *parse_real();
+    Null *parse_null_object();
+    LiteralString *parse_literal_string();
+    HexadecimalString *parse_hexadecimal_string();
+    Name *parse_name();
+    Array *parse_array();
+    Dictionary *parse_dictionary();
+    IndirectReference *parse_indirect_reference();
+    IndirectObject *parse_indirect_object();
+    Object *parse_stream_or_dictionary();
 };
 
 } // namespace pdf

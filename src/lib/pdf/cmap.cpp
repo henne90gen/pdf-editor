@@ -2,18 +2,26 @@
 
 namespace pdf {
 
-void CMapParser::ignoreNewLineTokens() {
-    while (currentTokenIs(Token::Type::NEW_LINE)) {
+std::optional<std::string> CMap::map_char_code(uint8_t code) {
+    auto itr = charmap.find(code);
+    if (itr == charmap.end()) {
+        return {};
+    }
+    return itr->second;
+}
+
+void CMapParser::ignore_new_line_tokens() {
+    while (current_token_is(Token::Type::NEW_LINE)) {
         currentTokenIdx++;
     }
 }
 
-bool CMapParser::ensureTokensHaveBeenLexed() {
+bool CMapParser::ensure_tokens_have_been_lexed() {
     if (currentTokenIdx < tokens.size()) {
         return true;
     }
 
-    std::optional<Token> token = lexer.getToken();
+    std::optional<Token> token = lexer.get_token();
     if (!token.has_value()) {
         return false;
     }
@@ -25,35 +33,35 @@ bool CMapParser::ensureTokensHaveBeenLexed() {
     return true;
 }
 
-bool CMapParser::currentTokenIs(Token::Type type) {
-    if (!ensureTokensHaveBeenLexed()) {
+bool CMapParser::current_token_is(Token::Type type) {
+    if (!ensure_tokens_have_been_lexed()) {
         return false;
     }
 
     return tokens[currentTokenIdx].type == type;
 }
 
-void CMapParser::parseCodeSpaceRange() {
+void CMapParser::parse_code_space_range() {
     auto beforeTokenIdx = currentTokenIdx;
-    if (!currentTokenIs(Token::Type::INTEGER)) {
+    if (!current_token_is(Token::Type::INTEGER)) {
         return;
     }
     auto &integerToken = tokens[currentTokenIdx];
 
     currentTokenIdx++;
-    if (!currentTokenIs(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE)) {
+    if (!current_token_is(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
 
     currentTokenIdx++;
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
     std::string str = std::string(integerToken.content);
     auto numRanges  = std::strtol(str.c_str(), nullptr, 10);
     for (int i = 0; i < numRanges; i++) {
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -61,7 +69,7 @@ void CMapParser::parseCodeSpaceRange() {
 //        auto &rangeStart = tokens[currentTokenIdx];
 
         currentTokenIdx++;
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -71,10 +79,10 @@ void CMapParser::parseCodeSpaceRange() {
         // FIXME save range start and range end somehow
 
         currentTokenIdx++;
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
     }
 
-    if (!currentTokenIs(Token::Type::CMAP_END_CODE_SPACE_RANGE)) {
+    if (!current_token_is(Token::Type::CMAP_END_CODE_SPACE_RANGE)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
@@ -82,27 +90,27 @@ void CMapParser::parseCodeSpaceRange() {
     currentTokenIdx++;
 }
 
-void CMapParser::parseBfChar(std::unordered_map<uint8_t, std::string> &charmap) {
+void CMapParser::parse_bf_char(std::unordered_map<uint8_t, std::string> &charmap) {
     auto beforeTokenIdx = currentTokenIdx;
-    if (!currentTokenIs(Token::Type::INTEGER)) {
+    if (!current_token_is(Token::Type::INTEGER)) {
         return;
     }
     auto &integerToken = tokens[currentTokenIdx];
 
     currentTokenIdx++;
-    if (!currentTokenIs(Token::Type::CMAP_BEGIN_BF_CHAR)) {
+    if (!current_token_is(Token::Type::CMAP_BEGIN_BF_CHAR)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
 
     currentTokenIdx++;
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
     std::string str = std::string(integerToken.content);
     auto numRanges  = std::strtol(str.c_str(), nullptr, 10);
     for (int i = 0; i < numRanges; i++) {
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -110,7 +118,7 @@ void CMapParser::parseBfChar(std::unordered_map<uint8_t, std::string> &charmap) 
         auto &srcCode = tokens[currentTokenIdx];
 
         currentTokenIdx++;
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -124,10 +132,10 @@ void CMapParser::parseBfChar(std::unordered_map<uint8_t, std::string> &charmap) 
         charmap[srcCodeStr[0]] = dstCodeStr;
 
         currentTokenIdx++;
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
     }
 
-    if (!currentTokenIs(Token::Type::CMAP_END_BF_CHAR)) {
+    if (!current_token_is(Token::Type::CMAP_END_BF_CHAR)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
@@ -135,29 +143,29 @@ void CMapParser::parseBfChar(std::unordered_map<uint8_t, std::string> &charmap) 
     currentTokenIdx++;
 }
 
-void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap) {
+void CMapParser::parse_bf_range(std::unordered_map<uint8_t, std::string> &charmap) {
     auto beforeTokenIdx = currentTokenIdx;
-    if (!currentTokenIs(Token::Type::INTEGER)) {
+    if (!current_token_is(Token::Type::INTEGER)) {
         return;
     }
     auto &integerToken = tokens[currentTokenIdx];
 
     currentTokenIdx++;
-    if (!currentTokenIs(Token::Type::CMAP_BEGIN_BF_RANGE)) {
+    if (!current_token_is(Token::Type::CMAP_BEGIN_BF_RANGE)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
 
     currentTokenIdx++;
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
     std::string str = std::string(integerToken.content);
     auto numRanges  = std::strtol(str.c_str(), nullptr, 10);
     for (int i = 0; i < numRanges; i++) {
         // srcCodeLo srcCodeHi dstCodeLo
         // srcCodeLo srcCodeHi [dstString_1 … dstString_M]
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -165,7 +173,7 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
         auto &srcCodeLo = tokens[currentTokenIdx];
 
         currentTokenIdx++;
-        if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
             currentTokenIdx = beforeTokenIdx;
             return;
         }
@@ -177,15 +185,15 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
         auto srcCodeHiStr = HexadecimalString(srcCodeHi.content).to_string();
 
         currentTokenIdx++;
-        if (currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+        if (current_token_is(Token::Type::HEXADECIMAL_STRING)) {
 //            auto &dstCode = tokens[currentTokenIdx];
             // FIXME use dstCode somehow
 
-        } else if (currentTokenIs(Token::Type::ARRAY_START)) {
+        } else if (current_token_is(Token::Type::ARRAY_START)) {
             currentTokenIdx++;
 
             uint8_t code = srcCodeLoStr.at(srcCodeLoStr.size() - 1);
-            while (currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+            while (current_token_is(Token::Type::HEXADECIMAL_STRING)) {
                 auto &dstCode   = tokens[currentTokenIdx];
                 auto dstCodeStr = HexadecimalString(dstCode.content).to_string();
                 charmap[code]   = dstCodeStr;
@@ -194,7 +202,7 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
                 code++;
             }
 
-            if (!currentTokenIs(Token::Type::ARRAY_END)) {
+            if (!current_token_is(Token::Type::ARRAY_END)) {
                 currentTokenIdx = beforeTokenIdx;
                 return;
             }
@@ -204,10 +212,10 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
         }
 
         currentTokenIdx++;
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
     }
 
-    if (!currentTokenIs(Token::Type::CMAP_END_BF_RANGE)) {
+    if (!current_token_is(Token::Type::CMAP_END_BF_RANGE)) {
         currentTokenIdx = beforeTokenIdx;
         return;
     }
@@ -217,7 +225,7 @@ void CMapParser::parseBfRange(std::unordered_map<uint8_t, std::string> &charmap)
 
 CMap *CMapParser::parse() {
     // eat everything before the first 'begincmap'
-    while (!currentTokenIs(Token::Type::CMAP_BEGIN)) {
+    while (!current_token_is(Token::Type::CMAP_BEGIN)) {
         currentTokenIdx++;
     }
 
@@ -227,19 +235,19 @@ CMap *CMapParser::parse() {
     while (true) {
         auto beforeTokenCount = tokens.size();
 
-        parseCodeSpaceRange();
+        parse_code_space_range();
 
-        parseBfChar(charmap);
+        parse_bf_char(charmap);
 
-        parseBfRange(charmap);
+        parse_bf_range(charmap);
 
-        if (currentTokenIs(Token::Type::CMAP_END)) {
+        if (current_token_is(Token::Type::CMAP_END)) {
             // TODO this is the only exit for this loop, add another exit condition for 'safety'
             break;
         }
 
         currentTokenIdx++;
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
         if (beforeTokenCount == tokens.size()) {
             break;
         }

@@ -33,6 +33,10 @@ struct Object {
         ENUMERATE_OBJECT_TYPES(DECLARE_ENUM)
 #undef DECLARE_ENUM
     };
+
+    Type type;
+    std::string_view data;
+
     explicit Object(Type _type, std::string_view _data) : type(_type), data(_data) {}
     virtual ~Object() = default;
 
@@ -42,47 +46,40 @@ struct Object {
         return (T *)this;
     }
     template <typename T> bool is() { return T::staticType() == type || T::staticType() == Type::OBJECT; }
-
-    Type type;
-    std::string_view data;
 };
 
 struct Boolean : public Object {
-    static Type staticType() { return Type::BOOLEAN; }
-
     bool value = false;
 
+    static Type staticType() { return Type::BOOLEAN; }
     explicit Boolean(std::string_view data, bool b) : Object(staticType(), data), value(b) {}
 };
 
 struct Integer : public Object {
-    static Type staticType() { return Type::INTEGER; }
-
     int64_t value = 0;
 
+    static Type staticType() { return Type::INTEGER; }
     explicit Integer(std::string_view data, int64_t i) : Object(staticType(), data), value(i) {}
 
     void set(Document &document, int64_t i);
 };
 
 struct Real : public Object {
-    static Type staticType() { return Type::REAL; }
-
     double value = 0;
 
+    static Type staticType() { return Type::REAL; }
     explicit Real(std::string_view data, double d) : Object(staticType(), data), value(d) {}
 };
 
 struct LiteralString : public Object {
     static Type staticType() { return Type::LITERAL_STRING; }
-
     explicit LiteralString(std::string_view data) : Object(staticType(), data) {}
-    std::string_view value() { return data.substr(1, data.size() - 2); }
+
+    [[nodiscard]] std::string_view value() const { return data.substr(1, data.size() - 2); }
 };
 
 struct HexadecimalString : public Object {
     static Type staticType() { return Type::HEXADECIMAL_STRING; }
-
     explicit HexadecimalString(std::string_view _data) : Object(staticType(), _data) {
         if (data[0] == '<') {
             data = data.substr(1, data.size() - 2);
@@ -94,16 +91,15 @@ struct HexadecimalString : public Object {
 
 struct Name : public Object {
     static Type staticType() { return Type::NAME; }
-
     explicit Name(std::string_view data) : Object(staticType(), data) {}
+
     [[nodiscard]] std::string_view value() { return data; }
 };
 
 struct Array : public Object {
-    static Type staticType() { return Type::ARRAY; }
-
     std::vector<Object *> values = {};
 
+    static Type staticType() { return Type::ARRAY; }
     explicit Array(std::string_view data, std::vector<Object *> objects)
         : Object(staticType(), data), values(std::move(objects)) {}
 
@@ -111,10 +107,9 @@ struct Array : public Object {
 };
 
 struct Dictionary : public Object {
-    static Type staticType() { return Type::DICTIONARY; }
-
     std::unordered_map<std::string, Object *> values = {};
 
+    static Type staticType() { return Type::DICTIONARY; }
     explicit Dictionary(std::string_view data, std::unordered_map<std::string, Object *> map)
         : Object(staticType(), data), values(std::move(map)) {}
 
@@ -128,35 +123,30 @@ struct Dictionary : public Object {
 };
 
 struct IndirectReference : public Object {
-    static Type staticType() { return Type::INDIRECT_REFERENCE; }
-
     int64_t objectNumber     = 0;
     int64_t generationNumber = 0;
 
+    static Type staticType() { return Type::INDIRECT_REFERENCE; }
     explicit IndirectReference(std::string_view data, int64_t _objectNumber, int64_t _generationNumber)
         : Object(staticType(), data), objectNumber(_objectNumber), generationNumber(_generationNumber) {}
 };
 
 struct IndirectObject : public Object {
-    static Type staticType() { return Type::INDIRECT_OBJECT; }
-
     int64_t objectNumber     = 0;
     int64_t generationNumber = 0;
     Object *object           = nullptr;
 
+    static Type staticType() { return Type::INDIRECT_OBJECT; }
     explicit IndirectObject(std::string_view data, int64_t _objectNumber, int64_t _generationNumber, Object *_object)
         : Object(staticType(), data), objectNumber(_objectNumber), generationNumber(_generationNumber),
           object(_object) {}
 };
 
-class OperatorParser;
-
 struct Stream : public Object {
-    static Type staticType() { return Type::STREAM; }
-
     Dictionary *dictionary = nullptr;
     std::string_view stream_data;
 
+    static Type staticType() { return Type::STREAM; }
     explicit Stream(std::string_view data, Dictionary *_dictionary, std::string_view _stream_data)
         : Object(staticType(), data), dictionary(_dictionary), stream_data(_stream_data) {}
 
@@ -166,13 +156,11 @@ struct Stream : public Object {
 
 struct Null : public Object {
     static Type staticType() { return Type::NULL_OBJECT; }
-
     explicit Null(std::string_view data) : Object(staticType(), data) {}
 };
 
 struct ObjectStreamContent : public Object {
     static Type staticType() { return Type::OBJECT_STREAM_CONTENT; }
-
     explicit ObjectStreamContent(std::string_view data) : Object(staticType(), data) {}
 };
 

@@ -24,7 +24,7 @@ TEST(Renderer, HelloWorld) {
     auto pages = document.pages();
     for (size_t i = 0; i < pages.size(); i++) {
         auto page     = pages[i];
-        auto cropBox  = page->cropBox();
+        auto cropBox  = page->crop_box();
         auto width    = cropBox->width();
         auto height   = cropBox->height();
         auto surface  = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);

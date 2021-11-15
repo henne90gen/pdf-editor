@@ -14,12 +14,12 @@ Parser::Parser(Lexer &_lexer, Allocator &_allocator)
 Parser::Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver)
     : lexer(_lexer), allocator(_allocator), referenceResolver(_referenceResolver) {}
 
-bool Parser::ensureTokensHaveBeenLexed() {
+bool Parser::ensure_tokens_have_been_lexed() {
     if (currentTokenIdx < tokens.size()) {
         return true;
     }
 
-    std::optional<Token> token = lexer.getToken();
+    std::optional<Token> token = lexer.get_token();
     if (!token.has_value()) {
         return false;
     }
@@ -31,16 +31,16 @@ bool Parser::ensureTokensHaveBeenLexed() {
     return true;
 }
 
-bool Parser::currentTokenIs(Token::Type type) {
-    if (!ensureTokensHaveBeenLexed()) {
+bool Parser::current_token_is(Token::Type type) {
+    if (!ensure_tokens_have_been_lexed()) {
         return false;
     }
 
     return tokens[currentTokenIdx].type == type;
 }
 
-Boolean *Parser::parseBoolean() {
-    if (!currentTokenIs(Token::Type::BOOLEAN)) {
+Boolean *Parser::parse_boolean() {
+    if (!current_token_is(Token::Type::BOOLEAN)) {
         return nullptr;
     }
     std::string_view &content = tokens[currentTokenIdx].content;
@@ -58,8 +58,8 @@ Boolean *Parser::parseBoolean() {
     return allocator.allocate<Boolean>(content, value);
 }
 
-Integer *Parser::parseInteger() {
-    if (!currentTokenIs(Token::Type::INTEGER)) {
+Integer *Parser::parse_integer() {
+    if (!current_token_is(Token::Type::INTEGER)) {
         return nullptr;
     }
 
@@ -77,8 +77,8 @@ Integer *Parser::parseInteger() {
     return nullptr;
 }
 
-Real *Parser::parseReal() {
-    if (!currentTokenIs(Token::Type::REAL)) {
+Real *Parser::parse_real() {
+    if (!current_token_is(Token::Type::REAL)) {
         return nullptr;
     }
 
@@ -96,8 +96,8 @@ Real *Parser::parseReal() {
     return nullptr;
 }
 
-Null *Parser::parseNullObject() {
-    if (!currentTokenIs(Token::Type::NULL_OBJ)) {
+Null *Parser::parse_null_object() {
+    if (!current_token_is(Token::Type::NULL_OBJ)) {
         return nullptr;
     }
 
@@ -106,8 +106,8 @@ Null *Parser::parseNullObject() {
     return allocator.allocate<Null>(content);
 }
 
-LiteralString *Parser::parseLiteralString() {
-    if (!currentTokenIs(Token::Type::LITERAL_STRING)) {
+LiteralString *Parser::parse_literal_string() {
+    if (!current_token_is(Token::Type::LITERAL_STRING)) {
         return nullptr;
     }
 
@@ -116,8 +116,8 @@ LiteralString *Parser::parseLiteralString() {
     return allocator.allocate<LiteralString>(content);
 }
 
-HexadecimalString *Parser::parseHexadecimalString() {
-    if (!currentTokenIs(Token::Type::HEXADECIMAL_STRING)) {
+HexadecimalString *Parser::parse_hexadecimal_string() {
+    if (!current_token_is(Token::Type::HEXADECIMAL_STRING)) {
         return nullptr;
     }
 
@@ -126,8 +126,8 @@ HexadecimalString *Parser::parseHexadecimalString() {
     return allocator.allocate<HexadecimalString>(content.substr(1, content.size() - 2));
 }
 
-Name *Parser::parseName() {
-    if (!currentTokenIs(Token::Type::NAME)) {
+Name *Parser::parse_name() {
+    if (!current_token_is(Token::Type::NAME)) {
         return nullptr;
     }
     auto &content = tokens[currentTokenIdx].content;
@@ -135,8 +135,8 @@ Name *Parser::parseName() {
     return allocator.allocate<Name>(content.substr(1));
 }
 
-Array *Parser::parseArray() {
-    if (!currentTokenIs(Token::Type::ARRAY_START)) {
+Array *Parser::parse_array() {
+    if (!current_token_is(Token::Type::ARRAY_START)) {
         return nullptr;
     }
 
@@ -146,7 +146,7 @@ Array *Parser::parseArray() {
 
     std::vector<Object *> objects = {};
     while (true) {
-        if (currentTokenIs(Token::Type::ARRAY_END)) {
+        if (current_token_is(Token::Type::ARRAY_END)) {
             break;
         }
         auto object = parse();
@@ -155,7 +155,7 @@ Array *Parser::parseArray() {
             return nullptr;
         }
 
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
 
         objects.push_back(object);
     }
@@ -168,14 +168,14 @@ Array *Parser::parseArray() {
     return allocator.allocate<Array>(data, objects);
 }
 
-void Parser::ignoreNewLineTokens() {
-    while (currentTokenIs(Token::Type::NEW_LINE)) {
+void Parser::ignore_new_line_tokens() {
+    while (current_token_is(Token::Type::NEW_LINE)) {
         currentTokenIdx++;
     }
 }
 
-Dictionary *Parser::parseDictionary() {
-    if (!currentTokenIs(Token::Type::DICTIONARY_START)) {
+Dictionary *Parser::parse_dictionary() {
+    if (!current_token_is(Token::Type::DICTIONARY_START)) {
         return nullptr;
     }
 
@@ -183,11 +183,11 @@ Dictionary *Parser::parseDictionary() {
     auto beforeTokenIdx     = currentTokenIdx;
     currentTokenIdx++;
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
     std::unordered_map<std::string, Object *> objects = {};
-    while (!currentTokenIs(Token::Type::DICTIONARY_END)) {
-        auto key = parseName();
+    while (!current_token_is(Token::Type::DICTIONARY_END)) {
+        auto key = parse_name();
         if (key == nullptr) {
             currentTokenIdx = beforeTokenIdx;
             return nullptr;
@@ -199,7 +199,7 @@ Dictionary *Parser::parseDictionary() {
             return nullptr;
         }
 
-        ignoreNewLineTokens();
+        ignore_new_line_tokens();
 
         // TODO is this conversion to a string really necessary?
         objects[std::string(key->value())] = value;
@@ -213,8 +213,8 @@ Dictionary *Parser::parseDictionary() {
     return allocator.allocate<Dictionary>(data, objects);
 }
 
-IndirectReference *Parser::parseIndirectReference() {
-    if (!currentTokenIs(Token::Type::INDIRECT_REFERENCE)) {
+IndirectReference *Parser::parse_indirect_reference() {
+    if (!current_token_is(Token::Type::INDIRECT_REFERENCE)) {
         return nullptr;
     }
 
@@ -236,8 +236,8 @@ IndirectReference *Parser::parseIndirectReference() {
     return nullptr;
 }
 
-IndirectObject *Parser::parseIndirectObject() {
-    if (!currentTokenIs(Token::Type::OBJECT_START)) {
+IndirectObject *Parser::parse_indirect_object() {
+    if (!current_token_is(Token::Type::OBJECT_START)) {
         return nullptr;
     }
 
@@ -245,7 +245,7 @@ IndirectObject *Parser::parseIndirectObject() {
     auto beforeTokenIndex   = currentTokenIdx;
     currentTokenIdx++;
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
     auto object = parse();
     if (object == nullptr) {
@@ -253,9 +253,9 @@ IndirectObject *Parser::parseIndirectObject() {
         return nullptr;
     }
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
-    if (!currentTokenIs(Token::Type::OBJECT_END)) {
+    if (!current_token_is(Token::Type::OBJECT_END)) {
         currentTokenIdx = beforeTokenIndex;
         return nullptr;
     }
@@ -281,27 +281,27 @@ IndirectObject *Parser::parseIndirectObject() {
     return nullptr;
 }
 
-Object *Parser::parseStreamOrDictionary() {
-    if (!ensureTokensHaveBeenLexed()) {
+Object *Parser::parse_stream_or_dictionary() {
+    if (!ensure_tokens_have_been_lexed()) {
         return nullptr;
     }
 
     auto objectStartContent = tokens[currentTokenIdx].content.data();
     auto beforeTokenIdx     = currentTokenIdx;
-    auto dictionary         = parseDictionary();
+    auto dictionary         = parse_dictionary();
     if (dictionary == nullptr) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
 
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
-    if (!currentTokenIs(Token::Type::STREAM_START)) {
+    if (!current_token_is(Token::Type::STREAM_START)) {
         return dictionary;
     }
     currentTokenIdx++;
 
-    if (!currentTokenIs(Token::Type::NEW_LINE)) {
+    if (!current_token_is(Token::Type::NEW_LINE)) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
@@ -338,10 +338,10 @@ Object *Parser::parseStreamOrDictionary() {
         return nullptr;
     }
 
-    auto streamData = lexer.advanceStream(length);
-    ignoreNewLineTokens();
+    auto streamData = lexer.advance_stream(length);
+    ignore_new_line_tokens();
 
-    if (!currentTokenIs(Token::Type::STREAM_END)) {
+    if (!current_token_is(Token::Type::STREAM_END)) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
@@ -355,59 +355,59 @@ Object *Parser::parseStreamOrDictionary() {
 }
 
 Object *Parser::parse() {
-    ignoreNewLineTokens();
+    ignore_new_line_tokens();
 
-    auto boolean = parseBoolean();
+    auto boolean = parse_boolean();
     if (boolean != nullptr) {
         return boolean;
     }
 
-    auto integer = parseInteger();
+    auto integer = parse_integer();
     if (integer != nullptr) {
         return integer;
     }
 
-    auto real = parseReal();
+    auto real = parse_real();
     if (real != nullptr) {
         return real;
     }
 
-    auto nullObject = parseNullObject();
+    auto nullObject = parse_null_object();
     if (nullObject != nullptr) {
         return nullObject;
     }
 
-    auto literalString = parseLiteralString();
+    auto literalString = parse_literal_string();
     if (literalString != nullptr) {
         return literalString;
     }
 
-    auto hexadecimalString = parseHexadecimalString();
+    auto hexadecimalString = parse_hexadecimal_string();
     if (hexadecimalString != nullptr) {
         return hexadecimalString;
     }
 
-    auto name = parseName();
+    auto name = parse_name();
     if (name != nullptr) {
         return name;
     }
 
-    auto array = parseArray();
+    auto array = parse_array();
     if (array != nullptr) {
         return array;
     }
 
-    auto stream = parseStreamOrDictionary();
+    auto stream = parse_stream_or_dictionary();
     if (stream != nullptr) {
         return stream;
     }
 
-    auto indirectReference = parseIndirectReference();
+    auto indirectReference = parse_indirect_reference();
     if (indirectReference != nullptr) {
         return indirectReference;
     }
 
-    auto indirectObject = parseIndirectObject();
+    auto indirectObject = parse_indirect_object();
     if (indirectObject != nullptr) {
         return indirectObject;
     }

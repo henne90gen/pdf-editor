@@ -4,7 +4,7 @@
 #include <pdf/operator_parser.h>
 
 void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type, std::function<void(pdf::Operator *)> func) {
-    auto operation = parser.getOperator();
+    auto operation = parser.get_operator();
     ASSERT_NE(operation, nullptr);
     ASSERT_EQ(operation->type, type);
     func(operation);

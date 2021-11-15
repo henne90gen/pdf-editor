@@ -107,7 +107,6 @@ struct Operator {
 #undef DECLARE_ENUM
     };
     Type type;
-    explicit Operator(Type _type) : type(_type), data() {}
 
     union {
         struct {
@@ -148,59 +147,59 @@ struct Operator {
             Name *name;
         } Do_PaintXObject;
     } data;
+
+    explicit Operator(Type _type) : type(_type), data() {}
 };
 
 [[maybe_unused]] Operator::Type stringToOperatorType(const std::string &t);
 std::string operatorTypeToString(Operator::Type &type);
 std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
-class OperatorParser {
-  public:
-    explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
-
-    Operator *getOperator();
-
-  private:
+struct OperatorParser {
     Lexer &lexer;
     Allocator &allocator;
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 
+    explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
+
+    Operator *get_operator();
+
+  private:
     /**
      * Tries to parse the operand at the given index as the given type.
      * Indexing works backwards: operand2 operand1 operand0 OPERATOR
      */
     template <typename T> T operand(int) { ASSERT(false); }
 
-    Operator *createOperator(Operator::Type type);
-
-    Operator *createOperator_w(Operator *result);
-    Operator *createOperator_re(Operator *result);
-    Operator *createOperator_rg(Operator *result);
-    Operator *createOperator_Td(Operator *result);
-    Operator *createOperator_Tf(Operator *result);
-    Operator *createOperator_TJ(Operator *result);
-    Operator *createOperator_J(Operator *result);
-    Operator *createOperator_Tm(Operator *result);
-    Operator *createOperator_Tj(Operator *result);
-    Operator *createOperator_cm(Operator *result);
-    Operator *createOperator_g(Operator *result);
-    Operator *createOperator_d(Operator *result);
-    Operator *createOperator_c(Operator *result);
-    Operator *createOperator_s(Operator *result);
-    Operator *createOperator_Tc(Operator *result);
-    Operator *createOperator_CS(Operator *result);
-    Operator *createOperator_S(Operator *result);
-    Operator *createOperator_sc(Operator *result);
-    Operator *createOperator_SC(Operator *result);
-    Operator *createOperator_m(Operator *result);
-    Operator *createOperator_B(Operator *result);
-    Operator *createOperator_Tw(Operator *result);
-    Operator *createOperator_G(Operator *result);
-    Operator *createOperator_Tz(Operator *result);
-    Operator *createOperator_f(Operator *result);
-    Operator *createOperator_gs(Operator *result);
-    Operator *createOperator_Do(Operator *result);
+    Operator *create_operator(Operator::Type type);
+    Operator *create_operator_w(Operator *result);
+    Operator *create_operator_re(Operator *result);
+    Operator *create_operator_rg(Operator *result);
+    Operator *create_operator_Td(Operator *result);
+    Operator *create_operator_Tf(Operator *result);
+    Operator *create_operator_TJ(Operator *result);
+    Operator *create_operator_J(Operator *result);
+    Operator *create_operator_Tm(Operator *result);
+    Operator *create_operator_Tj(Operator *result);
+    Operator *create_operator_cm(Operator *result);
+    Operator *create_operator_g(Operator *result);
+    Operator *create_operator_d(Operator *result);
+    Operator *create_operator_c(Operator *result);
+    Operator *create_operator_s(Operator *result);
+    Operator *create_operator_Tc(Operator *result);
+    Operator *create_operator_CS(Operator *result);
+    Operator *create_operator_S(Operator *result);
+    Operator *create_operator_sc(Operator *result);
+    Operator *create_operator_SC(Operator *result);
+    Operator *create_operator_m(Operator *result);
+    Operator *create_operator_B(Operator *result);
+    Operator *create_operator_Tw(Operator *result);
+    Operator *create_operator_G(Operator *result);
+    Operator *create_operator_Tz(Operator *result);
+    Operator *create_operator_f(Operator *result);
+    Operator *create_operator_gs(Operator *result);
+    Operator *create_operator_Do(Operator *result);
 };
 
 } // namespace pdf

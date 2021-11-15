@@ -66,12 +66,12 @@ TEST(Reader, HelloWorldFont) {
     auto font = fontOpt.value();
     ASSERT_NE(font, nullptr);
     ASSERT_EQ(font->type(), "TrueType");
-    ASSERT_TRUE(font->isTrueType());
-    ASSERT_EQ(font->baseFont()->value(), "BAAAAA+LiberationSerif");
+    ASSERT_TRUE(font->is_true_type());
+    ASSERT_EQ(font->base_font()->value(), "BAAAAA+LiberationSerif");
 
-    auto fontDescriptor = font->fontDescriptor(document);
+    auto fontDescriptor = font->font_descriptor(document);
     ASSERT_NE(fontDescriptor, nullptr);
-    ASSERT_EQ(fontDescriptor->fontName()->value(), "BAAAAA+LiberationSerif");
+    ASSERT_EQ(fontDescriptor->font_name()->value(), "BAAAAA+LiberationSerif");
 
     auto flags = fontDescriptor->flags();
     ASSERT_TRUE(flags->symbolic());
@@ -79,7 +79,7 @@ TEST(Reader, HelloWorldFont) {
     auto encodingOpt = font->encoding(document);
     ASSERT_FALSE(encodingOpt.has_value());
 
-    auto toUnicodeOpt = font->toUnicode(document);
+    auto toUnicodeOpt = font->to_unicode(document);
     ASSERT_TRUE(toUnicodeOpt.has_value());
 }
 
@@ -101,7 +101,7 @@ TEST(Reader, HelloWorldCmap) {
 
     auto font = fontOpt.value();
     ASSERT_NE(font, nullptr);
-    auto toUnicodeOpt = font->toUnicode(document);
+    auto toUnicodeOpt = font->to_unicode(document);
     ASSERT_TRUE(toUnicodeOpt.has_value());
 //    auto toUnicode = toUnicodeOpt.value();
 //    auto cmap      = toUnicode->read_cmap();
@@ -111,8 +111,8 @@ TEST(Reader, FontFlags) {
     auto i = new pdf::Integer("262178", 262178);
     auto f = i->as<pdf::FontFlags>();
     ASSERT_TRUE(f->serif());
-    ASSERT_TRUE(f->nonsymbolic());
-    ASSERT_TRUE(f->forceBold());
+    ASSERT_TRUE(f->non_symbolic());
+    ASSERT_TRUE(f->force_bold());
 }
 
 TEST(Reader, ObjectStream) {

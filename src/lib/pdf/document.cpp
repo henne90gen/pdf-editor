@@ -144,7 +144,7 @@ void Document::for_each_page(const std::function<bool(Page *)> &func) {
         return;
     }
 
-    if (pageTreeRoot->isPage()) {
+    if (pageTreeRoot->is_page()) {
         func(allocator.allocate<Page>(*this, pageTreeRoot));
         return;
     }
@@ -156,7 +156,7 @@ void Document::for_each_page(const std::function<bool(Page *)> &func) {
 
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
-            if (resolvedKid->isPage()) {
+            if (resolvedKid->is_page()) {
                 if (!func(allocator.allocate<Page>(*this, resolvedKid))) {
                     // stop iterating
                     return;

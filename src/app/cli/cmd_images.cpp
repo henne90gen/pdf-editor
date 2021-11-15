@@ -14,7 +14,10 @@ int cmd_images(const ImagesArgs &args) {
     document.for_each_image([&count](pdf::Image &img) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);
         spdlog::info("Dict: {}", pdf::to_string(img.stream->dictionary));
-        img.write_bmp(std::to_string(count) + ".bmp");
+        const auto &fileName = std::to_string(count) + ".bmp";
+        if (img.write_bmp(fileName)) {
+            spdlog::warn("Failed to write image file '{}'", fileName);
+        }
         count++;
         return true;
     });

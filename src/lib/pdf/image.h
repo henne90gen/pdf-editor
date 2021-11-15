@@ -12,7 +12,8 @@ struct Image {
     int64_t bitsPerComponent = 0;
     Stream *stream           = nullptr;
 
-    bool write_bmp(const std::string &fileName) const;
+    /// writes the image to a .bmp file with the given fileName, returns false on success
+    [[nodiscard]] bool write_bmp(const std::string &fileName) const;
 };
 
 } // namespace pdf

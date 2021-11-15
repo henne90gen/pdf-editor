@@ -2,8 +2,8 @@
 
 #include <cairomm/cairomm.h>
 
-#include "page.h"
 #include "operator_parser.h"
+#include "page.h"
 
 namespace pdf {
 
@@ -89,16 +89,15 @@ struct GraphicsState {
 };
 
 struct Renderer {
+    Page *page;
+    std::vector<GraphicsState> stateStack = {};
+
     explicit Renderer(Page *_page) : page(_page) { stateStack.emplace_back(); }
 
     void render(const Cairo::RefPtr<Cairo::Context> &cr);
 
   private:
-    Page *page;
-    std::vector<GraphicsState> stateStack = {};
-
     void render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams);
-
     void setNonStrokingColor(Operator *op);
     void endText();
     void beginText();

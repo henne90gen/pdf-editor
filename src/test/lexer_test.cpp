@@ -3,7 +3,7 @@
 #include <pdf/lexer.h>
 
 void assertNextToken(pdf::Lexer &lexer, pdf::Token::Type type, const std::string &content) {
-    auto result = lexer.getToken();
+    auto result = lexer.get_token();
     ASSERT_TRUE(result.has_value());
     auto value = result.value();
     ASSERT_EQ(value.type, type);
@@ -11,7 +11,7 @@ void assertNextToken(pdf::Lexer &lexer, pdf::Token::Type type, const std::string
 }
 
 void assertNoMoreTokens(pdf::Lexer &lexer) {
-    auto result = (lexer).getToken();
+    auto result = (lexer).get_token();
     ASSERT_FALSE(result.has_value()) << result.value().content;
 }
 
@@ -125,7 +125,7 @@ TEST(Lexer, Stream) {
     auto lexer        = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::STREAM_START, "stream");
     assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\n");
-    ASSERT_EQ(lexer.advanceStream(10), "some bytes");
+    ASSERT_EQ(lexer.advance_stream(10), "some bytes");
     assertNextToken(lexer, pdf::Token::Type::NEW_LINE, "\n");
     assertNextToken(lexer, pdf::Token::Type::STREAM_END, "endstream");
     assertNoMoreTokens(lexer);

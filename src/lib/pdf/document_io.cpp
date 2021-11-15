@@ -285,8 +285,10 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
 }
 
 bool Document::read_from_memory(char *buffer, size_t size, Document &document) {
+    // FIXME using the existing buffer collides with the memory management using the Allocator
     document.data        = buffer;
     document.sizeInBytes = size;
+    document.allocator.init(document.sizeInBytes);
 
     return document.read_data();
 }
