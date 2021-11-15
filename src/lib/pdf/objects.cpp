@@ -99,13 +99,17 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::decode() const {
-    const char *output = stream_data.data();
-    size_t outputSize  = stream_data.length();
+std::string_view Stream::decode(Allocator &allocator) {
+    if (decodedStream != nullptr) {
+        return {decodedStream, decodedStreamSize};
+    }
+
+    const char *output = streamData.data();
+    size_t outputSize  = streamData.length();
 
     auto fs = filters();
     if (fs.empty()) {
-        return stream_data;
+        return streamData;
     }
 
     for (const auto &filter : fs) {
@@ -118,7 +122,7 @@ std::string_view Stream::decode() const {
             size_t inputSize  = outputSize;
 
             outputSize = inputSize * 3;
-            output     = (char *)malloc(outputSize);
+            output     = allocator.allocate_chunk(outputSize);
 
             z_stream infstream;
             infstream.zalloc    = Z_NULL;
@@ -136,9 +140,8 @@ std::string_view Stream::decode() const {
             outputSize = infstream.total_out;
 
             // copy the result into a buffer that fits exactly
-            char *tmp = (char *)malloc(outputSize);
+            char *tmp = allocator.allocate_chunk(outputSize);
             memcpy(tmp, output, outputSize);
-            free((void *)output);
             output = tmp;
         } else {
             spdlog::error("Unknown filter: {}", filter);
@@ -147,6 +150,8 @@ std::string_view Stream::decode() const {
         // TODO handle more filters
     }
 
+    decodedStream     = output;
+    decodedStreamSize = outputSize;
     return {output, outputSize};
 }
 

@@ -2,11 +2,13 @@
 
 #include <cstdint>
 
+#include "allocator.h"
 #include "objects.h"
 
 namespace pdf {
 
 struct Image {
+    Allocator &allocator;
     int64_t width            = 0;
     int64_t height           = 0;
     int64_t bitsPerComponent = 0;

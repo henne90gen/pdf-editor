@@ -11,21 +11,22 @@ void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
-    auto cropBox = page->crop_box();
+    auto cropBox = page.crop_box();
     cr->set_source_rgb(1, 1, 1);
     cr->rectangle(0, 0, cropBox->width(), cropBox->height());
     cr->fill();
 
-    auto contentStreams = page->content_streams();
+    auto contentStreams = page.content_streams();
     ASSERT(!contentStreams.empty());
     render(cr, contentStreams);
 }
 
 void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
-        auto textProvider   = StringTextProvider(s->decode());
+        auto decodedStream  = s->decode(page.document.allocator);
+        auto textProvider   = StringTextProvider(decodedStream);
         auto lexer          = TextLexer(textProvider);
-        auto operatorParser = OperatorParser(lexer, page->document.allocator);
+        auto operatorParser = OperatorParser(lexer, page.document.allocator);
         Operator *op        = operatorParser.get_operator();
         while (op != nullptr) {
             if (op->type == Operator::Type::w_SetLineWidth) {
@@ -109,14 +110,14 @@ void Renderer::moveStartOfNextLine(Operator *op) {
 void Renderer::setTextFontAndSize(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
-    auto fontMapOpt = page->resources()->fonts(page->document);
+    auto fontMapOpt = page.resources()->fonts(page.document);
     if (!fontMapOpt.has_value()) {
         // TODO add logging
         return;
     }
 
     auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
-    auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
+    auto fontOpt  = fontMapOpt.value()->get(page.document, fontName);
     if (!fontOpt.has_value()) {
         // TODO add logging
         return;
@@ -177,14 +178,14 @@ void Renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
 void Renderer::loadFont(Font *font) {
     stateStack.back().textState.textFont.font = font;
 
-    auto toUnicodeOpt = font->to_unicode(page->document);
+    auto toUnicodeOpt = font->to_unicode(page.document);
     if (toUnicodeOpt.has_value()) {
         //        auto toUnicode = toUnicodeOpt.value();
         //        auto cmapFilePtr = toUnicode->to_string().data();
         // TODO read in cmap file
     }
 
-    std::optional<Stream *> fontFileOpt = font->font_program(page->document);
+    std::optional<Stream *> fontFileOpt = font->font_program(page.document);
     if (!fontFileOpt.has_value()) {
         spdlog::error("Failed to find embedded font program!");
         return;
@@ -201,7 +202,7 @@ void Renderer::loadFont(Font *font) {
     }
 
     FT_Face face;
-    auto view    = fontFile->decode();
+    auto view    = fontFile->decode(page.document.allocator);
     auto basePtr = view.data();
     auto size    = (int64_t)view.length();
     error        = FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte *>(basePtr), size, faceIndex, &face);

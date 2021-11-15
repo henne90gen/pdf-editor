@@ -89,10 +89,10 @@ struct GraphicsState {
 };
 
 struct Renderer {
-    Page *page;
+    Page &page;
     std::vector<GraphicsState> stateStack = {};
 
-    explicit Renderer(Page *_page) : page(_page) { stateStack.emplace_back(); }
+    explicit Renderer(Page &_page) : page(_page) { stateStack.emplace_back(); }
 
     void render(const Cairo::RefPtr<Cairo::Context> &cr);
 

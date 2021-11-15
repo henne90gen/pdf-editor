@@ -6,6 +6,14 @@
 
 namespace pdf {
 
+Allocator::~Allocator() {
+    while (currentAllocation != nullptr) {
+        auto prev = currentAllocation->previousAllocation;
+        free(currentAllocation);
+        currentAllocation = prev;
+    }
+}
+
 void Allocator::init(size_t sizeOfPdfFile) {
     auto sizeInBytes = sizeOfPdfFile * 2;
     auto bufferStart = (char *)malloc(sizeof(Allocation) + sizeInBytes);
@@ -20,7 +28,7 @@ void Allocator::init(size_t sizeOfPdfFile) {
 char *Allocator::allocate_chunk(size_t size) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     if (currentAllocation->bufferPosition + size > currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
-        spdlog::error("Failed to fit object of size {} bytes into the existing memory, allocating more");
+        spdlog::warn("Failed to fit object of size {} bytes into the existing memory, allocating more", size);
 
         auto sizeInBytes = currentAllocation->sizeInBytes * 2;
         auto bufferStart = (char *)malloc(sizeof(Allocation) + sizeInBytes);

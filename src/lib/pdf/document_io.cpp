@@ -44,7 +44,7 @@ bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrail
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
     auto sizeField2 = W->values[2]->as<Integer>()->value;
-    auto content    = stream->decode();
+    auto content    = stream->decode(allocator);
 
     // verify that the content of the stream matches the size in the dictionary
     size_t countInDict        = stream->dictionary->values["Size"]->as<Integer>()->value - 1;

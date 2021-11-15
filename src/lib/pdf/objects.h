@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "allocator.h"
 #include "util.h"
 
 namespace pdf {
@@ -144,13 +145,15 @@ struct IndirectObject : public Object {
 
 struct Stream : public Object {
     Dictionary *dictionary = nullptr;
-    std::string_view stream_data;
+    std::string_view streamData;
+    const char *decodedStream = nullptr;
+    size_t decodedStreamSize  = 0;
 
     static Type staticType() { return Type::STREAM; }
     explicit Stream(std::string_view data, Dictionary *_dictionary, std::string_view _stream_data)
-        : Object(staticType(), data), dictionary(_dictionary), stream_data(_stream_data) {}
+        : Object(staticType(), data), dictionary(_dictionary), streamData(_stream_data) {}
 
-    [[nodiscard]] std::string_view decode() const;
+    [[nodiscard]] std::string_view decode(Allocator &allocator);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

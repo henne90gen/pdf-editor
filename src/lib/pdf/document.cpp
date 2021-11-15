@@ -48,7 +48,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
 
-        auto content      = stream->decode();
+        auto content      = stream->decode(allocator);
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
         auto parser       = Parser(lexer, allocator, this);
@@ -361,7 +361,7 @@ size_t Document::character_count() {
 }
 
 void Document::for_each_image(const std::function<bool(Image &)> &func) {
-    for_each_object([&func](IndirectObject *obj) {
+    for_each_object([this, &func](IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
             return true;
         }
@@ -393,6 +393,7 @@ void Document::for_each_image(const std::function<bool(Image &)> &func) {
         }
 
         Image image = {
+              .allocator        = allocator,
               .width            = widthOpt.value()->value,
               .height           = heightOpt.value()->value,
               .bitsPerComponent = bitsPerComponentOpt.value()->value,

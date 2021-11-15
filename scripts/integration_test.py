@@ -5,14 +5,37 @@ import multiprocessing
 
 NUM_PROCESSES = 10
 ACTIVATED_TESTS = {"VeraPDF": ["6.1 File structure"]}
+IGNORED_TESTS = ["veraPDF test suite 6-1-12-t02-pass-a.pdf"]
+RUN_WITH_VALGRIND = False
 
 
 def test_file(executable: str, file_path: str) -> bool:
+    for ignored in IGNORED_TESTS:
+        if ignored in file_path:
+            return False
+
     has_error = False
     try:
-        process = subprocess.run([executable, "info", file_path], capture_output=True, timeout=1)
-    except:
+        cmd = []
+        if RUN_WITH_VALGRIND:
+            cmd.extend( [
+                "valgrind",
+                "--tool=memcheck",
+                "--gen-suppressions=all",
+                "--leak-check=full",
+                "--leak-resolution=med",
+                "--track-origins=yes",
+                "--error-exitcode=0",
+            ])
+
+        cmd.extend([executable, "info", file_path])
+        process = subprocess.run(cmd, capture_output=True, timeout=10)
+    except Exception as e:
+        print(e)
         has_error = True
+        print(" ".join(cmd))
+        print(file_path)
+        return has_error
 
     if not has_error:
         if "fail" in file_path:

@@ -186,8 +186,8 @@ TEST(Parser, Stream) {
     assertParses<pdf::Stream>(input, [&input](pdf::Stream *result) {
         ASSERT_EQ(result->data.length(), 61);
         ASSERT_EQ(result->data, input);
-        ASSERT_EQ(result->stream_data.length(), 10);
-        ASSERT_EQ(result->stream_data, "some bytes");
+        ASSERT_EQ(result->streamData.length(), 10);
+        ASSERT_EQ(result->streamData, "some bytes");
     });
 }
 
@@ -201,8 +201,8 @@ TEST(Parser, StreamIndirectLength) {
                                                    [&input](pdf::Stream *result) {
                                                        ASSERT_EQ(result->data.length(), 64);
                                                        ASSERT_EQ(result->data, input);
-                                                       ASSERT_EQ(result->stream_data.length(), 10);
-                                                       ASSERT_EQ(result->stream_data, "some bytes");
+                                                       ASSERT_EQ(result->streamData.length(), 10);
+                                                       ASSERT_EQ(result->streamData, "some bytes");
                                                    });
 }
 

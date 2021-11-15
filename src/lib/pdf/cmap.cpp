@@ -257,7 +257,7 @@ CMap *CMapParser::parse() {
 }
 
 std::optional<CMap *> CMapStream::read_cmap(Allocator &allocator) {
-    auto data         = decode();
+    auto data         = decode(allocator);
     auto textProvider = StringTextProvider(data);
     auto lexer        = TextLexer(textProvider);
     auto parser       = CMapParser(lexer, allocator);

@@ -16,6 +16,7 @@ struct Allocation {
 struct Allocator {
     Allocation *currentAllocation = nullptr;
 
+    ~Allocator();
     void init(size_t sizeOfPdfFile);
     char *allocate_chunk(size_t size);
 

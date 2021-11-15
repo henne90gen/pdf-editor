@@ -48,7 +48,7 @@ bool Image::write_bmp(const std::string &fileName) const {
     infoHeader.yPixelsPerM   = 0;
     infoHeader.colorsUsed    = 0;
 
-    auto pixels = stream->decode();
+    auto pixels = stream->decode(allocator);
 
     auto rowSize = static_cast<int32_t>(std::ceil((infoHeader.bitsPerPixel * width) / 32)) * 4;
     auto pBuf    = (uint8_t *)pixels.data();

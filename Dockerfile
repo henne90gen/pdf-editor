@@ -9,3 +9,4 @@ RUN cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=/usr/bin/c
 RUN cmake --build .
 RUN ctest --output-on-failure
 RUN cmake --build . --target test_files
+RUN cmake --build . --target test_suite_verapdf
