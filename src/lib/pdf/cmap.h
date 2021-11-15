@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "allocator.h"
 #include "lexer.h"
 #include "objects.h"
 
@@ -23,14 +24,15 @@ class CMap {
 };
 
 struct CMapParser {
-    explicit CMapParser(Lexer &_lexer) : lexer(_lexer) {}
+    explicit CMapParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
 
     /// Attempts to parse a CMap from the given lexer
     CMap *parse(); // TODO maybe return by value instead of a pointer
 
   private:
     Lexer &lexer;
-    size_t currentTokenIdx       = 0;
+    Allocator &allocator;
+    size_t currentTokenIdx    = 0;
     std::vector<Token> tokens = {};
 
     void ignoreNewLineTokens();
@@ -43,7 +45,7 @@ struct CMapParser {
 };
 
 struct CMapStream : public Stream {
-    std::optional<CMap *> read_cmap();
+    std::optional<CMap *> read_cmap(Allocator &allocator);
 };
 
 } // namespace pdf

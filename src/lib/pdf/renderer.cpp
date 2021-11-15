@@ -7,7 +7,7 @@
 
 namespace pdf {
 
-void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
+void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
@@ -21,11 +21,11 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     render(cr, contentStreams);
 }
 
-void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
+void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
         auto textProvider   = StringTextProvider(s->decode());
         auto lexer          = TextLexer(textProvider);
-        auto operatorParser = OperatorParser(lexer);
+        auto operatorParser = OperatorParser(lexer, page->document.allocator);
         Operator *op        = operatorParser.getOperator();
         while (op != nullptr) {
             if (op->type == Operator::Type::w_SetLineWidth) {
@@ -60,18 +60,18 @@ void renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector
     }
 }
 
-void renderer::appendRectangle() const { // TODO append rectangle to the current path
+void Renderer::appendRectangle() const { // TODO append rectangle to the current path
 }
 
-void renderer::modifyClippingPathUsingEvenOddRule() const { // TODO clipping path modification
+void Renderer::modifyClippingPathUsingEvenOddRule() const { // TODO clipping path modification
 }
 
-void renderer::endPathWithoutFillingOrStroking() const {
+void Renderer::endPathWithoutFillingOrStroking() const {
     // TODO this is a path painting no-op
     //  it does however set the clipping path, if a clipping path operator was used before it
 }
 
-void renderer::setNonStrokingColor(Operator *op) {
+void Renderer::setNonStrokingColor(Operator *op) {
     stateStack.back().nonStrokingColor = Color::rgb( //
           op->data.rg_SetNonStrokingColorRGB.r,      //
           op->data.rg_SetNonStrokingColorRGB.g,      //
@@ -79,23 +79,23 @@ void renderer::setNonStrokingColor(Operator *op) {
     );
 }
 
-void renderer::endText() {
+void Renderer::endText() {
     // make sure text object parameters are set before unsetting them
     ASSERT(stateStack.back().textState.textObjectParams.has_value());
     stateStack.back().textState.textObjectParams = {};
 }
 
-void renderer::beginText() {
+void Renderer::beginText() {
     // only one BT ... ET can be open at a time
     ASSERT(!stateStack.back().textState.textObjectParams.has_value());
     stateStack.back().textState.textObjectParams = std::optional(TextObjectState());
 }
 
-void renderer::pushGraphicsState() { stateStack.emplace_back(); }
+void Renderer::pushGraphicsState() { stateStack.emplace_back(); }
 
-void renderer::popGraphicsState() { stateStack.pop_back(); }
+void Renderer::popGraphicsState() { stateStack.pop_back(); }
 
-void renderer::moveStartOfNextLine(Operator *op) {
+void Renderer::moveStartOfNextLine(Operator *op) {
     auto currentLineMatrix = stateStack.back().textState.textObjectParams.value().textLineMatrix;
     auto tmp               = Cairo::identity_matrix();
     tmp.translate(op->data.Td_MoveStartOfNextLine.x, op->data.Td_MoveStartOfNextLine.x);
@@ -106,7 +106,7 @@ void renderer::moveStartOfNextLine(Operator *op) {
     stateStack.back().textState.textObjectParams.value().textMatrix     = newLineMatrix;
 }
 
-void renderer::setTextFontAndSize(Operator *op) {
+void Renderer::setTextFontAndSize(Operator *op) {
     stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
     auto fontMapOpt = page->resources()->fonts(page->document);
@@ -126,7 +126,7 @@ void renderer::setTextFontAndSize(Operator *op) {
     loadFont(font);
 }
 
-void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void Renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     auto &textState       = stateStack.back().textState;
     auto textRenderMatrix = Cairo::identity_matrix();
     textRenderMatrix.scale(textState.textFontSize, textState.textFontSize);
@@ -174,7 +174,7 @@ void renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     cr->show_glyphs(glyphs);
 }
 
-void renderer::loadFont(Font *font) {
+void Renderer::loadFont(Font *font) {
     stateStack.back().textState.textFont.font = font;
 
     auto toUnicodeOpt = font->toUnicode(page->document);

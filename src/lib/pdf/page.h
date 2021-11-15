@@ -43,7 +43,7 @@ struct Resources : public Dictionary {
 };
 
 struct ContentStream : public Stream {
-    void for_each_operator(const std::function<bool(Operator *)> &func);
+    void for_each_operator(Allocator &allocator, const std::function<bool(Operator *)> &func);
 };
 
 struct Page {

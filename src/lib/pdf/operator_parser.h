@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "allocator.h"
 #include "lexer.h"
 #include "objects.h"
 
@@ -155,12 +156,13 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
 class OperatorParser {
   public:
-    explicit OperatorParser(Lexer &_lexer) : lexer(_lexer) {}
+    explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
 
     Operator *getOperator();
 
   private:
     Lexer &lexer;
+    Allocator &allocator;
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 

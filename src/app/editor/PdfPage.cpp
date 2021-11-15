@@ -145,7 +145,7 @@ void PdfWidget::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int 
 
     auto pages = file.pages();
     for (auto page : pages) {
-        pdf::renderer renderer(page);
+        pdf::Renderer renderer(page);
         // FIXME undefined reference to `pdf::renderer::render(std::shared_ptr<Cairo::Context> const&)'
         //        renderer.render(cr);
 

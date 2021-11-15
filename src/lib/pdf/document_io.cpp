@@ -15,25 +15,25 @@ void ignoreNewLines(char *&ptr) {
     }
 }
 
-Dictionary *parseDict(char *start, size_t length) {
+Dictionary *parseDict(Allocator &allocator, char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     const std::string_view input = std::string_view(start, length);
     auto text                    = StringTextProvider(input);
     auto lexer                   = TextLexer(text);
-    auto parser                  = Parser(lexer);
+    auto parser                  = Parser(lexer, allocator);
     auto result                  = parser.parse();
     ASSERT(result != nullptr);
     return result->as<Dictionary>();
 }
 
-Stream *parseStream(char *start, size_t length) {
+Stream *parseStream(Allocator &allocator, char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     const std::string_view input = std::string_view(start, length);
     auto text                    = StringTextProvider(input);
     auto lexer                   = TextLexer(text);
-    auto parser                  = Parser(lexer);
+    auto parser                  = Parser(lexer, allocator);
     auto result                  = parser.parse();
     ASSERT(result != nullptr);
     return result->as<IndirectObject>()->object->as<Stream>();
@@ -130,7 +130,7 @@ bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrail
         return false;
     }
 
-    currentTrailer->prev = new Trailer();
+    currentTrailer->prev = allocator.allocate<Trailer>();
     return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
 }
 
@@ -143,7 +143,7 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
         auto startxrefPtr      = data + sizeInBytes;
         auto startOfStream     = crossRefStartPtr;
         size_t lengthOfStream  = startxrefPtr - startOfStream;
-        currentTrailer->stream = parseStream(startOfStream, lengthOfStream);
+        currentTrailer->stream = parseStream(allocator, startOfStream, lengthOfStream);
         return read_cross_reference_stream(currentTrailer->stream, currentTrailer);
     }
 
@@ -213,13 +213,13 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
         }
     }
 
-    currentTrailer->dict = parseDict(currentReadPtr, lengthOfTrailerDict);
+    currentTrailer->dict = parseDict(allocator, currentReadPtr, lengthOfTrailerDict);
     auto itr             = currentTrailer->dict->values.find("Prev");
     if (!(itr != currentTrailer->dict->values.end())) {
         return false;
     }
 
-    currentTrailer->prev = new Trailer();
+    currentTrailer->prev = allocator.allocate<Trailer>();
     return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
 }
 
@@ -274,7 +274,8 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
     }
 
     document.sizeInBytes = is.tellg();
-    document.data        = (char *)malloc(document.sizeInBytes);
+    document.allocator.init(document.sizeInBytes);
+    document.data = document.allocator.allocate_chunk(document.sizeInBytes);
 
     is.seekg(0);
     is.read(document.data, static_cast<std::streamsize>(document.sizeInBytes));

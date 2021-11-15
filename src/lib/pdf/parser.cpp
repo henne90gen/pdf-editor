@@ -6,6 +6,14 @@
 
 namespace pdf {
 
+NoopReferenceResolver GlobalNoopReferenceResolver = {};
+
+Parser::Parser(Lexer &_lexer, Allocator &_allocator)
+    : lexer(_lexer), allocator(_allocator), referenceResolver(&GlobalNoopReferenceResolver) {}
+
+Parser::Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver)
+    : lexer(_lexer), allocator(_allocator), referenceResolver(_referenceResolver) {}
+
 bool Parser::ensureTokensHaveBeenLexed() {
     if (currentTokenIdx < tokens.size()) {
         return true;
@@ -47,7 +55,7 @@ Boolean *Parser::parseBoolean() {
     } else {
         // TODO add logging
     }
-    return new Boolean(content, value);
+    return allocator.allocate<Boolean>(content, value);
 }
 
 Integer *Parser::parseInteger() {
@@ -60,7 +68,7 @@ Integer *Parser::parseInteger() {
         // TODO is this conversion to a string really necessary?
         int64_t value = std::stoll(std::string(content));
         currentTokenIdx++;
-        return new Integer(content, value);
+        return allocator.allocate<Integer>(content, value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -79,7 +87,7 @@ Real *Parser::parseReal() {
         // TODO is this conversion to a string really necessary?
         double value = std::stod(std::string(content));
         currentTokenIdx++;
-        return new Real(content, value);
+        return allocator.allocate<Real>(content, value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -95,7 +103,7 @@ Null *Parser::parseNullObject() {
 
     auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new Null(content);
+    return allocator.allocate<Null>(content);
 }
 
 LiteralString *Parser::parseLiteralString() {
@@ -105,7 +113,7 @@ LiteralString *Parser::parseLiteralString() {
 
     auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new LiteralString(content);
+    return allocator.allocate<LiteralString>(content);
 }
 
 HexadecimalString *Parser::parseHexadecimalString() {
@@ -115,7 +123,7 @@ HexadecimalString *Parser::parseHexadecimalString() {
 
     auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new HexadecimalString(content.substr(1, content.size() - 2));
+    return allocator.allocate<HexadecimalString>(content.substr(1, content.size() - 2));
 }
 
 Name *Parser::parseName() {
@@ -124,7 +132,7 @@ Name *Parser::parseName() {
     }
     auto &content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return new Name(content.substr(1));
+    return allocator.allocate<Name>(content.substr(1));
 }
 
 Array *Parser::parseArray() {
@@ -141,7 +149,7 @@ Array *Parser::parseArray() {
         if (currentTokenIs(Token::Type::ARRAY_END)) {
             break;
         }
-        auto object = parseObject();
+        auto object = parse();
         if (object == nullptr) {
             currentTokenIdx = beforeTokenIdx;
             return nullptr;
@@ -157,7 +165,7 @@ Array *Parser::parseArray() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
-    return new Array(data, objects);
+    return allocator.allocate<Array>(data, objects);
 }
 
 void Parser::ignoreNewLineTokens() {
@@ -185,7 +193,7 @@ Dictionary *Parser::parseDictionary() {
             return nullptr;
         }
 
-        auto value = parseObject();
+        auto value = parse();
         if (value == nullptr) {
             currentTokenIdx = beforeTokenIdx;
             return nullptr;
@@ -202,7 +210,7 @@ Dictionary *Parser::parseDictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    return new Dictionary(data, objects);
+    return allocator.allocate<Dictionary>(data, objects);
 }
 
 IndirectReference *Parser::parseIndirectReference() {
@@ -219,7 +227,7 @@ IndirectReference *Parser::parseIndirectReference() {
         const size_t pos2              = content.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(content.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
-        return new IndirectReference(content, objectNumber, generationNumber);
+        return allocator.allocate<IndirectReference>(content, objectNumber, generationNumber);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -239,7 +247,7 @@ IndirectObject *Parser::parseIndirectObject() {
 
     ignoreNewLineTokens();
 
-    auto object = parseObject();
+    auto object = parse();
     if (object == nullptr) {
         currentTokenIdx = beforeTokenIndex;
         return nullptr;
@@ -264,7 +272,7 @@ IndirectObject *Parser::parseIndirectObject() {
         auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
         auto dataLength = tokenDiff + lastTokenContent.size();
         auto data       = std::string_view(objectStartContent.data(), dataLength);
-        return new IndirectObject(data, objectNumber, generationNumber, object);
+        return allocator.allocate<IndirectObject>(data, objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -343,10 +351,10 @@ Object *Parser::parseStreamOrDictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    return new Stream(data, dictionary, streamData);
+    return allocator.allocate<Stream>(data, dictionary, streamData);
 }
 
-Object *Parser::parseObject() {
+Object *Parser::parse() {
     ignoreNewLineTokens();
 
     auto boolean = parseBoolean();
@@ -406,7 +414,5 @@ Object *Parser::parseObject() {
 
     return nullptr;
 }
-
-Object *Parser::parse() { return parseObject(); }
 
 } // namespace pdf

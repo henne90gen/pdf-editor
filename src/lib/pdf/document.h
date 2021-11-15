@@ -1,9 +1,10 @@
 #pragma once
 
+#include "allocator.h"
 #include "font.h"
+#include "image.h"
 #include "objects.h"
 #include "parser.h"
-#include "image.h"
 
 #include <functional>
 
@@ -93,6 +94,7 @@ struct ChangeSection {
 };
 
 struct Document : public ReferenceResolver {
+    Allocator allocator       = {};
     char *data                = nullptr;
     size_t sizeInBytes        = 0;
     int64_t lastCrossRefStart = {};

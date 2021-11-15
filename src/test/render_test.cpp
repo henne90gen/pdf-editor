@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <pdf/document.h>
 #include <pdf/renderer.h>
+#include <pdf/document.h>
 
 TEST(Renderer, Blank) {
     pdf::Document document;
@@ -12,7 +12,7 @@ TEST(Renderer, Blank) {
 
     auto pages = document.pages();
     for (auto page : pages) {
-        pdf::renderer renderer(page);
+        pdf::Renderer renderer(page);
         renderer.render(cr);
     }
 }
@@ -30,7 +30,7 @@ TEST(Renderer, HelloWorld) {
         auto surface  = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);
         auto cr       = Cairo::Context::create(surface);
 
-        pdf::renderer renderer(page);
+        pdf::Renderer renderer(page);
         renderer.render(cr);
 
         const std::string filename = "test-" + std::to_string(i) + ".png";

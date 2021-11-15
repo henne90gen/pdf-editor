@@ -39,7 +39,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto input  = std::string_view(start, length);
         auto text   = StringTextProvider(input);
         auto lexer  = TextLexer(text);
-        auto parser = Parser(lexer, (ReferenceResolver *)this);
+        auto parser = Parser(lexer, allocator, this);
         auto result = parser.parse();
         ASSERT(result != nullptr);
         return result->as<IndirectObject>();
@@ -51,7 +51,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto content      = stream->decode();
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
-        auto parser       = Parser(lexer, this);
+        auto parser       = Parser(lexer, allocator, this);
         int64_t N         = stream->dictionary->values["N"]->as<Integer>()->value;
 
         // TODO cache objectNumbers and corresponding objects
@@ -69,8 +69,8 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
             objs[i]  = obj;
         }
 
-        return new IndirectObject(content, objectNumbers[entry->compressed.indexInStream], 0,
-                                  objs[entry->compressed.indexInStream]);
+        return allocator.allocate<IndirectObject>(content, objectNumbers[entry->compressed.indexInStream], 0,
+                                                  objs[entry->compressed.indexInStream]);
     }
     ASSERT(false);
 }
@@ -145,7 +145,7 @@ void Document::for_each_page(const std::function<bool(Page *)> &func) {
     }
 
     if (pageTreeRoot->isPage()) {
-        func(new Page(*this, pageTreeRoot));
+        func(allocator.allocate<Page>(*this, pageTreeRoot));
         return;
     }
 
@@ -157,7 +157,7 @@ void Document::for_each_page(const std::function<bool(Page *)> &func) {
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->isPage()) {
-                if (!func(new Page(*this, resolvedKid))) {
+                if (!func(allocator.allocate<Page>(*this, resolvedKid))) {
                     // stop iterating
                     return;
                 }
@@ -322,7 +322,7 @@ size_t Document::character_count() {
         auto contentStreams = page->content_streams();
         CMap *cmap          = nullptr;
         for (auto contentStream : contentStreams) {
-            contentStream->for_each_operator([&result, this, &page, &cmap](Operator *op) {
+            contentStream->for_each_operator(allocator, [&result, this, &page, &cmap](Operator *op) {
                 if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
                     result += count_TJ_characters(cmap, op);
                 } else if (op->type == Operator::Type::Tj_ShowTextString) {

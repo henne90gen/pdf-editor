@@ -36,13 +36,13 @@ std::vector<ContentStream *> Page::content_streams() {
     return result;
 }
 
-void ContentStream::for_each_operator(const std::function<bool(Operator*)> &func) {
+void ContentStream::for_each_operator(Allocator &allocator, const std::function<bool(Operator *)> &func) {
     auto textProvider   = StringTextProvider(decode());
     auto lexer          = TextLexer(textProvider);
-    auto operatorParser = OperatorParser(lexer);
+    auto operatorParser = OperatorParser(lexer, allocator);
     Operator *op        = operatorParser.getOperator();
     while (op != nullptr) {
-        if (!func(op)){
+        if (!func(op)) {
             break;
         }
         op = operatorParser.getOperator();

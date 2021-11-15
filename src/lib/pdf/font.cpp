@@ -54,7 +54,7 @@ std::optional<CMap *> Font::cmap(Document &document) {
         return {};
     }
 
-    return cmapStreamOpt.value()->read_cmap();
+    return cmapStreamOpt.value()->read_cmap(document.allocator);
 }
 
 } // namespace pdf

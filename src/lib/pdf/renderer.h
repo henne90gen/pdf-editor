@@ -88,8 +88,8 @@ struct GraphicsState {
     double miterLimit = 10.0;
 };
 
-struct renderer {
-    explicit renderer(Page *_page) : page(_page) { stateStack.emplace_back(); }
+struct Renderer {
+    explicit Renderer(Page *_page) : page(_page) { stateStack.emplace_back(); }
 
     void render(const Cairo::RefPtr<Cairo::Context> &cr);
 

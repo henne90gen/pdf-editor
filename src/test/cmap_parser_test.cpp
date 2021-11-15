@@ -11,8 +11,10 @@ TEST(CMapParser, HelloWorld) {
           "begincodespacerange\n<00> <FF>\nendcodespacerange\n8 beginbfchar\n<01> <0048>\n<02> <0065>\n<03> "
           "<006C>\n<04> <006F>\n<05> <0020>\n<06> <0057>\n<07> <0072>\n<08> <0064>\nendbfchar\nendcmap\nCMapName "
           "currentdict /CMap defineresource pop\nend\nend");
-    auto lexer  = pdf::TextLexer(textProvider);
-    auto parser = pdf::CMapParser(lexer);
+    auto lexer     = pdf::TextLexer(textProvider);
+    auto allocator = pdf::Allocator();
+    allocator.init(1000);
+    auto parser = pdf::CMapParser(lexer, allocator);
     auto result = parser.parse();
     ASSERT_TRUE(result != nullptr);
     ASSERT_EQ(result->map_char_code(1), "H");
@@ -32,11 +34,13 @@ TEST(CMapParser, StandardExample) {
           "begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n2 beginbfrange\n<0000> <005E> <0020>\n<005F> "
           "<0061> [<00660066> <00660069> <00660066006C>]\nendbfrange\n1 beginbfchar\n<3A51> "
           "<D840DC3E>\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend");
-    auto lexer  = pdf::TextLexer(textProvider);
-    auto parser = pdf::CMapParser(lexer);
+    auto lexer     = pdf::TextLexer(textProvider);
+    auto allocator = pdf::Allocator();
+    allocator.init(1000);
+    auto parser = pdf::CMapParser(lexer, allocator);
     auto result = parser.parse();
     ASSERT_TRUE(result != nullptr);
-//    ASSERT_EQ(result->map_char_code(95), "ff");
-//    ASSERT_EQ(result->map_char_code(96), "fi");
-//    ASSERT_EQ(result->map_char_code(97), "ffl");
+    //    ASSERT_EQ(result->map_char_code(95), "ff");
+    //    ASSERT_EQ(result->map_char_code(96), "fi");
+    //    ASSERT_EQ(result->map_char_code(97), "ffl");
 }

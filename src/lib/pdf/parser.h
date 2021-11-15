@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "allocator.h"
 #include "lexer.h"
 #include "objects.h"
 #include "util.h"
@@ -25,15 +26,14 @@ class NoopReferenceResolver : public ReferenceResolver {
 
 class Parser {
   public:
-    explicit Parser(Lexer &_lexer) : lexer(_lexer), referenceResolver(new NoopReferenceResolver()) {}
-
-    explicit Parser(Lexer &_lexer, ReferenceResolver *_referenceResolver)
-        : lexer(_lexer), referenceResolver(_referenceResolver) {}
+    explicit Parser(Lexer &_lexer, Allocator &_allocator);
+    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
 
     Object *parse();
 
   private:
     Lexer &lexer;
+    Allocator &allocator;
     ReferenceResolver *referenceResolver;
 
     std::vector<Token> tokens = {};
@@ -43,7 +43,6 @@ class Parser {
     [[nodiscard]] bool ensureTokensHaveBeenLexed();
     [[nodiscard]] bool currentTokenIs(Token::Type type);
 
-    Object *parseObject();
     Boolean *parseBoolean();
     Integer *parseInteger();
     Real *parseReal();
