@@ -19,10 +19,11 @@ void Allocator::init(size_t sizeOfPdfFile) {
     auto bufferStart = (char *)malloc(sizeof(Allocation) + sizeInBytes);
     ASSERT(bufferStart != nullptr);
 
-    currentAllocation                 = reinterpret_cast<Allocation *>(bufferStart);
-    currentAllocation->sizeInBytes    = sizeInBytes;
-    currentAllocation->bufferStart    = bufferStart + sizeof(Allocation);
-    currentAllocation->bufferPosition = currentAllocation->bufferStart;
+    currentAllocation                     = reinterpret_cast<Allocation *>(bufferStart);
+    currentAllocation->sizeInBytes        = sizeInBytes;
+    currentAllocation->bufferStart        = bufferStart + sizeof(Allocation);
+    currentAllocation->bufferPosition     = currentAllocation->bufferStart;
+    currentAllocation->previousAllocation = nullptr;
 }
 
 char *Allocator::allocate_chunk(size_t size) {
