@@ -197,13 +197,16 @@ TEST(Parser, StreamIndirectLength) {
                                               "some bytes\n"
                                               "endstream";
     std::vector<pdf::IndirectObject *> refs = {new pdf::IndirectObject("3 0 R", 3, 0, new pdf::Integer("10", 10))};
-    assertParsesWithReferenceResolver<pdf::Stream>(input, new TestReferenceResolver(refs),
-                                                   [&input](pdf::Stream *result) {
-                                                       ASSERT_EQ(result->data.length(), 64);
-                                                       ASSERT_EQ(result->data, input);
-                                                       ASSERT_EQ(result->streamData.length(), 10);
-                                                       ASSERT_EQ(result->streamData, "some bytes");
-                                                   });
+    auto resolver                           = TestReferenceResolver(refs);
+    assertParsesWithReferenceResolver<pdf::Stream>(input, &resolver, [&input](pdf::Stream *result) {
+        ASSERT_EQ(result->data.length(), 64);
+        ASSERT_EQ(result->data, input);
+        ASSERT_EQ(result->streamData.length(), 10);
+        ASSERT_EQ(result->streamData, "some bytes");
+    });
+    for (auto ref : refs) {
+        delete ref;
+    }
 }
 
 TEST(Parser, Null) {

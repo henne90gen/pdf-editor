@@ -195,11 +195,11 @@ void Integer::set(Document &document, int64_t i) {
 
     // TODO avoid allocating twice here
     auto s            = std::to_string(i);
-    char *new_content = reinterpret_cast<char *>(malloc(s.size()));
+    char *new_content = document.allocator.allocate_chunk(s.size());
     memcpy(new_content, s.data(), s.size());
 
     // TODO can we do this without const-casting here?
-    char *insertionPoint = const_cast<char *>(data.data());
+    const char *insertionPoint = data.data();
 
     // NOTE: moving to the end of the data section, because it gets deleted right before insertion
     insertionPoint += data.size();

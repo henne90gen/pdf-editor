@@ -80,8 +80,8 @@ struct ChangeSectionDeleted {
 };
 
 struct ChangeSectionAdded {
-    char *insertion_point;
-    char *new_content;
+    const char *insertion_point;
+    const char *new_content;
     size_t new_content_length;
 };
 
@@ -166,7 +166,7 @@ struct Document : public ReferenceResolver {
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
 
     void delete_raw_section(std::string_view d);
-    void add_raw_section(char *insertion_point, char *new_content, size_t new_content_length);
+    void add_raw_section(const char *insertion_point, const char *new_content, size_t new_content_length);
 
   private:
     IndirectObject *get_object(int64_t objectNumber);

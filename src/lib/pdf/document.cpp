@@ -248,7 +248,7 @@ void Document::delete_raw_section(std::string_view d) {
     changeSections.push_back({.type = ChangeSectionType::DELETED, .deleted = {.deleted_area = d}});
 }
 
-void Document::add_raw_section(char *insertionPoint, char *newContent, size_t newContentLength) {
+void Document::add_raw_section(const char *insertionPoint, const char *newContent, size_t newContentLength) {
     changeSections.push_back({.type  = ChangeSectionType::ADDED,
                               .added = {.insertion_point    = insertionPoint,
                                         .new_content        = newContent,

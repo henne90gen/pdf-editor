@@ -56,4 +56,5 @@ TEST(Writer, DeletePageSecond) {
     pdf::Document testDoc;
     ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, testDoc));
     ASSERT_EQ(testDoc.page_count(), 1);
+    free(buffer);
 }
