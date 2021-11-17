@@ -21,6 +21,10 @@ add_executable(static_vector_test static_vector_test.cpp)
 target_link_libraries(static_vector_test gtest_main pdf-lib)
 gtest_discover_tests(static_vector_test)
 
+add_executable(static_map_test static_map_test.cpp)
+target_link_libraries(static_map_test gtest_main pdf-lib)
+gtest_discover_tests(static_map_test)
+
 add_custom_target(test_files
         COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/test_directory.py $<TARGET_FILE:pdf-cli> ${CMAKE_SOURCE_DIR}/test-files)
 add_dependencies(test_files pdf-cli)
