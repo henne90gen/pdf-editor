@@ -9,7 +9,7 @@ namespace pdf {
 Allocator::~Allocator() {
     size_t allocationsFreed = 0;
     size_t bytesFreed       = 0;
-    auto allocation = currentAllocation;
+    auto allocation         = currentAllocation;
     while (allocation != nullptr) {
         auto prev = allocation->previousAllocation;
         bytesFreed += allocation->sizeInBytes;
@@ -28,8 +28,8 @@ void Allocator::init(size_t sizeOfPdfFile) {
 
     currentAllocation                     = reinterpret_cast<Allocation *>(bufferStart);
     currentAllocation->sizeInBytes        = sizeInBytes;
-    currentAllocation->bufferStart        = bufferStart + sizeof(Allocation);
-    currentAllocation->bufferPosition     = currentAllocation->bufferStart;
+    currentAllocation->bufferStart        = bufferStart;
+    currentAllocation->bufferPosition     = bufferStart + sizeof(Allocation);
     currentAllocation->previousAllocation = nullptr;
 }
 
@@ -40,8 +40,8 @@ void Allocator::extend(size_t size) {
 
     auto allocation                = reinterpret_cast<Allocation *>(bufferStart);
     allocation->sizeInBytes        = sizeInBytes;
-    allocation->bufferStart        = bufferStart + sizeof(Allocation);
-    allocation->bufferPosition     = allocation->bufferStart;
+    allocation->bufferStart        = bufferStart;
+    allocation->bufferPosition     = bufferStart + sizeof(Allocation);
     allocation->previousAllocation = currentAllocation;
     currentAllocation              = allocation;
 }
@@ -49,7 +49,8 @@ void Allocator::extend(size_t size) {
 char *Allocator::allocate_chunk(size_t size) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     if (currentAllocation->bufferPosition + size > currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
-        spdlog::trace("Failed to fit object of size {} bytes into the existing memory, allocating more", size);
+        spdlog::warn("Failed to fit object of size {} bytes into the existing memory, allocating more", size);
+
         auto sizeInBytes = currentAllocation->sizeInBytes * 2;
         extend(sizeInBytes);
     }
