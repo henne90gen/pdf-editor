@@ -3,6 +3,8 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
+// TODO this is a hack to get the gtkmm4 code to compile on Windows
+#undef WIN32
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/box.h>
