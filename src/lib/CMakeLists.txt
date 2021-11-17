@@ -13,7 +13,7 @@ function(target_link_cairo target)
 endfunction()
 
 add_library(pdf-lib
-        pdf/allocator.cpp
+        pdf/helper/allocator.cpp
         pdf/lexer.cpp
         pdf/parser.cpp
         pdf/document.cpp

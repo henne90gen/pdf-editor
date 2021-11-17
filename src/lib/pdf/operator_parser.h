@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "allocator.h"
+#include "helper/allocator.h"
 #include "lexer.h"
 #include "objects.h"
 
