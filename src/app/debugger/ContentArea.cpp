@@ -94,14 +94,14 @@ void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {
                 break;
             }
 
-            char *ptr = document.data + byteOffset;
-            if (*ptr < 32 || *ptr > 126) {
+            char c = *(document.data + byteOffset);
+            if (c < 32 || c > 126) {
                 continue;
             }
 
             int x             = col * PIXELS_PER_BYTE;
             int y             = (row + 1) * PIXELS_PER_BYTE;
-            auto str          = std::string(ptr, 1);
+            auto str          = std::string(1, c);
             auto glyphs       = std::vector<Cairo::Glyph>(1);
             auto clusters     = std::vector<Cairo::TextCluster>(1);
             auto clusterFlags = Cairo::TextClusterFlags();

@@ -163,11 +163,11 @@ std::string HexadecimalString::to_string() const {
         tmp += "0";
     }
 
-    char *buf  = (char *)malloc(4);
-    char *low  = buf;
-    low[1]     = '\0';
-    char *high = buf + 2;
-    high[1]    = '\0';
+    char buf[4] = {};
+    char *low   = buf;
+    low[1]      = '\0';
+    char *high  = buf + 2;
+    high[1]     = '\0';
 
     std::string result;
     for (size_t i = 0; i < tmp.size(); i += 2) {
@@ -179,7 +179,6 @@ std::string HexadecimalString::to_string() const {
         result += nextChar;
     }
 
-    free(buf);
     return result;
 }
 

@@ -19,7 +19,7 @@
 class DebugWindow : public Gtk::ApplicationWindow {
   public:
     [[maybe_unused]] DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
-                                 const pdf::Document &_document);
+                                 const std::string &filePath);
 
     void update_selected_byte_label(int b);
     void update_hovered_byte_label(int b);

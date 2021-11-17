@@ -30,15 +30,11 @@ void DebugApplication::on_open(const Gio::Application::type_vec_files &files, co
 
     if (!appWindow) {
         // TODO only opening the first file for now -> do something with the rest of them
-        pdf::Document document;
-        if (pdf::Document::read_from_file(files[0]->get_path(), document)) {
-            return;
-        }
-
         try {
-            auto builderString = std::string((char *)debugger_xml_data, debugger_xml_size);
-            auto builder       = Gtk::Builder::create_from_string(builderString);
-            appWindow          = Gtk::Builder::get_widget_derived<DebugWindow>(builder, "DebugWindow", document);
+            auto builderString   = std::string((char *)debugger_xml_data, debugger_xml_size);
+            auto builder         = Gtk::Builder::create_from_string(builderString);
+            const auto &filePath = files[0]->get_path();
+            appWindow            = Gtk::Builder::get_widget_derived<DebugWindow>(builder, "DebugWindow", filePath);
             add_window(*appWindow);
         } catch (Gtk::BuilderError &err) {
             spdlog::error("{}", err.what()); //

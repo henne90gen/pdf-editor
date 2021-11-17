@@ -10,8 +10,6 @@ int cmd_info(const InfoArgs &args) {
         return 1;
     }
 
-    spdlog::set_pattern("%v");
-
     spdlog::info("Size in bytes: {:>5}", document.sizeInBytes);
     spdlog::info("Pages:         {:>5}", document.page_count());
     spdlog::info("Lines:         {:>5}", document.line_count());

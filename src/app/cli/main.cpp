@@ -78,6 +78,8 @@ int parse_images_arguments(int argc, char **argv, ImagesArgs &result) {
 // pdf info my.pdf                -> shows info
 // cat my.pdf | pdf info          -> shows info
 int main(int argc, char **argv) {
+    spdlog::set_level(spdlog::level::trace);
+
     auto commandType = parse_command_type(argc, argv);
     switch (commandType) {
     case CommandType::UNKNOWN:

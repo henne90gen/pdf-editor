@@ -7,16 +7,23 @@
 namespace pdf {
 
 Allocator::~Allocator() {
-    while (currentAllocation != nullptr) {
-        auto prev = currentAllocation->previousAllocation;
-        free(currentAllocation);
-        currentAllocation = prev;
+    size_t allocationsFreed = 0;
+    size_t bytesFreed       = 0;
+    auto allocation = currentAllocation;
+    while (allocation != nullptr) {
+        auto prev = allocation->previousAllocation;
+        bytesFreed += allocation->sizeInBytes;
+        free(allocation);
+        allocation = prev;
+        allocationsFreed++;
     }
+
+    spdlog::trace("Freed {} allocations ({} bytes total)", allocationsFreed, bytesFreed);
 }
 
 void Allocator::init(size_t sizeOfPdfFile) {
-    auto sizeInBytes = sizeOfPdfFile * 2;
-    auto bufferStart = (char *)malloc(sizeof(Allocation) + sizeInBytes);
+    auto sizeInBytes = sizeof(Allocation) + sizeOfPdfFile * 2;
+    auto bufferStart = (char *)malloc(sizeInBytes);
     ASSERT(bufferStart != nullptr);
 
     currentAllocation                     = reinterpret_cast<Allocation *>(bufferStart);
@@ -27,11 +34,12 @@ void Allocator::init(size_t sizeOfPdfFile) {
 }
 
 void Allocator::extend(size_t size) {
-    auto bufferStart = (char *)malloc(sizeof(Allocation) + size);
+    auto sizeInBytes = sizeof(Allocation) + size;
+    auto bufferStart = (char *)malloc(sizeInBytes);
     ASSERT(bufferStart != nullptr);
 
     auto allocation                = reinterpret_cast<Allocation *>(bufferStart);
-    allocation->sizeInBytes        = size;
+    allocation->sizeInBytes        = sizeInBytes;
     allocation->bufferStart        = bufferStart + sizeof(Allocation);
     allocation->bufferPosition     = allocation->bufferStart;
     allocation->previousAllocation = currentAllocation;

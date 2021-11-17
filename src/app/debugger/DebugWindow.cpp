@@ -1,11 +1,15 @@
 #include "DebugWindow.h"
 
 #include <gtkmm/eventcontrollermotion.h>
-#include <gtkmm/eventcontrollerscroll.h>
 #include <spdlog/spdlog.h>
 
-DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const pdf::Document &_document)
-    : Gtk::ApplicationWindow(obj), document(_document) {
+DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
+    : Gtk::ApplicationWindow(obj) {
+    if (pdf::Document::read_from_file(filePath, document)) {
+        spdlog::error("Failed to open document");
+        return;
+    }
+
     selectedByteLabel = builder->get_widget<Gtk::Label>("SelectedByteLabel");
     hoveredByteLabel  = builder->get_widget<Gtk::Label>("HoveredByteLabel");
     trailerHighlight  = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
