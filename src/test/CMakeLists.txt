@@ -13,9 +13,13 @@ add_executable(render_test render_test.cpp)
 target_link_libraries(render_test gtest_main pdf-lib)
 gtest_discover_tests(render_test)
 
-add_executable(write_test writer_test.cpp)
-target_link_libraries(write_test gtest_main pdf-lib)
-gtest_discover_tests(write_test)
+add_executable(writer_test writer_test.cpp)
+target_link_libraries(writer_test gtest_main pdf-lib)
+gtest_discover_tests(writer_test)
+
+add_executable(static_vector_test static_vector_test.cpp)
+target_link_libraries(static_vector_test gtest_main pdf-lib)
+gtest_discover_tests(static_vector_test)
 
 add_custom_target(test_files
         COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/test_directory.py $<TARGET_FILE:pdf-cli> ${CMAKE_SOURCE_DIR}/test-files)

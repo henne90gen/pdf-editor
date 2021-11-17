@@ -142,7 +142,7 @@ Array *Parser::parse_array() {
     }
 
     auto objectStartContent = tokens[currentTokenIdx].content;
-    auto beforeTokenIdx      = currentTokenIdx;
+    auto beforeTokenIdx     = currentTokenIdx;
     currentTokenIdx++;
 
     std::vector<Object *> objects = {};
@@ -166,7 +166,8 @@ Array *Parser::parse_array() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
-    return allocator.allocate<Array>(data, objects);
+    auto vec        = StaticVector<Object *>::create(allocator, objects);
+    return allocator.allocate<Array>(data, vec);
 }
 
 void Parser::ignore_new_line_tokens() {

@@ -18,6 +18,7 @@ struct Allocator {
 
     ~Allocator();
     void init(size_t sizeOfPdfFile);
+    void extend(size_t size);
     char *allocate_chunk(size_t size);
 
     template <typename T, typename... Args> T *allocate(Args &&...args) {

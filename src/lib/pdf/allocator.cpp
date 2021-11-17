@@ -26,21 +26,24 @@ void Allocator::init(size_t sizeOfPdfFile) {
     currentAllocation->previousAllocation = nullptr;
 }
 
+void Allocator::extend(size_t size) {
+    auto bufferStart = (char *)malloc(sizeof(Allocation) + size);
+    ASSERT(bufferStart != nullptr);
+
+    auto allocation                = reinterpret_cast<Allocation *>(bufferStart);
+    allocation->sizeInBytes        = size;
+    allocation->bufferStart        = bufferStart + sizeof(Allocation);
+    allocation->bufferPosition     = allocation->bufferStart;
+    allocation->previousAllocation = currentAllocation;
+    currentAllocation              = allocation;
+}
+
 char *Allocator::allocate_chunk(size_t size) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     if (currentAllocation->bufferPosition + size > currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
-        spdlog::warn("Failed to fit object of size {} bytes into the existing memory, allocating more", size);
-
+        spdlog::trace("Failed to fit object of size {} bytes into the existing memory, allocating more", size);
         auto sizeInBytes = currentAllocation->sizeInBytes * 2;
-        auto bufferStart = (char *)malloc(sizeof(Allocation) + sizeInBytes);
-        ASSERT(bufferStart != nullptr);
-
-        auto allocation                = reinterpret_cast<Allocation *>(bufferStart);
-        allocation->sizeInBytes        = sizeInBytes;
-        allocation->bufferStart        = bufferStart + sizeof(Allocation);
-        allocation->bufferPosition     = allocation->bufferStart;
-        allocation->previousAllocation = currentAllocation;
-        currentAllocation              = allocation;
+        extend(sizeInBytes);
     }
 
     auto result = currentAllocation->bufferPosition;

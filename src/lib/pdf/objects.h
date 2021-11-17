@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "allocator.h"
+#include "static_vector.h"
 #include "util.h"
 
 namespace pdf {
@@ -98,16 +99,17 @@ struct Name : public Object {
 };
 
 struct Array : public Object {
-    std::vector<Object *> values = {};
+    StaticVector<Object *> values = {};
 
     static Type staticType() { return Type::ARRAY; }
-    explicit Array(std::string_view data, std::vector<Object *> objects)
-        : Object(staticType(), data), values(std::move(objects)) {}
+    explicit Array(std::string_view data, StaticVector<Object *> objects)
+        : Object(staticType(), data), values(objects) {}
 
     void remove_element(Document &document, size_t index);
 };
 
 struct Dictionary : public Object {
+    // TODO replace std::unordered_map with StaticMap
     std::unordered_map<std::string, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }

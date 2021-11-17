@@ -39,6 +39,7 @@ void ContentWindow::scroll_value_changed() {
         return;
     }
 
+#if 0
     if (isControlDown) {
         auto dy = y - previousVAdjustment;
         hadjustment->set_value(previousHAdjustment);
@@ -47,6 +48,7 @@ void ContentWindow::scroll_value_changed() {
         contentArea->update_zoom(dy);
         return;
     }
+#endif
 
     contentContainer->move(*contentArea, x, y);
     contentArea->set_offsets(x, y);

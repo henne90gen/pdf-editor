@@ -186,7 +186,7 @@ std::string HexadecimalString::to_string() const {
 void Array::remove_element(Document &document, size_t index) {
     ASSERT(index < values.size());
     document.delete_raw_section(values[index]->data);
-    values.erase(values.begin() + static_cast<int64_t>(index));
+    values.remove(index);
 }
 
 void Integer::set(Document &document, int64_t i) {
