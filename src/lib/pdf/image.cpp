@@ -43,7 +43,8 @@ bool Image::write_bmp(const std::string &fileName) const {
     BmpInfoHeader infoHeader = {};
     infoHeader.width         = static_cast<int32_t>(width);
     infoHeader.height        = static_cast<int32_t>(height);
-    infoHeader.bitsPerPixel  = 3 * stream->dictionary->values["BitsPerComponent"]->as<Integer>()->value;
+    int bitsPerComponent     = stream->dictionary->find<Integer>("BitsPerComponent").value()->value;
+    infoHeader.bitsPerPixel  = 3 * bitsPerComponent;
     infoHeader.xPixelsPerM   = 0;
     infoHeader.yPixelsPerM   = 0;
     infoHeader.colorsUsed    = 0;

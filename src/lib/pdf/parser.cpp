@@ -212,7 +212,8 @@ Dictionary *Parser::parse_dictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    return allocator.allocate<Dictionary>(data, objects);
+    auto map        = StaticMap<std::string, Object *>::create(allocator, objects);
+    return allocator.allocate<Dictionary>(data, map);
 }
 
 IndirectReference *Parser::parse_indirect_reference() {
@@ -309,18 +310,19 @@ Object *Parser::parse_stream_or_dictionary() {
     }
     currentTokenIdx++;
 
-    auto itr = dictionary->values.find("Length");
-    if (itr == dictionary->values.end()) {
+    auto opt = dictionary->values.find("Length");
+    if (!opt.has_value()) {
         // TODO add logging
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
 
     int64_t length = -1;
-    if (itr->second->is<Integer>()) {
-        length = itr->second->as<Integer>()->value;
-    } else if (itr->second->is<IndirectReference>()) {
-        auto obj = referenceResolver->resolve(itr->second->as<IndirectReference>());
+    auto &value    = opt.value();
+    if (value->is<Integer>()) {
+        length = value->as<Integer>()->value;
+    } else if (value->is<IndirectReference>()) {
+        auto obj = referenceResolver->resolve(value->as<IndirectReference>());
         if (obj == nullptr) {
             // TODO add logging
             return nullptr;

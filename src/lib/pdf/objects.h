@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "helper/allocator.h"
+#include "helper/static_map.h"
 #include "helper/static_vector.h"
 #include "helper/util.h"
 
@@ -109,19 +110,18 @@ struct Array : public Object {
 };
 
 struct Dictionary : public Object {
-    // TODO replace std::unordered_map with StaticMap
-    std::unordered_map<std::string, Object *> values = {};
+    StaticMap<std::string, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(std::string_view data, std::unordered_map<std::string, Object *> map)
-        : Object(staticType(), data), values(std::move(map)) {}
+    explicit Dictionary(std::string_view data, StaticMap<std::string, Object *> map)
+        : Object(staticType(), data), values(map) {}
 
     template <typename T> std::optional<T *> find(const std::string &key) {
-        auto itr = values.find(key);
-        if (itr == values.end()) {
+        auto opt = values.find(key);
+        if (!opt.has_value()) {
             return {};
         }
-        return itr->second->as<T>();
+        return opt.value()->as<T>();
     }
 };
 
