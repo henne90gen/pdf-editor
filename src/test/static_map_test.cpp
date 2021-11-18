@@ -58,3 +58,16 @@ TEST(StaticMap, Find) {
     val = staticMap.find(5);
     ASSERT_EQ(val, std::optional<int>());
 }
+
+TEST(StaticMap, Remove) {
+    pdf::Allocator allocator = {};
+    allocator.init(100);
+
+    std::unordered_map<int, int> map = {{1, 2}, {2, 3}, {3, 4}};
+    auto staticMap                   = pdf::StaticMap<int, int>::create(allocator, map);
+    auto val                         = staticMap.remove(1);
+    ASSERT_EQ(val, std::optional(2));
+
+    val = staticMap.find(1);
+    ASSERT_EQ(val, std::optional<int>());
+}

@@ -61,6 +61,7 @@ template <typename K, typename V> struct StaticMap {
     Iterator end() { return Iterator(&entries[capacity]); }
     Iterator end() const { return Iterator(&entries[capacity]); }
 
+    /// searches the map for the given key and returns either the found element or an empty optional
     std::optional<V> find(const K &key) {
         auto i = 0;
         auto h = std::hash<K>()(key);
@@ -79,6 +80,33 @@ template <typename K, typename V> struct StaticMap {
             // NOTE: this only works because we are not modifying the map
             // -> thus there will always be an empty slot
         }
+        return {};
+    }
+
+    /// same as find(), except that the element is removed after retrieving it
+    std::optional<V> remove(const K &key) {
+        auto i = 0;
+        auto h = std::hash<K>()(key);
+        while (true) {
+            auto index  = (h + i) % capacity;
+            auto &entry = entries[index];
+            if (entry.status == Entry::Status::EMPTY) {
+                return {};
+            }
+
+            if (key == entry.key) {
+                auto value = entry.value;
+                entry.status = Entry::Status::EMPTY;
+                entry.key    = {};
+                entry.value  = {};
+                return value;
+            }
+
+            i++;
+            // NOTE: this only works because we are not modifying the map
+            // -> thus there will always be an empty slot
+        }
+        return {};
     }
 
     static StaticMap<K, V> create(Allocator &allocator, const std::unordered_map<K, V> &map) {

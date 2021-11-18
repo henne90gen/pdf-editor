@@ -15,6 +15,8 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     trailerHighlight  = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
     objectsHighlight  = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
     jumpToByteButton  = builder->get_widget<Gtk::Button>("JumpToByteButton");
+    memoryUsageLabel  = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
+    memoryUsageLabel->set_text(std::to_string(document.allocator.total_bytes_allocated()));
 
     contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
@@ -24,7 +26,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
 
-    contentWindow = Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+    Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
 }
 
 void DebugWindow::update_selected_byte_label(int b) {

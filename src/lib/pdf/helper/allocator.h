@@ -21,6 +21,11 @@ struct Allocator {
     void extend(size_t size);
     char *allocate_chunk(size_t sizeInBytes);
 
+    std::vector<size_t> bytes_allocated();
+    size_t total_bytes_allocated();
+    size_t num_allocations();
+    void for_each_allocation(const std::function<bool(Allocation *)> &func);
+
     template <typename T, typename... Args> T *allocate(Args &&...args) {
         auto s   = sizeof(T);
         auto buf = allocate_chunk(s);

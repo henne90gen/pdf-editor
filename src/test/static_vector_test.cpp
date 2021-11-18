@@ -18,6 +18,19 @@ TEST(StaticVector, Create) {
     ASSERT_EQ(staticVector[2], 3);
 }
 
+TEST(StaticVector, Iterate) {
+    pdf::Allocator allocator = {};
+    allocator.init(100);
+
+    std::vector<int> vec = {1, 2, 3};
+    auto staticVector    = pdf::StaticVector<int>::create(allocator, vec);
+    int i                = 1;
+    for (auto &elem : staticVector) {
+        ASSERT_EQ(elem, i);
+        i++;
+    }
+}
+
 TEST(StaticVector, Remove) {
     pdf::Allocator allocator = {};
     allocator.init(100);

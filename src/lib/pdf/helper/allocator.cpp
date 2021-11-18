@@ -48,7 +48,8 @@ void Allocator::extend(size_t size) {
 
 char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
-    if (currentAllocation->bufferPosition + sizeInBytes > currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
+    if (currentAllocation->bufferPosition + sizeInBytes >
+        currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
         spdlog::warn("Failed to fit object of size {} bytes into the existing memory, allocating more", sizeInBytes);
 
         auto newAllocationSize = currentAllocation->sizeInBytes * 2;
@@ -58,6 +59,21 @@ char *Allocator::allocate_chunk(size_t sizeInBytes) {
     auto result = currentAllocation->bufferPosition;
     currentAllocation->bufferPosition += sizeInBytes;
     return result;
+}
+
+std::vector<size_t> Allocator::bytes_allocated() { return std::vector<size_t>(); }
+
+size_t Allocator::total_bytes_allocated() {}
+
+size_t Allocator::num_allocations() { return 0; }
+
+void Allocator::for_each_allocation(const std::function<bool(Allocation *)> &func) {
+    auto allocation = currentAllocation;
+    while (allocation != nullptr) {
+        auto prev = allocation->previousAllocation;
+        func(allocation);
+        allocation = prev;
+    }
 }
 
 } // namespace pdf

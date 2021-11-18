@@ -28,10 +28,10 @@ class DebugWindow : public Gtk::ApplicationWindow {
 
   private:
     pdf::Document document;
-    ContentWindow *contentWindow;
     ContentArea *contentArea;
     Gtk::Label *selectedByteLabel;
     Gtk::Label *hoveredByteLabel;
+    Gtk::Label *memoryUsageLabel;
     Gtk::CheckButton *trailerHighlight;
     Gtk::CheckButton *objectsHighlight;
     Gtk::Button *jumpToByteButton;
