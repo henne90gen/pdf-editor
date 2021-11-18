@@ -22,14 +22,14 @@ std::optional<CMapStream *> pdf::Font::to_unicode(pdf::Document &document) {
 }
 
 pdf::FontDescriptor *pdf::Font::font_descriptor(pdf::Document &document) {
-    return document.get<FontDescriptor>(values["FontDescriptor"]);
+    return document.get<FontDescriptor>(must_find<Object>("FontDescriptor"));
 }
 
 std::optional<Object *> pdf::Font::encoding(pdf::Document &document) {
     return document.get<Object>(find<Object>("Encoding"));
 }
 
-pdf::Array *pdf::Font::widths(pdf::Document &document) { return document.get<Array>(values["Widths"]); }
+pdf::Array *pdf::Font::widths(pdf::Document &document) { return document.get<Array>(must_find<Object>("Widths")); }
 
 std::optional<Stream *> Font::font_program(Document &document) {
     if (is_true_type()) {

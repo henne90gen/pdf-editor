@@ -57,7 +57,9 @@ template <typename K, typename V> struct StaticMap {
 
     [[nodiscard]] size_t size() const { return entryCount; }
     Iterator begin() { return Iterator(&entries[0]); }
+    Iterator begin() const { return Iterator(&entries[0]); }
     Iterator end() { return Iterator(&entries[capacity]); }
+    Iterator end() const { return Iterator(&entries[capacity]); }
 
     std::optional<V> find(const K &key) {
         auto i = 0;

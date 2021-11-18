@@ -40,14 +40,14 @@ Stream *parseStream(Allocator &allocator, char *start, size_t length) {
 }
 
 bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrailer) {
-    auto W          = stream->dictionary->values["W"]->as<Array>();
+    auto W          = stream->dictionary->must_find<Array>("W");
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
     auto sizeField2 = W->values[2]->as<Integer>()->value;
     auto content    = stream->decode(allocator);
 
     // verify that the content of the stream matches the size in the dictionary
-    size_t countInDict        = stream->dictionary->values["Size"]->as<Integer>()->value - 1;
+    size_t countInDict        = stream->dictionary->must_find<Integer>("Size")->value - 1;
     size_t crossRefEntryCount = content.size() / (sizeField0 + sizeField1 + sizeField2);
     if (countInDict != crossRefEntryCount) {
         spdlog::warn(
@@ -125,13 +125,13 @@ bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrail
         }
     }
 
-    auto itr = stream->dictionary->values.find("Prev");
-    if (itr == stream->dictionary->values.end()) {
+    auto opt = stream->dictionary->values.find("Prev");
+    if (!opt.has_value()) {
         return false;
     }
 
     currentTrailer->prev = allocator.allocate<Trailer>();
-    return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
+    return read_trailers(data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
 bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
@@ -214,13 +214,13 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     }
 
     currentTrailer->dict = parseDict(allocator, currentReadPtr, lengthOfTrailerDict);
-    auto itr             = currentTrailer->dict->values.find("Prev");
-    if (!(itr != currentTrailer->dict->values.end())) {
+    auto opt             = currentTrailer->dict->values.find("Prev");
+    if (!opt.has_value()) {
         return false;
     }
 
     currentTrailer->prev = allocator.allocate<Trailer>();
-    return read_trailers(data + itr->second->as<Integer>()->value, currentTrailer->prev);
+    return read_trailers(data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
 bool Document::read_data() {

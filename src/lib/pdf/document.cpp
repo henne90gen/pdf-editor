@@ -46,13 +46,13 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
     } else if (entry->type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = get_object(entry->compressed.objectNumberOfStream);
         auto stream       = streamObject->object->as<Stream>();
-        ASSERT(stream->dictionary->values["Type"]->as<Name>()->value() == "ObjStm");
+        ASSERT(stream->dictionary->must_find<Name>("Type")->value() == "ObjStm");
 
         auto content      = stream->decode(allocator);
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
         auto parser       = Parser(lexer, allocator, this);
-        int64_t N         = stream->dictionary->values["N"]->as<Integer>()->value;
+        int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
 
         // TODO cache objectNumbers and corresponding objects
         auto objectNumbers = std::vector<int64_t>(N);
@@ -129,11 +129,11 @@ size_t Document::object_count(const bool parseObjects) {
 }
 
 PageTreeNode *PageTreeNode::parent(Document &document) {
-    auto itr = values.find("Parent");
-    if (itr == values.end()) {
+    auto opt = values.find("Parent");
+    if (!opt.has_value()) {
         return nullptr;
     }
-    return document.get<PageTreeNode>(itr->second);
+    return document.get<PageTreeNode>(opt.value());
 }
 
 void Document::for_each_page(const std::function<bool(Page *)> &func) {
@@ -256,23 +256,22 @@ void Document::add_raw_section(const char *insertionPoint, const char *newConten
 }
 
 DocumentCatalog *Trailer::catalog(Document &document) const {
-    std::unordered_map<std::string, Object *>::iterator itr;
+    std::optional<Object *> opt;
     if (dict != nullptr) {
-        itr = dict->values.find("Root");
-        ASSERT(itr != dict->values.end());
+        opt = dict->values.find("Root");
     } else {
-        itr = stream->dictionary->values.find("Root");
-        ASSERT(itr != stream->dictionary->values.end());
+        opt = stream->dictionary->values.find("Root");
     }
-    return document.get<DocumentCatalog>(itr->second);
+    ASSERT(opt.has_value());
+    return document.get<DocumentCatalog>(opt.value());
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
-    auto itr = values.find("Pages");
-    if (itr == values.end()) {
+    auto opt = values.find("Pages");
+    if (!opt.has_value()) {
         return nullptr;
     }
-    return document.get<PageTreeNode>(itr->second);
+    return document.get<PageTreeNode>(opt.value());
 }
 
 [[maybe_unused]] bool Document::insert_document(Document & /*otherDocument*/, size_t /*atPageNum*/) {

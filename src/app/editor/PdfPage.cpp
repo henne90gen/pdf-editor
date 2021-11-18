@@ -103,8 +103,8 @@ void PdfPage::addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRo
 void PdfPage::addRows(const pdf::Dictionary *dict, int depth, Gtk::TreeModel::Row *parentRow) {
     for (auto &entry : dict->values) {
         auto row                = createRow(parentRow);
-        row[columns.m_col_name] = entry.first;
-        addRows(entry.second, depth + 1, &row);
+        row[columns.m_col_name] = entry.key;
+        addRows(entry.value, depth + 1, &row);
     }
 }
 

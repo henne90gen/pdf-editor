@@ -123,6 +123,14 @@ struct Dictionary : public Object {
         }
         return opt.value()->as<T>();
     }
+
+    template <typename T> T *must_find(const std::string &key) {
+        auto opt = values.find(key);
+        if (!opt.has_value()) {
+            return nullptr;
+        }
+        return opt.value()->as<T>();
+    }
 };
 
 struct IndirectReference : public Object {

@@ -49,20 +49,20 @@ std::string to_string(Object *object) {
     }
     case Object::Type::DICTIONARY: {
         std::string result = "<<\n";
-        auto entries       = std::vector<std::pair<std::string, Object *>>();
+        auto entries       = std::vector<StaticMap<std::string, Object *>::Entry>();
         entries.reserve(object->as<Dictionary>()->values.size());
         for (auto &entry : object->as<Dictionary>()->values) {
             entries.emplace_back(entry);
         }
         std::sort(entries.begin(), entries.end(),
-                  [](const std::pair<std::string, Object *> &a, const std::pair<std::string, Object *> &b) {
-                      return a.first < b.first;
+                  [](const StaticMap<std::string, Object *>::Entry &a, const StaticMap<std::string, Object *>::Entry &b) {
+                      return a.key < b.key;
                   });
         for (auto &entry : entries) {
             result += "  ";
-            result += entry.first;
+            result += entry.key;
             result += ": ";
-            result += to_string(entry.second);
+            result += to_string(entry.value);
             result += "\n";
         }
         result += ">>";
@@ -79,17 +79,17 @@ std::string to_string(Object *object) {
 }
 
 std::vector<std::string> Stream::filters() const {
-    auto itr = dictionary->values.find("Filter");
-    if (itr == dictionary->values.end()) {
+    auto opt = dictionary->values.find("Filter");
+    if (!opt.has_value()) {
         return {};
     }
 
-    if (itr->second->is<Name>()) {
+    if (opt.value()->is<Name>()) {
         // TODO is this conversion to a string really necessary?
-        return {std::string(itr->second->as<Name>()->value())};
+        return {std::string(opt.value()->as<Name>()->value())};
     }
 
-    auto array  = itr->second->as<Array>();
+    auto array  = opt.value()->as<Array>();
     auto result = std::vector<std::string>();
     result.reserve(array->values.size());
     for (auto filter : array->values) {

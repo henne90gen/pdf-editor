@@ -94,16 +94,16 @@ TEST(Parser, DictionaryEmpty) {
 TEST(Parser, DictionaryWithValues) {
     assertParses<pdf::Dictionary>("<< /Type /Hello \n /Key /Value \n >>", [](pdf::Dictionary *result) {
         ASSERT_EQ(result->values.size(), 2); //
-        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value(), "Hello");
-        ASSERT_EQ(result->values["Key"]->as<pdf::Name>()->value(), "Value");
+        ASSERT_EQ(result->must_find<pdf::Name>("Type")->value(), "Hello");
+        ASSERT_EQ(result->must_find<pdf::Name>("Key")->value(), "Value");
     });
 }
 
 TEST(Parser, DictionaryNested) {
     assertParses<pdf::Dictionary>("<< /Type /Hello \n /Dict << /Key /Value \n >> \n >>", [](pdf::Dictionary *result) {
         ASSERT_EQ(result->values.size(), 2);
-        ASSERT_EQ(result->values["Type"]->as<pdf::Name>()->value(), "Hello");
-        ASSERT_EQ(result->values["Dict"]->as<pdf::Dictionary>()->values.size(), 1);
+        ASSERT_EQ(result->must_find<pdf::Name>("Type")->value(), "Hello");
+        ASSERT_EQ(result->must_find<pdf::Dictionary>("Dict")->values.size(), 1);
     });
 }
 
@@ -139,15 +139,15 @@ TEST(Parser, DictionaryTrailer) {
                               ">>";
     assertParses<pdf::Dictionary>(input, [](pdf::Dictionary *result) {
         ASSERT_EQ(result->values.size(), 5); //
-        ASSERT_EQ(result->values["Size"]->as<pdf::Integer>()->value, 9);
-        ASSERT_EQ(result->values["Info"]->as<pdf::IndirectReference>()->objectNumber, 8);
-        ASSERT_EQ(result->values["Info"]->as<pdf::IndirectReference>()->generationNumber, 0);
-        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values.size(), 2);
-        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[0]->as<pdf::HexadecimalString>()->data,
+        ASSERT_EQ(result->must_find<pdf::Integer>("Size")->value, 9);
+        ASSERT_EQ(result->must_find<pdf::IndirectReference>("Info")->objectNumber, 8);
+        ASSERT_EQ(result->must_find<pdf::IndirectReference>("Info")->generationNumber, 0);
+        ASSERT_EQ(result->must_find<pdf::Array>("ID")->values.size(), 2);
+        ASSERT_EQ(result->must_find<pdf::Array>("ID")->values[0]->as<pdf::HexadecimalString>()->data,
                   "949FFBA879E60749D38B89A33E0DD9E7");
-        ASSERT_EQ(result->values["ID"]->as<pdf::Array>()->values[1]->as<pdf::HexadecimalString>()->data,
+        ASSERT_EQ(result->must_find<pdf::Array>("ID")->values[1]->as<pdf::HexadecimalString>()->data,
                   "949FFBA879E60749D38B89A33E0DD9E7");
-        ASSERT_EQ(result->values["DocChecksum"]->as<pdf::Name>()->value(), "87E47BA8C63C8BA796458FA05DBE8C32");
+        ASSERT_EQ(result->must_find<pdf::Name>("DocChecksum")->value(), "87E47BA8C63C8BA796458FA05DBE8C32");
     });
 }
 

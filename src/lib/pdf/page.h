@@ -7,17 +7,17 @@
 namespace pdf {
 
 struct PageTreeNode : public Dictionary {
-    Name *type() { return values["Type"]->as<Name>(); }
+    Name *type() { return must_find<Name>("Type"); }
     bool is_page() { return type()->value() == "Page"; }
     PageTreeNode *parent(Document &document);
-    Array *kids() { return values["Kids"]->as<Array>(); }
-    Integer *count() { return values["Count"]->as<Integer>(); }
+    Array *kids() { return must_find<Array>("Kids"); }
+    Integer *count() { return must_find<Integer>("Count"); }
 
     template <typename T>
     std::optional<T *> attribute(Document &document, const std::string &attributeName, bool inheritable) {
-        auto itr = values.find(attributeName);
-        if (itr != values.end()) {
-            return document.get<T>(itr->second);
+        auto opt = values.find(attributeName);
+        if (opt.has_value()) {
+            return document.get<T>(opt.value());
         }
 
         if (!inheritable) {
@@ -60,7 +60,9 @@ struct Page {
     Rectangle *bleed_box() { return node->attribute<Rectangle>(document, "BleedBox", true).value_or(media_box()); }
     Rectangle *trim_box() { return node->attribute<Rectangle>(document, "TrimBox", true).value_or(media_box()); }
     Rectangle *art_box() { return node->attribute<Rectangle>(document, "ArtBox", true).value_or(media_box()); }
-    std::optional<Dictionary *> box_color_info() { return node->attribute<Dictionary>(document, "BoxColorInfo", false); }
+    std::optional<Dictionary *> box_color_info() {
+        return node->attribute<Dictionary>(document, "BoxColorInfo", false);
+    }
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
     std::vector<ContentStream *> content_streams();
 

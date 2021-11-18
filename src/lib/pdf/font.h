@@ -21,19 +21,19 @@ struct FontFlags : public Integer {
 };
 
 struct FontDescriptor : public Dictionary {
-    Name *font_name() { return values["FontName"]->as<Name>(); }
+    Name *font_name() { return must_find<Name>("FontName"); }
     // TODO std::optional<std::string_view> fontFamily() {return find<>()}
     std::optional<Name *> font_stretch() { return find<Name>("FontStretch"); }
     std::optional<Real *> font_weight() { return find<Real>("FontWeight"); }
-    FontFlags *flags() { return values["Flags"]->as<FontFlags>(); }
-    Rectangle *font_bbox() { return values["FontBBox"]->as<Rectangle>(); }
-    Real *italic_angle() { return values["ItalicAngle"]->as<Real>(); }
-    Real *ascent() { return values["Ascent"]->as<Real>(); }
-    Real *descent() { return values["Descent"]->as<Real>(); }
+    FontFlags *flags() { return must_find<FontFlags>("Flags"); }
+    Rectangle *font_bbox() { return must_find<Rectangle>("FontBBox"); }
+    Real *italic_angle() { return must_find<Real>("ItalicAngle"); }
+    Real *ascent() { return must_find<Real>("Ascent"); }
+    Real *descent() { return must_find<Real>("Descent"); }
     std::optional<Real *> leading() { return find<Real>("Leading"); }
-    Real *cap_height() { return values["CapHeight"]->as<Real>(); }
+    Real *cap_height() { return must_find<Real>("CapHeight"); }
     std::optional<Real *> x_height() { return find<Real>("XHeight"); }
-    Real *stem_v() { return values["StemV"]->as<Real>(); }
+    Real *stem_v() { return must_find<Real>("StemV"); }
     std::optional<Real *> stem_h() { return find<Real>("StemH"); }
     std::optional<Real *> avg_width() { return find<Real>("AvgWidth"); }
     std::optional<Real *> max_width() { return find<Real>("MaxWidth"); }
@@ -49,7 +49,7 @@ struct FontDescriptor : public Dictionary {
 };
 
 struct Font : public Dictionary {
-    std::string_view type() { return values["Subtype"]->as<Name>()->value(); }
+    std::string_view type() { return must_find<Name>("Subtype")->value(); }
     bool is_type0() { return type() == "Type0"; }
     bool is_type1() { return type() == "Type1"; }
     bool is_MM_type1() { return type() == "MMType1"; }
@@ -58,9 +58,9 @@ struct Font : public Dictionary {
     bool is_CID_font_type0() { return type() == "CIDFontType0"; }
     bool is_CID_font_type2() { return type() == "CIDFontType2"; }
     std::optional<Name *> name() { return find<Name>("Name"); }
-    Name *base_font() { return values["BaseFont"]->as<Name>(); }
-    Integer *first_char() { return values["FirstChar"]->as<Integer>(); }
-    Integer *last_char() { return values["LastChar"]->as<Integer>(); }
+    Name *base_font() { return must_find<Name>("BaseFont"); }
+    Integer *first_char() { return must_find<Integer>("FirstChar"); }
+    Integer *last_char() { return must_find<Integer>("LastChar"); }
     Array *widths(Document &document);
     FontDescriptor *font_descriptor(Document &document);
     std::optional<Object *> encoding(Document &document);
