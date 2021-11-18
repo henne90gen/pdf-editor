@@ -1,10 +1,8 @@
 #include "ContentArea.h"
 
 #include <gtkmm/eventcontrollermotion.h>
-#include <gtkmm/eventcontrollerscroll.h>
 #include <gtkmm/gestureclick.h>
 #include <random>
-#include <spdlog/spdlog.h>
 
 ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
     : Gtk::DrawingArea(obj), document(_document) {

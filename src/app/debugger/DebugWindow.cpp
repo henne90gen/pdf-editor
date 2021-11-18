@@ -1,7 +1,9 @@
 #include "DebugWindow.h"
 
+#include <glibmm/main.h>
 #include <gtkmm/eventcontrollermotion.h>
-#include <spdlog/spdlog.h>
+#include <iomanip>
+#include <sstream>
 
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
@@ -15,8 +17,6 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     trailerHighlight  = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
     objectsHighlight  = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
     jumpToByteButton  = builder->get_widget<Gtk::Button>("JumpToByteButton");
-    memoryUsageLabel  = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
-    memoryUsageLabel->set_text(std::to_string(document.allocator.total_bytes_allocated()));
 
     contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
@@ -27,6 +27,16 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
 
     Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+
+    memoryUsageLabel  = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
+    update_memory_usage_label();
+    // NOTE using polling seems to be the only reasonable solution
+    Glib::signal_timeout().connect(
+          [this]() {
+              update_memory_usage_label();
+              return true;
+          },
+          500);
 }
 
 void DebugWindow::update_selected_byte_label(int b) {
@@ -66,4 +76,35 @@ void DebugWindow::response_jump_to_byte_dialog(int response) {
 
     delete jumpToByteDialog;
     jumpToByteDialog = nullptr;
+}
+
+std::string format_bytes(size_t bytes) {
+    static std::array<std::string, 6> postfixes = {
+          "B", "KB", "MB", "GB", "TB", "PB",
+    };
+
+    int i    = 0;
+    auto tmp = static_cast<double>(bytes);
+    while (tmp >= 1024.0) {
+        if (i >= postfixes.size()) {
+            break;
+        }
+        tmp /= 1024.0;
+        i++;
+    }
+
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(2) << tmp;
+    stream << " ";
+    stream << postfixes[i];
+    return stream.str();
+}
+
+void DebugWindow::update_memory_usage_label() {
+    auto totalBytesUsed      = format_bytes(document.allocator.total_bytes_used());
+    auto totalBytesAllocated = format_bytes(document.allocator.total_bytes_allocated());
+    auto numAllocations      = std::to_string(document.allocator.num_allocations());
+    auto text = totalBytesUsed + " bytes used / " + totalBytesAllocated + " bytes allocated (" + numAllocations +
+                " allocations)";
+    memoryUsageLabel->set_text(text);
 }

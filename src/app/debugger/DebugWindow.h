@@ -25,6 +25,7 @@ class DebugWindow : public Gtk::ApplicationWindow {
     void update_hovered_byte_label(int b);
     void open_jump_to_byte_dialog();
     void response_jump_to_byte_dialog(int response);
+    void update_memory_usage_label();
 
   private:
     pdf::Document document;

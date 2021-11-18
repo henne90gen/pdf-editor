@@ -9,14 +9,13 @@ namespace pdf {
 Allocator::~Allocator() {
     size_t allocationsFreed = 0;
     size_t bytesFreed       = 0;
-    auto allocation         = currentAllocation;
-    while (allocation != nullptr) {
-        auto prev = allocation->previousAllocation;
-        bytesFreed += allocation->sizeInBytes;
-        free(allocation);
-        allocation = prev;
+
+    for_each_allocation([&allocationsFreed, &bytesFreed](Allocation &allocation) {
+        bytesFreed += allocation.sizeInBytes;
+        free(&allocation);
         allocationsFreed++;
-    }
+        return true;
+    });
 
     spdlog::trace("Freed {} allocations ({} bytes total)", allocationsFreed, bytesFreed);
 }
@@ -61,19 +60,40 @@ char *Allocator::allocate_chunk(size_t sizeInBytes) {
     return result;
 }
 
-std::vector<size_t> Allocator::bytes_allocated() { return std::vector<size_t>(); }
-
-size_t Allocator::total_bytes_allocated() {}
-
-size_t Allocator::num_allocations() { return 0; }
-
-void Allocator::for_each_allocation(const std::function<bool(Allocation *)> &func) {
+void Allocator::for_each_allocation(const std::function<bool(Allocation &)> &func) const {
     auto allocation = currentAllocation;
     while (allocation != nullptr) {
         auto prev = allocation->previousAllocation;
-        func(allocation);
+        func(*allocation);
         allocation = prev;
     }
+}
+
+size_t Allocator::total_bytes_allocated() const {
+    size_t result = 0;
+    for_each_allocation([&result](Allocation &allocation) {
+        result += allocation.sizeInBytes;
+        return true;
+    });
+    return result;
+}
+
+size_t Allocator::num_allocations() const {
+    size_t result = 0;
+    for_each_allocation([&result](Allocation &allocation) {
+        result++;
+        return true;
+    });
+    return result;
+}
+
+size_t Allocator::total_bytes_used() const {
+    size_t result = 0;
+    for_each_allocation([&result](Allocation &allocation) {
+        result += allocation.bufferPosition - allocation.bufferStart;
+        return true;
+    });
+    return result;
 }
 
 } // namespace pdf
