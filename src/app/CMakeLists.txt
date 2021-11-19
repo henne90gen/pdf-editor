@@ -28,9 +28,10 @@ embed_file(debugger/debugger.xml debugger_xml)
 
 add_executable(pdf-editor
         editor/main.cpp
-        editor/EditorApplication.cpp
         editor/EditorWindow.cpp
         editor/PdfPage.cpp
+        editor/EditorApplication.cpp
+        common/PdfApplication.cpp
         common/OpenWindow.cpp
         ${editor_xml}
         ${open_xml})
@@ -45,6 +46,7 @@ add_executable(pdf-debugger
         debugger/ContentWindow.cpp
         debugger/ContentArea.cpp
         debugger/JumpToByteDialog.cpp
+        common/PdfApplication.cpp
         common/OpenWindow.cpp
         ${debugger_xml}
         ${open_xml})
