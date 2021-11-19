@@ -10,6 +10,8 @@ class EditorApplication : public Gtk::Application {
         return Glib::make_refptr_for_instance<EditorApplication>(new EditorApplication());
     }
 
+    void open_window(const std::string &filePath);
+
   protected:
     EditorApplication();
 

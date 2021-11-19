@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <requires lib="gtk+" version="4.5.0"/>
+
+    <object class="GtkApplicationWindow" id="OpenWindow">
+        <property name="default-width">400</property>
+        <property name="default-height">600</property>
+        <child>
+            <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                    <object class="GtkScrolledWindow" id="ContentWindow">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="focusable">True</property>
+                        <property name="focus-on-click">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                            <object class="GtkViewport" id="ContentViewport">
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+
+    <object class="GtkHeaderBar" id="TitleBar">
+        <child type="start">
+            <object class="GtkButton" id="OpenButton">
+                <property name="label" translatable="yes">Open</property>
+            </object>
+        </child>
+    </object>
+</interface>

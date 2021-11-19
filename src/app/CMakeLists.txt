@@ -19,22 +19,25 @@ function(embed_file file generated_c)
     set(${generated_c} ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.c PARENT_SCOPE)
 endfunction()
 
-add_executable(pdf-cli cli/main.cpp util.cpp)
-target_link_libraries(pdf-cli PRIVATE pdf-lib spdlog::spdlog)
+add_executable(pdf-cli cli/main.cpp cli/util.cpp)
+target_link_libraries(pdf-cli PRIVATE pdf-lib)
 
-embed_file(editor/editor.xml editor_glade)
+embed_file(common/open.xml open_xml)
+embed_file(editor/editor.xml editor_xml)
+embed_file(debugger/debugger.xml debugger_xml)
+
 add_executable(pdf-editor
         editor/main.cpp
         editor/EditorApplication.cpp
         editor/EditorWindow.cpp
         editor/PdfPage.cpp
-        util.cpp
-        ${editor_glade})
+        common/OpenWindow.cpp
+        ${editor_xml}
+        ${open_xml})
 target_link_gtk3(pdf-editor)
-target_link_libraries(pdf-editor PRIVATE pdf-lib spdlog::spdlog)
-target_include_directories(pdf-editor PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(pdf-editor PRIVATE pdf-lib)
+target_include_directories(pdf-editor PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-embed_file(debugger/debugger.xml debugger_glade)
 add_executable(pdf-debugger
         debugger/main.cpp
         debugger/DebugApplication.cpp
@@ -42,9 +45,11 @@ add_executable(pdf-debugger
         debugger/ContentWindow.cpp
         debugger/ContentArea.cpp
         debugger/JumpToByteDialog.cpp
-        ${debugger_glade})
+        common/OpenWindow.cpp
+        ${debugger_xml}
+        ${open_xml})
 target_link_gtk3(pdf-debugger)
-target_link_libraries(pdf-debugger PRIVATE pdf-lib spdlog::spdlog)
-target_include_directories(pdf-debugger PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(pdf-debugger PRIVATE pdf-lib)
+target_include_directories(pdf-debugger PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS pdf-cli pdf-editor pdf-debugger DESTINATION bin)

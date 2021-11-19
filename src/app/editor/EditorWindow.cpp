@@ -1,20 +1,19 @@
 #include "EditorWindow.h"
 
-EditorWindow::EditorWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder)
-    : Gtk::ApplicationWindow(obj), builder(std::move(_builder)) {
+#include <spdlog/spdlog.h>
 
-//    std::vector<Gtk::TargetEntry> targets = {Gtk::TargetEntry("text/uri-list")};
-//    this->drag_dest_set(targets, Gtk::DEST_DEFAULT_DROP | Gtk::DEST_DEFAULT_HIGHLIGHT | Gtk::DEST_DEFAULT_MOTION,
-//                        Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
-//    this->signal_drag_drop().connect(sigc::mem_fun(this, &EditorWindow::custom_on_drag_drop));
-//    this->signal_drag_data_received().connect(sigc::mem_fun(this, &EditorWindow::custom_on_drag_data_received));
-
-    notebook = builder->get_widget<Gtk::Notebook>("ContentNotebook");
-    for (int i = 0; i < notebook->get_n_pages(); i++) {
-        notebook->remove_page(i);
+EditorWindow::EditorWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> /*_builder*/, const std::string &filePath)
+    : Gtk::ApplicationWindow(obj) {
+    if (pdf::Document::read_from_file(filePath, document)) {
+        spdlog::error("Failed to open document");
+        return;
     }
 
-    notebook->show();
+    //    std::vector<Gtk::TargetEntry> targets = {Gtk::TargetEntry("text/uri-list")};
+    //    this->drag_dest_set(targets, Gtk::DEST_DEFAULT_DROP | Gtk::DEST_DEFAULT_HIGHLIGHT | Gtk::DEST_DEFAULT_MOTION,
+    //                        Gdk::ACTION_COPY | Gdk::ACTION_MOVE);
+    //    this->signal_drag_drop().connect(sigc::mem_fun(this, &EditorWindow::custom_on_drag_drop));
+    //    this->signal_drag_data_received().connect(sigc::mem_fun(this, &EditorWindow::custom_on_drag_data_received));
 }
 
 // bool EditorWindow::custom_on_drag_drop(const Glib::RefPtr<Gdk::DragContext> &context, int x, int y, guint time) {
@@ -34,16 +33,3 @@ EditorWindow::EditorWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _buil
 //     notebook->show();
 //     context->drag_finish(true, false, time);
 // }
-
-void EditorWindow::add_document(const std::string &filePath) {
-    auto &document = documents.emplace_back();
-    if (pdf::Document::read_from_file(filePath, document)) {
-        spdlog::error("Could not load pdf file");
-        return;
-    }
-
-    auto &page     = pages.emplace_back(document);
-    auto lastSlash = filePath.find_last_of('/');
-    auto fileName  = filePath.substr(lastSlash + 1);
-    notebook->append_page(page, fileName);
-}

@@ -2,25 +2,19 @@
 
 #include <filesystem>
 #include <iostream>
-#include <spdlog/spdlog.h>
 
 // TODO this is a hack to get the gtkmm4 code to compile on Windows
 #undef WIN32
-#include <glibmm/convert.h>
-#include <glibmm/markup.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/builder.h>
-#include <gtkmm/notebook.h>
-#include <gtkmm/textview.h>
 
 #include "PdfPage.h"
 
 class EditorWindow : public Gtk::ApplicationWindow {
   public:
-    [[maybe_unused]] EditorWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder);
+    [[maybe_unused]] EditorWindow(BaseObjectType *obj, Glib::RefPtr<Gtk::Builder> _builder,
+                                  const std::string &filePath);
     ~EditorWindow() override = default;
-
-    void add_document(const std::string &filePath);
 
   protected:
     //    bool custom_on_drag_drop(const Glib::RefPtr<Gdk::DragContext> &context, int x, int y, guint time);
@@ -29,10 +23,6 @@ class EditorWindow : public Gtk::ApplicationWindow {
     //                                      const Gtk::SelectionData &selection_data, guint info, guint time);
 
   private:
-    Glib::RefPtr<Gtk::Builder> builder;
-    Gtk::Notebook *notebook = nullptr;
-
-    // using std::list here, because the stored objects have to have stable addresses
-    std::list<pdf::Document> documents = {};
-    std::list<PdfPage> pages           = {};
+    pdf::Document document;
+    //    PdfPage *pdfPage;
 };
