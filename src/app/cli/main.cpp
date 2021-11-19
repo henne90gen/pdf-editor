@@ -1,9 +1,8 @@
 #include <iostream>
 #include <pdf/document.h>
-#include <spdlog/spdlog.h>
 #include <unistd.h>
 
-#include "../util.h"
+#include "util.h"
 
 #include "cmd_delete_page.cpp"
 #include "cmd_images.cpp"
