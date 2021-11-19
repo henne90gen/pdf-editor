@@ -28,7 +28,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 
     Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
 
-    memoryUsageLabel  = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
+    memoryUsageLabel = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
     update_memory_usage_label();
     // NOTE using polling seems to be the only reasonable solution
     Glib::signal_timeout().connect(
@@ -83,7 +83,7 @@ std::string format_bytes(size_t bytes) {
           "B", "KB", "MB", "GB", "TB", "PB",
     };
 
-    int i    = 0;
+    size_t i = 0;
     auto tmp = static_cast<double>(bytes);
     while (tmp >= 1024.0) {
         if (i >= postfixes.size()) {

@@ -80,7 +80,7 @@ size_t Allocator::total_bytes_allocated() const {
 
 size_t Allocator::num_allocations() const {
     size_t result = 0;
-    for_each_allocation([&result](Allocation &allocation) {
+    for_each_allocation([&result](Allocation & /*allocation*/) {
         result++;
         return true;
     });
