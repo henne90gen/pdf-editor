@@ -45,6 +45,7 @@ add_executable(pdf-debugger
         debugger/DebugWindow.cpp
         debugger/ContentWindow.cpp
         debugger/ContentArea.cpp
+        debugger/DocumentTree.cpp
         debugger/JumpToByteDialog.cpp
         common/PdfApplication.cpp
         common/OpenWindow.cpp

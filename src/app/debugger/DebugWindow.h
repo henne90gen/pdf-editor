@@ -9,11 +9,13 @@
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/label.h>
 #include <gtkmm/scrolledwindow.h>
+#include <gtkmm/treestore.h>
 #include <gtkmm/viewport.h>
 
 #include <pdf/document.h>
 
 #include "ContentWindow.h"
+#include "DocumentTree.h"
 #include "JumpToByteDialog.h"
 
 class DebugWindow : public Gtk::ApplicationWindow {
@@ -26,15 +28,20 @@ class DebugWindow : public Gtk::ApplicationWindow {
     void open_jump_to_byte_dialog();
     void response_jump_to_byte_dialog(int response);
     void update_memory_usage_label();
+    void parse_document();
 
   private:
     pdf::Document document;
-    ContentArea *contentArea;
+
     Gtk::Label *selectedByteLabel;
     Gtk::Label *hoveredByteLabel;
     Gtk::Label *memoryUsageLabel;
     Gtk::CheckButton *trailerHighlight;
     Gtk::CheckButton *objectsHighlight;
     Gtk::Button *jumpToByteButton;
+    Gtk::Button *parseDocumentButton;
+
+    ContentArea *contentArea           = nullptr;
+    DocumentTree *documentTree         = nullptr;
     JumpToByteDialog *jumpToByteDialog = nullptr;
 };

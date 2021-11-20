@@ -8,17 +8,21 @@
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
     if (pdf::Document::read_from_file(filePath, document)) {
-        spdlog::error("Failed to open document");
+        spdlog::error("Failed to open document: {}", filePath);
         return;
     }
 
-    selectedByteLabel = builder->get_widget<Gtk::Label>("SelectedByteLabel");
-    hoveredByteLabel  = builder->get_widget<Gtk::Label>("HoveredByteLabel");
-    trailerHighlight  = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
-    objectsHighlight  = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
-    jumpToByteButton  = builder->get_widget<Gtk::Button>("JumpToByteButton");
+    selectedByteLabel   = builder->get_widget<Gtk::Label>("SelectedByteLabel");
+    hoveredByteLabel    = builder->get_widget<Gtk::Label>("HoveredByteLabel");
+    memoryUsageLabel    = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
+    trailerHighlight    = builder->get_widget<Gtk::CheckButton>("TrailerHighlightCheckButton");
+    objectsHighlight    = builder->get_widget<Gtk::CheckButton>("ObjectsHighlightCheckButton");
+    jumpToByteButton    = builder->get_widget<Gtk::Button>("JumpToByteButton");
+    parseDocumentButton = builder->get_widget<Gtk::Button>("ParseDocumentButton");
+    contentArea         = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
+    documentTree        = Gtk::Builder::get_widget_derived<DocumentTree>(builder, "DocumentTree", document);
 
-    contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
+    parseDocumentButton->signal_clicked().connect(sigc::mem_fun(*documentTree, &DocumentTree::fill_tree));
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
     objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
     contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_selected_byte_label));
@@ -26,9 +30,6 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
 
-    Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
-
-    memoryUsageLabel = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
     update_memory_usage_label();
     // NOTE using polling seems to be the only reasonable solution
     Glib::signal_timeout().connect(
@@ -37,6 +38,8 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
               return true;
           },
           500);
+
+    Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
 }
 
 void DebugWindow::update_selected_byte_label(int b) {
