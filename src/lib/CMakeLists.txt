@@ -1,6 +1,6 @@
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(Cairo REQUIRED cairomm-1.0)
+pkg_check_modules(Cairo REQUIRED cairomm-1.16)
 
 function(target_link_cairo target)
     target_link_libraries(${target} PUBLIC ${Cairo_LIBRARIES})

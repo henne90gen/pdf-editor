@@ -213,7 +213,7 @@ void Renderer::loadFont(Font *font) {
 
     stateStack.back().textState.textFont.ftFace = face;
     stateStack.back().textState.textFont.cairoFace =
-          Cairo::RefPtr(new Cairo::FontFace(cairo_ft_font_face_create_for_ft_face(face, 0)));
+          std::make_shared<Cairo::FontFace>(cairo_ft_font_face_create_for_ft_face(face, 0));
 }
 
 } // namespace pdf

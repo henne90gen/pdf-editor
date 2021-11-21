@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
-#include <pdf/renderer.h>
 #include <pdf/document.h>
+#include <pdf/renderer.h>
 
 TEST(Renderer, Blank) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
 
-    auto surface = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, 100, 100);
+    auto surface = Cairo::ImageSurface::create(Cairo::ImageSurface::Format::ARGB32, 100, 100);
     auto cr      = Cairo::Context::create(surface);
 
     auto pages = document.pages();
@@ -23,12 +23,12 @@ TEST(Renderer, HelloWorld) {
 
     auto pages = document.pages();
     for (size_t i = 0; i < pages.size(); i++) {
-        auto page     = pages[i];
-        auto cropBox  = page->crop_box();
-        auto width    = cropBox->width();
-        auto height   = cropBox->height();
-        auto surface  = Cairo::ImageSurface::create(Cairo::FORMAT_ARGB32, width, height);
-        auto cr       = Cairo::Context::create(surface);
+        auto page    = pages[i];
+        auto cropBox = page->crop_box();
+        auto width   = cropBox->width();
+        auto height  = cropBox->height();
+        auto surface = Cairo::ImageSurface::create(Cairo::ImageSurface::Format::ARGB32, width, height);
+        auto cr      = Cairo::Context::create(surface);
 
         pdf::Renderer renderer(*page);
         renderer.render(cr);
