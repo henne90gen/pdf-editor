@@ -10,6 +10,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/drawingarea.h>
+#include <gtkmm/eventcontrollerkey.h>
 #include <gtkmm/fixed.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/label.h>
@@ -45,14 +46,32 @@ class PdfWidget : public Gtk::Viewport {
 };
 #endif
 
-class PdfWindow : public Gtk::ScrolledWindow {
-  public:
-    [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/)
-        : Gtk::ScrolledWindow(obj) {}
-};
-
 class PdfArea : public Gtk::DrawingArea {
   public:
-    [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/)
-        : Gtk::DrawingArea(obj) {}
+    [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/);
+
+    void on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height);
+    void set_offsets(double x, double y);
+
+  private:
+    double offsetX = 0.0;
+    double offsetY = 0.0;
+};
+
+class PdfWindow : public Gtk::ScrolledWindow {
+  public:
+    [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder);
+
+  protected:
+    void size_allocate_vfunc(int width, int height, int baseline) override;
+    bool on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state);
+    void on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state);
+
+  private:
+    Gtk::Fixed *pdfContainer;
+    PdfArea *pdfArea;
+    double previousHAdjustment = 0.0;
+    double previousVAdjustment = 0.0;
+
+    void scroll_value_changed();
 };

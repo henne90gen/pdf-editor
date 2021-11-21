@@ -36,3 +36,10 @@
 | PDF/UA       |             | https://www.pdfa.org/resource/pdfua-reference-suite/                                                                               |
 | PDF/A        | Many files  | https://www.pdfa.org/resource/verapdf-test-suite/ https://github.com/veraPDF/veraPDF-corpus                                        |
 |              |             | https://github.com/bfosupport/pdfa-testsuite                                                                                       |
+
+## Ideas
+
+- edit text (vertical or horizontal)
+- move text
+- move images
+- remove images

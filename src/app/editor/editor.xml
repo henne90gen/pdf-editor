@@ -8,10 +8,20 @@
         <property name="default-height">200</property>
         <child>
             <object class="GtkScrolledWindow" id="PdfWindow">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="focusable">True</property>
+                <property name="focus-on-click">True</property>
+                <property name="vexpand">True</property>
+                <property name="hexpand">True</property>
                 <child>
                     <object class="GtkFixed" id="PdfContainer">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
                         <child>
                             <object class="GtkDrawingArea" id="PdfArea">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
                             </object>
                         </child>
                     </object>
