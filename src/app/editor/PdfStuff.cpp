@@ -180,9 +180,9 @@ void PdfWindow::size_allocate_vfunc(int width, int height, int baseline) {
     Gtk::Widget::size_allocate_vfunc(width, height, baseline);
 }
 
-bool PdfWindow::on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state) { return false; }
+bool PdfWindow::on_key_pressed(guint /*keyValue*/, guint /*keyCode*/, Gdk::ModifierType /*state*/) { return false; }
 
-void PdfWindow::on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state) {}
+void PdfWindow::on_key_released(guint /*keyValue*/, guint /*keyCode*/, Gdk::ModifierType /*state*/) {}
 
 void PdfWindow::scroll_value_changed() {
     const auto &hadjustment = get_hadjustment();
