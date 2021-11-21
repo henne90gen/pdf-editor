@@ -48,19 +48,21 @@ class PdfWidget : public Gtk::Viewport {
 
 class PdfArea : public Gtk::DrawingArea {
   public:
-    [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/);
+    [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
+                             pdf::Document &_document);
 
-    void on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height);
+    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void set_offsets(double x, double y);
 
   private:
+    pdf::Document &document;
     double offsetX = 0.0;
     double offsetY = 0.0;
 };
 
 class PdfWindow : public Gtk::ScrolledWindow {
   public:
-    [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder);
+    [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
 
   protected:
     void size_allocate_vfunc(int width, int height, int baseline) override;

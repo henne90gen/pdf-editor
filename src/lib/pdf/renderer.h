@@ -94,10 +94,10 @@ struct Renderer {
 
     explicit Renderer(Page &_page) : page(_page) { stateStack.emplace_back(); }
 
-    void render(const Cairo::RefPtr<Cairo::Context> &cr);
+    void render(const std::shared_ptr<Cairo::Context> &cr);
 
   private:
-    void render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams);
+    void render(const std::shared_ptr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams);
     void setNonStrokingColor(Operator *op);
     void endText();
     void beginText();
@@ -105,7 +105,7 @@ struct Renderer {
     void popGraphicsState();
     void moveStartOfNextLine(Operator *op);
     void setTextFontAndSize(Operator *op);
-    void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *pOperator);
+    void showText(const std::shared_ptr<Cairo::Context> &cr, Operator *pOperator);
     void loadFont(Font *font);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;

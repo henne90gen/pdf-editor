@@ -120,15 +120,26 @@ void PdfWidget::size_allocate_vfunc(int w, int h, int baseline) {
 
 #endif
 
-PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &) : Gtk::DrawingArea(obj) {
+constexpr int PAGE_PADDING = 10;
+
+PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &, pdf::Document &_document)
+    : Gtk::DrawingArea(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &PdfArea::on_draw));
 }
 
-void PdfArea::on_draw(const Glib::RefPtr<Cairo::Context> &cr, int width, int height) {
+void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) {
+    spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
+
     cr->translate(-offsetX, -offsetY);
-    cr->set_source_rgb(0, 1, 0);
-    cr->rectangle(100, 100, 100, 100);
-    cr->fill();
+    //    cr->scale(zoom, zoom);
+
+    auto pages = document.pages();
+    for (auto page : pages) {
+        pdf::Renderer renderer(*page);
+        renderer.render(cr);
+
+        cr->translate(0, page->height() + PAGE_PADDING);
+    }
 }
 
 void PdfArea::set_offsets(const double x, const double y) {
@@ -137,15 +148,25 @@ void PdfArea::set_offsets(const double x, const double y) {
     queue_draw();
 }
 
-PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder) : Gtk::ScrolledWindow(obj) {
+PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document)
+    : Gtk::ScrolledWindow(obj) {
     pdfContainer = builder->get_widget<Gtk::Fixed>("PdfContainer");
-    pdfArea      = Gtk::Builder::get_widget_derived<PdfArea>(builder, "PdfArea");
+    pdfArea      = Gtk::Builder::get_widget_derived<PdfArea>(builder, "PdfArea", document);
     get_hadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWindow::scroll_value_changed));
     get_vadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWindow::scroll_value_changed));
 
-    int width  = 1000;
-    int height = 1000;
-    pdfContainer->set_size_request(width, height);
+    double width  = 0;
+    double height = PAGE_PADDING;
+    document.for_each_page([&width, &height](pdf::Page *page) {
+        double currentWidth = page->width();
+        if (currentWidth > width) {
+            width = currentWidth;
+        }
+        // TODO maybe add some padding between the pages
+        height += page->height() + PAGE_PADDING;
+        return true;
+    });
+    pdfContainer->set_size_request(static_cast<int>(width), static_cast<int>(height));
 
     auto keyCtrl = Gtk::EventControllerKey::create();
     keyCtrl->signal_key_pressed().connect(sigc::mem_fun(*this, &PdfWindow::on_key_pressed), false);

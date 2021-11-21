@@ -7,7 +7,7 @@
 
 namespace pdf {
 
-void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
+void Renderer::render(const std::shared_ptr<Cairo::Context> &cr) {
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
@@ -21,7 +21,7 @@ void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr) {
     render(cr, contentStreams);
 }
 
-void Renderer::render(const Cairo::RefPtr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
+void Renderer::render(const std::shared_ptr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
         auto decodedStream  = s->decode(page.document.allocator);
         auto textProvider   = StringTextProvider(decodedStream);
@@ -127,7 +127,7 @@ void Renderer::setTextFontAndSize(Operator *op) {
     loadFont(font);
 }
 
-void Renderer::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void Renderer::showText(const std::shared_ptr<Cairo::Context> &cr, Operator *op) {
     auto &textState       = stateStack.back().textState;
     auto textRenderMatrix = Cairo::identity_matrix();
     textRenderMatrix.scale(textState.textFontSize, textState.textFontSize);

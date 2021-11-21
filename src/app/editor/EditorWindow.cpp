@@ -9,6 +9,5 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
         return;
     }
 
-    Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow");
-    Gtk::Builder::get_widget_derived<PdfArea>(builder, "PdfArea");
+    Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
 }
