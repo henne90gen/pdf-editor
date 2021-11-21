@@ -29,7 +29,7 @@ embed_file(debugger/debugger.xml debugger_xml)
 add_executable(pdf-editor
         editor/main.cpp
         editor/EditorWindow.cpp
-        editor/PdfPage.cpp
+        editor/PdfStuff.cpp
         editor/EditorApplication.cpp
         common/PdfApplication.cpp
         common/OpenWindow.cpp

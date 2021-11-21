@@ -8,7 +8,9 @@
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/box.h>
+#include <gtkmm/builder.h>
 #include <gtkmm/drawingarea.h>
+#include <gtkmm/fixed.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/label.h>
 #include <gtkmm/scrolledwindow.h>
@@ -18,6 +20,7 @@
 
 #include <pdf/document.h>
 
+#if 0
 class PdfWidget : public Gtk::Viewport {
   public:
     explicit PdfWidget(pdf::Document &file);
@@ -34,46 +37,22 @@ class PdfWidget : public Gtk::Viewport {
 
   private:
     pdf::Document &file;
-    Glib::RefPtr<Gtk::Adjustment> hadjustment = Gtk::Adjustment::create(0, 0, 1);
-    Glib::RefPtr<Gtk::Adjustment> vadjustment = Gtk::Adjustment::create(0, 0, 1);
     Gtk::DrawingArea drawingArea;
 
     [[maybe_unused]] bool isCtrlPressed = false;
     double zoom                         = 1.0;
     [[maybe_unused]] double zoomSpeed   = 0.1;
 };
+#endif
 
-class PdfPage : public Gtk::Frame {
+class PdfWindow : public Gtk::ScrolledWindow {
   public:
-    explicit PdfPage(pdf::Document &file);
+    [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/)
+        : Gtk::ScrolledWindow(obj) {}
+};
 
-    class ModelColumns : public Gtk::TreeStore::ColumnRecord {
-      public:
-        ModelColumns() {
-            add(m_col_name);
-            add(m_col_value);
-        }
-
-        Gtk::TreeModelColumn<Glib::ustring> m_col_name;
-        Gtk::TreeModelColumn<Glib::ustring> m_col_value;
-    };
-
-  private:
-    pdf::Document &file;
-
-    Gtk::Box box;
-    Gtk::ScrolledWindow leftScrolledWindow;
-    Gtk::ScrolledWindow rightScrolledWindow;
-
-    PdfWidget pdfWidget;
-
-    Gtk::TreeView treeView;
-    ModelColumns columns;
-    Glib::RefPtr<Gtk::TreeStore> treeStore;
-
-    void addRows(pdf::Object *obj, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
-    void addRows(const pdf::Dictionary *dict, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
-    void addRows(const pdf::Array *arr, int depth, Gtk::TreeModel::Row *parentRow = nullptr);
-
-    Gtk::TreeModel::Row createRow(Gtk::TreeRow *parentRow);
+class PdfArea : public Gtk::DrawingArea {
+  public:
+    [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/)
+        : Gtk::DrawingArea(obj) {}
 };

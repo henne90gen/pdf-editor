@@ -31,11 +31,15 @@ void PdfApplication::on_activate() {
 }
 
 void PdfApplication::on_open(const Gio::Application::type_vec_files &files, const Glib::ustring & /*hint*/) {
-    spdlog::info("Opening {} files", files.size());
-
     if (files.empty()) {
         spdlog::warn("There were no files");
         return;
+    }
+
+    if (files.size() == 1) {
+        spdlog::info("Opening 1 file");
+    } else {
+        spdlog::info("Opening {} files", files.size());
     }
 
     for (auto &file : files) {

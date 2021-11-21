@@ -4,8 +4,6 @@
 #include <gtkmm/builder.h>
 #include <spdlog/spdlog.h>
 
-#include <pdf/document.h>
-
 #include "EditorWindow.h"
 #include "editor.xml.h"
 
