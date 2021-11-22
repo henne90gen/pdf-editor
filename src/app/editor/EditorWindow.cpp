@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "PdfWindow.h"
+
 EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
     if (pdf::Document::read_from_file(filePath, document)) {

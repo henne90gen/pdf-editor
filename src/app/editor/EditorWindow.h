@@ -8,7 +8,7 @@
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/builder.h>
 
-#include "PdfStuff.h"
+#include "PdfArea.h"
 
 class EditorWindow : public Gtk::ApplicationWindow {
   public:
