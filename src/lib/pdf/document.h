@@ -131,11 +131,11 @@ struct Document : public ReferenceResolver {
     /// List of pages
     std::vector<Page *> pages();
     /// Iterates over all pages in the document, until 'func' returns 'false'
-    void for_each_page(const std::function<bool(Page *)> &func);
+    void for_each_page(const std::function<ForEachResult(Page *)> &func);
     /// List of objects
     std::vector<IndirectObject *> objects();
     /// Iterates over all objects in the document, until 'func' returns 'false'
-    void for_each_object(const std::function<bool(IndirectObject *)> &func);
+    void for_each_object(const std::function<ForEachResult(IndirectObject *)> &func);
 
     /// Number of indirect objects
     size_t object_count(bool parseObjects = true);
@@ -149,7 +149,7 @@ struct Document : public ReferenceResolver {
     size_t character_count();
 
     /// Iterates over all images in the document, until 'func' returns 'false'
-    void for_each_image(const std::function<bool(Image &)> &func);
+    void for_each_image(const std::function<ForEachResult(Image &)> &func);
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] bool write_to_file(const std::string &filePath);

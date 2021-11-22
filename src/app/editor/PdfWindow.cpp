@@ -18,7 +18,7 @@ PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &buil
         }
         // TODO maybe add some padding between the pages
         height += page->height() + PAGE_PADDING;
-        return true;
+        return pdf::ForEachResult::CONTINUE;
     });
     pdfContainer->set_size_request(static_cast<int>(width), static_cast<int>(height));
 

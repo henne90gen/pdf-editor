@@ -74,7 +74,7 @@ void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) con
         double g = dist(engine);
         double b = dist(engine);
         highlight_range(cr, object->data.data(), object->data.size(), r, g, b);
-        return true;
+        return pdf::ForEachResult::CONTINUE;
     });
 }
 

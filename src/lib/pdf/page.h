@@ -46,6 +46,14 @@ struct ContentStream : public Stream {
     void for_each_operator(Allocator &allocator, const std::function<bool(Operator *)> &func);
 };
 
+struct TextBlock {
+    std::string text;
+    double x      = 0.0;
+    double y      = 0.0;
+    double width  = 0.0;
+    double height = 0.0;
+};
+
 struct Page {
     Document &document;
     PageTreeNode *node;
@@ -65,10 +73,12 @@ struct Page {
     }
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
     std::vector<ContentStream *> content_streams();
+    std::vector<TextBlock> text_blocks();
 
     int64_t rotate();
     double width();
     double height();
+    size_t character_count();
 };
 
 } // namespace pdf

@@ -27,7 +27,7 @@ struct Allocator {
     [[nodiscard]] size_t total_bytes_allocated() const;
     [[nodiscard]] size_t num_allocations() const;
 
-    void for_each_allocation(const std::function<bool(Allocation &)> &func) const;
+    void for_each_allocation(const std::function<ForEachResult(Allocation &)> &func) const;
 
     template <typename T, typename... Args> T *allocate(Args &&...args) {
         auto s   = sizeof(T);

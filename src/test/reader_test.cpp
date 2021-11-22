@@ -137,3 +137,17 @@ TEST(Reader, ObjectStream) {
     auto str    = stream->decode(document.allocator);
     ASSERT_EQ(str.size(), 117);
 }
+
+TEST(Reader, HelloWorldTextBlocks) {
+    pdf::Document document;
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+
+    auto pages = document.pages();
+    ASSERT_EQ(pages.size(), 1);
+
+    auto page      = pages[0];
+    auto textBlock = page->text_blocks();
+    ASSERT_EQ(textBlock.size(), 1);
+
+    // TODO   ASSERT_EQ(textBlock[0].x, 100);
+}

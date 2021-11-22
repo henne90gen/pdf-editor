@@ -91,12 +91,12 @@ std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
     for_each_object([&result](IndirectObject *obj) {
         result.push_back(obj);
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
 
-void Document::for_each_object(const std::function<bool(IndirectObject *)> &func) {
+void Document::for_each_object(const std::function<ForEachResult(IndirectObject *)> &func) {
     // FIXME this does not consider objects from 'Prev'-ious trailers
     for (int64_t i = 0; i < static_cast<int64_t>(trailer.crossReferenceTable.entries.size()); i++) {
         auto object = get_object(i);
@@ -104,7 +104,8 @@ void Document::for_each_object(const std::function<bool(IndirectObject *)> &func
             continue;
         }
 
-        if (!func(object)) {
+        ForEachResult result = func(object);
+        if (result == ForEachResult::BREAK) {
             break;
         }
     }
@@ -115,7 +116,7 @@ size_t Document::object_count(const bool parseObjects) {
     if (parseObjects) {
         for_each_object([&result](IndirectObject *) {
             result++;
-            return true;
+            return ForEachResult::CONTINUE;
         });
     } else {
         for (auto &entry : trailer.crossReferenceTable.entries) {
@@ -136,7 +137,7 @@ PageTreeNode *PageTreeNode::parent(Document &document) {
     return document.get<PageTreeNode>(opt.value());
 }
 
-void Document::for_each_page(const std::function<bool(Page *)> &func) {
+void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
     auto c            = catalog();
     auto pageTreeRoot = c->page_tree_root(*this);
     if (pageTreeRoot == nullptr) {
@@ -157,8 +158,9 @@ void Document::for_each_page(const std::function<bool(Page *)> &func) {
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->is_page()) {
-                if (!func(allocator.allocate<Page>(*this, resolvedKid))) {
-                    // stop iterating
+                Page *page           = allocator.allocate<Page>(*this, resolvedKid);
+                ForEachResult result = func(page);
+                if (result == ForEachResult::BREAK) {
                     return;
                 }
             } else {
@@ -174,7 +176,7 @@ std::vector<Page *> Document::pages() {
     auto result = std::vector<Page *>();
     for_each_page([&result](auto page) {
         result.push_back(page);
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -183,7 +185,7 @@ size_t Document::page_count() {
     size_t result = 0;
     for_each_page([&result](auto) {
         result++;
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -204,7 +206,7 @@ bool Document::delete_page(size_t pageNum) {
     for_each_page([&currentPageNum, &pageNum, this](Page *page) {
         if (currentPageNum != pageNum) {
             currentPageNum++;
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         auto parent = page->node->parent(*this);
@@ -236,7 +238,7 @@ bool Document::delete_page(size_t pageNum) {
             parent->count()->set(*this, static_cast<int64_t>(parent->kids()->values.size()));
         }
 
-        return false;
+        return ForEachResult::BREAK;
     });
 
     // TODO clean up objects that are no longer required
@@ -289,106 +291,45 @@ size_t Document::word_count() {
     return 0;
 }
 
-size_t count_TJ_characters(CMap *cmap, Operator *op) {
-    // TODO skip whitespace characters
-    size_t result = 0;
-    for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
-        if (value->is<Integer>()) {
-            // do nothing
-        } else if (value->is<HexadecimalString>()) {
-            auto codes = value->as<HexadecimalString>()->to_string();
-            for (char code : codes) {
-                auto strOpt = cmap->map_char_code(code);
-                if (strOpt.has_value()) {
-                    result += strOpt.value().size();
-                }
-            }
-        } else if (value->is<LiteralString>()) {
-            auto str = std::string(value->as<LiteralString>()->value());
-            for (size_t i = 0; i < str.size(); i++) {
-                result++;
-            }
-        }
-    }
-    return result;
-}
-
-size_t count_Tj_characters(Operator *op) { return op->data.Tj_ShowTextString.string->value().size(); }
-
 size_t Document::character_count() {
     size_t result = 0;
-    for_each_page([&result, this](Page *page) {
-        auto contentStreams = page->content_streams();
-        CMap *cmap          = nullptr;
-        for (auto contentStream : contentStreams) {
-            contentStream->for_each_operator(allocator, [&result, this, &page, &cmap](Operator *op) {
-                if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-                    result += count_TJ_characters(cmap, op);
-                } else if (op->type == Operator::Type::Tj_ShowTextString) {
-                    result += count_Tj_characters(op);
-                } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
-                    auto fontMapOpt = page->resources()->fonts(page->document);
-                    if (!fontMapOpt.has_value()) {
-                        // TODO add logging
-                        return true;
-                    }
-
-                    auto fontName = std::string(op->data.Tf_SetTextFontAndSize.font_name());
-                    auto fontOpt  = fontMapOpt.value()->get(page->document, fontName);
-                    if (!fontOpt.has_value()) {
-                        // TODO add logging
-                        return true;
-                    }
-
-                    auto font    = fontOpt.value();
-                    auto cmapOpt = font->cmap(*this);
-                    if (!cmapOpt.has_value()) {
-                        return true;
-                    }
-                    cmap = cmapOpt.value();
-                }
-
-                // TODO also count other text operators
-
-                return true;
-            });
-        }
-        return true;
+    for_each_page([&result](Page *page) {
+        result += page->character_count();
+        return ForEachResult::CONTINUE;
     });
-
     return result;
 }
 
-void Document::for_each_image(const std::function<bool(Image &)> &func) {
+void Document::for_each_image(const std::function<ForEachResult(Image &)> &func) {
     for_each_object([this, &func](IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         const auto stream  = obj->object->as<Stream>();
         const auto typeOpt = stream->dictionary->find<Name>("Type");
         if (!typeOpt.has_value() || typeOpt.value()->value() != "XObject") {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         const auto subtypeOpt = stream->dictionary->find<Name>("Subtype");
         if (!subtypeOpt.has_value() || subtypeOpt.value()->value() != "Image") {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         const auto widthOpt = stream->dictionary->find<Integer>("Width");
         if (!widthOpt.has_value()) {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         const auto heightOpt = stream->dictionary->find<Integer>("Height");
         if (!heightOpt.has_value()) {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         const auto bitsPerComponentOpt = stream->dictionary->find<Integer>("BitsPerComponent");
         if (!bitsPerComponentOpt.has_value()) {
-            return true;
+            return ForEachResult::CONTINUE;
         }
 
         Image image = {
@@ -398,9 +339,7 @@ void Document::for_each_image(const std::function<bool(Image &)> &func) {
               .bitsPerComponent = bitsPerComponentOpt.value()->value,
               .stream           = stream,
         };
-        func(image);
-
-        return true;
+        return func(image);
     });
 }
 

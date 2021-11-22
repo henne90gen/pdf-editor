@@ -23,12 +23,7 @@ void Renderer::render(const std::shared_ptr<Cairo::Context> &cr) {
 
 void Renderer::render(const std::shared_ptr<Cairo::Context> &cr, const std::vector<ContentStream *> &streams) {
     for (auto s : streams) {
-        auto decodedStream  = s->decode(page.document.allocator);
-        auto textProvider   = StringTextProvider(decodedStream);
-        auto lexer          = TextLexer(textProvider);
-        auto operatorParser = OperatorParser(lexer, page.document.allocator);
-        Operator *op        = operatorParser.get_operator();
-        while (op != nullptr) {
+        s->for_each_operator(page.document.allocator, [this, &cr](Operator *op) {
             if (op->type == Operator::Type::w_SetLineWidth) {
                 stateStack.back().lineWidth = op->data.w_SetLineWidth.lineWidth;
             } else if (op->type == Operator::Type::q_PushGraphicsState) {
@@ -56,8 +51,9 @@ void Renderer::render(const std::shared_ptr<Cairo::Context> &cr, const std::vect
             } else {
                 // TODO unknown operator
             }
-            op = operatorParser.get_operator();
-        }
+
+            return true;
+        });
     }
 }
 
@@ -99,7 +95,7 @@ void Renderer::popGraphicsState() { stateStack.pop_back(); }
 void Renderer::moveStartOfNextLine(Operator *op) {
     auto currentLineMatrix = stateStack.back().textState.textObjectParams.value().textLineMatrix;
     auto tmp               = Cairo::identity_matrix();
-    tmp.translate(op->data.Td_MoveStartOfNextLine.x, op->data.Td_MoveStartOfNextLine.x);
+    tmp.translate(op->data.Td_MoveStartOfNextLine.x, op->data.Td_MoveStartOfNextLine.y);
 
     auto newLineMatrix = tmp * currentLineMatrix;
 

@@ -19,7 +19,7 @@ int cmd_images(const ImagesArgs &args) {
             spdlog::warn("Failed to write image file '{}'", fileName);
         }
         count++;
-        return true;
+        return pdf::ForEachResult::CONTINUE;
     });
 
     return 0;

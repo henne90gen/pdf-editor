@@ -14,7 +14,7 @@ Allocator::~Allocator() {
         bytesFreed += allocation.sizeInBytes;
         free(&allocation);
         allocationsFreed++;
-        return true;
+        return ForEachResult::CONTINUE;
     });
 
     spdlog::trace("Freed {} allocations ({} bytes total)", allocationsFreed, bytesFreed);
@@ -60,7 +60,7 @@ char *Allocator::allocate_chunk(size_t sizeInBytes) {
     return result;
 }
 
-void Allocator::for_each_allocation(const std::function<bool(Allocation &)> &func) const {
+void Allocator::for_each_allocation(const std::function<ForEachResult(Allocation &)> &func) const {
     auto allocation = currentAllocation;
     while (allocation != nullptr) {
         auto prev = allocation->previousAllocation;
@@ -73,7 +73,7 @@ size_t Allocator::total_bytes_allocated() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation &allocation) {
         result += allocation.sizeInBytes;
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -82,7 +82,7 @@ size_t Allocator::num_allocations() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation & /*allocation*/) {
         result++;
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -91,7 +91,7 @@ size_t Allocator::total_bytes_used() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation &allocation) {
         result += allocation.bufferPosition - allocation.bufferStart;
-        return true;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }

@@ -17,3 +17,12 @@
 #define ASSERT(x)
 #endif
 #endif
+
+namespace pdf {
+
+enum class ForEachResult {
+    CONTINUE,
+    BREAK,
+};
+
+}
