@@ -100,6 +100,17 @@ namespace pdf {
     O(BX, UNKNOWN)                                                                                                     \
     O(EX, UNKNOWN)
 
+struct Tf_SetTextFontSize {
+    const char *fontNameData;
+    size_t fontNameLength;
+    double fontSize;
+    [[nodiscard]] std::string_view font_name() const {
+        auto fontName = std::string_view(fontNameData, fontNameLength);
+        fontName      = fontName.substr(1); // remove leading "/"
+        return fontName;
+    }
+};
+
 struct Operator {
     enum class Type {
 #define DECLARE_ENUM(Name, Description) Name##_##Description,
@@ -121,16 +132,7 @@ struct Operator {
         struct {
             double x, y;
         } Td_MoveStartOfNextLine;
-        struct {
-            const char *fontNameData;
-            size_t fontNameLength;
-            double fontSize;
-            [[nodiscard]] std::string_view font_name() const {
-                auto fontName = std::string_view(fontNameData, fontNameLength);
-                fontName      = fontName.substr(1); // remove leading "/"
-                return fontName;
-            }
-        } Tf_SetTextFontAndSize;
+        Tf_SetTextFontSize Tf_SetTextFontAndSize;
         struct {
             Array *objects;
         } TJ_ShowOneOrMoreTextStrings;

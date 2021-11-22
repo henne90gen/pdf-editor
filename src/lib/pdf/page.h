@@ -1,6 +1,7 @@
 #pragma once
 
 #include "document.h"
+#include "helper/util.h"
 #include "objects.h"
 #include "operator_parser.h"
 
@@ -43,7 +44,7 @@ struct Resources : public Dictionary {
 };
 
 struct ContentStream : public Stream {
-    void for_each_operator(Allocator &allocator, const std::function<bool(Operator *)> &func);
+    void for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func);
 };
 
 struct TextBlock {
@@ -79,6 +80,7 @@ struct Page {
     double width();
     double height();
     size_t character_count();
+    std::optional<Font *> get_font(const Tf_SetTextFontSize &data);
 };
 
 } // namespace pdf

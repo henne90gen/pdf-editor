@@ -12,7 +12,9 @@ struct CMap {
     std::unordered_map<uint8_t, std::string> charmap = {};
 
     explicit CMap(std::unordered_map<uint8_t, std::string> _charmap) : charmap(std::move(_charmap)) {}
-    [[nodiscard]] std::optional<std::string> map_char_code(uint8_t code);
+
+    [[nodiscard]] std::optional<std::string> map_char_code(uint8_t code) const;
+    [[nodiscard]] std::string map_char_codes(HexadecimalString *str) const;
 };
 
 struct CMapParser {

@@ -146,8 +146,9 @@ TEST(Reader, HelloWorldTextBlocks) {
     ASSERT_EQ(pages.size(), 1);
 
     auto page      = pages[0];
-    auto textBlock = page->text_blocks();
-    ASSERT_EQ(textBlock.size(), 1);
+    auto textBlocks = page->text_blocks();
+    ASSERT_EQ(textBlocks.size(), 1);
 
-    // TODO   ASSERT_EQ(textBlock[0].x, 100);
+    ASSERT_EQ(textBlocks[0].text, "Hello World");
+    // TODO   ASSERT_EQ(textBlocks[0].x, 100);
 }
