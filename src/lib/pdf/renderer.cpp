@@ -98,7 +98,7 @@ void Renderer::popGraphicsState() { stateStack.pop_back(); }
 
 void Renderer::moveStartOfNextLine(Operator *op) {
     auto tmp = Cairo::identity_matrix();
-    tmp.translate(op->data.Td_MoveStartOfNextLine.x, op->data.Td_MoveStartOfNextLine.y);
+    tmp.translate(op->data.Td_MoveStartOfNextLine.x, page.height() - op->data.Td_MoveStartOfNextLine.y);
 
     auto currentLineMatrix = stateStack.back().textState.textObjectParams.value().textLineMatrix;
     auto newLineMatrix     = tmp * currentLineMatrix;
