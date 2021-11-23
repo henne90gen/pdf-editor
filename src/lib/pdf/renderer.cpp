@@ -11,12 +11,16 @@ void Renderer::render() {
     // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
+    cr->save();
+
     auto cropBox = page.crop_box();
     cr->set_source_rgb(1, 1, 1);
     cr->rectangle(0, 0, cropBox->width(), cropBox->height());
     cr->fill();
 
     traverse();
+
+    cr->restore();
 }
 
 void Renderer::on_show_text(Operator *op) {
