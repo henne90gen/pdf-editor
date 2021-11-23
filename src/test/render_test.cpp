@@ -12,8 +12,8 @@ TEST(Renderer, Blank) {
 
     auto pages = document.pages();
     for (auto page : pages) {
-        pdf::Renderer renderer(*page);
-        renderer.render(cr);
+        pdf::Renderer renderer(*page, cr);
+        renderer.render();
     }
 }
 
@@ -30,8 +30,8 @@ TEST(Renderer, HelloWorld) {
         auto surface = Cairo::ImageSurface::create(Cairo::ImageSurface::Format::ARGB32, width, height);
         auto cr      = Cairo::Context::create(surface);
 
-        pdf::Renderer renderer(*page);
-        renderer.render(cr);
+        pdf::Renderer renderer(*page, cr);
+        renderer.render();
 
         const std::string filename = "test-" + std::to_string(i) + ".png";
         surface->write_to_png(filename);
