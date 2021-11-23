@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 #include <unordered_map>
+#include <optional>
 
 namespace pdf {
 

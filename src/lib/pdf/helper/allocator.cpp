@@ -45,6 +45,10 @@ void Allocator::extend(size_t size) {
     currentAllocation              = allocation;
 }
 
+void Allocator::clear_current_allocation() const {
+    currentAllocation->bufferPosition = currentAllocation->bufferStart + sizeof(Allocation);
+}
+
 char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     if (currentAllocation->bufferPosition + sizeInBytes >

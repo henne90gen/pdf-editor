@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <cstring>
+#include <vector>
 
 #include "allocator.h"
 
@@ -24,18 +24,18 @@ template <typename T> struct StaticVector {
     }
 
     [[nodiscard]] size_t size() const { return count; }
-    T* begin() { return &elements[0]; }
-    T* end() { return &elements[count]; } // 'count' is out of bounds
+    T *begin() { return &elements[0]; }
+    T *end() { return &elements[count]; } // 'count' is out of bounds
 
     static StaticVector<T> create(Allocator &allocator, const std::vector<T> &vec) {
         auto sizeInBytes = vec.size() * sizeof(T);
         auto elements    = (T *)allocator.allocate_chunk(sizeInBytes);
         memcpy(elements, vec.data(), sizeInBytes);
-        return {
-              .elements = elements,
-              .count    = vec.size(),
-        };
+        return StaticVector(elements, vec.size());
     }
+
+  private:
+    StaticVector(T *_elements, size_t _count) : elements(_elements), count(_count) {}
 };
 
 } // namespace pdf

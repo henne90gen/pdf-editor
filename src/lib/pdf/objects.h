@@ -100,7 +100,7 @@ struct Name : public Object {
 };
 
 struct Array : public Object {
-    StaticVector<Object *> values = {};
+    StaticVector<Object *> values;
 
     static Type staticType() { return Type::ARRAY; }
     explicit Array(std::string_view data, StaticVector<Object *> objects)
