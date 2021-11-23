@@ -1,7 +1,5 @@
 #include "cmap.h"
 
-#include <cairomm/cairomm.h>
-
 namespace pdf {
 
 std::optional<std::string> CMap::map_char_code(uint8_t code) const {
