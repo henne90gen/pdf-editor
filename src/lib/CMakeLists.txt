@@ -24,7 +24,8 @@ add_library(pdf-lib
         pdf/cmap.cpp
         pdf/operator_parser.cpp
         pdf/image.cpp
-        pdf/renderer.cpp)
+        pdf/renderer.cpp
+        pdf/operator_traverser.cpp)
 target_include_directories(pdf-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pdf-lib PUBLIC zlibstatic freetype spdlog::spdlog)
 target_link_cairo(pdf-lib)

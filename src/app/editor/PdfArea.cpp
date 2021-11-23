@@ -16,8 +16,8 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
 
     auto pages = document.pages();
     for (auto page : pages) {
-        pdf::Renderer renderer(*page);
-        renderer.render(cr);
+        pdf::Renderer renderer(*page, cr);
+        renderer.render();
 
         cr->translate(0, page->height() + PAGE_PADDING);
     }
