@@ -10,8 +10,9 @@
 #include <pdf/document.h>
 
 #include "ContentArea.h"
+#include "common/ScrollableContentWindow.h"
 
-class ContentWindow : public Gtk::ScrolledWindow {
+class ContentWindow : public ScrollableContentWindow {
   public:
     [[maybe_unused]] ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
                                    pdf::Document &document);
@@ -19,19 +20,10 @@ class ContentWindow : public Gtk::ScrolledWindow {
     void scroll_to_byte(int byte);
 
   protected:
-    void size_allocate_vfunc(int width, int height, int baseline) override;
-    bool on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state);
-    void on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state);
-    bool on_scroll(double x, double y);
+    std::pair<double, double> calculate_content_size() override;
+    ScrolledContainer &container() override { return *contentArea; }
 
   private:
     pdf::Document &document;
-    Gtk::Fixed *contentContainer;
     ContentArea *contentArea;
-    bool isControlDown         = false;
-    double previousHAdjustment = 0.0;
-    double previousVAdjustment = 0.0;
-
-    void scroll_value_changed();
-    void update_container_size();
 };

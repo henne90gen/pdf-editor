@@ -9,24 +9,17 @@
 
 #include "PdfArea.h"
 
-class PdfWindow : public Gtk::ScrolledWindow {
+#include "common/ScrollableContentWindow.h"
+
+class PdfWindow : public ScrollableContentWindow {
   public:
     [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
 
   protected:
-    void size_allocate_vfunc(int width, int height, int baseline) override;
-    bool on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state);
-    void on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state);
-    bool on_scroll(double x, double y);
+    std::pair<double, double> calculate_content_size() override;
+    ScrolledContainer &container() override;
 
   private:
     pdf::Document &document;
-    Gtk::Fixed *pdfContainer;
     PdfArea *pdfArea;
-    bool isControlDown         = false;
-    double previousHAdjustment = 0.0;
-    double previousVAdjustment = 0.0;
-
-    void scroll_value_changed();
-    void update_container_size();
 };

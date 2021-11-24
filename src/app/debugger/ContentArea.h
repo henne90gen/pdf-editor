@@ -7,12 +7,14 @@
 
 #include <pdf/document.h>
 
+#include "common/ScrollableContentWindow.h"
+
 constexpr int PIXELS_PER_BYTE = 50;
 constexpr int BYTES_PER_ROW   = 50;
 
-class ContentArea : public Gtk::DrawingArea {
+class ContentArea : public ScrolledContainer {
   public:
-    double zoom                 = 1.0;
+    double _zoom = 1.0;
 
     [[maybe_unused]] ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder,
                                  pdf::Document &_document);
@@ -24,8 +26,9 @@ class ContentArea : public Gtk::DrawingArea {
     void toggle_highlight_trailer();
     void toggle_highlight_objects();
 
-    void set_offsets(double x, double y);
-    void update_zoom(double z);
+    void set_offsets(double x, double y) override;
+    void update_zoom(double z) override;
+    double zoom() override { return _zoom; }
 
     void set_selected_byte(int byte) {
         selectedByte = byte;

@@ -5,7 +5,7 @@
 #include <random>
 
 ContentArea::ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
-    : Gtk::DrawingArea(obj), document(_document) {
+    : ScrolledContainer(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &ContentArea::on_draw));
 
     auto motionCtrl = Gtk::EventControllerMotion::create();
@@ -25,7 +25,7 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     cr->save();
 
     cr->translate(-offsetX, -offsetY);
-    cr->scale(zoom, zoom);
+    cr->scale(_zoom, _zoom);
 
     highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
 
@@ -176,8 +176,8 @@ void ContentArea::on_mouse_click(int numPress, double x, double y) {
 }
 
 int ContentArea::find_byte(double x, double y) const {
-    auto canvasX = (x + offsetX) / zoom;
-    auto canvasY = (y + offsetY) / zoom;
+    auto canvasX = (x + offsetX) / _zoom;
+    auto canvasY = (y + offsetY) / _zoom;
     auto byteX   = static_cast<int>(canvasX) / PIXELS_PER_BYTE;
     auto byteY   = static_cast<int>(canvasY) / PIXELS_PER_BYTE;
     return byteY * BYTES_PER_ROW + byteX;
@@ -208,11 +208,11 @@ void ContentArea::set_offsets(double x, double y) {
 
 void ContentArea::update_zoom(double z) {
     // TODO make zoom speed adapt with the current zoom level
-    zoom -= z * 0.075;
-    if (zoom <= 0.1) {
-        zoom = 0.1;
-    } else if (zoom > 10.0) {
-        zoom = 10.0;
+    _zoom -= z * 0.075;
+    if (_zoom <= 0.1) {
+        _zoom = 0.1;
+    } else if (_zoom > 10.0) {
+        _zoom = 10.0;
     }
     queue_draw();
 }

@@ -5,7 +5,7 @@
 #include <pdf/renderer.h>
 
 PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
-    : Gtk::DrawingArea(obj), document(_document) {
+    : ScrolledContainer(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &PdfArea::on_draw));
 
     auto showTextButton = builder->get_widget<Gtk::CheckButton>("HighlightTextCheckButton");
@@ -16,7 +16,7 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
     spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
 
     cr->translate(-offsetX, -offsetY);
-    cr->scale(zoom, zoom);
+    cr->scale(_zoom, _zoom);
 
     render_pages(cr);
     render_text_blocks(cr);
@@ -56,11 +56,11 @@ void PdfArea::set_offsets(const double x, const double y) {
 
 void PdfArea::update_zoom(double z) {
     // TODO make zoom speed adapt with the current zoom level
-    zoom += z * 0.1;
-    if (zoom <= 0.1) {
-        zoom = 0.1;
-    } else if (zoom > 10.0) {
-        zoom = 10.0;
+    _zoom += z * 0.1;
+    if (_zoom <= 0.1) {
+        _zoom = 0.1;
+    } else if (_zoom > 10.0) {
+        _zoom = 10.0;
     }
     queue_draw();
 }

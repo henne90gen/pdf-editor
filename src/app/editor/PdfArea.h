@@ -22,17 +22,20 @@
 #include <pdf/document.h>
 #include <pdf/page.h>
 
+#include "common/ScrollableContentWindow.h"
+
 constexpr int PAGE_PADDING = 10;
 
-class PdfArea : public Gtk::DrawingArea {
+class PdfArea : public ScrolledContainer {
   public:
-    double zoom = 1.0;
+    double _zoom = 1.0;
 
     [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
                              pdf::Document &_document);
 
-    void set_offsets(double x, double y);
-    void update_zoom(double z);
+    void set_offsets(double x, double y) override;
+    void update_zoom(double z) override;
+    double zoom() override { return _zoom; }
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void on_highlight_text_toggled();

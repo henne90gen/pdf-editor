@@ -34,6 +34,7 @@ add_executable(pdf-editor
         editor/EditorApplication.cpp
         common/PdfApplication.cpp
         common/OpenWindow.cpp
+        common/ScrollableContentWindow.cpp
         ${editor_xml}
         ${open_xml})
 target_link_gtk4(pdf-editor)
@@ -50,6 +51,7 @@ add_executable(pdf-debugger
         debugger/JumpToByteDialog.cpp
         common/PdfApplication.cpp
         common/OpenWindow.cpp
+        common/ScrollableContentWindow.cpp
         ${debugger_xml}
         ${open_xml})
 target_link_gtk4(pdf-debugger)
