@@ -1,5 +1,7 @@
 #include "page.h"
 
+#include "operator_traverser.h"
+
 namespace pdf {
 
 int64_t Page::rotate() {
@@ -50,55 +52,64 @@ void ContentStream::for_each_operator(Allocator &allocator, const std::function<
     }
 }
 
-std::vector<TextBlock> Page::text_blocks() {
+struct TextBlockFinder : public OperatorTraverser {
     std::vector<TextBlock> result = {};
 
-    Font *font          = nullptr;
-    auto contentStreams = content_streams();
-    for (auto contentStream : contentStreams) {
-        contentStream->for_each_operator(document.allocator, [this, &result, &font](Operator *op) {
-            if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
-                auto fontOpt = get_font(op->data.Tf_SetTextFontAndSize);
-                if (fontOpt.has_value()) {
-                    font = fontOpt.value();
-                }
-            } else if (op->type == Operator::Type::Tj_ShowTextString) {
-                spdlog::info("Tj_ShowTextString");
-            } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-                spdlog::info("TJ_ShowOneOrMoreTextStrings");
-                double offsetX = 0.0;
-                std::string str;
-                for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
-                    if (value->is<HexadecimalString>()) {
-                        spdlog::info("Found HexadecimalString");
-                        auto cmapOpt = font->cmap(document);
-                        if (cmapOpt.has_value()) {
-                            str += cmapOpt.value()->map_char_codes(value->as<HexadecimalString>());
-                        }
-                    } else if (value->is<LiteralString>()) {
-                        spdlog::info("Found LiteralString");
-                        str += value->as<LiteralString>()->value();
-                    } else if (value->is<Integer>()) {
-                        spdlog::info("Found Integer");
-                        offsetX -= static_cast<double>(value->as<Integer>()->value) / 1000.0;
-                    }
-                }
+    explicit TextBlockFinder(Page &page) : OperatorTraverser(page) {}
 
-                auto extents = font->text_extents(document, str);
-                result.push_back({
-                      .text   = str,
-                      .x      = 0.0,
-                      .y      = 0.0,
-                      .width  = extents.x_advance + offsetX,
-                      .height = extents.y_advance,
-                });
-            }
-
-            return ForEachResult::CONTINUE;
-        });
+    std::vector<TextBlock> find() {
+        traverse();
+        return result;
     }
 
-    return result;
+    void on_show_text(Operator *op) override {
+        spdlog::info("TJ_ShowOneOrMoreTextStrings");
+
+        TextFont &textFont = state().textState.textFont;
+        auto cmapOpt       = textFont.font->cmap(page.document);
+
+        auto face       = textFont.cairoFace;
+        auto fontMatrix = font_matrix();
+        auto ctm        = stateStack.back().currentTransformationMatrix;
+        auto scaledFont = Cairo::ScaledFont::create(face, fontMatrix, ctm);
+
+        double offsetX = 0.0;
+        std::string text;
+        for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
+            if (value->is<HexadecimalString>()) {
+                spdlog::info("Found HexadecimalString");
+                if (cmapOpt.has_value()) {
+                    text += cmapOpt.value()->map_char_codes(value->as<HexadecimalString>());
+                }
+            } else if (value->is<LiteralString>()) {
+                spdlog::info("Found LiteralString");
+                text += value->as<LiteralString>()->value();
+            } else if (value->is<Integer>()) {
+                spdlog::info("Found Integer");
+                offsetX -= static_cast<double>(value->as<Integer>()->value) / 1000.0;
+            }
+        }
+
+        double x = 0.0;
+        double y = 0.0;
+        fontMatrix.transform_point(x, y);
+
+        // FIXME width and height calculation are not correct (only x_advance is filled out in extents struct)
+        Cairo::TextExtents extents = {};
+        cairo_scaled_font_text_extents(scaledFont->cobj(), text.c_str(), &extents);
+        result.push_back({
+              .text   = text,
+              .x      = x,
+              .y      = y,
+              .width  = extents.x_advance + offsetX,
+              .height = extents.height,
+        });
+    }
+};
+
+std::vector<TextBlock> Page::text_blocks() {
+    auto finder = TextBlockFinder(*this);
+    return finder.find();
 }
 
 size_t count_TJ_characters(CMap *cmap, Operator *op) {

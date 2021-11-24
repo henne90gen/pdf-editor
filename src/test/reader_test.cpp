@@ -145,10 +145,13 @@ TEST(Reader, HelloWorldTextBlocks) {
     auto pages = document.pages();
     ASSERT_EQ(pages.size(), 1);
 
-    auto page      = pages[0];
+    auto page       = pages[0];
     auto textBlocks = page->text_blocks();
     ASSERT_EQ(textBlocks.size(), 1);
 
     ASSERT_EQ(textBlocks[0].text, "Hello World");
-    // TODO   ASSERT_EQ(textBlocks[0].x, 100);
+    ASSERT_DOUBLE_EQ(textBlocks[0].x, 56.8);
+    ASSERT_DOUBLE_EQ(textBlocks[0].y, 67.900763779528006);
+    ASSERT_DOUBLE_EQ(textBlocks[0].width, 98.902000000000001);
+    ASSERT_DOUBLE_EQ(textBlocks[0].height, 0);
 }

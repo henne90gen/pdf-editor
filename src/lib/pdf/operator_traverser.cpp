@@ -3,6 +3,8 @@
 namespace pdf {
 
 void OperatorTraverser::traverse() {
+    // TODO set graphics state to default values
+
     auto streams = page.content_streams();
     ASSERT(!streams.empty());
     for (auto s : streams) {
@@ -16,7 +18,7 @@ void OperatorTraverser::traverse() {
 
 void OperatorTraverser::apply_operator(Operator *op) {
     if (op->type == Operator::Type::w_SetLineWidth) {
-        stateStack.back().lineWidth = op->data.w_SetLineWidth.lineWidth;
+        state().lineWidth = op->data.w_SetLineWidth.lineWidth;
     } else if (op->type == Operator::Type::q_PushGraphicsState) {
         pushGraphicsState();
     } else if (op->type == Operator::Type::Q_PopGraphicsState) {
@@ -56,7 +58,7 @@ void OperatorTraverser::endPathWithoutFillingOrStroking() const {
 }
 
 void OperatorTraverser::setNonStrokingColor(Operator *op) {
-    stateStack.back().nonStrokingColor = Color::rgb( //
+    state().nonStrokingColor = Color::rgb( //
           op->data.rg_SetNonStrokingColorRGB.r,      //
           op->data.rg_SetNonStrokingColorRGB.g,      //
           op->data.rg_SetNonStrokingColorRGB.b       //
@@ -65,14 +67,14 @@ void OperatorTraverser::setNonStrokingColor(Operator *op) {
 
 void OperatorTraverser::endText() {
     // make sure text object parameters are set before unsetting them
-    ASSERT(stateStack.back().textState.textObjectParams.has_value());
-    stateStack.back().textState.textObjectParams = {};
+    ASSERT(state().textState.textObjectParams.has_value());
+    state().textState.textObjectParams = {};
 }
 
 void OperatorTraverser::beginText() {
     // only one BT ... ET can be open at a time
-    ASSERT(!stateStack.back().textState.textObjectParams.has_value());
-    stateStack.back().textState.textObjectParams = std::optional(TextObjectState());
+    ASSERT(!state().textState.textObjectParams.has_value());
+    state().textState.textObjectParams = std::optional(TextObjectState());
 }
 
 void OperatorTraverser::pushGraphicsState() { stateStack.emplace_back(); }
@@ -83,15 +85,15 @@ void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp = Cairo::identity_matrix();
     tmp.translate(op->data.Td_MoveStartOfNextLine.x, page.height() - op->data.Td_MoveStartOfNextLine.y);
 
-    auto currentLineMatrix = stateStack.back().textState.textObjectParams.value().textLineMatrix;
+    auto currentLineMatrix = state().textState.textObjectParams.value().textLineMatrix;
     auto newLineMatrix     = tmp * currentLineMatrix;
 
-    stateStack.back().textState.textObjectParams.value().textLineMatrix = newLineMatrix;
-    stateStack.back().textState.textObjectParams.value().textMatrix     = newLineMatrix;
+    state().textState.textObjectParams.value().textLineMatrix = newLineMatrix;
+    state().textState.textObjectParams.value().textMatrix     = newLineMatrix;
 }
 
 void OperatorTraverser::setTextFontAndSize(Operator *op) {
-    stateStack.back().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
+    state().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
     auto fontMapOpt = page.resources()->fonts(page.document);
     if (!fontMapOpt.has_value()) {
@@ -108,17 +110,17 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
 
     auto font                                 = fontOpt.value();
     auto fontFace                             = font->load_font_face(page.document);
-    stateStack.back().textState.textFont.font = font;
+    state().textState.textFont.font = font;
     if (fontFace != nullptr) {
-        stateStack.back().textState.textFont.ftFace    = fontFace;
-        stateStack.back().textState.textFont.cairoFace = Cairo::FtFontFace::create(fontFace, 0);
+        state().textState.textFont.ftFace    = fontFace;
+        state().textState.textFont.cairoFace = Cairo::FtFontFace::create(fontFace, 0);
     }
 }
 
 void OperatorTraverser::showText(Operator *op) { on_show_text(op); }
 
 Cairo::Matrix OperatorTraverser::font_matrix() const {
-    const auto &textState = stateStack.back().textState;
+    const auto &textState = state().textState;
     auto textRenderMatrix = Cairo::identity_matrix();
     textRenderMatrix.scale(textState.textFontSize, textState.textFontSize);
     textRenderMatrix.translate(0, textState.textRiseUnscaled);

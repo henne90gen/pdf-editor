@@ -75,9 +75,6 @@ struct Font : public Dictionary {
     /// Character mapping
     std::optional<CMap *> cmap(Document &document);
     FT_Face load_font_face(Document &document);
-
-    /// calculates (width, height) of the given text (string)
-    Cairo::TextExtents text_extents(Document &document, const std::string &text);
 };
 
 struct FontMap : public Dictionary {

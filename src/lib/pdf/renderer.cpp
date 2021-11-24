@@ -2,13 +2,11 @@
 
 #include <spdlog/spdlog.h>
 
-#include "helper/util.h"
 #include "operator_parser.h"
 
 namespace pdf {
 
 void Renderer::render() {
-    // TODO set graphics state to default values
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
 
     cr->save();
@@ -24,7 +22,7 @@ void Renderer::render() {
 }
 
 void Renderer::on_show_text(Operator *op) {
-    const auto &textState = stateStack.back().textState;
+    const auto &textState = state().textState;
     cr->set_font_matrix(font_matrix());
     cr->set_font_face(textState.textFont.cairoFace);
     cr->set_source_rgb(0.0, 0.0, 0.0);

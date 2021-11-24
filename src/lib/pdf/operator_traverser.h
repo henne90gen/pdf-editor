@@ -100,6 +100,9 @@ struct OperatorTraverser {
     /// calculates the current font matrix
     [[nodiscard]] Cairo::Matrix font_matrix() const;
 
+    GraphicsState &state() { return stateStack.back(); }
+    [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
+
     virtual void on_show_text(Operator *) {}
 
   private:

@@ -85,16 +85,4 @@ FT_Face Font::load_font_face(Document &document) {
     return face;
 }
 
-Cairo::TextExtents Font::text_extents(Document &document, const std::string &text) {
-    auto face       = load_font_face(document);
-    auto ftFace     = Cairo::FtFontFace::create(face, 0);
-    auto fontMatrix = Cairo::identity_matrix();
-    auto ctm        = Cairo::identity_matrix();
-    auto scaledFont = Cairo::ScaledFont::create(ftFace, fontMatrix, ctm);
-    // TODO apply correct font matrix
-    Cairo::TextExtents extents;
-    cairo_scaled_font_text_extents(scaledFont->cobj(), text.c_str(), &extents);
-    return extents;
-}
-
 } // namespace pdf
