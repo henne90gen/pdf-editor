@@ -20,6 +20,7 @@
 #include <gtkmm/viewport.h>
 
 #include <pdf/document.h>
+#include <pdf/page.h>
 
 constexpr int PAGE_PADDING = 10;
 
@@ -30,9 +31,16 @@ class PdfArea : public Gtk::DrawingArea {
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void set_offsets(double x, double y);
+    void on_highlight_text_toggled();
 
   private:
     pdf::Document &document;
+
     double offsetX = 0.0;
     double offsetY = 0.0;
+
+    bool highlightText                     = false;
+    std::vector<pdf::TextBlock> textBlocks = {};
+
+    void render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr);
 };

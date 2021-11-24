@@ -152,6 +152,6 @@ TEST(Reader, HelloWorldTextBlocks) {
     ASSERT_EQ(textBlocks[0].text, "Hello World");
     ASSERT_DOUBLE_EQ(textBlocks[0].x, 56.8);
     ASSERT_DOUBLE_EQ(textBlocks[0].y, 67.900763779528006);
-    ASSERT_DOUBLE_EQ(textBlocks[0].width, 98.902000000000001);
-    ASSERT_DOUBLE_EQ(textBlocks[0].height, 0);
+    ASSERT_DOUBLE_EQ(textBlocks[0].width, 58.902000000000001);
+    ASSERT_DOUBLE_EQ(textBlocks[0].height, 9);
 }
