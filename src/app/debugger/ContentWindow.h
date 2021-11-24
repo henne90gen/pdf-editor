@@ -22,8 +22,10 @@ class ContentWindow : public Gtk::ScrolledWindow {
     void size_allocate_vfunc(int width, int height, int baseline) override;
     bool on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state);
     void on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state);
+    bool on_scroll(double x, double y);
 
   private:
+    pdf::Document &document;
     Gtk::Fixed *contentContainer;
     ContentArea *contentArea;
     bool isControlDown         = false;
@@ -31,4 +33,5 @@ class ContentWindow : public Gtk::ScrolledWindow {
     double previousVAdjustment = 0.0;
 
     void scroll_value_changed();
+    void update_container_size();
 };

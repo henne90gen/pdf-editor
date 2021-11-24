@@ -26,6 +26,8 @@ constexpr int PAGE_PADDING = 10;
 
 class PdfArea : public Gtk::DrawingArea {
   public:
+    double zoom = 1.0;
+
     [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
                              pdf::Document &_document);
 
@@ -40,10 +42,10 @@ class PdfArea : public Gtk::DrawingArea {
 
     double offsetX = 0.0;
     double offsetY = 0.0;
-    double zoom    = 1.0;
 
     bool highlightText                     = false;
     std::vector<pdf::TextBlock> textBlocks = {};
 
+    void render_pages(const Cairo::RefPtr<Cairo::Context> &cr);
     void render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr);
 };

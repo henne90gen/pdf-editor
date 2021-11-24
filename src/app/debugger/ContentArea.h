@@ -12,6 +12,8 @@ constexpr int BYTES_PER_ROW   = 50;
 
 class ContentArea : public Gtk::DrawingArea {
   public:
+    double zoom                 = 1.0;
+
     [[maybe_unused]] ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder,
                                  pdf::Document &_document);
 
@@ -23,13 +25,12 @@ class ContentArea : public Gtk::DrawingArea {
     void toggle_highlight_objects();
 
     void set_offsets(double x, double y);
+    void update_zoom(double z);
 
     void set_selected_byte(int byte) {
         selectedByte = byte;
         signalSelectedByte.emit(selectedByte);
     }
-
-    void update_zoom(double d);
 
   protected:
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) const;
@@ -39,6 +40,17 @@ class ContentArea : public Gtk::DrawingArea {
     void on_mouse_click(int numPress, double x, double y);
 
   private:
+    pdf::Document &document;
+    double offsetX              = 0.0;
+    double offsetY              = 0.0;
+    bool shouldHighlightTrailer = false;
+    bool shouldHighlightObjects = false;
+    int hoveredByte             = -1;
+    int selectedByte            = -1;
+
+    type_signal_byte signalHoveredByte;
+    type_signal_byte signalSelectedByte;
+
     void draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const;
     void highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const;
     void highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const;
@@ -48,16 +60,4 @@ class ContentArea : public Gtk::DrawingArea {
     void highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t length, double r,
                          double g, double b) const;
     static void highlight_byte(const Cairo::RefPtr<Cairo::Context> &cr, int byte, double r, double g, double b);
-
-    pdf::Document &document;
-    double offsetX              = 0.0;
-    double offsetY              = 0.0;
-    double zoom                 = 1.0;
-    bool shouldHighlightTrailer = false;
-    bool shouldHighlightObjects = false;
-    int hoveredByte             = -1;
-    int selectedByte            = -1;
-
-    type_signal_byte signalHoveredByte;
-    type_signal_byte signalSelectedByte;
 };

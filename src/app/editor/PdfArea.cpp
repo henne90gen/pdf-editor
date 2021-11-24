@@ -18,6 +18,11 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
     cr->translate(-offsetX, -offsetY);
     cr->scale(zoom, zoom);
 
+    render_pages(cr);
+    render_text_blocks(cr);
+}
+
+void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->save();
 
     auto pages = document.pages();
@@ -29,8 +34,6 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
     }
 
     cr->restore();
-
-    render_text_blocks(cr);
 }
 
 void PdfArea::render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr) {

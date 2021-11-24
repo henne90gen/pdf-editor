@@ -5,25 +5,14 @@
 #include <gtkmm/eventcontrollerscroll.h>
 #include <pdf/page.h>
 
-PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document)
-    : Gtk::ScrolledWindow(obj) {
+PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
+    : Gtk::ScrolledWindow(obj), document(_document) {
     pdfContainer = builder->get_widget<Gtk::Fixed>("PdfContainer");
     pdfArea      = Gtk::Builder::get_widget_derived<PdfArea>(builder, "PdfArea", document);
     get_hadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWindow::scroll_value_changed));
     get_vadjustment()->signal_value_changed().connect(sigc::mem_fun(*this, &PdfWindow::scroll_value_changed));
 
-    double width  = 0;
-    double height = PAGE_PADDING;
-    document.for_each_page([&width, &height](pdf::Page *page) {
-        double currentWidth = page->width();
-        if (currentWidth > width) {
-            width = currentWidth;
-        }
-        // TODO maybe add some padding between the pages
-        height += page->height() + PAGE_PADDING;
-        return pdf::ForEachResult::CONTINUE;
-    });
-    pdfContainer->set_size_request(static_cast<int>(width), static_cast<int>(height));
+    update_container_size();
 
     auto keyCtrl = Gtk::EventControllerKey::create();
     keyCtrl->signal_key_pressed().connect(sigc::mem_fun(*this, &PdfWindow::on_key_pressed), false);
@@ -61,6 +50,7 @@ void PdfWindow::on_key_released(guint keyValue, guint /*keyCode*/, Gdk::Modifier
 bool PdfWindow::on_scroll(double /*x*/, double y) {
     if (isControlDown) {
         pdfArea->update_zoom(y);
+        update_container_size();
         return true;
     }
     return false;
@@ -76,17 +66,27 @@ void PdfWindow::scroll_value_changed() {
         return;
     }
 
-//    if (isControlDown) {
-//        auto dy = y - previousVAdjustment;
-//        hadjustment->set_value(previousHAdjustment);
-//        vadjustment->set_value(previousVAdjustment);
-//        //        contentContainer->move(*contentArea, previousHAdjustment, previousVAdjustment);
-//        //        contentArea->update_zoom(dy);
-//        return;
-//    }
-
     pdfContainer->move(*pdfArea, x, y);
     pdfArea->set_offsets(x, y);
     previousHAdjustment = x;
     previousVAdjustment = y;
+}
+
+void PdfWindow::update_container_size() {
+    double width  = 0;
+    double height = PAGE_PADDING;
+    document.for_each_page([&width, &height](pdf::Page *page) {
+        double currentWidth = page->width();
+        if (currentWidth > width) {
+            width = currentWidth;
+        }
+        // TODO maybe add some padding between the pages
+        height += page->height() + PAGE_PADDING;
+        return pdf::ForEachResult::CONTINUE;
+    });
+
+    auto zoom        = pdfArea->zoom;
+    auto finalWidth  = static_cast<int>(width * zoom);
+    auto finalHeight = static_cast<int>(height * zoom);
+    pdfContainer->set_size_request(finalWidth, finalHeight);
 }

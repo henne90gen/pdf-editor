@@ -23,6 +23,7 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     spdlog::trace("ContentArea::on_draw(width={}, height={}) offsetX={} offsetY={}", w, h, offsetX, offsetY);
 
     cr->save();
+
     cr->translate(-offsetX, -offsetY);
     cr->scale(zoom, zoom);
 
@@ -175,8 +176,8 @@ void ContentArea::on_mouse_click(int numPress, double x, double y) {
 }
 
 int ContentArea::find_byte(double x, double y) const {
-    auto canvasX = x + offsetX;
-    auto canvasY = y + offsetY;
+    auto canvasX = (x + offsetX) / zoom;
+    auto canvasY = (y + offsetY) / zoom;
     auto byteX   = static_cast<int>(canvasX) / PIXELS_PER_BYTE;
     auto byteY   = static_cast<int>(canvasY) / PIXELS_PER_BYTE;
     return byteY * BYTES_PER_ROW + byteX;
@@ -205,9 +206,10 @@ void ContentArea::set_offsets(double x, double y) {
     queue_draw();
 }
 
-void ContentArea::update_zoom(double /*d*/) {
-    zoom += 0.01;
-    if (zoom < 0.1) {
+void ContentArea::update_zoom(double z) {
+    // TODO make zoom speed adapt with the current zoom level
+    zoom -= z * 0.075;
+    if (zoom <= 0.1) {
         zoom = 0.1;
     } else if (zoom > 10.0) {
         zoom = 10.0;

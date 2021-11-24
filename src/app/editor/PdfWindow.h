@@ -20,6 +20,7 @@ class PdfWindow : public Gtk::ScrolledWindow {
     bool on_scroll(double x, double y);
 
   private:
+    pdf::Document &document;
     Gtk::Fixed *pdfContainer;
     PdfArea *pdfArea;
     bool isControlDown         = false;
@@ -27,4 +28,5 @@ class PdfWindow : public Gtk::ScrolledWindow {
     double previousVAdjustment = 0.0;
 
     void scroll_value_changed();
+    void update_container_size();
 };
