@@ -16,7 +16,7 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
     spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
 
     cr->translate(-offsetX, -offsetY);
-    //    cr->scale(zoom, zoom);
+    cr->scale(zoom, zoom);
 
     cr->save();
 
@@ -48,6 +48,17 @@ void PdfArea::render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr) {
 void PdfArea::set_offsets(const double x, const double y) {
     offsetX = x;
     offsetY = y;
+    queue_draw();
+}
+
+void PdfArea::update_zoom(double z) {
+    // TODO make zoom speed adapt with the current zoom level
+    zoom += z * 0.1;
+    if (zoom <= 0.1) {
+        zoom = 0.1;
+    } else if (zoom > 10.0) {
+        zoom = 10.0;
+    }
     queue_draw();
 }
 

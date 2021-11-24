@@ -17,10 +17,12 @@ class PdfWindow : public Gtk::ScrolledWindow {
     void size_allocate_vfunc(int width, int height, int baseline) override;
     bool on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state);
     void on_key_released(guint keyValue, guint keyCode, Gdk::ModifierType state);
+    bool on_scroll(double x, double y);
 
   private:
     Gtk::Fixed *pdfContainer;
     PdfArea *pdfArea;
+    bool isControlDown         = false;
     double previousHAdjustment = 0.0;
     double previousVAdjustment = 0.0;
 

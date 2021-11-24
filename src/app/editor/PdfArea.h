@@ -29,8 +29,10 @@ class PdfArea : public Gtk::DrawingArea {
     [[maybe_unused]] PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
                              pdf::Document &_document);
 
-    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void set_offsets(double x, double y);
+    void update_zoom(double z);
+
+    void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
     void on_highlight_text_toggled();
 
   private:
@@ -38,6 +40,7 @@ class PdfArea : public Gtk::DrawingArea {
 
     double offsetX = 0.0;
     double offsetY = 0.0;
+    double zoom    = 1.0;
 
     bool highlightText                     = false;
     std::vector<pdf::TextBlock> textBlocks = {};
