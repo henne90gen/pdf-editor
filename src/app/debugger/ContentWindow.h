@@ -10,7 +10,7 @@
 #include <pdf/document.h>
 
 #include "ContentArea.h"
-#include "common/ScrollableContentWindow.h"
+#include "ScrollableContentWindow.h"
 
 class ContentWindow : public ScrollableContentWindow {
   public:

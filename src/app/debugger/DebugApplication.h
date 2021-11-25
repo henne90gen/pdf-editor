@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/PdfApplication.h"
+#include <PdfApplication.h>
 
 class DebugApplication : public PdfApplication {
   public:

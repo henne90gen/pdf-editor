@@ -22,7 +22,7 @@
 #include <pdf/document.h>
 #include <pdf/page.h>
 
-#include "common/ScrollableContentWindow.h"
+#include <ScrollableContentWindow.h>
 
 constexpr int PAGE_PADDING = 10;
 

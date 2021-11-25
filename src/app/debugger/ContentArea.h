@@ -7,7 +7,7 @@
 
 #include <pdf/document.h>
 
-#include "common/ScrollableContentWindow.h"
+#include "ScrollableContentWindow.h"
 
 constexpr int PIXELS_PER_BYTE = 50;
 constexpr int BYTES_PER_ROW   = 50;

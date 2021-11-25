@@ -9,7 +9,7 @@
 
 #include "PdfArea.h"
 
-#include "common/ScrollableContentWindow.h"
+#include "ScrollableContentWindow.h"
 
 class PdfWindow : public ScrollableContentWindow {
   public:

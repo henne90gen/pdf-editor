@@ -4,7 +4,7 @@
 #undef WIN32
 #include <gtkmm/application.h>
 
-#include "common/PdfApplication.h"
+#include <PdfApplication.h>
 
 class EditorApplication : public PdfApplication {
   public:
