@@ -9,15 +9,15 @@
 
 #include "PdfArea.h"
 
-#include "ScrollableContentWindow.h"
+#include "ScrolledZoomedWindow.h"
 
-class PdfWindow : public ScrollableContentWindow {
+class PdfWindow : public ScrolledZoomedWindow {
   public:
     [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
 
   protected:
     std::pair<double, double> calculate_content_size() override;
-    ScrolledContainer &container() override;
+    ScrolledZoomedContent &content() override;
 
   private:
     pdf::Document &document;

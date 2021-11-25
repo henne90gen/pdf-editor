@@ -63,8 +63,6 @@ struct TextBlockFinder : public OperatorTraverser {
     }
 
     void on_show_text(Operator *op) override {
-        spdlog::info("TJ_ShowOneOrMoreTextStrings");
-
         TextFont &textFont = state().textState.textFont;
         auto cmapOpt       = textFont.font->cmap(page.document);
 
@@ -78,7 +76,6 @@ struct TextBlockFinder : public OperatorTraverser {
         std::string text;
         for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
             if (value->is<HexadecimalString>()) {
-                spdlog::info("Found HexadecimalString");
                 if (cmapOpt.has_value()) {
                     text += cmapOpt.value()->map_char_codes(value->as<HexadecimalString>());
                 }
@@ -93,10 +90,8 @@ struct TextBlockFinder : public OperatorTraverser {
                     offsetX += static_cast<double>(extents.x_advance);
                 }
             } else if (value->is<LiteralString>()) {
-                spdlog::info("Found LiteralString");
                 text += value->as<LiteralString>()->value();
             } else if (value->is<Integer>()) {
-                spdlog::info("Found Integer");
                 offsetX -= static_cast<double>(value->as<Integer>()->value) / 1000.0;
             }
         }
@@ -105,7 +100,6 @@ struct TextBlockFinder : public OperatorTraverser {
         double y = 0.0;
         fontMatrix.transform_point(x, y);
 
-        // FIXME width and height calculation are not correct (only x_advance is filled out in extents struct)
         Cairo::TextExtents extents = {};
         cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), glyphs.size(), &extents);
         result.push_back({

@@ -5,7 +5,7 @@
 #include <pdf/renderer.h>
 
 PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
-    : ScrolledContainer(obj), document(_document) {
+    : ScrolledZoomedContent(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &PdfArea::on_draw));
 
     auto showTextButton = builder->get_widget<Gtk::CheckButton>("HighlightTextCheckButton");

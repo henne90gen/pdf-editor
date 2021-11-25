@@ -7,12 +7,12 @@
 
 #include <pdf/document.h>
 
-#include "ScrollableContentWindow.h"
+#include "ScrolledZoomedWindow.h"
 
 constexpr int PIXELS_PER_BYTE = 50;
 constexpr int BYTES_PER_ROW   = 50;
 
-class ContentArea : public ScrolledContainer {
+class ContentArea : public ScrolledZoomedContent {
   public:
     double _zoom = 1.0;
 

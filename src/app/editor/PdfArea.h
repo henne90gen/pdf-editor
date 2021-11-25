@@ -22,11 +22,11 @@
 #include <pdf/document.h>
 #include <pdf/page.h>
 
-#include <ScrollableContentWindow.h>
+#include <ScrolledZoomedWindow.h>
 
 constexpr int PAGE_PADDING = 10;
 
-class PdfArea : public ScrolledContainer {
+class PdfArea : public ScrolledZoomedContent {
   public:
     double _zoom = 1.0;
 

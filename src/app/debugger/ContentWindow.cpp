@@ -1,7 +1,7 @@
 #include "ContentWindow.h"
 
 ContentWindow::ContentWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
-    : ScrollableContentWindow(obj, builder, "ContentContainer"), document(_document) {
+    : ScrolledZoomedWindow(obj, builder, "ContentContainer"), document(_document) {
     contentArea = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &ContentWindow::scroll_to_byte));
 
