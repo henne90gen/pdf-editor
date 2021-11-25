@@ -4,6 +4,7 @@
 
 #include "util.h"
 
+#include "cmd_embed.cpp"
 #include "cmd_delete_page.cpp"
 #include "cmd_images.cpp"
 #include "cmd_info.cpp"
@@ -14,6 +15,7 @@ enum class CommandType {
     DELETE_PAGE,
     CONCATENATE,
     IMAGES,
+    EMBED,
 };
 
 CommandType parse_command_type(int argc, char **argv) {
@@ -30,6 +32,9 @@ CommandType parse_command_type(int argc, char **argv) {
         }
         if (arg == "images") {
             return CommandType::IMAGES;
+        }
+        if (arg == "embed") {
+            return CommandType::EMBED;
         }
     }
 
@@ -72,6 +77,15 @@ int parse_images_arguments(int argc, char **argv, ImagesArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
 }
 
+int parse_embed_args(int argc, char**argv, EmbedArgs&result) {
+    int startSource = 2;
+    if (argc > 3) {
+        result.files.push_back(std::string_view(argv[startSource], strlen(argv[startSource])));
+        startSource++;
+    }
+    return parse_document_source(argc, argv, startSource, result.source);
+}
+
 // pdf delete-page 1 my.pdf       -> deletes page 1 from my.pdf and dumps the result to stdout
 // cat my.pdf | pdf delete-page 1 -> deletes page 1 from my.pdf and dumps the result to stdout
 // pdf info my.pdf                -> shows info
@@ -107,6 +121,13 @@ int main(int argc, char **argv) {
             return 1;
         }
         return cmd_images(args);
+    }
+    case CommandType::EMBED: {
+        EmbedArgs args;
+        if (parse_embed_args(argc, argv, args)) {
+            return 1;
+        }
+        return cmd_embed(args);
     }
     }
 }
