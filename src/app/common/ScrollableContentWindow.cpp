@@ -32,7 +32,7 @@ void ScrollableContentWindow::size_allocate_vfunc(int width, int height, int bas
     Gtk::Widget::size_allocate_vfunc(width, height, baseline);
 }
 
-bool ScrollableContentWindow::on_key_pressed(guint keyValue, guint keyCode, Gdk::ModifierType state) {
+bool ScrollableContentWindow::on_key_pressed(guint keyValue, guint /*keyCode*/, Gdk::ModifierType /*state*/) {
     if (keyValue == GDK_KEY_Control_L) {
         isControlDown = true;
     }
