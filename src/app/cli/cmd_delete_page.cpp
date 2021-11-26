@@ -1,13 +1,13 @@
 #include <pdf/document.h>
 
 struct DeleteArgs {
-    int pageNum           = 0;
-    DocumentSource source = {};
+    std::string_view source = {};
+    int pageNum             = 0;
 };
 
 int cmd_delete_page(const DeleteArgs &args) {
     pdf::Document document;
-    if (args.source.read_document(document)) {
+    if (pdf::Document::read_from_file(std::string(args.source), document)) {
         return 1;
     }
 

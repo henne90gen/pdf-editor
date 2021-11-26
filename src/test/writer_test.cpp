@@ -4,6 +4,8 @@
 
 #include <pdf/document.h>
 
+#include "test_util.h"
+
 TEST(Writer, Blank) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
@@ -57,4 +59,23 @@ TEST(Writer, DeletePageSecond) {
     ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, testDoc));
     ASSERT_EQ(testDoc.page_count(), 1);
     free(buffer);
+}
+
+TEST(Writer, Embed) {
+    pdf::Document document;
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+    ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf"));
+
+    char *buffer = nullptr;
+    size_t size  = 0;
+    ASSERT_FALSE(document.write_to_memory(buffer, size));
+    ASSERT_NE(buffer, nullptr);
+    ASSERT_NE(size, 0);
+
+    ASSERT_BUFFER_CONTAINS_AT(
+          buffer, "14 0 obj <<\n/Length 6650\n/Filter /FlateDecode\n/FileMetadata << /Name (hello-world.pdf) /Executable false >>\n>> stream\n",
+          6867);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "endstream endobj\n", 13635);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "xref\n0 15\n", 13652);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006692 00000 n", 13922);
 }

@@ -2,10 +2,14 @@
 #include <pdf/document.h>
 #include <unistd.h>
 
-#include "util.h"
+void help() {
+    spdlog::error("Usage:");
+    spdlog::error("    pdf-app [COMMAND] [FILE_PATH]");
+    spdlog::error("");
+}
 
-#include "cmd_embed.cpp"
 #include "cmd_delete_page.cpp"
+#include "cmd_embed.cpp"
 #include "cmd_images.cpp"
 #include "cmd_info.cpp"
 
@@ -41,15 +45,14 @@ CommandType parse_command_type(int argc, char **argv) {
     return CommandType::UNKNOWN;
 }
 
-int parse_document_source(int argc, char **argv, int firstArg, DocumentSource &documentSource) {
-    bool isTerminal = isatty(fileno(stdin));
-    if (isTerminal && firstArg >= argc) {
+int parse_document_source(int argc, char **argv, int firstArg, std::string_view &documentSource) {
+    if (firstArg >= argc) {
         spdlog::error("No PDF document source specified");
         help();
         return 1;
     }
 
-    documentSource = {.fromStdin = !isTerminal, .filePath = std::string(argv[firstArg])};
+    documentSource = std::string_view(argv[firstArg], strlen(argv[firstArg]));
     return 0;
 }
 
@@ -77,19 +80,15 @@ int parse_images_arguments(int argc, char **argv, ImagesArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
 }
 
-int parse_embed_args(int argc, char**argv, EmbedArgs&result) {
+int parse_embed_args(int argc, char **argv, EmbedArgs &result) {
     int startSource = 2;
-    if (argc > 3) {
-        result.files.push_back(std::string_view(argv[startSource], strlen(argv[startSource])));
+    while (startSource < argc) {
+        result.files.emplace_back(argv[startSource], strlen(argv[startSource]));
         startSource++;
     }
-    return parse_document_source(argc, argv, startSource, result.source);
+    return 0;
 }
 
-// pdf delete-page 1 my.pdf       -> deletes page 1 from my.pdf and dumps the result to stdout
-// cat my.pdf | pdf delete-page 1 -> deletes page 1 from my.pdf and dumps the result to stdout
-// pdf info my.pdf                -> shows info
-// cat my.pdf | pdf info          -> shows info
 int main(int argc, char **argv) {
     spdlog::set_level(spdlog::level::trace);
 

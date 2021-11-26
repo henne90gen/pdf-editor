@@ -1,12 +1,13 @@
 #pragma once
 
-#include "helper/allocator.h"
 #include "font.h"
+#include "helper/allocator.h"
 #include "image.h"
 #include "objects.h"
 #include "parser.h"
 
 #include <functional>
+#include <unordered_set>
 
 namespace pdf {
 
@@ -31,26 +32,26 @@ enum class CrossReferenceEntryType {
 };
 
 struct CrossReferenceEntryFree {
-    uint64_t nextFreeObjectNumber;
-    uint64_t nextFreeObjectGenerationNumber;
+    uint64_t nextFreeObjectNumber           = 0;
+    uint64_t nextFreeObjectGenerationNumber = 0;
 };
 
 struct CrossReferenceEntryNormal {
-    uint64_t byteOffset;
-    uint64_t generationNumber;
+    uint64_t byteOffset       = 0;
+    uint64_t generationNumber = 0;
 };
 
 struct CrossReferenceEntryCompressed {
-    uint64_t objectNumberOfStream;
-    uint64_t indexInStream;
+    uint64_t objectNumberOfStream = 0;
+    uint64_t indexInStream        = 0;
 };
 
 struct CrossReferenceEntry {
-    CrossReferenceEntryType type;
+    CrossReferenceEntryType type = CrossReferenceEntryType::FREE;
     union {
         CrossReferenceEntryFree free;
         CrossReferenceEntryNormal normal;
-        CrossReferenceEntryCompressed compressed;
+        CrossReferenceEntryCompressed compressed = {};
     };
 };
 
@@ -87,10 +88,15 @@ struct ChangeSectionAdded {
 
 struct ChangeSection {
     ChangeSectionType type = ChangeSectionType::NONE;
+    /// 0 => no associated object, not 0 => the object number of the associated object
+    int64_t objectNumber = 0;
     union {
-        ChangeSectionDeleted deleted;
         ChangeSectionAdded added = {};
+        ChangeSectionDeleted deleted;
     };
+
+    [[nodiscard]] const char *start_pointer() const;
+    [[nodiscard]] size_t size() const;
 };
 
 struct Document : public ReferenceResolver {
@@ -164,6 +170,11 @@ struct Document : public ReferenceResolver {
     bool delete_page(size_t pageNum);
     /// Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
+    /// Inserts a file into the pdf document, returns 0 on success
+    bool embed_file(const std::string &filePath);
+
+    int64_t next_object_number() const;
+    void add_object(const std::string &content);
 
     void delete_raw_section(std::string_view d);
     void add_raw_section(const char *insertion_point, const char *new_content, size_t new_content_length);
@@ -179,7 +190,7 @@ struct Document : public ReferenceResolver {
     bool write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
     void write_new_cross_ref_table(std::ostream &s);
-    void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref);
+    void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) const;
 };
 
 } // namespace pdf

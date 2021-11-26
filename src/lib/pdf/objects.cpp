@@ -133,6 +133,7 @@ std::string_view Stream::decode(Allocator &allocator) {
             infstream.avail_out = (uInt)outputSize; // size of output
             infstream.next_out  = (Bytef *)output;  // output char array
 
+            // TODO error handling
             inflateInit(&infstream);
             inflate(&infstream, Z_NO_FLUSH);
             inflateEnd(&infstream);

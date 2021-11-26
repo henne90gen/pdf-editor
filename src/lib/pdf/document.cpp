@@ -3,11 +3,34 @@
 #include <bitset>
 #include <fstream>
 #include <spdlog/spdlog.h>
+#include <sstream>
 
 #include "operator_parser.h"
 #include "page.h"
 
 namespace pdf {
+
+const char *pdf::ChangeSection::start_pointer() const {
+    switch (type) {
+    case ChangeSectionType::NONE:
+        return nullptr;
+    case ChangeSectionType::ADDED:
+        return added.insertion_point;
+    case ChangeSectionType::DELETED:
+        return deleted.deleted_area.data();
+    }
+}
+
+size_t ChangeSection::size() const {
+    switch (type) {
+    case ChangeSectionType::NONE:
+        return 0;
+    case ChangeSectionType::ADDED:
+        return added.new_content_length;
+    case ChangeSectionType::DELETED:
+        return deleted.deleted_area.size();
+    }
+}
 
 IndirectObject *Document::load_object(int64_t objectNumber) {
     CrossReferenceEntry *entry = nullptr;
@@ -247,14 +270,21 @@ bool Document::delete_page(size_t pageNum) {
 }
 
 void Document::delete_raw_section(std::string_view d) {
-    changeSections.push_back({.type = ChangeSectionType::DELETED, .deleted = {.deleted_area = d}});
+    changeSections.push_back({.type         = ChangeSectionType::DELETED,
+                              .objectNumber = 0,
+                              .deleted      = {
+                                    .deleted_area = d,
+                              }});
 }
 
 void Document::add_raw_section(const char *insertionPoint, const char *newContent, size_t newContentLength) {
-    changeSections.push_back({.type  = ChangeSectionType::ADDED,
-                              .added = {.insertion_point    = insertionPoint,
-                                        .new_content        = newContent,
-                                        .new_content_length = newContentLength}});
+    changeSections.push_back({.type         = ChangeSectionType::ADDED,
+                              .objectNumber = 0,
+                              .added        = {
+                                    .insertion_point    = insertionPoint,
+                                    .new_content        = newContent,
+                                    .new_content_length = newContentLength,
+                              }});
 }
 
 DocumentCatalog *Trailer::catalog(Document &document) const {
@@ -341,6 +371,149 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
         };
         return func(image);
     });
+}
+
+#if WIN32
+std::optional<bool> is_executable(const std::string & /*filePath*/) {
+    // TODO add is_executable implementation for windows
+    return false;
+}
+#else
+#include <sys/stat.h>
+#include <zlib.h>
+std::optional<bool> is_executable(const std::string &filePath) {
+    struct stat st = {};
+    if (stat(filePath.c_str(), &st)) {
+        return {};
+    }
+    return st.st_mode & S_IXUSR;
+}
+#endif
+
+void deflate_buffer(char *srcData, size_t srcSize, char *&destData, size_t &destSize) {
+    // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
+    destSize = srcSize * 2;
+    destData = (char *)malloc(destSize);
+
+    z_stream stream  = {};
+    stream.zalloc    = Z_NULL;
+    stream.zfree     = Z_NULL;
+    stream.opaque    = Z_NULL;
+    stream.avail_in  = (uInt)srcSize;     // size of input
+    stream.next_in   = (Bytef *)srcData;  // input char array
+    stream.avail_out = (uInt)destSize;    // size of output
+    stream.next_out  = (Bytef *)destData; // output char array
+
+    auto ret = deflateInit(&stream, Z_BEST_COMPRESSION);
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+
+    ret = deflate(&stream, Z_FULL_FLUSH);
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+
+    ret      = deflateEnd(&stream);
+    destSize = stream.total_out;
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+}
+
+bool create_stream_for_file(const std::string &filePath, size_t objectNumber, std::ifstream &is,
+                            std::stringstream &ss) {
+    auto fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
+
+    size_t fileSize = is.tellg();
+    is.seekg(0);
+    spdlog::info("Embedding {} bytes of file '{}'", fileSize, filePath);
+
+    auto isExecutableOpt = is_executable(filePath);
+    if (!isExecutableOpt.has_value()) {
+        spdlog::error("Failed to get executable status");
+        return true;
+    }
+    auto isExecutableStr = isExecutableOpt.value() ? "true" : "false";
+
+    char *fileData = (char *)malloc(fileSize);
+    is.read(fileData, static_cast<std::streamsize>(fileSize));
+
+    char *data      = nullptr;
+    size_t dataSize = 0;
+    deflate_buffer(fileData, fileSize, data, dataSize);
+
+    ss << objectNumber << " 0 obj <<\n";
+    ss << "/Length " << dataSize << "\n";
+    ss << "/Filter /FlateDecode\n";
+    ss << "/FileMetadata << ";
+    ss << "/Name (" << fileName << ") ";
+    ss << "/Executable " << isExecutableStr;
+    ss << " >>\n";
+    ss << ">> stream\n";
+    ss << std::string_view(data, dataSize);
+    ss << "endstream endobj\n";
+
+    free(fileData);
+    free(data);
+    return false;
+}
+
+bool Document::embed_file(const std::string &filePath) {
+    auto is = std::ifstream();
+    is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
+
+    if (!is.is_open()) {
+        spdlog::error("Failed to open file for reading: '{}'", filePath);
+        return true;
+    }
+
+    std::stringstream ss;
+    if (create_stream_for_file(filePath, next_object_number(), is, ss)) {
+        return true;
+    }
+
+    auto s = ss.str();
+    add_object(s);
+
+    return false;
+}
+
+void Document::add_object(const std::string &str) {
+    auto objectNumber = next_object_number();
+
+    // TODO copy string data into memory from allocator
+    size_t chunkSize = str.size();
+    auto chunk       = allocator.allocate_chunk(chunkSize);
+    memcpy(chunk, str.data(), chunkSize);
+    changeSections.push_back({
+          .type         = ChangeSectionType::ADDED,
+          .objectNumber = objectNumber,
+          .added =
+                {
+                      .insertion_point    = data + lastCrossRefStart,
+                      .new_content        = chunk,
+                      .new_content_length = chunkSize,
+                },
+    });
+
+    trailer.crossReferenceTable.objectCount++;
+
+    trailer.crossReferenceTable.entries.push_back({
+          .type = CrossReferenceEntryType::NORMAL,
+          .normal =
+                {
+                      .byteOffset       = static_cast<uint64_t>(lastCrossRefStart),
+                      .generationNumber = 0,
+                },
+    });
+}
+
+int64_t Document::next_object_number() const {
+    return trailer.crossReferenceTable.firstObjectNumber + trailer.crossReferenceTable.objectCount;
 }
 
 } // namespace pdf

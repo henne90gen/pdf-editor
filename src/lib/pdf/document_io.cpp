@@ -269,7 +269,7 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
-        spdlog::error("Failed to open pdf file for reading");
+        spdlog::error("Failed to open pdf file for reading: '{}'", filePath);
         return true;
     }
 
@@ -299,25 +299,11 @@ bool Document::write_to_stream(std::ostream &s) {
         return s.bad();
     }
 
+    std::sort(changeSections.begin(), changeSections.end(),
+              [](const ChangeSection &a, const ChangeSection &b) { return a.start_pointer() < b.start_pointer(); });
+
+    auto ptr                     = data;
     size_t bytesWrittenUntilXref = 0;
-
-    std::sort(changeSections.begin(), changeSections.end(), [](const ChangeSection &a, const ChangeSection &b) {
-        if (a.type == ChangeSectionType::ADDED && b.type == ChangeSectionType::ADDED) {
-            return a.added.insertion_point < b.added.insertion_point;
-        }
-        if (a.type == ChangeSectionType::ADDED && b.type == ChangeSectionType::DELETED) {
-            return a.added.insertion_point < b.deleted.deleted_area.data();
-        }
-        if (a.type == ChangeSectionType::DELETED && b.type == ChangeSectionType::ADDED) {
-            return a.deleted.deleted_area.data() < b.added.insertion_point;
-        }
-        if (a.type == ChangeSectionType::DELETED && b.type == ChangeSectionType::DELETED) {
-            return a.deleted.deleted_area.data() < b.deleted.deleted_area.data();
-        }
-        ASSERT(false);
-    });
-
-    auto ptr = data;
     write_content(s, ptr, bytesWrittenUntilXref);
     if (s.bad()) {
         return true;
@@ -337,6 +323,7 @@ bool Document::write_to_stream(std::ostream &s) {
 void Document::write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref) {
     for (const auto &section : changeSections) {
         if (section.type == ChangeSectionType::DELETED) {
+            // NOTE write content up until the deleted section
             auto size = section.deleted.deleted_area.data() - ptr;
             s.write(ptr, size);
             if (s.bad()) {
@@ -389,15 +376,25 @@ void write_zero_padded_number(std::ostream &s, uint64_t num, int64_t maxNumDigit
     }
 }
 
-void Document::write_new_cross_ref_table(std::ostream &s) {
-    struct TempXRefEntry {
-        int64_t objectNumber      = 0;
-        CrossReferenceEntry entry = {};
-    };
+struct TempXRefEntry {
+    int64_t objectNumber      = 0;
+    CrossReferenceEntry entry = {};
+};
 
+bool should_apply_offset(const std::vector<ChangeSection> &changeSections, size_t changeSectionIndex,
+                         const TempXRefEntry &crossRefEntry) {
+    return changeSectionIndex <= 0 || changeSectionIndex - 1 >= changeSections.size() ||
+           changeSections[changeSectionIndex - 1].type != ChangeSectionType::ADDED ||
+           crossRefEntry.objectNumber != changeSections[changeSectionIndex - 1].objectNumber;
+}
+
+void Document::write_new_cross_ref_table(std::ostream &s) {
     auto crossReferenceEntries = std::vector<TempXRefEntry>(trailer.crossReferenceTable.entries.size());
     for (int i = 0; i < static_cast<int>(trailer.crossReferenceTable.entries.size()); i++) {
-        crossReferenceEntries[i] = {.objectNumber = i, .entry = trailer.crossReferenceTable.entries[i]};
+        crossReferenceEntries[i] = {
+              .objectNumber = i + trailer.crossReferenceTable.firstObjectNumber,
+              .entry        = trailer.crossReferenceTable.entries[i],
+        };
     }
 
     std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
@@ -441,7 +438,11 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
             if (changeSection.type == ChangeSectionType::DELETED) {
                 size_t deletedOffset = changeSection.deleted.deleted_area.data() - data;
                 if (deletedOffset > crossRefEntry.entry.normal.byteOffset) {
-                    crossRefEntry.entry.normal.byteOffset += offset;
+
+                    // TODO add test for this if statement
+                    if (should_apply_offset(changeSections, changeSectionIndex, crossRefEntry)) {
+                        crossRefEntry.entry.normal.byteOffset += offset;
+                    }
                     break;
                 }
 
@@ -464,10 +465,15 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
         }
 
         if (changeSectionIndex >= changeSections.size()) {
-            crossRefEntry.entry.normal.byteOffset += offset;
+            if (should_apply_offset(changeSections, changeSectionIndex, crossRefEntry)) {
+                crossRefEntry.entry.normal.byteOffset += offset;
+            }
             continue;
         }
     }
+
+    std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
+              [](const TempXRefEntry &a, const TempXRefEntry &b) { return a.objectNumber < b.objectNumber; });
 
     auto xrefKeyword = "xref\n";
     s.write(xrefKeyword, 5);
@@ -478,8 +484,6 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
     s.write(objectCountStr.c_str(), static_cast<std::streamsize>(objectCountStr.size()));
     s.write("\n", 1);
 
-    std::sort(crossReferenceEntries.begin(), crossReferenceEntries.end(),
-              [](const TempXRefEntry &a, const TempXRefEntry &b) { return a.objectNumber < b.objectNumber; });
     for (auto &entry : crossReferenceEntries) {
         // TODO iterate over all entries and write them to the output stream
         if (entry.entry.type == CrossReferenceEntryType::NORMAL) {
@@ -500,7 +504,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
     }
 }
 
-void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) {
+void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) const {
     s.write("trailer\n", 8);
     s.write(trailer.dict->data.data(), static_cast<std::streamsize>(trailer.dict->data.size()));
     s.write("\nstartxref\n", 11);
@@ -514,7 +518,7 @@ bool Document::write_to_file(const std::string &filePath) {
     os.open(filePath, std::ios::out | std::ios::binary);
 
     if (!os.is_open()) {
-        spdlog::error("Failed to open pdf file for writing");
+        spdlog::error("Failed to open pdf file for writing: '{}'", filePath);
         return true;
     }
 

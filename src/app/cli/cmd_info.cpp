@@ -1,20 +1,28 @@
 #include <pdf/document.h>
 
 struct InfoArgs {
-    DocumentSource source = {};
+    std::string_view source = {};
 };
 
 int cmd_info(const InfoArgs &args) {
     pdf::Document document;
-    if (args.source.read_document(document)) {
+    if (pdf::Document::read_from_file(std::string(args.source), document)) {
         return 1;
     }
 
+    size_t pageCount           = document.page_count();
+    size_t lineCount           = document.line_count();
+    size_t wordCount           = document.word_count();
+    size_t characterCount      = document.character_count();
+    size_t objectCount         = document.object_count(false);
+    size_t parsableObjectCount = document.objects().size();
+
     spdlog::info("Size in bytes: {:>5}", document.sizeInBytes);
-    spdlog::info("Pages:         {:>5}", document.page_count());
-    spdlog::info("Lines:         {:>5}", document.line_count());
-    spdlog::info("Words:         {:>5}", document.word_count());
-    spdlog::info("Characters:    {:>5}", document.character_count());
-    spdlog::info("Objects:       {:>5} ({} parsable)", document.object_count(false), document.objects().size());
+    spdlog::info("Pages:         {:>5}", pageCount);
+    spdlog::info("Lines:         {:>5}", lineCount);
+    spdlog::info("Words:         {:>5}", wordCount);
+    spdlog::info("Characters:    {:>5}", characterCount);
+    spdlog::info("Objects:       {:>5} ({} parsable)", objectCount, parsableObjectCount);
+
     return 0;
 }
