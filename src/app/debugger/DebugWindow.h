@@ -25,21 +25,22 @@ class DebugWindow : public Gtk::ApplicationWindow {
 
     void update_selected_byte_label(int b);
     void update_hovered_byte_label(int b);
+    void update_memory_usage_label();
+    void update_details_label(pdf::Object *object);
     void open_jump_to_byte_dialog();
     void response_jump_to_byte_dialog(int response);
-    void update_memory_usage_label();
-    void parse_document();
 
   private:
     pdf::Document document;
 
-    Gtk::Label *selectedByteLabel;
-    Gtk::Label *hoveredByteLabel;
-    Gtk::Label *memoryUsageLabel;
-    Gtk::CheckButton *trailerHighlight;
-    Gtk::CheckButton *objectsHighlight;
-    Gtk::Button *jumpToByteButton;
-    Gtk::Button *parseDocumentButton;
+    Gtk::Label *selectedByteLabel      = nullptr;
+    Gtk::Label *hoveredByteLabel       = nullptr;
+    Gtk::Label *memoryUsageLabel       = nullptr;
+    Gtk::Label *detailsLabel           = nullptr;
+    Gtk::CheckButton *trailerHighlight = nullptr;
+    Gtk::CheckButton *objectsHighlight = nullptr;
+    Gtk::Button *jumpToByteButton      = nullptr;
+    Gtk::Button *parseDocumentButton   = nullptr;
 
     ContentArea *contentArea           = nullptr;
     DocumentTree *documentTree         = nullptr;

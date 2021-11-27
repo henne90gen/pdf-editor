@@ -98,31 +98,43 @@
                             </object>
                         </child>
                         <child>
-                            <object class="GtkScrolledWindow">
+                            <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="orientation">vertical</property>
                                 <child>
-                                    <object class="GtkTreeView" id="DocumentTree">
+                                    <object class="GtkScrolledWindow">
+                                        <property name="vexpand">True</property>
                                         <child>
-                                            <object class="GtkTreeViewColumn" id="NameColumn">
-                                                <property name="title">Name</property>
+                                            <object class="GtkTreeView" id="DocumentTree">
                                                 <child>
-                                                    <object class="GtkCellRendererText" id="NameRenderer"/>
-                                                    <attributes>
-                                                        <attribute name="text">0</attribute>
-                                                    </attributes>
+                                                    <object class="GtkTreeViewColumn" id="NameColumn">
+                                                        <property name="title">Name</property>
+                                                        <child>
+                                                            <object class="GtkCellRendererText" id="NameRenderer"/>
+                                                            <attributes>
+                                                                <attribute name="text">0</attribute>
+                                                            </attributes>
+                                                        </child>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkTreeViewColumn" id="ValueColumn">
+                                                        <property name="title">Value</property>
+                                                        <child>
+                                                            <object class="GtkCellRendererText" id="ValueRenderer"/>
+                                                            <attributes>
+                                                                <attribute name="text">1</attribute>
+                                                            </attributes>
+                                                        </child>
+                                                    </object>
                                                 </child>
                                             </object>
                                         </child>
-                                        <child>
-                                            <object class="GtkTreeViewColumn" id="ValueColumn">
-                                                <property name="title">Value</property>
-                                                <child>
-                                                    <object class="GtkCellRendererText" id="ValueRenderer"/>
-                                                    <attributes>
-                                                        <attribute name="text">1</attribute>
-                                                    </attributes>
-                                                </child>
-                                            </object>
-                                        </child>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel" id="DetailsLabel">
+                                        <property name="selectable">True</property>
                                     </object>
                                 </child>
                             </object>
@@ -132,30 +144,4 @@
             </object>
         </child>
     </object>
-
-    <menu id='DocumentTreeMenu'>
-        <section>
-            <item>
-                <attribute name='label' translatable='yes'>_New Window</attribute>
-                <link name="submenu">
-                    <item>
-                        <attribute name='label' translatable='yes'>_New Something</attribute>
-                        <attribute name='action'>app.new_something</attribute>
-                    </item>
-                    <item>
-                        <attribute name='label' translatable='yes'>_New Else</attribute>
-                        <attribute name='action'>app.new_else</attribute>
-                    </item>
-                </link>
-            </item>
-            <item>
-                <attribute name='label' translatable='yes'>_About Sunny</attribute>
-                <attribute name='action'>app.about</attribute>
-            </item>
-            <item>
-                <attribute name='label' translatable='yes'>_Quit</attribute>
-                <attribute name='action'>app.quit</attribute>
-            </item>
-        </section>
-    </menu>
 </interface>

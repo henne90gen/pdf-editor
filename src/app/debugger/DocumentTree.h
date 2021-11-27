@@ -2,6 +2,7 @@
 
 // TODO this is a hack to get the gtkmm4 code to compile on Windows
 #undef WIN32
+#include <giomm/simpleaction.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/popovermenu.h>
 #include <gtkmm/treestore.h>
@@ -12,10 +13,12 @@
 struct DocumentModelColumns : public Gtk::TreeModel::ColumnRecord {
     Gtk::TreeModelColumn<std::string> name;
     Gtk::TreeModelColumn<std::string> value;
+    Gtk::TreeModelColumn<pdf::Object *> object;
 
     DocumentModelColumns() {
         add(name);
         add(value);
+        add(object);
     }
 };
 
@@ -25,18 +28,17 @@ class DocumentTree : public Gtk::TreeView {
 
     void fill_tree();
 
-  protected:
-    // Signal handler for showing popup menu:
-    void on_popup_button_pressed(int n_press, double x, double y);
+    using type_signal_object_selected = sigc::signal<void(pdf::Object *)>;
+    type_signal_object_selected signal_object_selected() { return signalObjectSelected; }
 
-    // Signal handler for popup menu items:
-    void on_menu_file_popup_generic();
+  protected:
+    void on_row_clicked(const Gtk::TreeModel::Path &, Gtk::TreeViewColumn *);
 
   private:
     pdf::Document &document;
     Glib::RefPtr<Gtk::TreeStore> treeStore;
     DocumentModelColumns columns = DocumentModelColumns();
-    Gtk::PopoverMenu menuPopover;
+    type_signal_object_selected signalObjectSelected;
 
     void create_row(pdf::Object *object, Gtk::TreeRow &parentRow, std::unordered_set<pdf::Object *> &alreadyVisited);
     void create_rows(pdf::Dictionary *dictionary, Gtk::TreeRow &parentRow,

@@ -22,14 +22,15 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     parseDocumentButton = builder->get_widget<Gtk::Button>("ParseDocumentButton");
     contentArea         = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
     documentTree        = Gtk::Builder::get_widget_derived<DocumentTree>(builder, "DocumentTree", document);
+    detailsLabel        = builder->get_widget<Gtk::Label>("DetailsLabel");
 
     parseDocumentButton->signal_clicked().connect(sigc::mem_fun(*documentTree, &DocumentTree::fill_tree));
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
     objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
     contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_selected_byte_label));
     contentArea->signal_hovered_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_hovered_byte_label));
-
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
+    documentTree->signal_object_selected().connect(sigc::mem_fun(*this, &DebugWindow::update_details_label));
 
     update_memory_usage_label();
     // NOTE using polling seems to be the only reasonable solution
@@ -111,4 +112,44 @@ void DebugWindow::update_memory_usage_label() {
     auto text = totalBytesUsed + " bytes used / " + totalBytesAllocated + " bytes allocated (" + numAllocations +
                 " allocations)";
     memoryUsageLabel->set_text(text);
+}
+
+void DebugWindow::update_details_label(pdf::Object *object) {
+    detailsLabel->set_text("");
+
+    switch (object->type) {
+    case pdf::Object::Type::OBJECT:
+        break;
+    case pdf::Object::Type::BOOLEAN:
+        break;
+    case pdf::Object::Type::INTEGER:
+        break;
+    case pdf::Object::Type::REAL:
+        break;
+    case pdf::Object::Type::HEXADECIMAL_STRING:
+        break;
+    case pdf::Object::Type::LITERAL_STRING:
+        break;
+    case pdf::Object::Type::NAME:
+        break;
+    case pdf::Object::Type::ARRAY:
+        break;
+    case pdf::Object::Type::DICTIONARY:
+        break;
+    case pdf::Object::Type::INDIRECT_REFERENCE:
+        update_details_label(document.resolve(object->as<pdf::IndirectReference>()));
+        break;
+    case pdf::Object::Type::INDIRECT_OBJECT:
+        update_details_label(object->as<pdf::IndirectObject>()->object);
+        break;
+    case pdf::Object::Type::STREAM: {
+        auto stream = object->as<pdf::Stream>();
+        auto str    = std::string(stream->decode(document.allocator));
+        detailsLabel->set_text(str);
+    } break;
+    case pdf::Object::Type::NULL_OBJECT:
+        break;
+    case pdf::Object::Type::OBJECT_STREAM_CONTENT:
+        break;
+    }
 }
