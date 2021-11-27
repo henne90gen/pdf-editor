@@ -131,7 +131,7 @@ void DocumentTree::create_rows(pdf::Array *array, Gtk::TreeRow &parentRow,
     }
 }
 
-void DocumentTree::on_popup_button_pressed(int n_press, double x, double y) {
+void DocumentTree::on_popup_button_pressed(int /*n_press*/, double x, double y) {
     const Gdk::Rectangle rect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     menuPopover.set_pointing_to(rect);
     menuPopover.popup();
