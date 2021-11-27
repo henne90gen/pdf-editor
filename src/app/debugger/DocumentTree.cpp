@@ -2,7 +2,8 @@
 
 #include <gtkmm/gestureclick.h>
 
-DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
+DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
+                           pdf::Document &_document)
     : Gtk::TreeView(obj), document(_document) {
     treeStore = Gtk::TreeStore::create(columns);
     set_model(treeStore);
@@ -127,6 +128,6 @@ void DocumentTree::on_row_clicked(const Gtk::TreeModel::Path &, Gtk::TreeViewCol
         return;
     }
 
-    auto &row        = *iter;
+    auto &row = *iter;
     signalObjectSelected.emit(row[columns.object]);
 }
