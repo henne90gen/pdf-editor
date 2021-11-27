@@ -1,10 +1,33 @@
 #include "DocumentTree.h"
 
-DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/,
-                           pdf::Document &_document)
+#include <giomm/menu.h>
+#include <giomm/simpleactiongroup.h>
+#include <gtkmm/gestureclick.h>
+
+DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
     : Gtk::TreeView(obj), document(_document) {
     treeStore = Gtk::TreeStore::create(columns);
     set_model(treeStore);
+
+    auto refGesture = Gtk::GestureClick::create();
+    refGesture->set_button(GDK_BUTTON_SECONDARY);
+    refGesture->signal_pressed().connect(sigc::mem_fun(*this, &DocumentTree::on_popup_button_pressed));
+    add_controller(refGesture);
+
+    // Fill popup menu:
+    auto menu = builder->get_object<Gio::Menu>("DocumentTreeMenu");
+    menuPopover.set_menu_model(menu);
+    menuPopover.set_parent(*this);
+    menuPopover.set_has_arrow(true);
+
+    // Create actions:
+    auto refActionGroup = Gio::SimpleActionGroup::create();
+    refActionGroup->add_action("new", sigc::mem_fun(*this, &DocumentTree::on_menu_file_popup_generic));
+    refActionGroup->add_action("new_something", sigc::mem_fun(*this, &DocumentTree::on_menu_file_popup_generic));
+    refActionGroup->add_action("new_else", sigc::mem_fun(*this, &DocumentTree::on_menu_file_popup_generic));
+    refActionGroup->add_action("about", sigc::mem_fun(*this, &DocumentTree::on_menu_file_popup_generic));
+    refActionGroup->add_action("quit", sigc::mem_fun(*this, &DocumentTree::on_menu_file_popup_generic));
+    insert_action_group("app", refActionGroup);
 }
 
 void DocumentTree::fill_tree() {
@@ -106,4 +129,25 @@ void DocumentTree::create_rows(pdf::Array *array, Gtk::TreeRow &parentRow,
         row[columns.name] = std::to_string(i);
         create_row(array->values[i], row, alreadyVisited);
     }
+}
+
+void DocumentTree::on_popup_button_pressed(int n_press, double x, double y) {
+    const Gdk::Rectangle rect(static_cast<int>(x), static_cast<int>(y), 1, 1);
+    menuPopover.set_pointing_to(rect);
+    menuPopover.popup();
+}
+
+void DocumentTree::on_menu_file_popup_generic() {
+    auto refSelection = get_selection();
+    if (!refSelection) {
+        return;
+    }
+
+    auto iter = refSelection->get_selected();
+    if (!iter) {
+        return;
+    }
+
+    std::string name = (*iter)[columns.name];
+    spdlog::info("Selected Name: {}", name);
 }

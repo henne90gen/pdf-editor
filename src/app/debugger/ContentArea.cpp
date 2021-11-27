@@ -59,6 +59,14 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
         }
         currentTrailer = currentTrailer->prev;
     }
+
+    if (document.trailer.dict != nullptr) {
+        highlight_range(cr, document.data + document.lastCrossRefStart,
+                        document.trailer.dict->data.data() - (document.data + document.lastCrossRefStart), 0, 0, 1);
+    } else {
+        highlight_range(cr, document.data + document.lastCrossRefStart,
+                        document.trailer.stream->data.data() - (document.data + document.lastCrossRefStart), 0, 0, 1);
+    }
 }
 
 void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const {

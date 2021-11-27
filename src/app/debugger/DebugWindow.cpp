@@ -11,6 +11,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
         spdlog::error("Failed to open document: {}", filePath);
         return;
     }
+    set_title(filePath);
 
     selectedByteLabel   = builder->get_widget<Gtk::Label>("SelectedByteLabel");
     hoveredByteLabel    = builder->get_widget<Gtk::Label>("HoveredByteLabel");

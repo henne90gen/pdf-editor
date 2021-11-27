@@ -133,11 +133,29 @@
         </child>
     </object>
 
-    <object class="GtkTreeStore" id="ObjectStore">
-        <columns>
-            <column type="gchararray"/>
-            <column type="gchararray"/>
-            <column type="gint"/>
-        </columns>
-    </object>
+    <menu id='DocumentTreeMenu'>
+        <section>
+            <item>
+                <attribute name='label' translatable='yes'>_New Window</attribute>
+                <link name="submenu">
+                    <item>
+                        <attribute name='label' translatable='yes'>_New Something</attribute>
+                        <attribute name='action'>app.new_something</attribute>
+                    </item>
+                    <item>
+                        <attribute name='label' translatable='yes'>_New Else</attribute>
+                        <attribute name='action'>app.new_else</attribute>
+                    </item>
+                </link>
+            </item>
+            <item>
+                <attribute name='label' translatable='yes'>_About Sunny</attribute>
+                <attribute name='action'>app.about</attribute>
+            </item>
+            <item>
+                <attribute name='label' translatable='yes'>_Quit</attribute>
+                <attribute name='action'>app.quit</attribute>
+            </item>
+        </section>
+    </menu>
 </interface>

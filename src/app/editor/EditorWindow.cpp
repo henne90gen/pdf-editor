@@ -10,6 +10,7 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
         spdlog::error("Failed to open document");
         return;
     }
+    set_title(filePath);
 
     Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
 }

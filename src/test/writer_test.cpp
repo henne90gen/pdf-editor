@@ -72,10 +72,33 @@ TEST(Writer, Embed) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    ASSERT_BUFFER_CONTAINS_AT(
-          buffer, "14 0 obj <<\n/Length 6650\n/Filter /FlateDecode\n/FileMetadata << /Name (hello-world.pdf) /Executable false >>\n>> stream\n",
-          6867);
+    ASSERT_BUFFER_CONTAINS_AT(buffer,
+                              "14 0 obj <<\n/Length 6650\n/Filter /FlateDecode\n/FileMetadata << /Name "
+                              "(hello-world.pdf) /Executable false >>\n>> stream\n",
+                              6867);
     ASSERT_BUFFER_CONTAINS_AT(buffer, "endstream endobj\n", 13635);
     ASSERT_BUFFER_CONTAINS_AT(buffer, "xref\n0 15\n", 13652);
     ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006692 00000 n", 13922);
+}
+
+TEST(Writer, AddRawSection) {
+    pdf::Document document;
+    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+
+    char buf[7] = "/Hello";
+    document.add_raw_section(document.data + 6059, buf, 6);
+
+    char *buffer = nullptr;
+    size_t size  = 0;
+    ASSERT_FALSE(document.write_to_memory(buffer, size));
+    ASSERT_NE(buffer, nullptr);
+    ASSERT_NE(size, 0);
+
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "<</Hello/Type", 6057);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006333", 6903);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006502", 6963);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006246", 7083);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006601", 7123);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006698", 7143);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, "6873", 7345);
 }
