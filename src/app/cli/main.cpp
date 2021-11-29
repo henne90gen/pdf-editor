@@ -1,6 +1,5 @@
 #include <iostream>
 #include <pdf/document.h>
-#include <unistd.h>
 
 void help() {
     spdlog::error("Usage:");
@@ -12,6 +11,7 @@ void help() {
 #include "cmd_embed.cpp"
 #include "cmd_images.cpp"
 #include "cmd_info.cpp"
+#include "cmd_text.cpp"
 
 enum class CommandType {
     UNKNOWN,
@@ -20,6 +20,7 @@ enum class CommandType {
     CONCATENATE,
     IMAGES,
     EMBED,
+    TEXT,
 };
 
 CommandType parse_command_type(int argc, char **argv) {
@@ -40,6 +41,9 @@ CommandType parse_command_type(int argc, char **argv) {
         if (arg == "embed") {
             return CommandType::EMBED;
         }
+        if (arg == "text") {
+            return CommandType::TEXT;
+        }
     }
 
     return CommandType::UNKNOWN;
@@ -56,11 +60,11 @@ int parse_document_source(int argc, char **argv, int firstArg, std::string_view 
     return 0;
 }
 
-int parse_info_arguments(int argc, char **argv, InfoArgs &result) {
+int parse_info_args(int argc, char **argv, InfoArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
 }
 
-int parse_delete_arguments(int argc, char **argv, DeleteArgs &result) {
+int parse_delete_args(int argc, char **argv, DeleteArgs &result) {
     if (argc < 3) {
         return 1;
     }
@@ -76,7 +80,7 @@ int parse_delete_arguments(int argc, char **argv, DeleteArgs &result) {
     return 0;
 }
 
-int parse_images_arguments(int argc, char **argv, ImagesArgs &result) {
+int parse_images_args(int argc, char **argv, ImagesArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
 }
 
@@ -89,6 +93,10 @@ int parse_embed_args(int argc, char **argv, EmbedArgs &result) {
     return 0;
 }
 
+int parse_text_args(int argc, char **argv, TextArgs &result) {
+    return parse_document_source(argc, argv, 2, result.source);
+}
+
 int main(int argc, char **argv) {
     spdlog::set_level(spdlog::level::trace);
 
@@ -99,14 +107,14 @@ int main(int argc, char **argv) {
         return 1;
     case CommandType::INFO: {
         InfoArgs args;
-        if (parse_info_arguments(argc, argv, args)) {
+        if (parse_info_args(argc, argv, args)) {
             return 1;
         }
         return cmd_info(args);
     }
     case CommandType::DELETE_PAGE: {
         DeleteArgs args;
-        if (parse_delete_arguments(argc, argv, args)) {
+        if (parse_delete_args(argc, argv, args)) {
             return 1;
         }
         return cmd_delete_page(args);
@@ -116,7 +124,7 @@ int main(int argc, char **argv) {
         return 1;
     case CommandType::IMAGES: {
         ImagesArgs args;
-        if (parse_images_arguments(argc, argv, args)) {
+        if (parse_images_args(argc, argv, args)) {
             return 1;
         }
         return cmd_images(args);
@@ -127,6 +135,13 @@ int main(int argc, char **argv) {
             return 1;
         }
         return cmd_embed(args);
+    }
+    case CommandType::TEXT: {
+        TextArgs args;
+        if (parse_text_args(argc, argv, args)) {
+            return 1;
+        }
+        return cmd_text(args);
     }
     }
 }
