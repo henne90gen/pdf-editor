@@ -88,10 +88,25 @@ Operator *OperatorParser::get_operator() {
             tokens.push_back(t.value());
         }
 
+        if (tokens[currentTokenIdx].type == Token::Type::NEW_LINE) {
+            lastOperatorEnd += tokens[currentTokenIdx].content.size();
+        }
+
         if (tokens[currentTokenIdx].type == Token::Type::OPERATOR) {
-            const std::string_view &content = tokens[currentTokenIdx].content;
+            if (lastOperatorEnd == nullptr) {
+                lastOperatorEnd = tokens[0].content.data();
+            }
+
+            const auto operatorContent               = tokens[currentTokenIdx].content;
+            const auto operatorContentWithParameters = std::string_view(
+                  lastOperatorEnd, (operatorContent.data() - lastOperatorEnd) + operatorContent.size());
+            lastOperatorEnd = operatorContent.data() + operatorContent.size();
+            if (*lastOperatorEnd == ' ') {
+                lastOperatorEnd++;
+            }
+
             currentTokenIdx++;
-            return create_operator(stringToOperatorType(content));
+            return create_operator(stringToOperatorType(operatorContent), operatorContentWithParameters);
         }
 
         if (tokens[currentTokenIdx].type == Token::Type::INVALID) {
@@ -271,8 +286,8 @@ Operator *OperatorParser::create_operator_Do(Operator *result) {
     return result;
 }
 
-Operator *OperatorParser::create_operator(Operator::Type type) {
-    auto result = allocator.allocate<Operator>(type);
+Operator *OperatorParser::create_operator(Operator::Type type, std::string_view content) {
+    auto result = allocator.allocate<Operator>(type, content);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
         type == Operator::Type::W_ModifyClippingPathUsingNonZeroWindingNumberRule ||
         type == Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule ||

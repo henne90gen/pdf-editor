@@ -118,6 +118,7 @@ struct Operator {
 #undef DECLARE_ENUM
     };
     Type type;
+    std::string_view content;
 
     union {
         struct {
@@ -150,7 +151,7 @@ struct Operator {
         } Do_PaintXObject;
     } data;
 
-    explicit Operator(Type _type) : type(_type), data() {}
+    explicit Operator(Type _type, std::string_view _content) : type(_type), content(_content), data() {}
 };
 
 [[maybe_unused]] Operator::Type stringToOperatorType(const std::string &t);
@@ -162,6 +163,7 @@ struct OperatorParser {
     Allocator &allocator;
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
+    const char *lastOperatorEnd = nullptr;
 
     explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
 
@@ -174,7 +176,7 @@ struct OperatorParser {
      */
     template <typename T> T operand(int) { ASSERT(false); }
 
-    Operator *create_operator(Operator::Type type);
+    Operator *create_operator(Operator::Type type, std::string_view content);
     Operator *create_operator_w(Operator *result);
     Operator *create_operator_re(Operator *result);
     Operator *create_operator_rg(Operator *result);

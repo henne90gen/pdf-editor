@@ -3,7 +3,8 @@
 
 #include <pdf/operator_parser.h>
 
-void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type, std::function<void(pdf::Operator *)> func) {
+void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type,
+                  const std::function<void(pdf::Operator *)> &func) {
     auto operation = parser.get_operator();
     ASSERT_NE(operation, nullptr);
     ASSERT_EQ(operation->type, type);
@@ -92,4 +93,20 @@ TEST(OperationParser, HelloWorld) {
     assertNextOp(parser, pdf::Operator::Type::ET_EndText);
     assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState);
     assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState);
+}
+
+TEST(OperationParser, Content) {
+    auto textProvider = pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nQ ");
+    auto lexer        = pdf::TextLexer(textProvider);
+    auto allocator    = pdf::Allocator();
+    allocator.init(1000);
+    auto parser = pdf::OperatorParser(lexer, allocator);
+    assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth, [](auto op) { ASSERT_EQ(op->content, "0.1 w"); });
+    assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState, [](auto op) { ASSERT_EQ(op->content, "q"); });
+    assertNextOp(parser, pdf::Operator::Type::re_AppendRectangle, [](auto op) {
+        ASSERT_EQ(op->content, "0 0.028 611.971 791.971 re");
+    });
+    assertNextOp(parser, pdf::Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule, [](auto op) { ASSERT_EQ(op->content, "W*"); });
+    assertNextOp(parser, pdf::Operator::Type::n_EndPathWithoutFillingOrStroking, [](auto op) { ASSERT_EQ(op->content, "n"); });
+    assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState, [](auto op) { ASSERT_EQ(op->content, "Q"); });
 }

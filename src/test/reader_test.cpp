@@ -137,21 +137,3 @@ TEST(Reader, ObjectStream) {
     auto str    = stream->decode(document.allocator);
     ASSERT_EQ(str.size(), 117);
 }
-
-TEST(Reader, HelloWorldTextBlocks) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
-
-    auto pages = document.pages();
-    ASSERT_EQ(pages.size(), 1);
-
-    auto page       = pages[0];
-    auto textBlocks = page->text_blocks();
-    ASSERT_EQ(textBlocks.size(), 1);
-
-    ASSERT_EQ(textBlocks[0].text, "Hello World");
-    ASSERT_DOUBLE_EQ(textBlocks[0].x, 56.8);
-    ASSERT_DOUBLE_EQ(textBlocks[0].y, 67.900763779528006);
-    ASSERT_DOUBLE_EQ(textBlocks[0].width, 58.902000000000001);
-    ASSERT_DOUBLE_EQ(textBlocks[0].height, 9);
-}

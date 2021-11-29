@@ -390,7 +390,7 @@ std::optional<bool> is_executable(const std::string &filePath) {
 }
 #endif
 
-void deflate_buffer(char *srcData, size_t srcSize, char *&destData, size_t &destSize) {
+void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
     // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
     destSize = srcSize * 2;
     destData = (char *)malloc(destSize);
@@ -442,23 +442,23 @@ bool create_stream_for_file(const std::string &filePath, size_t objectNumber, st
     char *fileData = (char *)malloc(fileSize);
     is.read(fileData, static_cast<std::streamsize>(fileSize));
 
-    char *data      = nullptr;
-    size_t dataSize = 0;
-    deflate_buffer(fileData, fileSize, data, dataSize);
+    const char *encodedData = nullptr;
+    size_t encodedDataSize  = 0;
+    deflate_buffer(fileData, fileSize, encodedData, encodedDataSize);
 
     ss << objectNumber << " 0 obj <<\n";
-    ss << "/Length " << dataSize << "\n";
+    ss << "/Length " << encodedDataSize << "\n";
     ss << "/Filter /FlateDecode\n";
     ss << "/FileMetadata << ";
     ss << "/Name (" << fileName << ") ";
     ss << "/Executable " << isExecutableStr;
     ss << " >>\n";
     ss << ">> stream\n";
-    ss << std::string_view(data, dataSize);
+    ss << std::string_view(encodedData, encodedDataSize);
     ss << "endstream endobj\n";
 
     free(fileData);
-    free(data);
+    free((void *)encodedData);
     return false;
 }
 
@@ -476,19 +476,17 @@ bool Document::embed_file(const std::string &filePath) {
         return true;
     }
 
-    auto s = ss.str();
-    add_object(s);
+    auto s            = ss.str();
+    auto objectNumber = next_object_number();
+    add_object(objectNumber, s);
 
     return false;
 }
 
-void Document::add_object(const std::string &str) {
-    auto objectNumber = next_object_number();
-
-    // TODO copy string data into memory from allocator
-    size_t chunkSize = str.size();
+void Document::add_object(int64_t objectNumber, const std::string &content) {
+    size_t chunkSize = content.size();
     auto chunk       = allocator.allocate_chunk(chunkSize);
-    memcpy(chunk, str.data(), chunkSize);
+    memcpy(chunk, content.data(), chunkSize);
     changeSections.push_back({
           .type         = ChangeSectionType::ADDED,
           .objectNumber = objectNumber,
@@ -512,8 +510,66 @@ void Document::add_object(const std::string &str) {
     });
 }
 
+void Document::replace_object(int64_t objectNumber, const std::string &content) {
+    auto existingObject = get_object(objectNumber);
+    ASSERT(existingObject != nullptr);
+
+    size_t chunkSize = content.size();
+    auto chunk       = allocator.allocate_chunk(chunkSize);
+    memcpy(chunk, content.data(), chunkSize);
+    changeSections.push_back({
+          .type         = ChangeSectionType::ADDED,
+          .objectNumber = objectNumber,
+          .added =
+                {
+                      .insertion_point    = existingObject->data.data(),
+                      .new_content        = chunk,
+                      .new_content_length = chunkSize,
+                },
+    });
+    delete_raw_section(existingObject->data);
+
+    trailer.crossReferenceTable.entries[objectNumber].normal.byteOffset = existingObject->data.data() - data;
+}
+
 int64_t Document::next_object_number() const {
     return trailer.crossReferenceTable.firstObjectNumber + trailer.crossReferenceTable.objectCount;
+}
+
+void create_stream(int64_t objectNumber, const std::string &content, std::stringstream &ss) {
+    const char *encodedData = nullptr;
+    size_t encodedDataSize  = 0;
+    deflate_buffer(content.data(), content.size(), encodedData, encodedDataSize);
+
+    ss << objectNumber << " 0 obj <<\n";
+    ss << "/Length " << encodedDataSize << "\n";
+    ss << "/Filter /FlateDecode\n";
+    ss << ">> stream\n";
+    ss << std::string_view(encodedData, encodedDataSize);
+    ss << "endstream endobj\n";
+}
+
+void Document::add_stream(int64_t objectNumber, const std::string &content) {
+    std::stringstream ss;
+    create_stream(objectNumber, content, ss);
+    auto s = ss.str();
+    add_object(objectNumber, s);
+}
+
+void Document::replace_stream(int64_t objectNumber, const std::string &content) {
+    std::stringstream ss;
+    create_stream(objectNumber, content, ss);
+    auto s = ss.str();
+    replace_object(objectNumber, s);
+}
+
+IndirectObject *Document::find_existing_object(Object *object) {
+    for (auto &entry : objectList) {
+        if (entry.second->object == object) {
+            return entry.second;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace pdf

@@ -1,5 +1,7 @@
 #include "page.h"
 
+#include <sstream>
+
 #include "operator_traverser.h"
 
 namespace pdf {
@@ -71,7 +73,7 @@ struct TextBlockFinder : public OperatorTraverser {
         auto ctm        = stateStack.back().currentTransformationMatrix;
         auto scaledFont = Cairo::ScaledFont::create(face, fontMatrix, ctm);
 
-        auto glyphs     = std::vector<Cairo::Glyph>();
+        auto glyphs    = std::vector<Cairo::Glyph>();
         double offsetX = 0.0;
         std::string text;
         for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
@@ -108,6 +110,8 @@ struct TextBlockFinder : public OperatorTraverser {
               .y      = y,
               .width  = extents.width,
               .height = extents.height,
+              .op     = op,
+              .cs     = currentContentStream,
         });
     }
 };
@@ -181,6 +185,41 @@ size_t Page::character_count() {
         });
     }
     return result;
+}
+
+void TextBlock::move(Document &document, double x, double y) {
+    // BT 56.8 724.1 Td /F1 12 Tf            [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ              ET Q Q
+    // BT 56.8 724.1 Td /F1 12 Tf _x_ _y_ Td [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ -_x_ -_y_ Td ET Q Q
+    std::stringstream ss;
+
+    // write everything up to the operator we want to wrap
+    auto decoded = cs->decode(document.allocator);
+    ss << decoded.substr(0, op->content.data() - decoded.data());
+
+    // wrap operator with offset
+    if (op->content[0] != ' ') {
+        ss << " ";
+    }
+    ss << x;
+    ss << " ";
+    ss << y;
+    ss << " Td ";
+
+    // write operator
+    ss << op->content;
+
+    // wrap operator with negative offset
+    ss << " ";
+    ss << -x;
+    ss << " ";
+    ss << -y;
+    ss << " Td";
+
+    ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
+
+    auto s              = ss.str();
+    auto indirectObject = document.find_existing_object(cs);
+    document.replace_stream(indirectObject->objectNumber, s);
 }
 
 } // namespace pdf

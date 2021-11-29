@@ -72,13 +72,12 @@ TEST(Writer, Embed) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    ASSERT_BUFFER_CONTAINS_AT(buffer,
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 6867,
                               "14 0 obj <<\n/Length 6650\n/Filter /FlateDecode\n/FileMetadata << /Name "
-                              "(hello-world.pdf) /Executable false >>\n>> stream\n",
-                              6867);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "endstream endobj\n", 13635);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "xref\n0 15\n", 13652);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006692 00000 n", 13922);
+                              "(hello-world.pdf) /Executable false >>\n>> stream\n");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 13635, "endstream endobj\n");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 13652, "xref\n0 15\n");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 13922, "0000006692 00000 n");
 }
 
 TEST(Writer, AddRawSection) {
@@ -94,11 +93,11 @@ TEST(Writer, AddRawSection) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "<</Hello/Type", 6057);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006333", 6903);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006502", 6963);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006246", 7083);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006601", 7123);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "0000006698", 7143);
-    ASSERT_BUFFER_CONTAINS_AT(buffer, "6873", 7345);
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 6057, "<</Hello/Type");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 6903, "0000006333");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 6963, "0000006502");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 7083, "0000006246");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 7123, "0000006601");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 7143, "0000006698");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 7345, "6873");
 }

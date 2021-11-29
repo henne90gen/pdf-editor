@@ -8,6 +8,7 @@ void OperatorTraverser::traverse() {
     auto streams = page.content_streams();
     ASSERT(!streams.empty());
     for (auto s : streams) {
+        currentContentStream = s;
         s->for_each_operator(page.document.allocator, [this](Operator *op) {
             apply_operator(op);
 
@@ -58,10 +59,10 @@ void OperatorTraverser::endPathWithoutFillingOrStroking() const {
 }
 
 void OperatorTraverser::setNonStrokingColor(Operator *op) {
-    state().nonStrokingColor = Color::rgb( //
-          op->data.rg_SetNonStrokingColorRGB.r,      //
-          op->data.rg_SetNonStrokingColorRGB.g,      //
-          op->data.rg_SetNonStrokingColorRGB.b       //
+    state().nonStrokingColor = Color::rgb(      //
+          op->data.rg_SetNonStrokingColorRGB.r, //
+          op->data.rg_SetNonStrokingColorRGB.g, //
+          op->data.rg_SetNonStrokingColorRGB.b  //
     );
 }
 
@@ -108,8 +109,8 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
         return;
     }
 
-    auto font                                 = fontOpt.value();
-    auto fontFace                             = font->load_font_face(page.document);
+    auto font                       = fontOpt.value();
+    auto fontFace                   = font->load_font_face(page.document);
     state().textState.textFont.font = font;
     if (fontFace != nullptr) {
         state().textState.textFont.ftFace    = fontFace;

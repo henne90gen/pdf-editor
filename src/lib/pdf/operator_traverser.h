@@ -90,6 +90,7 @@ struct GraphicsState {
 
 struct OperatorTraverser {
     Page &page;
+    ContentStream* currentContentStream;
     std::vector<GraphicsState> stateStack = {};
 
     explicit OperatorTraverser(Page &_page) : page(_page) { stateStack.emplace_back(); }

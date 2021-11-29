@@ -53,6 +53,11 @@ struct TextBlock {
     double y      = 0.0;
     double width  = 0.0;
     double height = 0.0;
+
+    Operator *op      = nullptr;
+    ContentStream *cs = nullptr;
+
+    void move(Document &document, double x, double y);
 };
 
 struct Page {

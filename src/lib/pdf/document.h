@@ -174,10 +174,15 @@ struct Document : public ReferenceResolver {
     bool embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
-    void add_object(const std::string &content);
+    void add_object(int64_t objectNumber, const std::string &content);
+    void add_stream(int64_t objectNumber, const std::string &content);
+    void replace_object(int64_t objectNumber, const std::string &content);
+    void replace_stream(int64_t objectNumber, const std::string &content);
 
     void delete_raw_section(std::string_view d);
     void add_raw_section(const char *insertion_point, const char *new_content, size_t new_content_length);
+
+    IndirectObject *find_existing_object(Object *object);
 
   private:
     IndirectObject *get_object(int64_t objectNumber);
