@@ -437,12 +437,8 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
             auto &changeSection = changeSections[changeSectionIndex];
             if (changeSection.type == ChangeSectionType::DELETED) {
                 size_t deletedOffset = changeSection.deleted.deleted_area.data() - data;
-                if (deletedOffset > crossRefEntry.entry.normal.byteOffset) {
-
-                    // TODO add test for this if statement
-                    if (should_apply_offset(changeSections, changeSectionIndex, crossRefEntry)) {
-                        crossRefEntry.entry.normal.byteOffset += offset;
-                    }
+                if (deletedOffset >= crossRefEntry.entry.normal.byteOffset) {
+                    crossRefEntry.entry.normal.byteOffset += offset;
                     break;
                 }
 
@@ -452,7 +448,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
             }
             if (changeSection.type == ChangeSectionType::ADDED) {
                 size_t addedOffset = changeSection.added.insertion_point - data;
-                if (addedOffset > crossRefEntry.entry.normal.byteOffset) {
+                if (addedOffset >= crossRefEntry.entry.normal.byteOffset) {
                     crossRefEntry.entry.normal.byteOffset += offset;
                     break;
                 }
@@ -465,9 +461,7 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
         }
 
         if (changeSectionIndex >= changeSections.size()) {
-            if (should_apply_offset(changeSections, changeSectionIndex, crossRefEntry)) {
-                crossRefEntry.entry.normal.byteOffset += offset;
-            }
+            crossRefEntry.entry.normal.byteOffset += offset;
             continue;
         }
     }
@@ -484,8 +478,8 @@ void Document::write_new_cross_ref_table(std::ostream &s) {
     s.write(objectCountStr.c_str(), static_cast<std::streamsize>(objectCountStr.size()));
     s.write("\n", 1);
 
+    // iterate over all entries and write them to the output stream
     for (auto &entry : crossReferenceEntries) {
-        // TODO iterate over all entries and write them to the output stream
         if (entry.entry.type == CrossReferenceEntryType::NORMAL) {
             write_zero_padded_number(s, entry.entry.normal.byteOffset, 10);
             s.write(" ", 1);

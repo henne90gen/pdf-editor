@@ -202,7 +202,7 @@ void TextBlock::move(Document &document, double x, double y) {
     }
     ss << x;
     ss << " ";
-    ss << y;
+    ss << -y;
     ss << " Td ";
 
     // write operator
@@ -212,7 +212,7 @@ void TextBlock::move(Document &document, double x, double y) {
     ss << " ";
     ss << -x;
     ss << " ";
-    ss << -y;
+    ss << y;
     ss << " Td";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());

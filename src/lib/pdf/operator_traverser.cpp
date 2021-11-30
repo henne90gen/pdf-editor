@@ -76,6 +76,9 @@ void OperatorTraverser::beginText() {
     // only one BT ... ET can be open at a time
     ASSERT(!state().textState.textObjectParams.has_value());
     state().textState.textObjectParams = std::optional(TextObjectState());
+
+    // TODO this seems wrong (how can we flip the coordinate space on the y axis?)
+    state().textState.textObjectParams.value().textLineMatrix.translate(0, page.height());
 }
 
 void OperatorTraverser::pushGraphicsState() { stateStack.emplace_back(); }
@@ -84,7 +87,8 @@ void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
 
 void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp = Cairo::identity_matrix();
-    tmp.translate(op->data.Td_MoveStartOfNextLine.x, page.height() - op->data.Td_MoveStartOfNextLine.y);
+    // TODO this '-' seems wrong (how can we flip the coordinate space on the y axis?)
+    tmp.translate(op->data.Td_MoveStartOfNextLine.x, -op->data.Td_MoveStartOfNextLine.y);
 
     auto currentLineMatrix = state().textState.textObjectParams.value().textLineMatrix;
     auto newLineMatrix     = tmp * currentLineMatrix;
