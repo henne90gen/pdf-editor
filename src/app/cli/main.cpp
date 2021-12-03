@@ -41,14 +41,14 @@ CommandType parse_command_type(int argc, char **argv) {
         if (arg == "images") {
             return CommandType::IMAGES;
         }
+        if (arg == "text") {
+            return CommandType::TEXT;
+        }
         if (arg == "embed") {
             return CommandType::EMBED_FILES;
         }
         if (arg == "extract") {
             return CommandType::EXTRACT_FILES;
-        }
-        if (arg == "text") {
-            return CommandType::TEXT;
         }
     }
 
