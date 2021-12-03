@@ -11,7 +11,7 @@ TEST(Writer, Blank) {
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
     std::string filePath = "blank.pdf";
     auto error           = document.write_to_file(filePath);
-    ASSERT_FALSE(error);
+    ASSERT_FALSE(error.has_error());
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
 }
 
@@ -20,7 +20,7 @@ TEST(Writer, HelloWorld) {
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     std::string filePath = "hello-world.pdf";
     auto error           = document.write_to_file(filePath);
-    ASSERT_FALSE(error);
+    ASSERT_FALSE(error.has_error());
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
 }
 
@@ -39,7 +39,7 @@ TEST(Writer, DeletePageFirst) {
     ASSERT_EQ(document.page_count(), 1);
     std::string filePath = "delete-page-first.pdf";
     auto result          = document.write_to_file(filePath);
-    ASSERT_FALSE(result);
+    ASSERT_FALSE(result.has_error());
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
 }
 
@@ -51,12 +51,12 @@ TEST(Writer, DeletePageSecond) {
 
     char *buffer = nullptr;
     size_t size  = 0;
-    ASSERT_FALSE(document.write_to_memory(buffer, size));
+    ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
     pdf::Document testDoc;
-    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, testDoc));
+    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, testDoc).has_error());
     ASSERT_EQ(testDoc.page_count(), 1);
     free(buffer);
 }
@@ -68,7 +68,7 @@ TEST(Writer, Embed) {
 
     char *buffer = nullptr;
     size_t size  = 0;
-    ASSERT_FALSE(document.write_to_memory(buffer, size));
+    ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
@@ -89,7 +89,7 @@ TEST(Writer, AddRawSection) {
 
     char *buffer = nullptr;
     size_t size  = 0;
-    ASSERT_FALSE(document.write_to_memory(buffer, size));
+    ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 

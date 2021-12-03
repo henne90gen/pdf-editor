@@ -36,14 +36,13 @@ struct BmpFile {
 };
 #pragma pack(pop)
 
-bool Image::write_bmp(const std::string &fileName) const {
+Result Image::write_bmp(const std::string &fileName) const {
     BmpFileHeader fileHeader   = {};
     fileHeader.fileSizeInBytes = fileHeader.pixelOffset + width * height * 3;
 
     BmpInfoHeader infoHeader = {};
     infoHeader.width         = static_cast<int32_t>(width);
     infoHeader.height        = static_cast<int32_t>(height);
-    int bitsPerComponent     = stream->dictionary->find<Integer>("BitsPerComponent").value()->value;
     infoHeader.bitsPerPixel  = 3 * bitsPerComponent;
     infoHeader.xPixelsPerM   = 0;
     infoHeader.yPixelsPerM   = 0;
@@ -91,7 +90,7 @@ bool Image::write_bmp(const std::string &fileName) const {
     file.flush();
     file.close();
 
-    return true;
+    return Result::ok();
 }
 
 } // namespace pdf

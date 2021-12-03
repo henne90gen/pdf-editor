@@ -100,7 +100,7 @@ void DocumentTree::create_rows(pdf::Dictionary *dictionary, Gtk::TreeRow &parent
                                std::unordered_set<pdf::Object *> &alreadyVisited) {
     for (auto &entry : dictionary->values) {
         auto &row           = *treeStore->append(parentRow.children());
-        row[columns.name]   = entry.key;
+        row[columns.name]   = std::string(entry.key);
         row[columns.object] = entry.value;
         create_row(entry.value, row, alreadyVisited);
     }

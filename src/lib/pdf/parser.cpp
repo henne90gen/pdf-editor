@@ -187,7 +187,7 @@ Dictionary *Parser::parse_dictionary() {
 
     ignore_new_line_tokens();
 
-    std::unordered_map<std::string, Object *> objects = {};
+    std::unordered_map<std::string_view, Object *> objects = {};
     while (!current_token_is(Token::Type::DICTIONARY_END)) {
         auto key = parse_name();
         if (key == nullptr) {
@@ -203,8 +203,7 @@ Dictionary *Parser::parse_dictionary() {
 
         ignore_new_line_tokens();
 
-        // TODO is this conversion to a string really necessary?
-        objects[std::string(key->value())] = value;
+        objects[key->value()] = value;
     }
 
     auto lastTokenContent = tokens[currentTokenIdx].content;
@@ -212,7 +211,7 @@ Dictionary *Parser::parse_dictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    auto map        = StaticMap<std::string, Object *>::create(allocator, objects);
+    auto map        = StaticMap<std::string_view, Object *>::create(allocator, objects);
     return allocator.allocate<Dictionary>(data, map);
 }
 

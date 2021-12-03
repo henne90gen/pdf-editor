@@ -158,13 +158,13 @@ struct Document : public ReferenceResolver {
     void for_each_image(const std::function<ForEachResult(Image &)> &func);
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
-    [[nodiscard]] bool write_to_file(const std::string &filePath);
+    [[nodiscard]] Result write_to_file(const std::string &filePath);
     /// Writes the PDF-document to a newly allocated buffer, returns 0 on success
-    [[nodiscard]] bool write_to_memory(char *&buffer, size_t &size);
+    [[nodiscard]] Result write_to_memory(char *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath, returns 0 on success
-    static bool read_from_file(const std::string &filePath, Document &document);
+    static Result read_from_file(const std::string &filePath, Document &document);
     /// Reads the PDF-document from the given buffer, returns 0 on success
-    static bool read_from_memory(char *buffer, size_t size, Document &document);
+    static Result read_from_memory(char *buffer, size_t size, Document &document);
 
     /// Deletes the page with the given page number, returns 0 on success
     bool delete_page(size_t pageNum);
@@ -188,11 +188,11 @@ struct Document : public ReferenceResolver {
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
 
-    bool read_data();
-    bool read_trailers(char *crossRefStartPtr, Trailer *currentTrailer);
-    bool read_cross_reference_stream(Stream *stream, Trailer *currentTrailer);
+    Result read_data();
+    Result read_trailers(char *crossRefStartPtr, Trailer *currentTrailer);
+    Result read_cross_reference_stream(Stream *stream, Trailer *currentTrailer);
 
-    bool write_to_stream(std::ostream &s);
+    Result write_to_stream(std::ostream &s);
     void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
     void write_new_cross_ref_table(std::ostream &s);
     void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) const;

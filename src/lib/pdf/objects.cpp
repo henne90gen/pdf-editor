@@ -49,15 +49,14 @@ std::string to_string(Object *object) {
     }
     case Object::Type::DICTIONARY: {
         std::string result = "<<\n";
-        auto entries       = std::vector<StaticMap<std::string, Object *>::Entry>();
+        auto entries       = std::vector<StaticMap<std::string_view, Object *>::Entry>();
         entries.reserve(object->as<Dictionary>()->values.size());
         for (auto &entry : object->as<Dictionary>()->values) {
             entries.emplace_back(entry);
         }
         std::sort(entries.begin(), entries.end(),
-                  [](const StaticMap<std::string, Object *>::Entry &a, const StaticMap<std::string, Object *>::Entry &b) {
-                      return a.key < b.key;
-                  });
+                  [](const StaticMap<std::string_view, Object *>::Entry &a,
+                     const StaticMap<std::string_view, Object *>::Entry &b) { return a.key < b.key; });
         for (auto &entry : entries) {
             result += "  ";
             result += entry.key;

@@ -6,7 +6,7 @@ struct ImagesArgs {
 
 int cmd_images(const ImagesArgs &args) {
     pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.source), document)) {
+    if (pdf::Document::read_from_file(std::string(args.source), document).has_error()) {
         return 1;
     }
 
@@ -15,7 +15,7 @@ int cmd_images(const ImagesArgs &args) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);
         spdlog::info("Dict: {}", pdf::to_string(img.stream->dictionary));
         const auto &fileName = std::to_string(count) + ".bmp";
-        if (img.write_bmp(fileName)) {
+        if (img.write_bmp(fileName).has_error()) {
             spdlog::warn("Failed to write image file '{}'", fileName);
         }
         count++;

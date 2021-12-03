@@ -15,7 +15,7 @@ struct Image {
     Stream *stream           = nullptr;
 
     /// writes the image to a .bmp file with the given fileName, returns false on success
-    [[nodiscard]] bool write_bmp(const std::string &fileName) const;
+    [[nodiscard]] Result write_bmp(const std::string &fileName) const;
 };
 
 } // namespace pdf

@@ -39,7 +39,7 @@ Stream *parseStream(Allocator &allocator, char *start, size_t length) {
     return result->as<IndirectObject>()->object->as<Stream>();
 }
 
-bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrailer) {
+Result Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrailer) {
     auto W          = stream->dictionary->must_find<Array>("W");
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
@@ -127,14 +127,14 @@ bool Document::read_cross_reference_stream(Stream *stream, Trailer *currentTrail
 
     auto opt = stream->dictionary->values.find("Prev");
     if (!opt.has_value()) {
-        return false;
+        return Result::ok();
     }
 
     currentTrailer->prev = allocator.allocate<Trailer>();
     return read_trailers(data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
-bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
+Result Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     // decide whether xref stream or table
     const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
@@ -196,8 +196,7 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     while (std::string_view(currentReadPtr, 7) != "trailer") {
         currentReadPtr++;
         if (data + sizeInBytes < currentReadPtr + 7) {
-            spdlog::error("Unexpectedly reached end of file");
-            return true;
+            return Result::error("Unexpectedly reached end of file");
         }
     }
 
@@ -208,22 +207,21 @@ bool Document::read_trailers(char *crossRefStartPtr, Trailer *currentTrailer) {
     while (std::string_view(currentReadPtr + lengthOfTrailerDict, 9) != "startxref") {
         lengthOfTrailerDict++;
         if (data + sizeInBytes < currentReadPtr + lengthOfTrailerDict) {
-            spdlog::error("Unexpectedly reached end of file");
-            return true;
+            return Result::error("Unexpectedly reached end of file");
         }
     }
 
     currentTrailer->dict = parseDict(allocator, currentReadPtr, lengthOfTrailerDict);
     auto opt             = currentTrailer->dict->values.find("Prev");
     if (!opt.has_value()) {
-        return false;
+        return Result::ok();
     }
 
     currentTrailer->prev = allocator.allocate<Trailer>();
     return read_trailers(data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
-bool Document::read_data() {
+Result Document::read_data() {
     // parse eof
     size_t eofMarkerLength = 5;
     auto eofMarkerStart    = data + (sizeInBytes - eofMarkerLength);
@@ -234,8 +232,7 @@ bool Document::read_data() {
         eofMarkerStart--;
     }
     if (std::string_view(eofMarkerStart, eofMarkerLength) != "%%EOF") {
-        spdlog::error("Last line did not have '%%EOF'");
-        return true;
+        return Result::error("Last line did not have '%%EOF'");
     }
 
     char *lastCrossRefStartPtr = eofMarkerStart - 3;
@@ -243,8 +240,7 @@ bool Document::read_data() {
         lastCrossRefStartPtr--;
     }
     if (data == lastCrossRefStartPtr) {
-        spdlog::error("Unexpectedly reached start of file");
-        return true;
+        return Result::error("Unexpectedly reached start of file");
     }
     lastCrossRefStartPtr++;
 
@@ -253,24 +249,23 @@ bool Document::read_data() {
         const auto str    = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
         lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}", err.what());
-        return true;
+        return Result::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}",
+                             err.what());
     } catch (std::out_of_range &err) {
-        spdlog::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}", err.what());
-        return true;
+        return Result::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}",
+                             err.what());
     }
 
     auto crossRefStartPtr = data + lastCrossRefStart;
     return read_trailers(crossRefStartPtr, &trailer);
 }
 
-bool Document::read_from_file(const std::string &filePath, Document &document) {
+Result Document::read_from_file(const std::string &filePath, Document &document) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
-        spdlog::error("Failed to open pdf file for reading: '{}'", filePath);
-        return true;
+        return Result::error("Failed to open pdf file for reading: '{}'", filePath);
     }
 
     document.sizeInBytes = is.tellg();
@@ -284,7 +279,7 @@ bool Document::read_from_file(const std::string &filePath, Document &document) {
     return document.read_data();
 }
 
-bool Document::read_from_memory(char *buffer, size_t size, Document &document) {
+Result Document::read_from_memory(char *buffer, size_t size, Document &document) {
     // FIXME using the existing buffer collides with the memory management using the Allocator
     document.data        = buffer;
     document.sizeInBytes = size;
@@ -293,10 +288,10 @@ bool Document::read_from_memory(char *buffer, size_t size, Document &document) {
     return document.read_data();
 }
 
-bool Document::write_to_stream(std::ostream &s) {
+Result Document::write_to_stream(std::ostream &s) {
     if (changeSections.empty()) {
         s.write(data, static_cast<std::streamsize>(sizeInBytes));
-        return s.bad();
+        return Result::bool_(s.bad(), "Failed to write data");
     }
 
     std::sort(changeSections.begin(), changeSections.end(),
@@ -306,7 +301,7 @@ bool Document::write_to_stream(std::ostream &s) {
     size_t bytesWrittenUntilXref = 0;
     write_content(s, ptr, bytesWrittenUntilXref);
     if (s.bad()) {
-        return true;
+        return Result::error("Failed to write data");
     }
 
     // NOTE write everything up until the cross-reference table
@@ -317,7 +312,7 @@ bool Document::write_to_stream(std::ostream &s) {
 
     write_new_cross_ref_table(s);
     write_trailer_dict(s, bytesWrittenUntilXref);
-    return s.bad();
+    return Result::bool_(s.bad(), "Failed to write data");
 }
 
 void Document::write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref) {
@@ -507,13 +502,12 @@ void Document::write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref)
     s.write("\n%%EOF", 6);
 }
 
-bool Document::write_to_file(const std::string &filePath) {
+Result Document::write_to_file(const std::string &filePath) {
     auto os = std::ofstream();
     os.open(filePath, std::ios::out | std::ios::binary);
 
     if (!os.is_open()) {
-        spdlog::error("Failed to open pdf file for writing: '{}'", filePath);
-        return true;
+        return Result::error("Failed to open pdf file for writing: '{}'", filePath);
     }
 
     auto result = write_to_stream(os);
@@ -521,19 +515,19 @@ bool Document::write_to_file(const std::string &filePath) {
     return result;
 }
 
-bool Document::write_to_memory(char *&buffer, size_t &size) {
+Result Document::write_to_memory(char *&buffer, size_t &size) {
     std::stringstream ss;
 
     auto error = write_to_stream(ss);
-    if (error) {
-        return true;
+    if (error.has_error()) {
+        return error;
     }
 
     auto result = ss.str();
     size        = result.size();
     buffer      = (char *)malloc(size);
     memcpy(buffer, result.data(), size);
-    return false;
+    return Result::ok();
 }
 
 } // namespace pdf

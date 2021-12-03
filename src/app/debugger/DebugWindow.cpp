@@ -7,8 +7,9 @@
 
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
-    if (pdf::Document::read_from_file(filePath, document)) {
-        spdlog::error("Failed to open document: {}", filePath);
+    const auto result = pdf::Document::read_from_file(filePath, document);
+    if (result.has_error()) {
+        spdlog::error(result.message());
         return;
     }
     set_title(filePath);

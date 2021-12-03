@@ -1,3 +1,7 @@
+#include <spdlog/fmt/bundled/core.h>
+#include <string>
+#include <utility>
+
 #pragma once
 
 #ifndef __has_builtin
@@ -25,4 +29,28 @@ enum class ForEachResult {
     BREAK,
 };
 
-}
+class Result {
+  public:
+    template <typename... Args> //
+    static Result error(fmt::format_string<Args...> fmt, Args &&...args) {
+        return {true, fmt::format(fmt, std::forward<Args>(args)...)};
+    }
+
+    static Result ok() { return {false, ""}; }
+
+    template <typename... Args> //
+    static Result bool_(bool hasError, fmt::format_string<Args...> fmt, Args &&...args) {
+        return {hasError, fmt::format(fmt, std::forward<Args>(args)...)};
+    }
+
+    [[nodiscard]] bool has_error() const { return hasError; }
+    [[nodiscard]] std::string message() const { return errorMessage; }
+
+  private:
+    bool hasError = false;
+    std::string errorMessage;
+
+    Result(bool _hasError, std::string _errorMessage) : hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
+};
+
+} // namespace pdf

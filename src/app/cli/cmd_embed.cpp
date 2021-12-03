@@ -11,7 +11,7 @@ int cmd_embed(EmbedArgs &args) {
     }
 
     pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.files[args.files.size() - 1]), document)) {
+    if (pdf::Document::read_from_file(std::string(args.files[args.files.size() - 1]), document).has_error()) {
         return 1;
     }
 
@@ -19,7 +19,7 @@ int cmd_embed(EmbedArgs &args) {
         document.embed_file(std::string(args.files[i]));
     }
 
-    if (document.write_to_file("out.pdf")) {
+    if (document.write_to_file("out.pdf").has_error()) {
         return 1;
     }
     return 0;

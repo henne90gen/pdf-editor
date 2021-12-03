@@ -110,10 +110,10 @@ struct Array : public Object {
 };
 
 struct Dictionary : public Object {
-    StaticMap<std::string, Object *> values = {};
+    StaticMap<std::string_view, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(std::string_view data, StaticMap<std::string, Object *> map)
+    explicit Dictionary(std::string_view data, StaticMap<std::string_view, Object *> map)
         : Object(staticType(), data), values(map) {}
 
     template <typename T> std::optional<T *> find(const std::string &key) {
