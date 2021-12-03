@@ -26,9 +26,13 @@ add_library(pdf
         pdf/image.cpp
         pdf/renderer.cpp
         pdf/operator_traverser.cpp)
-target_include_directories(pdf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(pdf PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog)
 target_link_cairo(pdf)
 
-install(TARGETS pdf EXPORT pdf-export DESTINATION lib)
+install(TARGETS pdf zlibstatic spdlog EXPORT pdf ARCHIVE)
 install(DIRECTORY pdf TYPE INCLUDE FILES_MATCHING PATTERN "*.h")
+install(FILES pdf-config.cmake TYPE LIB)
+install(EXPORT pdf DESTINATION lib)

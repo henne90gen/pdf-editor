@@ -25,4 +25,4 @@ add_subdirectory(common)
 add_subdirectory(debugger)
 add_subdirectory(editor)
 
-install(TARGETS pdf-cli pdf-editor pdf-debugger DESTINATION bin)
+install(TARGETS pdf-cli pdf-editor pdf-debugger RUNTIME)
