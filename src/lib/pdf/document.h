@@ -136,11 +136,11 @@ struct Document : public ReferenceResolver {
     DocumentCatalog *catalog();
     /// List of pages
     std::vector<Page *> pages();
-    /// Iterates over all pages in the document, until 'func' returns 'false'
+    /// Iterates over all pages in the document
     void for_each_page(const std::function<ForEachResult(Page *)> &func);
     /// List of objects
     std::vector<IndirectObject *> objects();
-    /// Iterates over all objects in the document, until 'func' returns 'false'
+    /// Iterates over all objects in the document
     void for_each_object(const std::function<ForEachResult(IndirectObject *)> &func);
 
     /// Number of indirect objects
@@ -154,8 +154,10 @@ struct Document : public ReferenceResolver {
     /// Number of characters
     size_t character_count();
 
-    /// Iterates over all images in the document, until 'func' returns 'false'
+    /// Iterates over all images in the document
     void for_each_image(const std::function<ForEachResult(Image &)> &func);
+    /// Iterates over all embedded files in the document
+    void for_each_embedded_file(const std::function<ForEachResult(EmbeddedFile *)> &func);
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
     [[nodiscard]] Result write_to_file(const std::string &filePath);
@@ -171,7 +173,7 @@ struct Document : public ReferenceResolver {
     /// Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
     /// Inserts a file into the pdf document, returns 0 on success
-    bool embed_file(const std::string &filePath);
+    Result embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
     void add_object(int64_t objectNumber, const std::string &content);

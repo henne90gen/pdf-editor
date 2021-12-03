@@ -1,5 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include <pdf/document.h>
+
+#include "cmd_delete_page.cpp"
+#include "cmd_embed.cpp"
+#include "cmd_extract.cpp"
+#include "cmd_images.cpp"
+#include "cmd_info.cpp"
+#include "cmd_text.cpp"
 
 void help() {
     spdlog::error("Usage:");
@@ -7,19 +15,14 @@ void help() {
     spdlog::error("");
 }
 
-#include "cmd_delete_page.cpp"
-#include "cmd_embed.cpp"
-#include "cmd_images.cpp"
-#include "cmd_info.cpp"
-#include "cmd_text.cpp"
-
 enum class CommandType {
     UNKNOWN,
     INFO,
     DELETE_PAGE,
     CONCATENATE,
     IMAGES,
-    EMBED,
+    EMBED_FILES,
+    EXTRACT_FILES,
     TEXT,
 };
 
@@ -39,7 +42,10 @@ CommandType parse_command_type(int argc, char **argv) {
             return CommandType::IMAGES;
         }
         if (arg == "embed") {
-            return CommandType::EMBED;
+            return CommandType::EMBED_FILES;
+        }
+        if (arg == "extract") {
+            return CommandType::EXTRACT_FILES;
         }
         if (arg == "text") {
             return CommandType::TEXT;
@@ -93,6 +99,10 @@ int parse_embed_args(int argc, char **argv, EmbedArgs &result) {
     return 0;
 }
 
+int parse_extract_args(int argc, char **argv, ExtractArgs &result) {
+    return parse_document_source(argc, argv, 2, result.source);
+}
+
 int parse_text_args(int argc, char **argv, TextArgs &result) {
     return parse_document_source(argc, argv, 2, result.source);
 }
@@ -129,12 +139,19 @@ int main(int argc, char **argv) {
         }
         return cmd_images(args);
     }
-    case CommandType::EMBED: {
+    case CommandType::EMBED_FILES: {
         EmbedArgs args;
         if (parse_embed_args(argc, argv, args)) {
             return 1;
         }
         return cmd_embed(args);
+    }
+    case CommandType::EXTRACT_FILES: {
+        ExtractArgs args;
+        if (parse_extract_args(argc, argv, args)) {
+            return 1;
+        }
+        return cmd_extract(args);
     }
     case CommandType::TEXT: {
         TextArgs args;

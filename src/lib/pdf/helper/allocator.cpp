@@ -53,7 +53,7 @@ char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     if (currentAllocation->bufferPosition + sizeInBytes >
         currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
-        spdlog::warn("Failed to fit object of size {} bytes into the existing memory, allocating more", sizeInBytes);
+        spdlog::trace("Failed to fit object of size {} bytes into the existing memory, allocating more", sizeInBytes);
 
         auto newAllocationSize = currentAllocation->sizeInBytes * 2;
         extend(newAllocationSize);

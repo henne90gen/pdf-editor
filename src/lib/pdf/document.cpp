@@ -273,7 +273,7 @@ void Document::delete_raw_section(std::string_view d) {
     changeSections.push_back({.type         = ChangeSectionType::DELETED,
                               .objectNumber = 0,
                               .deleted      = {
-                                    .deleted_area = d,
+                                         .deleted_area = d,
                               }});
 }
 
@@ -281,9 +281,9 @@ void Document::add_raw_section(const char *insertionPoint, const char *newConten
     changeSections.push_back({.type         = ChangeSectionType::ADDED,
                               .objectNumber = 0,
                               .added        = {
-                                    .insertion_point    = insertionPoint,
-                                    .new_content        = newContent,
-                                    .new_content_length = newContentLength,
+                                           .insertion_point    = insertionPoint,
+                                           .new_content        = newContent,
+                                           .new_content_length = newContentLength,
                               }});
 }
 
@@ -424,8 +424,8 @@ void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, 
     }
 }
 
-bool create_stream_for_file(const std::string &filePath, size_t objectNumber, std::ifstream &is,
-                            std::stringstream &ss) {
+Result create_stream_for_file(const std::string &filePath, size_t objectNumber, std::ifstream &is,
+                              std::stringstream &ss) {
     auto fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
 
     size_t fileSize = is.tellg();
@@ -434,8 +434,7 @@ bool create_stream_for_file(const std::string &filePath, size_t objectNumber, st
 
     auto isExecutableOpt = is_executable(filePath);
     if (!isExecutableOpt.has_value()) {
-        spdlog::error("Failed to get executable status");
-        return true;
+        return Result::error("Failed to get executable status");
     }
     auto isExecutableStr = isExecutableOpt.value() ? "true" : "false";
 
@@ -459,28 +458,28 @@ bool create_stream_for_file(const std::string &filePath, size_t objectNumber, st
 
     free(fileData);
     free((void *)encodedData);
-    return false;
+    return Result::ok();
 }
 
-bool Document::embed_file(const std::string &filePath) {
+Result Document::embed_file(const std::string &filePath) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
-        spdlog::error("Failed to open file for reading: '{}'", filePath);
-        return true;
+        return Result::error("Failed to open file for reading: '{}'", filePath);
     }
 
     std::stringstream ss;
-    if (create_stream_for_file(filePath, next_object_number(), is, ss)) {
-        return true;
+    auto result = create_stream_for_file(filePath, next_object_number(), is, ss);
+    if (result.has_error()) {
+        return result;
     }
 
     auto s            = ss.str();
     auto objectNumber = next_object_number();
     add_object(objectNumber, s);
 
-    return false;
+    return Result::ok();
 }
 
 void Document::add_object(int64_t objectNumber, const std::string &content) {
@@ -570,6 +569,24 @@ IndirectObject *Document::find_existing_object(Object *object) {
         }
     }
     return nullptr;
+}
+
+void Document::for_each_embedded_file(const std::function<ForEachResult(EmbeddedFile *)> &func) {
+    for_each_object([&func](pdf::IndirectObject *obj) {
+        if (!obj->object->is<Stream>()) {
+            return ForEachResult::CONTINUE;
+        }
+
+        const auto stream          = obj->object->as<Stream>();
+        const auto fileMetadataOpt = stream->dictionary->find<Dictionary>("FileMetadata");
+        if (!fileMetadataOpt.has_value()) {
+            return ForEachResult::CONTINUE;
+        }
+
+        func(stream->as<EmbeddedFile>());
+
+        return ForEachResult::CONTINUE;
+    });
 }
 
 } // namespace pdf

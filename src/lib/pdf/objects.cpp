@@ -206,4 +206,14 @@ void Integer::set(Document &document, int64_t i) {
     document.add_raw_section(insertionPoint, new_content, s.size());
 }
 
+std::string_view EmbeddedFile::name() {
+    auto fileMetadata = dictionary->must_find<Dictionary>("FileMetadata");
+    return fileMetadata->must_find<LiteralString>("Name")->value();
+}
+
+bool EmbeddedFile::is_executable() {
+    auto fileMetadata = dictionary->must_find<Dictionary>("FileMetadata");
+    return fileMetadata->must_find<Boolean>("Executable")->value;
+}
+
 } // namespace pdf

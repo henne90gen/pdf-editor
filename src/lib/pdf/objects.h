@@ -167,6 +167,11 @@ struct Stream : public Object {
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 
+struct EmbeddedFile : public Stream {
+    std::string_view name();
+    bool is_executable();
+};
+
 struct Null : public Object {
     static Type staticType() { return Type::NULL_OBJECT; }
     explicit Null(std::string_view data) : Object(staticType(), data) {}

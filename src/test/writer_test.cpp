@@ -64,7 +64,7 @@ TEST(Writer, DeletePageSecond) {
 TEST(Writer, Embed) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
-    ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf"));
+    ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
 
     char *buffer = nullptr;
     size_t size  = 0;
