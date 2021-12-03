@@ -12,7 +12,7 @@ function(target_link_cairo target)
     target_include_directories(${target} PUBLIC ${Cairo_INCLUDE_DIRS})
 endfunction()
 
-add_library(pdf-lib
+add_library(pdf
         pdf/helper/allocator.cpp
         pdf/lexer.cpp
         pdf/parser.cpp
@@ -26,6 +26,9 @@ add_library(pdf-lib
         pdf/image.cpp
         pdf/renderer.cpp
         pdf/operator_traverser.cpp)
-target_include_directories(pdf-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(pdf-lib PUBLIC zlibstatic freetype spdlog::spdlog)
-target_link_cairo(pdf-lib)
+target_include_directories(pdf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog)
+target_link_cairo(pdf)
+
+install(TARGETS pdf EXPORT pdf-export DESTINATION lib)
+install(DIRECTORY pdf TYPE INCLUDE FILES_MATCHING PATTERN "*.h")

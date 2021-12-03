@@ -9,5 +9,5 @@ add_executable(pdf-debugger
         JumpToByteDialog.cpp
         ${debugger_xml})
 target_link_gtk4(pdf-debugger)
-target_link_libraries(pdf-debugger PRIVATE pdf-lib pdf-common)
+target_link_libraries(pdf-debugger PRIVATE pdf pdf-common)
 target_include_directories(pdf-debugger PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
