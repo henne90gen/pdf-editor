@@ -31,6 +31,8 @@ size_t write_objects(Document &document, std::ostream &s, std::unordered_map<uin
             continue;
         }
 
+        // TODO find out whether object has been modified -> if so, walk object tree and write the in-memory
+        //  representation
         s << entry.second->data;
         byteOffsets[entry.first] = currentOffset;
         currentOffset += entry.second->data.size();
@@ -56,7 +58,7 @@ void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint6
 }
 
 Result write_to_stream(Document &document, std::ostream &s) {
-    // FIXME remove this (it is only to ensure that all objects have been loaded
+    // FIXME remove this (it ensures that all objects have been loaded)
     auto objs = document.objects();
 
     write_header(s);
