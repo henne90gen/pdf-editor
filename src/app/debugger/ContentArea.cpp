@@ -27,7 +27,7 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     cr->translate(-offsetX, -offsetY);
     cr->scale(_zoom, _zoom);
 
-    highlight_range(cr, document.data, document.sizeInBytes, 1, 1, 1);
+    highlight_range(cr, document.file.data, document.file.sizeInBytes, 1, 1, 1);
 
     highlight_trailer(cr);
     highlight_objects(cr);
@@ -46,7 +46,8 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
     }
 
     // TODO maybe skip highlighting trailers that are currently not visible
-    auto *currentTrailer = &document.trailer;
+    auto &file           = document.file;
+    auto *currentTrailer = &file.trailer;
     while (currentTrailer != nullptr) {
         if (currentTrailer->dict != nullptr) {
             auto start = currentTrailer->dict->data.data();
@@ -60,12 +61,12 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
         currentTrailer = currentTrailer->prev;
     }
 
-    if (document.trailer.dict != nullptr) {
-        highlight_range(cr, document.data + document.lastCrossRefStart,
-                        document.trailer.dict->data.data() - (document.data + document.lastCrossRefStart), 0, 0, 1);
+    if (file.trailer.dict != nullptr) {
+        highlight_range(cr, file.data + file.lastCrossRefStart,
+                        file.trailer.dict->data.data() - (file.data + file.lastCrossRefStart), 0, 0, 1);
     } else {
-        highlight_range(cr, document.data + document.lastCrossRefStart,
-                        document.trailer.stream->data.data() - (document.data + document.lastCrossRefStart), 0, 0, 1);
+        highlight_range(cr, file.data + file.lastCrossRefStart,
+                        file.trailer.stream->data.data() - (file.data + file.lastCrossRefStart), 0, 0, 1);
     }
 }
 
@@ -93,15 +94,15 @@ void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {
     cr->move_to(0, PIXELS_PER_BYTE);
 
     // TODO only go over the rows that will actually show up in the final output
-    auto rowCount = static_cast<int>(document.sizeInBytes) / BYTES_PER_ROW + 1;
+    auto rowCount = static_cast<int>(document.file.sizeInBytes) / BYTES_PER_ROW + 1;
     for (int row = 0; row < rowCount; row++) {
         for (int col = 0; col < BYTES_PER_ROW; col++) {
             size_t byteOffset = row * BYTES_PER_ROW + col;
-            if (byteOffset >= document.sizeInBytes) {
+            if (byteOffset >= document.file.sizeInBytes) {
                 break;
             }
 
-            char c = *(document.data + byteOffset);
+            char c = *(document.file.data + byteOffset);
             if (c < 32 || c > 126) {
                 continue;
             }
@@ -122,7 +123,7 @@ void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const
                                   double r, double g, double b) const {
     cr->set_source_rgb(r, g, b);
 
-    int startByte = static_cast<int>(startPtr - document.data);
+    int startByte = static_cast<int>(startPtr - document.file.data);
     int length    = static_cast<int>(lengthIn);
     if (startByte % BYTES_PER_ROW != 0) {
         int x     = startByte % BYTES_PER_ROW;

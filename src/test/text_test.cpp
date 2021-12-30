@@ -23,7 +23,7 @@ TEST(Text, HelloWorldTextBlocks) {
     ASSERT_DOUBLE_EQ(textBlocks[0].height, 9);
 }
 
-TEST(Text, Move) {
+TEST(Text, DISABLED_Move) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 

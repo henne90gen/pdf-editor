@@ -10,6 +10,7 @@
 
 namespace pdf {
 
+#if CHANGE_SECTIONS
 const char *pdf::ChangeSection::start_pointer() const {
     switch (type) {
     case ChangeSectionType::NONE:
@@ -31,10 +32,11 @@ size_t ChangeSection::size() const {
         return deleted.deleted_area.size();
     }
 }
+#endif
 
 IndirectObject *Document::load_object(int64_t objectNumber) {
     CrossReferenceEntry *entry = nullptr;
-    for (Trailer *t = &trailer; t != nullptr; t = t->prev) {
+    for (Trailer *t = &file.trailer; t != nullptr; t = t->prev) {
         if (objectNumber >= t->crossReferenceTable.firstObjectNumber &&
             objectNumber < t->crossReferenceTable.objectCount) {
             entry = &t->crossReferenceTable.entries[objectNumber - t->crossReferenceTable.firstObjectNumber];
@@ -50,7 +52,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
     }
 
     if (entry->type == CrossReferenceEntryType::NORMAL) {
-        auto start = data + entry->normal.byteOffset;
+        auto start = file.data + entry->normal.byteOffset;
 
         // TODO this is dangerous (it might read past the end of the stream)
         size_t length = 0;
@@ -121,7 +123,7 @@ std::vector<IndirectObject *> Document::objects() {
 
 void Document::for_each_object(const std::function<ForEachResult(IndirectObject *)> &func) {
     // FIXME this does not consider objects from 'Prev'-ious trailers
-    for (int64_t i = 0; i < static_cast<int64_t>(trailer.crossReferenceTable.entries.size()); i++) {
+    for (int64_t i = 0; i < static_cast<int64_t>(file.trailer.crossReferenceTable.entries.size()); i++) {
         auto object = get_object(i);
         if (object == nullptr) {
             continue;
@@ -142,7 +144,7 @@ size_t Document::object_count(const bool parseObjects) {
             return ForEachResult::CONTINUE;
         });
     } else {
-        for (auto &entry : trailer.crossReferenceTable.entries) {
+        for (auto &entry : file.trailer.crossReferenceTable.entries) {
             if (entry.type == CrossReferenceEntryType::FREE) {
                 continue;
             }
@@ -193,7 +195,22 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
     }
 }
 
-DocumentCatalog *Document::catalog() { return trailer.catalog(*this); }
+DocumentCatalog *Document::catalog() {
+    if (root != nullptr) {
+        return root;
+    }
+
+    std::optional<Object *> opt;
+    if (file.trailer.dict != nullptr) {
+        opt = file.trailer.dict->values.find("Root");
+    } else {
+        opt = file.trailer.stream->dictionary->values.find("Root");
+    }
+    ASSERT(opt.has_value());
+
+    root = get<DocumentCatalog>(opt.value());
+    return root;
+}
 
 std::vector<Page *> Document::pages() {
     auto result = std::vector<Page *>();
@@ -269,15 +286,18 @@ bool Document::delete_page(size_t pageNum) {
     return false;
 }
 
-void Document::delete_raw_section(std::string_view d) {
+void Document::delete_raw_section(std::string_view /*d*/) {
+#if CHANGE_SECTIONS
     changeSections.push_back({.type         = ChangeSectionType::DELETED,
                               .objectNumber = 0,
                               .deleted      = {
                                          .deleted_area = d,
                               }});
+#endif
 }
 
-void Document::add_raw_section(const char *insertionPoint, const char *newContent, size_t newContentLength) {
+void Document::add_raw_section(const char */*insertionPoint*/, const char */*newContent*/, size_t /*newContentLength*/) {
+#if CHANGE_SECTIONS
     changeSections.push_back({.type         = ChangeSectionType::ADDED,
                               .objectNumber = 0,
                               .added        = {
@@ -285,17 +305,7 @@ void Document::add_raw_section(const char *insertionPoint, const char *newConten
                                            .new_content        = newContent,
                                            .new_content_length = newContentLength,
                               }});
-}
-
-DocumentCatalog *Trailer::catalog(Document &document) const {
-    std::optional<Object *> opt;
-    if (dict != nullptr) {
-        opt = dict->values.find("Root");
-    } else {
-        opt = stream->dictionary->values.find("Root");
-    }
-    ASSERT(opt.has_value());
-    return document.get<DocumentCatalog>(opt.value());
+#endif
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
@@ -482,28 +492,30 @@ Result Document::embed_file(const std::string &filePath) {
     return Result::ok();
 }
 
-void Document::add_object(int64_t objectNumber, const std::string &content) {
+void Document::add_object(int64_t /*objectNumber*/, const std::string &content) {
     size_t chunkSize = content.size();
     auto chunk       = allocator.allocate_chunk(chunkSize);
     memcpy(chunk, content.data(), chunkSize);
+    #if CHANGE_SECTIONS
     changeSections.push_back({
           .type         = ChangeSectionType::ADDED,
           .objectNumber = objectNumber,
           .added =
                 {
-                      .insertion_point    = data + lastCrossRefStart,
+                      .insertion_point    = file.data + file.lastCrossRefStart,
                       .new_content        = chunk,
                       .new_content_length = chunkSize,
                 },
     });
+    #endif
 
-    trailer.crossReferenceTable.objectCount++;
+    file.trailer.crossReferenceTable.objectCount++;
 
-    trailer.crossReferenceTable.entries.push_back({
+    file.trailer.crossReferenceTable.entries.push_back({
           .type = CrossReferenceEntryType::NORMAL,
           .normal =
                 {
-                      .byteOffset       = static_cast<uint64_t>(lastCrossRefStart),
+                      .byteOffset       = static_cast<uint64_t>(file.lastCrossRefStart),
                       .generationNumber = 0,
                 },
     });
@@ -516,6 +528,7 @@ void Document::replace_object(int64_t objectNumber, const std::string &content) 
     size_t chunkSize = content.size();
     auto chunk       = allocator.allocate_chunk(chunkSize);
     memcpy(chunk, content.data(), chunkSize);
+    #if CHANGE_SECTIONS
     changeSections.push_back({
           .type         = ChangeSectionType::ADDED,
           .objectNumber = objectNumber,
@@ -526,13 +539,14 @@ void Document::replace_object(int64_t objectNumber, const std::string &content) 
                       .new_content_length = chunkSize,
                 },
     });
+    #endif
     delete_raw_section(existingObject->data);
 
-    trailer.crossReferenceTable.entries[objectNumber].normal.byteOffset = existingObject->data.data() - data;
+    file.trailer.crossReferenceTable.entries[objectNumber].normal.byteOffset = existingObject->data.data() - file.data;
 }
 
 int64_t Document::next_object_number() const {
-    return trailer.crossReferenceTable.firstObjectNumber + trailer.crossReferenceTable.objectCount;
+    return file.trailer.crossReferenceTable.firstObjectNumber + file.trailer.crossReferenceTable.objectCount;
 }
 
 void create_stream(int64_t objectNumber, const std::string &content, std::stringstream &ss) {

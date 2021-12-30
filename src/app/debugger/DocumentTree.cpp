@@ -14,12 +14,12 @@ DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
 
 void DocumentTree::fill_tree() {
     spdlog::info("Filling document tree view");
-    if (document.trailer.dict != nullptr) {
+    if (document.file.trailer.dict != nullptr) {
         auto &row           = *treeStore->append();
         row[columns.name]   = "Trailer";
-        row[columns.object] = document.trailer.dict;
+        row[columns.object] = document.file.trailer.dict;
         auto alreadyVisited = std::unordered_set<pdf::Object *>();
-        create_rows(document.trailer.dict, row, alreadyVisited);
+        create_rows(document.file.trailer.dict, row, alreadyVisited);
     }
 }
 

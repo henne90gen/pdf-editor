@@ -21,7 +21,7 @@ void ContentWindow::scroll_to_byte(int byte) {
 std::pair<double, double> ContentWindow::calculate_content_size() {
     int width = BYTES_PER_ROW * PIXELS_PER_BYTE;
     int numRows =
-          static_cast<int>(std::ceil((static_cast<double>(document.sizeInBytes) / static_cast<double>(BYTES_PER_ROW))));
+          static_cast<int>(std::ceil((static_cast<double>(document.file.sizeInBytes) / static_cast<double>(BYTES_PER_ROW))));
     int height = numRows * PIXELS_PER_BYTE;
     return {static_cast<double>(width), static_cast<double>(height)};
 }

@@ -9,6 +9,8 @@
 #include <functional>
 #include <unordered_set>
 
+#define CHANGE_SECTIONS 0
+
 namespace pdf {
 
 struct PageTreeNode;
@@ -66,10 +68,9 @@ struct Trailer {
     Dictionary *dict                        = nullptr;
     Stream *stream                          = nullptr;
     Trailer *prev                           = nullptr;
-
-    DocumentCatalog *catalog(Document &document) const;
 };
 
+#if CHANGE_SECTIONS
 enum class ChangeSectionType {
     NONE,
     ADDED,
@@ -99,15 +100,29 @@ struct ChangeSection {
     [[nodiscard]] size_t size() const;
 };
 
-struct Document : public ReferenceResolver {
-    Allocator allocator       = {};
+struct Modification {
+    Object *original = nullptr;
+    Object *modified = nullptr;
+};
+#endif
+
+struct DocumentFile {
     char *data                = nullptr;
     size_t sizeInBytes        = 0;
     int64_t lastCrossRefStart = {};
     Trailer trailer           = {};
+};
+
+struct Document : public ReferenceResolver {
+    Allocator allocator   = {};
+    DocumentFile file     = {};
+    DocumentCatalog *root = nullptr;
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
-    std::vector<ChangeSection> changeSections                 = {};
+#if CHANGE_SECTIONS
+    std::vector<ChangeSection> changeSections = {};
+    std::vector<Modification> modifications   = {};
+#endif
 
     virtual ~Document() = default;
 
@@ -189,15 +204,6 @@ struct Document : public ReferenceResolver {
   private:
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
-
-    Result read_data();
-    Result read_trailers(char *crossRefStartPtr, Trailer *currentTrailer);
-    Result read_cross_reference_stream(Stream *stream, Trailer *currentTrailer);
-
-    Result write_to_stream(std::ostream &s);
-    void write_content(std::ostream &s, char *&ptr, size_t &bytesWrittenUntilXref);
-    void write_new_cross_ref_table(std::ostream &s);
-    void write_trailer_dict(std::ostream &s, size_t bytesWrittenUntilXref) const;
 };
 
 } // namespace pdf

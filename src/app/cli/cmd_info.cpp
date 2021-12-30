@@ -17,7 +17,7 @@ int cmd_info(const InfoArgs &args) {
     size_t objectCount         = document.object_count(false);
     size_t parsableObjectCount = document.objects().size();
 
-    spdlog::info("Size in bytes: {:>5}", document.sizeInBytes);
+    spdlog::info("Size in bytes: {:>5}", document.file.sizeInBytes);
     spdlog::info("Pages:         {:>5}", pageCount);
     spdlog::info("Lines:         {:>5}", lineCount);
     spdlog::info("Words:         {:>5}", wordCount);
