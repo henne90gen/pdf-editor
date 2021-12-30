@@ -27,18 +27,19 @@ TEST(Writer, HelloWorld) {
 TEST(Writer, DeletePageInvalidPageNum) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
-    ASSERT_TRUE(document.delete_page(0));
-    ASSERT_TRUE(document.delete_page(-1));
-    ASSERT_TRUE(document.delete_page(3));
+    ASSERT_TRUE(document.delete_page(0).has_error());
+    ASSERT_TRUE(document.delete_page(-1).has_error());
+    ASSERT_TRUE(document.delete_page(3).has_error());
 }
 
 TEST(Writer, DeletePageFirst) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
-    ASSERT_FALSE(document.delete_page(1));
+    auto result = document.delete_page(1);
+    ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
     std::string filePath = "delete-page-first.pdf";
-    auto result          = document.write_to_file(filePath);
+    result               = document.write_to_file(filePath);
     ASSERT_FALSE(result.has_error());
     ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
 }
@@ -46,7 +47,8 @@ TEST(Writer, DeletePageFirst) {
 TEST(Writer, DISABLED_DeletePageSecond) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
-    ASSERT_FALSE(document.delete_page(2));
+    auto result = document.delete_page(2);
+    ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
 
     char *buffer = nullptr;
@@ -84,8 +86,8 @@ TEST(Writer, DISABLED_AddRawSection) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 
-    char buf[7] = "/Hello";
-    document.add_raw_section(document.file.data + 6059, buf, 6);
+//    char buf[7] = "/Hello";
+//    document.add_raw_section(document.file.data + 6059, buf, 6);
 
     char *buffer = nullptr;
     size_t size  = 0;

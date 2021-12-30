@@ -230,16 +230,14 @@ size_t Document::page_count() {
     return result;
 }
 
-bool Document::delete_page(size_t pageNum) {
+Result Document::delete_page(size_t pageNum) {
     auto count = page_count();
     if (count == 1) {
-        spdlog::warn("Cannot delete last page of document");
-        return true;
+        return Result::error("Cannot delete last page of document");
     }
 
     if (pageNum < 1 || pageNum > count) {
-        spdlog::warn("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum, count);
-        return true;
+        return Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum, count);
     }
 
     size_t currentPageNum = 1;
@@ -283,29 +281,7 @@ bool Document::delete_page(size_t pageNum) {
 
     // TODO clean up objects that are no longer required
 
-    return false;
-}
-
-void Document::delete_raw_section(std::string_view /*d*/) {
-#if CHANGE_SECTIONS
-    changeSections.push_back({.type         = ChangeSectionType::DELETED,
-                              .objectNumber = 0,
-                              .deleted      = {
-                                         .deleted_area = d,
-                              }});
-#endif
-}
-
-void Document::add_raw_section(const char */*insertionPoint*/, const char */*newContent*/, size_t /*newContentLength*/) {
-#if CHANGE_SECTIONS
-    changeSections.push_back({.type         = ChangeSectionType::ADDED,
-                              .objectNumber = 0,
-                              .added        = {
-                                           .insertion_point    = insertionPoint,
-                                           .new_content        = newContent,
-                                           .new_content_length = newContentLength,
-                              }});
-#endif
+    return Result::ok();
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
@@ -521,30 +497,6 @@ void Document::add_object(int64_t /*objectNumber*/, const std::string &content) 
     });
 }
 
-void Document::replace_object(int64_t objectNumber, const std::string &content) {
-    auto existingObject = get_object(objectNumber);
-    ASSERT(existingObject != nullptr);
-
-    size_t chunkSize = content.size();
-    auto chunk       = allocator.allocate_chunk(chunkSize);
-    memcpy(chunk, content.data(), chunkSize);
-    #if CHANGE_SECTIONS
-    changeSections.push_back({
-          .type         = ChangeSectionType::ADDED,
-          .objectNumber = objectNumber,
-          .added =
-                {
-                      .insertion_point    = existingObject->data.data(),
-                      .new_content        = chunk,
-                      .new_content_length = chunkSize,
-                },
-    });
-    #endif
-    delete_raw_section(existingObject->data);
-
-    file.trailer.crossReferenceTable.entries[objectNumber].normal.byteOffset = existingObject->data.data() - file.data;
-}
-
 int64_t Document::next_object_number() const {
     return file.trailer.crossReferenceTable.firstObjectNumber + file.trailer.crossReferenceTable.objectCount;
 }
@@ -560,20 +512,6 @@ void create_stream(int64_t objectNumber, const std::string &content, std::string
     ss << ">> stream\n";
     ss << std::string_view(encodedData, encodedDataSize);
     ss << "endstream endobj\n";
-}
-
-void Document::add_stream(int64_t objectNumber, const std::string &content) {
-    std::stringstream ss;
-    create_stream(objectNumber, content, ss);
-    auto s = ss.str();
-    add_object(objectNumber, s);
-}
-
-void Document::replace_stream(int64_t objectNumber, const std::string &content) {
-    std::stringstream ss;
-    create_stream(objectNumber, content, ss);
-    auto s = ss.str();
-    replace_object(objectNumber, s);
 }
 
 IndirectObject *Document::find_existing_object(Object *object) {

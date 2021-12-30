@@ -182,28 +182,15 @@ std::string HexadecimalString::to_string() const {
     return result;
 }
 
-void Array::remove_element(Document &document, size_t index) {
+void Array::remove_element(Document &/*document*/, size_t index) {
     ASSERT(index < values.size());
-    document.delete_raw_section(values[index]->data);
     values.remove(index);
+    // TODO track the deletion of the i-th element
 }
 
-void Integer::set(Document &document, int64_t i) {
+void Integer::set(Document &/*document*/, int64_t i) {
     value = i;
-    document.delete_raw_section(data);
-
-    // TODO avoid allocating twice here
-    auto s            = std::to_string(i);
-    char *new_content = document.allocator.allocate_chunk(s.size());
-    memcpy(new_content, s.data(), s.size());
-
-    // TODO can we do this without const-casting here?
-    const char *insertionPoint = data.data();
-
-    // NOTE: moving to the end of the data section, because it gets deleted right before insertion
-    insertionPoint += data.size();
-
-    document.add_raw_section(insertionPoint, new_content, s.size());
+    // TODO track the change of this value
 }
 
 std::string_view EmbeddedFile::name() {

@@ -7,19 +7,23 @@ struct DeleteArgs {
 
 int cmd_delete_page(const DeleteArgs &args) {
     pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.source), document).has_error()) {
+    auto result = pdf::Document::read_from_file(std::string(args.source), document);
+    if (result.has_error()) {
+        spdlog::error("Failed to load PDF document: {}", result.message());
         return 1;
     }
 
-    if (document.delete_page(args.pageNum)) {
-        spdlog::error("Failed to delete page {}", args.pageNum);
+    result = document.delete_page(args.pageNum);
+    if (result.has_error()) {
+        spdlog::error("Failed to delete page {}: {}", args.pageNum, result.message());
         return 1;
     }
 
     char *buffer;
     size_t size;
-    if (document.write_to_memory(buffer, size).has_error()) {
-        spdlog::error("Failed to save PDF document");
+    result = document.write_to_memory(buffer, size);
+    if (result.has_error()) {
+        spdlog::error("Failed to save PDF document: {}", result.message());
         return 1;
     }
 

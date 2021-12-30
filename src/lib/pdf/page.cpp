@@ -187,7 +187,7 @@ size_t Page::character_count() {
     return result;
 }
 
-void TextBlock::move(Document &document, double x, double y) {
+void TextBlock::move(Document &document, double xOffset, double yOffset) {
     // BT 56.8 724.1 Td /F1 12 Tf            [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ              ET Q Q
     // BT 56.8 724.1 Td /F1 12 Tf _x_ _y_ Td [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ -_x_ -_y_ Td ET Q Q
     std::stringstream ss;
@@ -200,9 +200,9 @@ void TextBlock::move(Document &document, double x, double y) {
     if (op->content[0] != ' ') {
         ss << " ";
     }
-    ss << x;
+    ss << xOffset;
     ss << " ";
-    ss << -y;
+    ss << -yOffset;
     ss << " Td ";
 
     // write operator
@@ -210,16 +210,17 @@ void TextBlock::move(Document &document, double x, double y) {
 
     // wrap operator with negative offset
     ss << " ";
-    ss << -x;
+    ss << -xOffset;
     ss << " ";
-    ss << y;
+    ss << yOffset;
     ss << " Td";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-    auto s              = ss.str();
-    auto indirectObject = document.find_existing_object(cs);
-    document.replace_stream(indirectObject->objectNumber, s);
+//    auto s              = ss.str();
+//    auto indirectObject = document.find_existing_object(cs);
+//    document.replace_stream(indirectObject->objectNumber, s);
+    // TODO save the change that were made to the stream
 }
 
 } // namespace pdf

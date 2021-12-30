@@ -9,8 +9,6 @@
 #include <functional>
 #include <unordered_set>
 
-#define CHANGE_SECTIONS 0
-
 namespace pdf {
 
 struct PageTreeNode;
@@ -70,42 +68,6 @@ struct Trailer {
     Trailer *prev                           = nullptr;
 };
 
-#if CHANGE_SECTIONS
-enum class ChangeSectionType {
-    NONE,
-    ADDED,
-    DELETED,
-};
-
-struct ChangeSectionDeleted {
-    std::string_view deleted_area;
-};
-
-struct ChangeSectionAdded {
-    const char *insertion_point;
-    const char *new_content;
-    size_t new_content_length;
-};
-
-struct ChangeSection {
-    ChangeSectionType type = ChangeSectionType::NONE;
-    /// 0 => no associated object, not 0 => the object number of the associated object
-    int64_t objectNumber = 0;
-    union {
-        ChangeSectionAdded added = {};
-        ChangeSectionDeleted deleted;
-    };
-
-    [[nodiscard]] const char *start_pointer() const;
-    [[nodiscard]] size_t size() const;
-};
-
-struct Modification {
-    Object *original = nullptr;
-    Object *modified = nullptr;
-};
-#endif
-
 struct DocumentFile {
     char *data                = nullptr;
     size_t sizeInBytes        = 0;
@@ -119,10 +81,6 @@ struct Document : public ReferenceResolver {
     DocumentCatalog *root = nullptr;
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
-#if CHANGE_SECTIONS
-    std::vector<ChangeSection> changeSections = {};
-    std::vector<Modification> modifications   = {};
-#endif
 
     virtual ~Document() = default;
 
@@ -184,7 +142,7 @@ struct Document : public ReferenceResolver {
     static Result read_from_memory(char *buffer, size_t size, Document &document);
 
     /// Deletes the page with the given page number, returns 0 on success
-    bool delete_page(size_t pageNum);
+    Result delete_page(size_t pageNum);
     /// Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
     /// Inserts a file into the pdf document, returns 0 on success
@@ -192,13 +150,8 @@ struct Document : public ReferenceResolver {
 
     int64_t next_object_number() const;
     void add_object(int64_t objectNumber, const std::string &content);
-    void add_stream(int64_t objectNumber, const std::string &content);
-    void replace_object(int64_t objectNumber, const std::string &content);
-    void replace_stream(int64_t objectNumber, const std::string &content);
 
-    void delete_raw_section(std::string_view d);
-    void add_raw_section(const char *insertion_point, const char *new_content, size_t new_content_length);
-
+    /// Finds the IndirectObject that wraps the given Object
     IndirectObject *find_existing_object(Object *object);
 
   private:

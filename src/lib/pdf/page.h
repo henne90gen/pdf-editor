@@ -57,7 +57,7 @@ struct TextBlock {
     Operator *op      = nullptr;
     ContentStream *cs = nullptr;
 
-    void move(Document &document, double x, double y);
+    void move(Document &document, double xOffset, double yOffset);
 };
 
 struct Page {
