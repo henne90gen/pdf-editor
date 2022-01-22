@@ -81,7 +81,7 @@ $(function() {
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
 <div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structpdf_1_1PageTreeNode.html">   10</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1PageTreeNode.html">PageTreeNode</a> : <span class="keyword">public</span> <a class="code" href="structpdf_1_1Dictionary.html">Dictionary</a> {</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <a class="code" href="structpdf_1_1Name.html">Name</a> *type() { <span class="keywordflow">return</span> must_find&lt;Name&gt;(<span class="stringliteral">&quot;Type&quot;</span>); }</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keywordtype">bool</span> is_page() { <span class="keywordflow">return</span> type()-&gt;value() == <span class="stringliteral">&quot;Page&quot;</span>; }</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keywordtype">bool</span> is_page() { <span class="keywordflow">return</span> type()-&gt;value == <span class="stringliteral">&quot;Page&quot;</span>; }</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <a class="code" href="structpdf_1_1PageTreeNode.html">PageTreeNode</a> *parent(<a class="code" href="structpdf_1_1Document.html">Document</a> &amp;document);</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <a class="code" href="structpdf_1_1Array.html">Array</a> *kids() { <span class="keywordflow">return</span> must_find&lt;Array&gt;(<span class="stringliteral">&quot;Kids&quot;</span>); }</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <a class="code" href="structpdf_1_1Integer.html">Integer</a> *count() { <span class="keywordflow">return</span> must_find&lt;Integer&gt;(<span class="stringliteral">&quot;Count&quot;</span>); }</div>
@@ -162,18 +162,18 @@ $(function() {
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
-<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:102</div></div>
+<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:34</div></div>
+<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:101</div></div>
 <div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:63</div></div>
-<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:112</div></div>
+<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:110</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:61</div></div>
 <div class="ttc" id="astructpdf_1_1FontMap_html"><div class="ttname"><a href="structpdf_1_1FontMap.html">pdf::FontMap</a></div><div class="ttdef"><b>Definition:</b> font.h:80</div></div>
 <div class="ttc" id="astructpdf_1_1Tf__SetTextFontSize_html"><div class="ttname"><a href="structpdf_1_1Tf__SetTextFontSize.html">pdf::Tf_SetTextFontSize</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:103</div></div>
 <div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:46</div></div>
-<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:95</div></div>
+<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:94</div></div>
 <div class="ttc" id="astructpdf_1_1PageTreeNode_html"><div class="ttname"><a href="structpdf_1_1PageTreeNode.html">pdf::PageTreeNode</a></div><div class="ttdef"><b>Definition:</b> page.h:10</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:78</div></div>
-<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:156</div></div>
+<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:152</div></div>
 <div class="ttc" id="astructpdf_1_1TextBlock_html"><div class="ttname"><a href="structpdf_1_1TextBlock.html">pdf::TextBlock</a></div><div class="ttdef"><b>Definition:</b> page.h:50</div></div>
 <div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:18</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:114</div></div>

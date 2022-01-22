@@ -123,7 +123,7 @@ $(function() {
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="structpdf_1_1Font.html">   56</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1Font.html">Font</a> : <span class="keyword">public</span> <a class="code" href="structpdf_1_1Dictionary.html">Dictionary</a> {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    std::string_view type() { <span class="keywordflow">return</span> must_find&lt;Name&gt;(<span class="stringliteral">&quot;Subtype&quot;</span>)-&gt;value(); }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    std::string_view type() { <span class="keywordflow">return</span> must_find&lt;Name&gt;(<span class="stringliteral">&quot;Subtype&quot;</span>)-&gt;value; }</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">bool</span> is_type0() { <span class="keywordflow">return</span> type() == <span class="stringliteral">&quot;Type0&quot;</span>; }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">bool</span> is_type1() { <span class="keywordflow">return</span> type() == <span class="stringliteral">&quot;Type1&quot;</span>; }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">bool</span> is_MM_type1() { <span class="keywordflow">return</span> type() == <span class="stringliteral">&quot;MMType1&quot;</span>; }</div>
@@ -153,14 +153,14 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1FontDescriptor_html_ab7374885597120f0b952caf81cda7fa5"><div class="ttname"><a href="structpdf_1_1FontDescriptor.html#ab7374885597120f0b952caf81cda7fa5">pdf::FontDescriptor::char_set</a></div><div class="ttdeci">std::optional&lt; Object * &gt; char_set()</div><div class="ttdef"><b>Definition:</b> font.h:53</div></div>
 <div class="ttc" id="astructpdf_1_1Real_html"><div class="ttname"><a href="structpdf_1_1Real.html">pdf::Real</a></div><div class="ttdef"><b>Definition:</b> objects.h:70</div></div>
-<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:102</div></div>
+<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:101</div></div>
 <div class="ttc" id="astructpdf_1_1FontDescriptor_html"><div class="ttname"><a href="structpdf_1_1FontDescriptor.html">pdf::FontDescriptor</a></div><div class="ttdef"><b>Definition:</b> font.h:28</div></div>
 <div class="ttc" id="astructpdf_1_1Font_html_aa827614f3e5cf8d36554a1251f6ba7b1"><div class="ttname"><a href="structpdf_1_1Font.html#aa827614f3e5cf8d36554a1251f6ba7b1">pdf::Font::cmap</a></div><div class="ttdeci">std::optional&lt; CMap * &gt; cmap(Document &amp;document)</div><div class="ttdoc">Character mapping.</div><div class="ttdef"><b>Definition:</b> font.cpp:47</div></div>
-<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:112</div></div>
+<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:110</div></div>
 <div class="ttc" id="astructpdf_1_1FontFlags_html"><div class="ttname"><a href="structpdf_1_1FontFlags.html">pdf::FontFlags</a></div><div class="ttdef"><b>Definition:</b> font.h:15</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:61</div></div>
 <div class="ttc" id="astructpdf_1_1FontMap_html"><div class="ttname"><a href="structpdf_1_1FontMap.html">pdf::FontMap</a></div><div class="ttdef"><b>Definition:</b> font.h:80</div></div>
-<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:95</div></div>
+<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:94</div></div>
 <div class="ttc" id="astructpdf_1_1Font_html"><div class="ttname"><a href="structpdf_1_1Font.html">pdf::Font</a></div><div class="ttdef"><b>Definition:</b> font.h:56</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:78</div></div>
 <div class="ttc" id="astructpdf_1_1Rectangle_html"><div class="ttname"><a href="structpdf_1_1Rectangle.html">pdf::Rectangle</a></div><div class="ttdef"><b>Definition:</b> rectangle.h:7</div></div>
