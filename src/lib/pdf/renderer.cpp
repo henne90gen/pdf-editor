@@ -47,8 +47,8 @@ void Renderer::on_show_text(Operator *op) {
                 xOffset += static_cast<double>(extents.x_advance);
             }
         } else if (value->is<LiteralString>()) {
-            auto utf8     = std::string(value->as<LiteralString>()->value());
-            auto clusters = std::vector<Cairo::TextCluster>();
+            const auto &utf8 = value->as<LiteralString>()->value;
+            auto clusters    = std::vector<Cairo::TextCluster>();
             Cairo::TextClusterFlags flags;
             std::vector<Cairo::Glyph> newGlyphs = {};
             scaledFont->text_to_glyphs(xOffset, 0.0, utf8, newGlyphs, clusters, flags);

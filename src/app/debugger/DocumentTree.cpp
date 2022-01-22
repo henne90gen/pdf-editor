@@ -49,13 +49,13 @@ void DocumentTree::create_row(pdf::Object *object, Gtk::TreeRow &parentRow,
         parentRow[columns.value] = std::to_string(object->as<pdf::Real>()->value);
         break;
     case pdf::Object::Type::HEXADECIMAL_STRING:
-        parentRow[columns.value] = std::string(object->as<pdf::HexadecimalString>()->data);
+        parentRow[columns.value] = std::string(object->as<pdf::HexadecimalString>()->value);
         break;
     case pdf::Object::Type::LITERAL_STRING:
-        parentRow[columns.value] = std::string(object->as<pdf::LiteralString>()->value());
+        parentRow[columns.value] = std::string(object->as<pdf::LiteralString>()->value);
         break;
     case pdf::Object::Type::NAME:
-        parentRow[columns.value] = std::string(object->as<pdf::Name>()->value());
+        parentRow[columns.value] = std::string(object->as<pdf::Name>()->value);
         break;
     case pdf::Object::Type::ARRAY:
         create_rows(object->as<pdf::Array>(), parentRow, alreadyVisited);

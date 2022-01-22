@@ -9,7 +9,7 @@ namespace pdf {
 
 struct PageTreeNode : public Dictionary {
     Name *type() { return must_find<Name>("Type"); }
-    bool is_page() { return type()->value() == "Page"; }
+    bool is_page() { return type()->value == "Page"; }
     PageTreeNode *parent(Document &document);
     Array *kids() { return must_find<Array>("Kids"); }
     Integer *count() { return must_find<Integer>("Count"); }

@@ -86,8 +86,8 @@ TEST(Writer, DISABLED_AddRawSection) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 
-//    char buf[7] = "/Hello";
-//    document.add_raw_section(document.file.data + 6059, buf, 6);
+    //    char buf[7] = "/Hello";
+    //    document.add_raw_section(document.file.data + 6059, buf, 6);
 
     char *buffer = nullptr;
     size_t size  = 0;
@@ -130,7 +130,9 @@ TEST(Writer, Trailer) {
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
     char *buffer = nullptr;
     size_t size  = 0;
-    auto error   = document.write_to_memory(buffer, size);
+    auto anError = document.write_to_file("test.pdf");
+    ASSERT_FALSE(anError.has_error());
+    auto error = document.write_to_memory(buffer, size);
     ASSERT_FALSE(error.has_error());
     ASSERT_BUFFER_CONTAINS_AT(buffer, 754, "\n\nxref 0 8");
     ASSERT_BUFFER_CONTAINS_AT(buffer, 764, "0000000000 65535 f \n");

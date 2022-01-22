@@ -222,7 +222,94 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
-Result read_data(Document &document) {
+IndirectObject *load_object(Document &document, CrossReferenceEntry &entry) {
+    if (entry.type == CrossReferenceEntryType::FREE) {
+        return nullptr;
+    }
+
+    if (entry.type == CrossReferenceEntryType::NORMAL) {
+        auto start = document.file.data + entry.normal.byteOffset;
+
+        // TODO this is dangerous (it might read past the end of the stream)
+        size_t length = 0;
+        while (std::string_view(start + length, 6) != "endobj") {
+            length++;
+        }
+        length += 6;
+
+        auto input  = std::string_view(start, length);
+        auto text   = StringTextProvider(input);
+        auto lexer  = TextLexer(text);
+        auto parser = Parser(lexer, document.allocator, &document);
+        auto result = parser.parse();
+        ASSERT(result != nullptr);
+        return result->as<IndirectObject>();
+    } else if (entry.type == CrossReferenceEntryType::COMPRESSED) {
+        auto streamObject = document.objectList[entry.compressed.objectNumberOfStream];
+        ASSERT(streamObject != nullptr);
+        auto stream = streamObject->object->as<Stream>();
+        ASSERT(stream->dictionary->must_find<Name>("Type")->value == "ObjStm");
+
+        auto content      = stream->decode(document.allocator);
+        auto textProvider = StringTextProvider(content);
+        auto lexer        = TextLexer(textProvider);
+        auto parser       = Parser(lexer, document.allocator, &document);
+        int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
+
+        auto objectNumbers = std::vector<int64_t>(N);
+        for (int i = 0; i < N; i++) {
+            auto objNum      = parser.parse()->as<Integer>();
+            objectNumbers[i] = objNum->value;
+            // parse the byteOffset as well
+            parser.parse();
+        }
+
+        auto objs = std::vector<Object *>(N);
+        for (int i = 0; i < N; i++) {
+            auto obj = parser.parse();
+            objs[i]  = obj;
+        }
+
+        return document.allocator.allocate<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
+                                                           objs[entry.compressed.indexInStream]);
+    }
+    ASSERT(false);
+}
+
+Result load_all_objects(Document &document, Trailer *trailer) {
+    if (trailer == nullptr) {
+        return Result::ok();
+    }
+
+    struct NumberedCrossReferenceEntry {
+        CrossReferenceEntry entry;
+        uint64_t objectNumber;
+    };
+    std::vector<NumberedCrossReferenceEntry> compressedEntries = {};
+    CrossReferenceTable &crt                                   = trailer->crossReferenceTable;
+    for (uint64_t objectNumber = crt.firstObjectNumber;
+         objectNumber < static_cast<uint64_t>(crt.firstObjectNumber + crt.objectCount); objectNumber++) {
+        auto itr = document.objectList.find(objectNumber);
+        if (itr != document.objectList.end()) {
+            continue;
+        }
+        CrossReferenceEntry &entry = crt.entries[objectNumber - crt.firstObjectNumber];
+        if (entry.type == CrossReferenceEntryType::COMPRESSED) {
+            compressedEntries.push_back({.entry = entry, .objectNumber = objectNumber});
+            continue;
+        }
+
+        document.objectList[objectNumber] = load_object(document, entry);
+    }
+
+    for (auto &compressedEntry : compressedEntries) {
+        document.objectList[compressedEntry.objectNumber] = load_object(document, compressedEntry.entry);
+    }
+
+    return Result::ok();
+}
+
+Result read_data(Document &document, bool loadAllObjects) {
     // parse eof
     size_t eofMarkerLength = 5;
     auto eofMarkerStart    = document.file.data + (document.file.sizeInBytes - eofMarkerLength);
@@ -259,10 +346,15 @@ Result read_data(Document &document) {
     }
 
     auto crossRefStartPtr = document.file.data + document.file.lastCrossRefStart;
-    return read_trailers(document, crossRefStartPtr, &document.file.trailer);
+    auto result           = read_trailers(document, crossRefStartPtr, &document.file.trailer);
+    if (result.has_error() || !loadAllObjects) {
+        return result;
+    }
+
+    return load_all_objects(document, &document.file.trailer);
 }
 
-Result Document::read_from_file(const std::string &filePath, Document &document) {
+Result Document::read_from_file(const std::string &filePath, Document &document, bool loadAllObjects) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
@@ -278,16 +370,16 @@ Result Document::read_from_file(const std::string &filePath, Document &document)
     is.read(document.file.data, static_cast<std::streamsize>(document.file.sizeInBytes));
     is.close();
 
-    return read_data(document);
+    return read_data(document, loadAllObjects);
 }
 
-Result Document::read_from_memory(char *buffer, size_t size, Document &document) {
+Result Document::read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects) {
     // FIXME using the existing buffer collides with the memory management using the Allocator
     document.file.data        = buffer;
     document.file.sizeInBytes = size;
     document.allocator.init(document.file.sizeInBytes);
 
-    return read_data(document);
+    return read_data(document, loadAllObjects);
 }
 
 } // namespace pdf

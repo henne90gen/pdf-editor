@@ -54,8 +54,9 @@ Boolean *Parser::parse_boolean() {
         value = false;
     } else {
         // TODO add logging
+        return nullptr;
     }
-    return allocator.allocate<Boolean>(content, value);
+    return allocator.allocate<Boolean>(value);
 }
 
 Integer *Parser::parse_integer() {
@@ -68,7 +69,7 @@ Integer *Parser::parse_integer() {
         // TODO is this conversion to a string really necessary?
         int64_t value = std::stoll(std::string(content));
         currentTokenIdx++;
-        return allocator.allocate<Integer>(content, value);
+        return allocator.allocate<Integer>(value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -87,7 +88,7 @@ Real *Parser::parse_real() {
         // TODO is this conversion to a string really necessary?
         double value = std::stod(std::string(content));
         currentTokenIdx++;
-        return allocator.allocate<Real>(content, value);
+        return allocator.allocate<Real>(value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -101,9 +102,8 @@ Null *Parser::parse_null_object() {
         return nullptr;
     }
 
-    auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<Null>(content);
+    return allocator.allocate<Null>();
 }
 
 LiteralString *Parser::parse_literal_string() {
@@ -113,7 +113,7 @@ LiteralString *Parser::parse_literal_string() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<LiteralString>(content);
+    return allocator.allocate<LiteralString>(std::string(content.substr(1, content.size() - 2)));
 }
 
 HexadecimalString *Parser::parse_hexadecimal_string() {
@@ -123,7 +123,7 @@ HexadecimalString *Parser::parse_hexadecimal_string() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<HexadecimalString>(content.substr(1, content.size() - 2));
+    return allocator.allocate<HexadecimalString>(std::string(content.substr(1, content.size() - 2)));
 }
 
 Name *Parser::parse_name() {
@@ -133,7 +133,7 @@ Name *Parser::parse_name() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<Name>(content.substr(1));
+    return allocator.allocate<Name>(std::string(content.substr(1)));
 }
 
 Array *Parser::parse_array() {
@@ -167,7 +167,7 @@ Array *Parser::parse_array() {
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
     auto vec        = StaticVector<Object *>::create(allocator, objects);
-    return allocator.allocate<Array>(data, vec);
+    return allocator.allocate<Array>(vec);
 }
 
 void Parser::ignore_new_line_tokens() {
@@ -181,13 +181,12 @@ Dictionary *Parser::parse_dictionary() {
         return nullptr;
     }
 
-    auto objectStartContent = tokens[currentTokenIdx].content.data();
-    auto beforeTokenIdx     = currentTokenIdx;
+    auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
     ignore_new_line_tokens();
 
-    std::unordered_map<std::string_view, Object *> objects = {};
+    std::unordered_map<std::string, Object *> objects = {};
     while (!current_token_is(Token::Type::DICTIONARY_END)) {
         auto key = parse_name();
         if (key == nullptr) {
@@ -203,16 +202,12 @@ Dictionary *Parser::parse_dictionary() {
 
         ignore_new_line_tokens();
 
-        objects[key->value()] = value;
+        objects[key->value] = value;
     }
 
-    auto lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    auto tokenDiff  = lastTokenContent.data() - objectStartContent;
-    auto dataLength = tokenDiff + lastTokenContent.size();
-    auto data       = std::string_view(objectStartContent, dataLength);
-    auto map        = StaticMap<std::string_view, Object *>::create(allocator, objects);
-    return allocator.allocate<Dictionary>(data, map);
+    auto map = StaticMap<std::string, Object *>::create(allocator, objects);
+    return allocator.allocate<Dictionary>(map);
 }
 
 IndirectReference *Parser::parse_indirect_reference() {
@@ -229,7 +224,7 @@ IndirectReference *Parser::parse_indirect_reference() {
         const size_t pos2              = content.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(content.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
-        return allocator.allocate<IndirectReference>(content, objectNumber, generationNumber);
+        return allocator.allocate<IndirectReference>(objectNumber, generationNumber);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -274,7 +269,7 @@ IndirectObject *Parser::parse_indirect_object() {
         auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
         auto dataLength = tokenDiff + lastTokenContent.size();
         auto data       = std::string_view(objectStartContent.data(), dataLength);
-        return allocator.allocate<IndirectObject>(data, objectNumber, generationNumber, object);
+        return allocator.allocate<IndirectObject>(objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -354,7 +349,7 @@ Object *Parser::parse_stream_or_dictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    return allocator.allocate<Stream>(data, dictionary, streamData);
+    return allocator.allocate<Stream>(dictionary, streamData);
 }
 
 Object *Parser::parse() {

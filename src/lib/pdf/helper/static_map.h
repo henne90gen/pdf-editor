@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <spdlog/spdlog.h>
 #include <unordered_map>
-#include <optional>
 
 namespace pdf {
 
@@ -12,6 +12,7 @@ template <typename K, typename V> struct StaticMap {
         enum struct Status {
             EMPTY  = 0,
             FILLED = 1,
+            END    = 2,
         };
 
         Status status = Status::EMPTY;
@@ -96,7 +97,7 @@ template <typename K, typename V> struct StaticMap {
             }
 
             if (key == entry.key) {
-                auto value = entry.value;
+                auto value   = entry.value;
                 entry.status = Entry::Status::EMPTY;
                 entry.key    = {};
                 entry.value  = {};
@@ -113,10 +114,11 @@ template <typename K, typename V> struct StaticMap {
     static StaticMap<K, V> create(Allocator &allocator, const std::unordered_map<K, V> &map) {
         auto entryCount = map.size();
         auto capacity   = entryCount * 2; // TODO think about using less memory here
-        auto entries    = (Entry *)allocator.allocate_chunk(capacity * sizeof(Entry));
-        std::memset(entries, 0, capacity * sizeof(Entry));
+        auto entries    = (Entry *)allocator.allocate_chunk((capacity + 1) * sizeof(Entry));
+        memset(entries, 0, capacity * sizeof(Entry));
+        entries[capacity].status = Entry::Status::END;
 
-        for (auto &entry : map) {
+        for (const auto &entry : map) {
             // TODO switch to quadratic probing
             auto i = 0;
             auto h = std::hash<K>()(entry.first);

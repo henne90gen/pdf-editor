@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "pdf/objects.h"
 #include <pdf/helper/allocator.h>
 #include <pdf/helper/static_map.h>
 
@@ -43,6 +44,20 @@ TEST(StaticMap, Iterate) {
     ASSERT_EQ(itr, staticMap.end());
 }
 
+TEST(StaticMap, IterateMore) {
+    pdf::Allocator allocator = {};
+    allocator.init(100);
+
+    auto map              = std::unordered_map<std::string_view, pdf::Object *>();
+    map["Hello"]          = new pdf::Integer(123);
+    map["World"]          = new pdf::LiteralString("World");
+    const auto &staticMap = pdf::StaticMap<std::string_view, pdf::Object *>::create(allocator, map);
+    for (const auto &entry : staticMap) {
+        auto filled = pdf::StaticMap<std::string_view, pdf::Object *>::Entry::Status::FILLED;
+        ASSERT_EQ(entry.status, filled);
+    }
+}
+
 TEST(StaticMap, Find) {
     pdf::Allocator allocator = {};
     allocator.init(100);
@@ -70,4 +85,15 @@ TEST(StaticMap, Remove) {
 
     val = staticMap.find(1);
     ASSERT_EQ(val, std::optional<int>());
+}
+
+TEST(StaticMap, CreateManyTimes) {
+    pdf::Allocator allocator = {};
+    allocator.init(1);
+
+    for (int i = 0; i < 1000; i++) {
+        std::unordered_map<std::string, int> map = {{"1", 2}, {"2", 3}, {"3", 4}};
+        auto staticMap                           = pdf::StaticMap<std::string, int>::create(allocator, map);
+        ASSERT_EQ(staticMap.size(), 3);
+    }
 }

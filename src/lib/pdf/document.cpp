@@ -71,7 +71,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
     } else if (entry->type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = get_object(entry->compressed.objectNumberOfStream);
         auto stream       = streamObject->object->as<Stream>();
-        ASSERT(stream->dictionary->must_find<Name>("Type")->value() == "ObjStm");
+        ASSERT(stream->dictionary->must_find<Name>("Type")->value == "ObjStm");
 
         auto content      = stream->decode(allocator);
         auto textProvider = StringTextProvider(content);
@@ -94,7 +94,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
             objs[i]  = obj;
         }
 
-        return allocator.allocate<IndirectObject>(content, objectNumbers[entry->compressed.indexInStream], 0,
+        return allocator.allocate<IndirectObject>(objectNumbers[entry->compressed.indexInStream], 0,
                                                   objs[entry->compressed.indexInStream]);
     }
     ASSERT(false);
@@ -324,12 +324,12 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
 
         const auto stream  = obj->object->as<Stream>();
         const auto typeOpt = stream->dictionary->find<Name>("Type");
-        if (!typeOpt.has_value() || typeOpt.value()->value() != "XObject") {
+        if (!typeOpt.has_value() || typeOpt.value()->value != "XObject") {
             return ForEachResult::CONTINUE;
         }
 
         const auto subtypeOpt = stream->dictionary->find<Name>("Subtype");
-        if (!subtypeOpt.has_value() || subtypeOpt.value()->value() != "Image") {
+        if (!subtypeOpt.has_value() || subtypeOpt.value()->value != "Image") {
             return ForEachResult::CONTINUE;
         }
 

@@ -30,6 +30,10 @@ template <> std::string_view OperatorParser::operand(int index) {
     return tokens[currentTokenIdx - (2 + index)].content;
 }
 
+template <> std::string OperatorParser::operand(int index) {
+    return std::string(tokens[currentTokenIdx - (2 + index)].content);
+}
+
 std::string replace(std::string str, const std::string &from, const std::string &to) {
     size_t start_pos = str.find(from);
     if (start_pos == std::string::npos)
@@ -191,7 +195,7 @@ Operator *OperatorParser::create_operator_Tm(Operator *result) {
 }
 
 Operator *OperatorParser::create_operator_Tj(Operator *result) {
-    result->data.Tj_ShowTextString.string = allocator.allocate<LiteralString>(operand<std::string_view>(0));
+    result->data.Tj_ShowTextString.string = allocator.allocate<LiteralString>(operand<std::string>(0));
     return result;
 }
 
@@ -281,7 +285,7 @@ Operator *OperatorParser::create_operator_gs(Operator *result) {
 }
 
 Operator *OperatorParser::create_operator_Do(Operator *result) {
-    auto name                         = operand<std::string_view>(0);
+    auto name                         = operand<std::string>(0);
     result->data.Do_PaintXObject.name = allocator.allocate<Name>(name);
     return result;
 }

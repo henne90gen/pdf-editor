@@ -21,6 +21,9 @@ Allocator::~Allocator() {
 }
 
 void Allocator::init(size_t sizeOfPdfFile) {
+    if (sizeOfPdfFile == 0) {
+        sizeOfPdfFile = 100;
+    }
     auto sizeInBytes = sizeof(Allocation) + sizeOfPdfFile * 2;
     auto bufferStart = (char *)malloc(sizeInBytes);
     ASSERT(bufferStart != nullptr);
@@ -51,7 +54,7 @@ void Allocator::clear_current_allocation() const {
 
 char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
-    if (currentAllocation->bufferPosition + sizeInBytes >
+    while (currentAllocation->bufferPosition + sizeInBytes >
         currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
         spdlog::trace("Failed to fit object of size {} bytes into the existing memory, allocating more", sizeInBytes);
 

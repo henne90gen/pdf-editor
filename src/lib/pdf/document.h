@@ -137,9 +137,9 @@ struct Document : public ReferenceResolver {
     /// Writes the PDF-document to a newly allocated buffer, returns 0 on success
     [[nodiscard]] Result write_to_memory(char *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath, returns 0 on success
-    static Result read_from_file(const std::string &filePath, Document &document);
+    static Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
     /// Reads the PDF-document from the given buffer, returns 0 on success
-    static Result read_from_memory(char *buffer, size_t size, Document &document);
+    static Result read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects = true);
 
     /// Deletes the page with the given page number, returns 0 on success
     Result delete_page(size_t pageNum);

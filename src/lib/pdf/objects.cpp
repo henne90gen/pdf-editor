@@ -23,6 +23,7 @@ std::ostream &operator<<(std::ostream &os, Object::Type &type) {
     return os;
 }
 
+#if 0
 std::string to_string(Object *object) {
     if (object == nullptr) {
         return "null";
@@ -37,7 +38,7 @@ std::string to_string(Object *object) {
     case Object::Type::REAL:
     case Object::Type::NULL_OBJECT:
     case Object::Type::INDIRECT_REFERENCE:
-        return std::string(object->data);
+        return "";
     case Object::Type::ARRAY: {
         std::string result = "[ ";
         for (auto &entry : object->as<Array>()->values) {
@@ -76,6 +77,7 @@ std::string to_string(Object *object) {
 
     return "";
 }
+#endif
 
 std::vector<std::string> Stream::filters() const {
     auto opt = dictionary->values.find("Filter");
@@ -85,7 +87,7 @@ std::vector<std::string> Stream::filters() const {
 
     if (opt.value()->is<Name>()) {
         // TODO is this conversion to a string really necessary?
-        return {std::string(opt.value()->as<Name>()->value())};
+        return {std::string(opt.value()->as<Name>()->value)};
     }
 
     auto array  = opt.value()->as<Array>();
@@ -93,7 +95,7 @@ std::vector<std::string> Stream::filters() const {
     result.reserve(array->values.size());
     for (auto filter : array->values) {
         // TODO is this conversion to a string really necessary?
-        result.emplace_back(filter->as<Name>()->value());
+        result.emplace_back(filter->as<Name>()->value);
     }
     return result;
 }
@@ -157,8 +159,7 @@ std::string_view Stream::decode(Allocator &allocator) {
 
 std::string HexadecimalString::to_string() const {
     // TODO this is quite hacky
-    // TODO is this conversion to a string really necessary?
-    std::string tmp = std::string(data);
+    std::string tmp = value;
     if (tmp.size() % 2 == 1) {
         tmp += "0";
     }
@@ -195,7 +196,7 @@ void Integer::set(Document &/*document*/, int64_t i) {
 
 std::string_view EmbeddedFile::name() {
     auto fileMetadata = dictionary->must_find<Dictionary>("FileMetadata");
-    return fileMetadata->must_find<LiteralString>("Name")->value();
+    return fileMetadata->must_find<LiteralString>("Name")->value;
 }
 
 bool EmbeddedFile::is_executable() {

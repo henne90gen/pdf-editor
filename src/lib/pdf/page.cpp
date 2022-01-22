@@ -92,7 +92,7 @@ struct TextBlockFinder : public OperatorTraverser {
                     offsetX += static_cast<double>(extents.x_advance);
                 }
             } else if (value->is<LiteralString>()) {
-                text += value->as<LiteralString>()->value();
+                text += value->as<LiteralString>()->value;
             } else if (value->is<Integer>()) {
                 offsetX -= static_cast<double>(value->as<Integer>()->value) / 1000.0;
             }
@@ -130,7 +130,7 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
         } else if (value->is<HexadecimalString>()) {
             result += cmap->map_char_codes(value->as<HexadecimalString>()).size();
         } else if (value->is<LiteralString>()) {
-            auto str = std::string(value->as<LiteralString>()->value());
+            const auto &str = value->as<LiteralString>()->value;
             for (size_t i = 0; i < str.size(); i++) {
                 result++;
             }
@@ -139,7 +139,7 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
     return result;
 }
 
-size_t count_Tj_characters(Operator *op) { return op->data.Tj_ShowTextString.string->value().size(); }
+size_t count_Tj_characters(Operator *op) { return op->data.Tj_ShowTextString.string->value.size(); }
 
 std::optional<Font *> Page::get_font(const Tf_SetTextFontSize &data) {
     auto fontMapOpt = resources()->fonts(document);
@@ -217,9 +217,9 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) {
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-//    auto s              = ss.str();
-//    auto indirectObject = document.find_existing_object(cs);
-//    document.replace_stream(indirectObject->objectNumber, s);
+    //    auto s              = ss.str();
+    //    auto indirectObject = document.find_existing_object(cs);
+    //    document.replace_stream(indirectObject->objectNumber, s);
     // TODO save the change that were made to the stream
 }
 

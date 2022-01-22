@@ -40,11 +40,12 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     cr->restore();
 }
 
-void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const {
+void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &) const {
     if (!shouldHighlightTrailer) {
         return;
     }
 
+#if 0
     // TODO maybe skip highlighting trailers that are currently not visible
     auto &file           = document.file;
     auto *currentTrailer = &file.trailer;
@@ -68,13 +69,15 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
         highlight_range(cr, file.data + file.lastCrossRefStart,
                         file.trailer.stream->data.data() - (file.data + file.lastCrossRefStart), 0, 0, 1);
     }
+#endif
 }
 
-void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const {
+void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &) const {
     if (!shouldHighlightObjects) {
         return;
     }
 
+#if 0
     auto engine = std::mt19937(1337); // NOLINT(cert-msc51-cpp)
     auto dist   = std::uniform_real_distribution(0.0, 1.0);
 
@@ -86,6 +89,7 @@ void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) con
         highlight_range(cr, object->data.data(), object->data.size(), r, g, b);
         return pdf::ForEachResult::CONTINUE;
     });
+#endif
 }
 
 void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {

@@ -54,7 +54,7 @@ struct FontDescriptor : public Dictionary {
 };
 
 struct Font : public Dictionary {
-    std::string_view type() { return must_find<Name>("Subtype")->value(); }
+    std::string_view type() { return must_find<Name>("Subtype")->value; }
     bool is_type0() { return type() == "Type0"; }
     bool is_type1() { return type() == "Type1"; }
     bool is_MM_type1() { return type() == "MMType1"; }
