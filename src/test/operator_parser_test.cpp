@@ -76,19 +76,19 @@ TEST(OperationParser, HelloWorld) {
         ASSERT_NE(objects, nullptr);
         ASSERT_EQ(objects->values.size(), 13);
         // [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]
-        ASSERT_EQ(objects->values[0]->as<pdf::HexadecimalString>()->data, "01");
+        ASSERT_EQ(objects->values[0]->as<pdf::HexadecimalString>()->value, "01");
         ASSERT_EQ(objects->values[1]->as<pdf::Integer>()->value, -2);
-        ASSERT_EQ(objects->values[2]->as<pdf::HexadecimalString>()->data, "02");
+        ASSERT_EQ(objects->values[2]->as<pdf::HexadecimalString>()->value, "02");
         ASSERT_EQ(objects->values[3]->as<pdf::Integer>()->value, 1);
-        ASSERT_EQ(objects->values[4]->as<pdf::HexadecimalString>()->data, "03");
+        ASSERT_EQ(objects->values[4]->as<pdf::HexadecimalString>()->value, "03");
         ASSERT_EQ(objects->values[5]->as<pdf::Integer>()->value, 2);
-        ASSERT_EQ(objects->values[6]->as<pdf::HexadecimalString>()->data, "03");
+        ASSERT_EQ(objects->values[6]->as<pdf::HexadecimalString>()->value, "03");
         ASSERT_EQ(objects->values[7]->as<pdf::Integer>()->value, 2);
-        ASSERT_EQ(objects->values[8]->as<pdf::HexadecimalString>()->data, "0405");
+        ASSERT_EQ(objects->values[8]->as<pdf::HexadecimalString>()->value, "0405");
         ASSERT_EQ(objects->values[9]->as<pdf::Integer>()->value, 17);
-        ASSERT_EQ(objects->values[10]->as<pdf::HexadecimalString>()->data, "06");
+        ASSERT_EQ(objects->values[10]->as<pdf::HexadecimalString>()->value, "06");
         ASSERT_EQ(objects->values[11]->as<pdf::Integer>()->value, 76);
-        ASSERT_EQ(objects->values[12]->as<pdf::HexadecimalString>()->data, "040708");
+        ASSERT_EQ(objects->values[12]->as<pdf::HexadecimalString>()->value, "040708");
     });
     assertNextOp(parser, pdf::Operator::Type::ET_EndText);
     assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState);

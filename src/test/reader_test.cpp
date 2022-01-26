@@ -67,11 +67,11 @@ TEST(Reader, HelloWorldFont) {
     ASSERT_NE(font, nullptr);
     ASSERT_EQ(font->type(), "TrueType");
     ASSERT_TRUE(font->is_true_type());
-    ASSERT_EQ(font->base_font()->value(), "BAAAAA+LiberationSerif");
+    ASSERT_EQ(font->base_font()->value, "BAAAAA+LiberationSerif");
 
     auto fontDescriptor = font->font_descriptor(document);
     ASSERT_NE(fontDescriptor, nullptr);
-    ASSERT_EQ(fontDescriptor->font_name()->value(), "BAAAAA+LiberationSerif");
+    ASSERT_EQ(fontDescriptor->font_name()->value, "BAAAAA+LiberationSerif");
 
     auto flags = fontDescriptor->flags();
     ASSERT_TRUE(flags->symbolic());
@@ -108,7 +108,7 @@ TEST(Reader, HelloWorldCmap) {
 }
 
 TEST(Reader, FontFlags) {
-    auto i = new pdf::Integer("262178", 262178);
+    auto i = new pdf::Integer(262178);
     auto f = i->as<pdf::FontFlags>();
     ASSERT_TRUE(f->serif());
     ASSERT_TRUE(f->non_symbolic());
