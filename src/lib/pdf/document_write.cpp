@@ -106,17 +106,17 @@ size_t write_indirect_object(std::ostream &s, IndirectObject *object) {
     s << object->objectNumber << " " << object->generationNumber << " obj\n";
     size_t bytesWritten = 6 + count_digits(object->objectNumber) + count_digits(object->generationNumber);
     bytesWritten += write_object(s, object->object);
-    s << "\nendobj";
-    bytesWritten += 7;
+    s << "\nendobj\n\n";
+    bytesWritten += 9;
     return bytesWritten;
 }
 size_t write_stream_object(std::ostream &s, Stream *stream) {
     auto bytesWritten = write_dictionary_object(s, stream->dictionary);
     s << "\nstream\n";
     s << stream->streamData;
-    s << "\nendstream";
+    s << "\nendstream\n";
     bytesWritten += stream->streamData.size();
-    bytesWritten += 18;
+    bytesWritten += 19;
     return bytesWritten;
 }
 size_t write_object_stream_content_object(std::ostream &, ObjectStreamContent *) {
@@ -177,7 +177,7 @@ size_t write_objects(Document &document, std::ostream &s, std::unordered_map<uin
 
 void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets,
                    size_t startXref) {
-    s << "\n\nxref ";
+    s << "xref ";
     s << 0 << " " << byteOffsets.size();
 
     s << "0000000000 65535 f \n";

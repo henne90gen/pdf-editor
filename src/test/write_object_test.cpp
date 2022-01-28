@@ -128,7 +128,7 @@ TEST(Writer, write_indirect_object) {
     auto bytesWritten = pdf::write_indirect_object(s, new pdf::IndirectObject(12, 3, new pdf::Integer(5)));
     const auto &str   = s.str();
     ASSERT_EQ(str.size(), bytesWritten);
-    ASSERT_EQ(str, "12 3 obj\n5\nendobj");
+    ASSERT_EQ(str, "12 3 obj\n5\nendobj\n\n");
 }
 
 TEST(Writer, write_stream) {
@@ -142,5 +142,5 @@ TEST(Writer, write_stream) {
     auto bytesWritten = pdf::write_stream_object(s, new pdf::Stream( dict, "abc123"));
     const auto &str   = s.str();
     ASSERT_EQ(str.size(), bytesWritten);
-    ASSERT_EQ(str, "<</Size 123>>\nstream\nabc123\nendstream");
+    ASSERT_EQ(str, "<</Size 123>>\nstream\nabc123\nendstream\n");
 }

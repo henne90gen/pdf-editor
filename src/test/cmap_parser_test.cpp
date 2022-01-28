@@ -4,7 +4,7 @@
 #include <pdf/cmap.h>
 #include <pdf/lexer.h>
 
-TEST(CMapParser, HelloWorld) {
+TEST(CMapParser, DISABLED_HelloWorld) {
     auto textProvider = pdf::StringTextProvider(
           "/CIDInit/ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo<<\n/Registry "
           "(Adobe)\n/Ordering (UCS)\n/Supplement 0\n>> def\n/CMapName/Adobe-Identity-UCS def\n/CMapType 2 def\n1 "

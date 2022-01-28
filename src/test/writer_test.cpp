@@ -4,25 +4,8 @@
 
 #include <pdf/document.h>
 
+#include "process.h"
 #include "test_util.h"
-
-TEST(Writer, Blank) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
-    std::string filePath = "blank.pdf";
-    auto error           = document.write_to_file(filePath);
-    ASSERT_FALSE(error.has_error());
-    ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
-}
-
-TEST(Writer, HelloWorld) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
-    std::string filePath = "hello-world.pdf";
-    auto error           = document.write_to_file(filePath);
-    ASSERT_FALSE(error.has_error());
-    ASSERT_TRUE(std::filesystem::exists(std::filesystem::path(filePath)));
-}
 
 TEST(Writer, DeletePageInvalidPageNum) {
     pdf::Document document;
@@ -125,25 +108,24 @@ TEST(Writer, Objects) {
     ASSERT_BUFFER_CONTAINS_AT(buffer, 19, "8 0 obj");
 }
 
-TEST(Writer, Trailer) {
+void write_pdf(const std::string &name) {
     pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
-    char *buffer = nullptr;
-    size_t size  = 0;
-    auto anError = document.write_to_file("test.pdf");
+    std::string testFilePath = "../../../test-files/" + name;
+    pdf::Document::read_from_file(testFilePath, document);
+
+    auto anError = document.write_to_file(name);
     ASSERT_FALSE(anError.has_error());
-    auto error = document.write_to_memory(buffer, size);
-    ASSERT_FALSE(error.has_error());
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 754, "\n\nxref 0 8");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 764, "0000000000 65535 f \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 784, "0000000588 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 804, "0000000469 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 824, "0000000452 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 844, "0000000356 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 864, "0000000336 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 884, "0000000285 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 904, "0000000191 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 924, "0000000019 00000 n \n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 944, "trailer\n<</Size 9");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 1110, ">>\nstartxref\n754\n%%EOF\n");
+
+    auto expectedResult = Process::execute("/usr/bin/pdfinfo", {testFilePath});
+    auto actualResult   = Process::execute("/usr/bin/pdfinfo", {name});
+    ASSERT_EQ(expectedResult.status, actualResult.status);
+    ASSERT_EQ(expectedResult.output, actualResult.output);
+    ASSERT_EQ(expectedResult.error, actualResult.error);
 }
+
+TEST(Writer, DISABLED_Blank) { write_pdf("blank.pdf"); }
+TEST(Writer, DISABLED_HelloWorld) { write_pdf("hello-world.pdf"); }
+TEST(Writer, DISABLED_Image1) { write_pdf("image-1.pdf"); }
+TEST(Writer, DISABLED_Image2) { write_pdf("image-2.pdf"); }
+TEST(Writer, DISABLED_ObjectStream) { write_pdf("object-stream.pdf"); }
+TEST(Writer, DISABLED_TwoPages) { write_pdf("two-pages.pdf"); }
