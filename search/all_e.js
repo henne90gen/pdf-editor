@@ -8,5 +8,5 @@ var searchData=
   ['remove_90',['remove',['../structpdf_1_1StaticMap.html#af71ccdb84e47782927434d237019c105',1,'pdf::StaticMap']]],
   ['renderer_91',['Renderer',['../structpdf_1_1Renderer.html',1,'pdf']]],
   ['resources_92',['Resources',['../structpdf_1_1Resources.html',1,'pdf']]],
-  ['result_93',['Result',['../classpdf_1_1Result.html',1,'pdf']]]
+  ['result_93',['Result',['../structProcess_1_1Result.html',1,'Process::Result'],['../classpdf_1_1Result.html',1,'pdf::Result']]]
 ];
