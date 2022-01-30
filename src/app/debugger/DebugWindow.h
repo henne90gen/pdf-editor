@@ -32,6 +32,7 @@ class DebugWindow : public Gtk::ApplicationWindow {
 
   private:
     pdf::Document document;
+    pdf::ReadMetadata metadata;
 
     Gtk::Label *selectedByteLabel      = nullptr;
     Gtk::Label *hoveredByteLabel       = nullptr;

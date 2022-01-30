@@ -7,7 +7,7 @@
 
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
-    const auto result = pdf::Document::read_from_file(filePath, document, false);
+    auto result = pdf::Document::read_from_file(filePath, document, false);
     if (result.has_error()) {
         spdlog::error(result.message());
         return;

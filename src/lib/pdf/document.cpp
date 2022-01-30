@@ -34,7 +34,7 @@ size_t ChangeSection::size() const {
 }
 #endif
 
-IndirectObject *Document::load_object(int64_t objectNumber) {
+std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t objectNumber) {
     CrossReferenceEntry *entry = nullptr;
     for (Trailer *t = &file.trailer; t != nullptr; t = t->prev) {
         if (objectNumber >= t->crossReferenceTable.firstObjectNumber &&
@@ -45,10 +45,10 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
     }
 
     if (entry == nullptr) {
-        return nullptr;
+        return {nullptr, {}};
     }
     if (entry->type == CrossReferenceEntryType::FREE) {
-        return nullptr;
+        return {nullptr, {}};
     }
 
     if (entry->type == CrossReferenceEntryType::NORMAL) {
@@ -67,7 +67,7 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
         auto parser = Parser(lexer, allocator, this);
         auto result = parser.parse();
         ASSERT(result != nullptr);
-        return result->as<IndirectObject>();
+        return {result->as<IndirectObject>(), input};
     } else if (entry->type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = get_object(entry->compressed.objectNumberOfStream);
         auto stream       = streamObject->object->as<Stream>();
@@ -94,8 +94,10 @@ IndirectObject *Document::load_object(int64_t objectNumber) {
             objs[i]  = obj;
         }
 
-        return allocator.allocate<IndirectObject>(objectNumbers[entry->compressed.indexInStream], 0,
-                                                  objs[entry->compressed.indexInStream]);
+        auto object = allocator.allocate<IndirectObject>(objectNumbers[entry->compressed.indexInStream], 0,
+                                                         objs[entry->compressed.indexInStream]);
+        // TODO the content does not refer to the original PDF document, but instead to a decoded stream
+        return {object, content};
     }
     ASSERT(false);
 }
@@ -105,9 +107,11 @@ IndirectObject *Document::get_object(int64_t objectNumber) {
         return objectList[objectNumber];
     }
 
-    auto object              = load_object(objectNumber);
-    objectList[objectNumber] = object;
-    return object;
+    auto object                         = load_object(objectNumber);
+    objectList[objectNumber]            = object.first;
+    file.metadata.objects[object.first] = {object.second,
+                                           false}; // TODO determine whether this obj is from an object stream or not
+    return object.first;
 }
 
 IndirectObject *Document::resolve(const IndirectReference *ref) { return get_object(ref->objectNumber); }
@@ -237,7 +241,8 @@ Result Document::delete_page(size_t pageNum) {
     }
 
     if (pageNum < 1 || pageNum > count) {
-        return Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum, count);
+        return Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum,
+                             count);
     }
 
     size_t currentPageNum = 1;
@@ -472,7 +477,7 @@ void Document::add_object(int64_t /*objectNumber*/, const std::string &content) 
     size_t chunkSize = content.size();
     auto chunk       = allocator.allocate_chunk(chunkSize);
     memcpy(chunk, content.data(), chunkSize);
-    #if CHANGE_SECTIONS
+#if CHANGE_SECTIONS
     changeSections.push_back({
           .type         = ChangeSectionType::ADDED,
           .objectNumber = objectNumber,
@@ -483,7 +488,7 @@ void Document::add_object(int64_t /*objectNumber*/, const std::string &content) 
                       .new_content_length = chunkSize,
                 },
     });
-    #endif
+#endif
 
     file.trailer.crossReferenceTable.objectCount++;
 

@@ -68,17 +68,33 @@ struct Trailer {
     Trailer *prev                           = nullptr;
 };
 
+struct ObjectMetadata {
+    std::string_view data = {};
+    bool isInObjectStream = false;
+};
+
+struct DocumentFileMetadata {
+    std::unordered_map<IndirectObject *, ObjectMetadata> objects = {};
+    std::unordered_map<Trailer *, std::string_view> trailers     = {};
+};
+
 struct DocumentFile {
-    char *data                = nullptr;
-    size_t sizeInBytes        = 0;
-    int64_t lastCrossRefStart = {};
-    Trailer trailer           = {};
+    char *data                    = nullptr;
+    size_t sizeInBytes            = 0;
+    int64_t lastCrossRefStart     = {};
+    Trailer trailer               = {};
+    DocumentFileMetadata metadata = {};
+};
+
+struct ReadMetadata {
+    std::vector<std::string_view> trailers                 = {};
+    std::unordered_map<Object *, std::string_view> objects = {};
 };
 
 struct Document : public ReferenceResolver {
     Allocator allocator   = {};
     DocumentFile file     = {};
-    DocumentCatalog *root = nullptr;
+    DocumentCatalog *root = nullptr; // TODO make this private?
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -156,7 +172,7 @@ struct Document : public ReferenceResolver {
 
   private:
     IndirectObject *get_object(int64_t objectNumber);
-    [[nodiscard]] IndirectObject *load_object(int64_t objectNumber);
+    [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);
 };
 
 } // namespace pdf

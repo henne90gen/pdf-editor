@@ -40,56 +40,33 @@ void ContentArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int w, int h)
     cr->restore();
 }
 
-void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &) const {
+void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) const {
     if (!shouldHighlightTrailer) {
         return;
     }
 
-#if 0
-    // TODO maybe skip highlighting trailers that are currently not visible
-    auto &file           = document.file;
-    auto *currentTrailer = &file.trailer;
-    while (currentTrailer != nullptr) {
-        if (currentTrailer->dict != nullptr) {
-            auto start = currentTrailer->dict->data.data();
-            auto size  = currentTrailer->dict->data.size();
-            highlight_range(cr, start, size, 0, 0, 1);
-        } else {
-            auto start = currentTrailer->stream->data.data();
-            auto size  = currentTrailer->stream->data.size();
-            highlight_range(cr, start, size, 0, 0, 1);
-        }
-        currentTrailer = currentTrailer->prev;
+    for (const auto &entry : document.file.metadata.trailers) {
+        highlight_range(cr, entry.second.data(), entry.second.size(), 0, 0, 1);
     }
-
-    if (file.trailer.dict != nullptr) {
-        highlight_range(cr, file.data + file.lastCrossRefStart,
-                        file.trailer.dict->data.data() - (file.data + file.lastCrossRefStart), 0, 0, 1);
-    } else {
-        highlight_range(cr, file.data + file.lastCrossRefStart,
-                        file.trailer.stream->data.data() - (file.data + file.lastCrossRefStart), 0, 0, 1);
-    }
-#endif
 }
 
-void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &) const {
+void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) const {
     if (!shouldHighlightObjects) {
         return;
     }
 
-#if 0
     auto engine = std::mt19937(1337); // NOLINT(cert-msc51-cpp)
     auto dist   = std::uniform_real_distribution(0.0, 1.0);
-
     // TODO this might be slow for large files -> don't highlight objects that are not visible
-    document.for_each_object([&](pdf::IndirectObject *object) {
+    for (const auto &entry : document.file.metadata.objects) {
+        if (entry.second.isInObjectStream) {
+            continue;
+        }
         double r = dist(engine);
         double g = dist(engine);
         double b = dist(engine);
-        highlight_range(cr, object->data.data(), object->data.size(), r, g, b);
-        return pdf::ForEachResult::CONTINUE;
-    });
-#endif
+        highlight_range(cr, entry.second.data.data(), entry.second.data.size(), r, g, b);
+    }
 }
 
 void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {

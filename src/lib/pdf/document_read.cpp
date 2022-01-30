@@ -145,6 +145,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
         auto startOfStream     = crossRefStartPtr;
         size_t lengthOfStream  = startxrefPtr - startOfStream;
         currentTrailer->stream = parseStream(document.allocator, startOfStream, lengthOfStream);
+        document.file.metadata.trailers[currentTrailer] = std::string_view(startOfStream, lengthOfStream);
         return read_cross_reference_stream(document, currentTrailer->stream, currentTrailer);
     }
 
@@ -212,6 +213,8 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
         }
     }
 
+    document.file.metadata.trailers[currentTrailer] =
+          std::string_view(crossRefStartPtr, (currentReadPtr - crossRefStartPtr) + lengthOfTrailerDict);
     currentTrailer->dict = parseDict(document.allocator, currentReadPtr, lengthOfTrailerDict);
     auto opt             = currentTrailer->dict->values.find("Prev");
     if (!opt.has_value()) {
@@ -222,9 +225,9 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
-IndirectObject *load_object(Document &document, CrossReferenceEntry &entry) {
+std::pair<IndirectObject *, std::string_view> load_object(Document &document, CrossReferenceEntry &entry) {
     if (entry.type == CrossReferenceEntryType::FREE) {
-        return nullptr;
+        return {nullptr, ""};
     }
 
     if (entry.type == CrossReferenceEntryType::NORMAL) {
@@ -243,8 +246,10 @@ IndirectObject *load_object(Document &document, CrossReferenceEntry &entry) {
         auto parser = Parser(lexer, document.allocator, &document);
         auto result = parser.parse();
         ASSERT(result != nullptr);
-        return result->as<IndirectObject>();
-    } else if (entry.type == CrossReferenceEntryType::COMPRESSED) {
+        return {result->as<IndirectObject>(), input};
+    }
+
+    if (entry.type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = document.objectList[entry.compressed.objectNumberOfStream];
         ASSERT(streamObject != nullptr);
         auto stream = streamObject->object->as<Stream>();
@@ -270,23 +275,25 @@ IndirectObject *load_object(Document &document, CrossReferenceEntry &entry) {
             objs[i]  = obj;
         }
 
-        return document.allocator.allocate<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
-                                                           objs[entry.compressed.indexInStream]);
+        auto object = document.allocator.allocate<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
+                                                                  objs[entry.compressed.indexInStream]);
+        // TODO the content does not refer to the original PDF document, but instead to a decoded stream
+        return {object, content};
     }
     ASSERT(false);
 }
 
 Result load_all_objects(Document &document, Trailer *trailer) {
     if (trailer == nullptr) {
-        return Result::ok();
+        return Result::error("Cannot load objects without trailer information (trailer=nullptr)");
     }
 
     struct NumberedCrossReferenceEntry {
         CrossReferenceEntry entry;
         uint64_t objectNumber;
     };
-    std::vector<NumberedCrossReferenceEntry> compressedEntries = {};
-    CrossReferenceTable &crt                                   = trailer->crossReferenceTable;
+    auto compressedEntries = std::vector<NumberedCrossReferenceEntry>();
+    auto &crt              = trailer->crossReferenceTable;
     for (uint64_t objectNumber = crt.firstObjectNumber;
          objectNumber < static_cast<uint64_t>(crt.firstObjectNumber + crt.objectCount); objectNumber++) {
         auto itr = document.objectList.find(objectNumber);
@@ -299,11 +306,15 @@ Result load_all_objects(Document &document, Trailer *trailer) {
             continue;
         }
 
-        document.objectList[objectNumber] = load_object(document, entry);
+        const std::pair<IndirectObject *, std::string_view> &object = load_object(document, entry);
+        document.objectList[objectNumber]                           = object.first;
+        document.file.metadata.objects[object.first] = {.data = object.second, .isInObjectStream = false};
     }
 
     for (auto &compressedEntry : compressedEntries) {
-        document.objectList[compressedEntry.objectNumber] = load_object(document, compressedEntry.entry);
+        const std::pair<IndirectObject *, std::string_view> &object = load_object(document, compressedEntry.entry);
+        document.objectList[compressedEntry.objectNumber]           = object.first;
+        document.file.metadata.objects[object.first]                       = {.data = object.second, .isInObjectStream = true};
     }
 
     return Result::ok();
@@ -346,9 +357,13 @@ Result read_data(Document &document, bool loadAllObjects) {
     }
 
     auto crossRefStartPtr = document.file.data + document.file.lastCrossRefStart;
+    auto trailersMetadata = std::vector<std::string_view>();
     auto result           = read_trailers(document, crossRefStartPtr, &document.file.trailer);
-    if (result.has_error() || !loadAllObjects) {
+    if (result.has_error()) {
         return result;
+    }
+    if (!loadAllObjects) {
+        return Result::ok();
     }
 
     return load_all_objects(document, &document.file.trailer);
