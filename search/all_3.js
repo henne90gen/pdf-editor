@@ -8,6 +8,7 @@ var searchData=
   ['document_27',['Document',['../structpdf_1_1Document.html',1,'pdf']]],
   ['documentcatalog_28',['DocumentCatalog',['../structpdf_1_1DocumentCatalog.html',1,'pdf']]],
   ['documentfile_29',['DocumentFile',['../structpdf_1_1DocumentFile.html',1,'pdf']]],
-  ['documentmodelcolumns_30',['DocumentModelColumns',['../structDocumentModelColumns.html',1,'']]],
-  ['documenttree_31',['DocumentTree',['../classDocumentTree.html',1,'']]]
+  ['documentfilemetadata_30',['DocumentFileMetadata',['../structpdf_1_1DocumentFileMetadata.html',1,'pdf']]],
+  ['documentmodelcolumns_31',['DocumentModelColumns',['../structDocumentModelColumns.html',1,'']]],
+  ['documenttree_32',['DocumentTree',['../classDocumentTree.html',1,'']]]
 ];

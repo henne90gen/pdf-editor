@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: Process::Result Struct Reference</title>
+<title>PDF Editor: pdf::ReadMetadata Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,32 +62,29 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>Process</b></li><li class="navelem"><a class="el" href="structProcess_1_1Result.html">Result</a></li>  </ul>
+<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1ReadMetadata.html">ReadMetadata</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structProcess_1_1Result-members.html">List of all members</a>  </div>
+<a href="structpdf_1_1ReadMetadata-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Process::Result Struct Reference</div>  </div>
+<div class="title">pdf::ReadMetadata Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a17de5b0bdab757ffca9373f0bc3bacfb"><td class="memItemLeft" align="right" valign="top"><a id="a17de5b0bdab757ffca9373f0bc3bacfb"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>output</b></td></tr>
-<tr class="separator:a17de5b0bdab757ffca9373f0bc3bacfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9e233c52e21411b9b1b98545c8de42d"><td class="memItemLeft" align="right" valign="top"><a id="aa9e233c52e21411b9b1b98545c8de42d"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>error</b></td></tr>
-<tr class="separator:aa9e233c52e21411b9b1b98545c8de42d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc8881c36c284d57e07ccda5caa69b82"><td class="memItemLeft" align="right" valign="top"><a id="acc8881c36c284d57e07ccda5caa69b82"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>status</b></td></tr>
-<tr class="separator:acc8881c36c284d57e07ccda5caa69b82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9417e69639ca0576aca88abdeb08422"><td class="memItemLeft" align="right" valign="top"><a id="af9417e69639ca0576aca88abdeb08422"></a>
+std::vector&lt; std::string_view &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>trailers</b> = {}</td></tr>
+<tr class="separator:af9417e69639ca0576aca88abdeb08422"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88c1484bca832a4e8d59bb44d1f917ff"><td class="memItemLeft" align="right" valign="top"><a id="a88c1484bca832a4e8d59bb44d1f917ff"></a>
+std::unordered_map&lt; <a class="el" href="structpdf_1_1Object.html">Object</a> *, std::string_view &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>objects</b> = {}</td></tr>
+<tr class="separator:a88c1484bca832a4e8d59bb44d1f917ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/test/<a class="el" href="process_8h_source.html">process.h</a></li>
+<li>src/lib/pdf/<a class="el" href="document_8h_source.html">document.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
