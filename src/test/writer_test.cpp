@@ -4,7 +4,7 @@
 
 #include <pdf/document.h>
 
-#include "process.h"
+#include "../util/process.h"
 #include "test_util.h"
 
 TEST(Writer, DeletePageInvalidPageNum) {
@@ -108,6 +108,39 @@ TEST(Writer, Objects) {
     ASSERT_BUFFER_CONTAINS_AT(buffer, 19, "8 0 obj");
 }
 
+std::vector<std::string_view> split_by_lines(const std::string &input) {
+    size_t lastStartIndex = 0;
+    size_t currentIndex   = 0;
+    auto result           = std::vector<std::string_view>();
+    while (currentIndex < input.size()) {
+        if (input[currentIndex] == '\n') {
+            result.emplace_back(input.data() + lastStartIndex, currentIndex - lastStartIndex);
+            lastStartIndex = currentIndex + 1;
+        }
+        currentIndex++;
+    }
+    result.emplace_back(input.data() + lastStartIndex, currentIndex - lastStartIndex);
+    return result;
+}
+
+TEST(SplitByLines, Simple) {
+    auto input = "abc\ndef\nghi";
+    auto lines = split_by_lines(input);
+    ASSERT_EQ(3, lines.size());
+    ASSERT_EQ("abc", lines[0]);
+    ASSERT_EQ("def", lines[1]);
+    ASSERT_EQ("ghi", lines[2]);
+}
+TEST(SplitByLines, EndsWithNewline) {
+    auto input = "abc\ndef\nghi\n";
+    auto lines = split_by_lines(input);
+    ASSERT_EQ(4, lines.size());
+    ASSERT_EQ("abc", lines[0]);
+    ASSERT_EQ("def", lines[1]);
+    ASSERT_EQ("ghi", lines[2]);
+    ASSERT_EQ("", lines[3]);
+}
+
 void write_pdf(const std::string &name) {
     pdf::Document document;
     std::string testFilePath = "../../../test-files/" + name;
@@ -116,16 +149,23 @@ void write_pdf(const std::string &name) {
     auto anError = document.write_to_file(name);
     ASSERT_FALSE(anError.has_error());
 
-    auto expectedResult = Process::execute("/usr/bin/pdfinfo", {testFilePath});
-    auto actualResult   = Process::execute("/usr/bin/pdfinfo", {name});
+    auto expectedResult = process::execute("/usr/bin/pdfinfo", {testFilePath});
+    auto actualResult   = process::execute("/usr/bin/pdfinfo", {name});
     ASSERT_EQ(expectedResult.status, actualResult.status);
-    ASSERT_EQ(expectedResult.output, actualResult.output);
     ASSERT_EQ(expectedResult.error, actualResult.error);
+    auto expectedOutputLines = split_by_lines(expectedResult.output);
+    auto actualOutputLines   = split_by_lines(actualResult.output);
+    for (size_t i = 0; i < expectedOutputLines.size(); i++) {
+        if (expectedOutputLines[i].starts_with("File size:")) {
+            continue;
+        }
+        ASSERT_EQ(expectedOutputLines[i], actualOutputLines[i]);
+    }
 }
 
-TEST(Writer, DISABLED_Blank) { write_pdf("blank.pdf"); }
-TEST(Writer, DISABLED_HelloWorld) { write_pdf("hello-world.pdf"); }
-TEST(Writer, DISABLED_Image1) { write_pdf("image-1.pdf"); }
-TEST(Writer, DISABLED_Image2) { write_pdf("image-2.pdf"); }
+TEST(Writer, Blank) { write_pdf("blank.pdf"); }
+TEST(Writer, HelloWorld) { write_pdf("hello-world.pdf"); }
+TEST(Writer, Image1) { write_pdf("image-1.pdf"); }
+TEST(Writer, Image2) { write_pdf("image-2.pdf"); }
 TEST(Writer, DISABLED_ObjectStream) { write_pdf("object-stream.pdf"); }
-TEST(Writer, DISABLED_TwoPages) { write_pdf("two-pages.pdf"); }
+TEST(Writer, TwoPages) { write_pdf("two-pages.pdf"); }

@@ -1,22 +1,6 @@
-#pragma once
+#include "process.h"
 
-#include <array>
-#include <cstdio>
-#include <fcntl.h>
-#include <spdlog/spdlog.h>
-#include <string>
-#include <sys/fcntl.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <vector>
-
-namespace Process {
-
-struct Result {
-    std::string output;
-    std::string error;
-    int status;
-};
+namespace process {
 
 char **prepare_argv(const std::string &command, const std::vector<std::string> &args) {
     char **argv = (char **)malloc((args.size() + 2) * sizeof(char *));
@@ -27,6 +11,28 @@ char **prepare_argv(const std::string &command, const std::vector<std::string> &
     argv[0]               = const_cast<char *>(command.c_str());
     argv[args.size() + 1] = nullptr;
     return argv;
+}
+
+void manage_child_process(int *outfd, int *errfd, const std::string &command, const std::vector<std::string> &args) {
+    close(outfd[0]);
+    dup2(outfd[1], STDOUT_FILENO);
+    close(outfd[1]);
+
+    close(errfd[0]);
+    dup2(errfd[1], STDERR_FILENO);
+    close(errfd[1]);
+
+    auto argv = prepare_argv(command, args);
+    if (execv(command.c_str(), argv) == -1) {
+        spdlog::error("execv has failed: {}", errno);
+        if (errno == ENOENT) {
+            spdlog::error("No such file or directory");
+        }
+        if (errno == EACCES) {
+            spdlog::error("Permission denied");
+        }
+    }
+    exit(errno);
 }
 
 Result execute(const std::string &command, const std::vector<std::string> &args) {
@@ -53,27 +59,8 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
         spdlog::error("fork has failed");
         return {};
     case 0: // child
-    {
-        close(outfd[0]);
-        dup2(outfd[1], STDOUT_FILENO);
-        close(outfd[1]);
-
-        close(errfd[0]);
-        dup2(errfd[1], STDERR_FILENO);
-        close(errfd[1]);
-
-        auto argv = prepare_argv(command, args);
-        if (execv(command.c_str(), argv) == -1) {
-            spdlog::error("execv has failed: {}", errno);
-            if (errno == ENOENT) {
-                spdlog::error("No such file or directory");
-            }
-            if (errno == EACCES) {
-                spdlog::error("Permission denied");
-            }
-        }
-        exit(errno);
-    }
+        manage_child_process(outfd, errfd, command, args);
+        return {};
     default: // parent
         break;
     }
@@ -115,4 +102,5 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
 
     return {outputResult, errorResult, status};
 }
-} // namespace Process
+
+} // namespace process
