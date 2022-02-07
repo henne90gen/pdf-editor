@@ -1,6 +1,7 @@
 .vscode
 .idea
 build
+install
 docs
 cmake-build-*
 *.glade~

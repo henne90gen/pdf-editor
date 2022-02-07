@@ -4,6 +4,10 @@ project(pdf-editor)
 
 # Third Party Dependencies
 set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_INSTALL OFF)
+set(BENCHMARK_INSTALL_DOCS OFF)
+set(BUILD_GMOCK OFF)
+set(INSTALL_GTEST OFF)
 set(SKIP_INSTALL_ALL ON)
 
 include(FetchContent)

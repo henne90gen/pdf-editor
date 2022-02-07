@@ -27,7 +27,7 @@ Dictionary *parseDict(Allocator &allocator, char *start, size_t length) {
     return result->as<Dictionary>();
 }
 
-Stream *parseStream(Allocator &allocator, char *start, size_t length) {
+IndirectObject *parseStream(Allocator &allocator, char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     const std::string_view input = std::string_view(start, length);
@@ -36,11 +36,12 @@ Stream *parseStream(Allocator &allocator, char *start, size_t length) {
     auto parser                  = Parser(lexer, allocator);
     auto result                  = parser.parse();
     ASSERT(result != nullptr);
-    return result->as<IndirectObject>()->object->as<Stream>();
+    return result->as<IndirectObject>();
 }
 
 Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer);
-Result read_cross_reference_stream(Document &document, Stream *stream, Trailer *currentTrailer) {
+Result read_cross_reference_stream(Document &document, IndirectObject *streamObject, Trailer *currentTrailer) {
+    auto stream     = streamObject->object->as<Stream>();
     auto W          = stream->dictionary->must_find<Array>("W");
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
@@ -141,12 +142,12 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     if (xrefKeyword != "xref") {
         //  stream -> parse stream
         // TODO how long is the stream? (just using the end of the file for parsing purposes)
-        auto startxrefPtr      = document.file.data + document.file.sizeInBytes;
-        auto startOfStream     = crossRefStartPtr;
-        size_t lengthOfStream  = startxrefPtr - startOfStream;
-        currentTrailer->stream = parseStream(document.allocator, startOfStream, lengthOfStream);
+        auto startxrefPtr            = document.file.data + document.file.sizeInBytes;
+        auto startOfStream           = crossRefStartPtr;
+        size_t lengthOfStream        = startxrefPtr - startOfStream;
+        currentTrailer->streamObject = parseStream(document.allocator, startOfStream, lengthOfStream);
         document.file.metadata.trailers[currentTrailer] = std::string_view(startOfStream, lengthOfStream);
-        return read_cross_reference_stream(document, currentTrailer->stream, currentTrailer);
+        return read_cross_reference_stream(document, currentTrailer->streamObject, currentTrailer);
     }
 
     //  table -> parse table and parse trailer dict
@@ -314,7 +315,7 @@ Result load_all_objects(Document &document, Trailer *trailer) {
     for (auto &compressedEntry : compressedEntries) {
         const std::pair<IndirectObject *, std::string_view> &object = load_object(document, compressedEntry.entry);
         document.objectList[compressedEntry.objectNumber]           = object.first;
-        document.file.metadata.objects[object.first]                       = {.data = object.second, .isInObjectStream = true};
+        document.file.metadata.objects[object.first]                = {.data = object.second, .isInObjectStream = true};
     }
 
     return Result::ok();

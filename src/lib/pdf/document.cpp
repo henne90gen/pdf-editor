@@ -208,7 +208,7 @@ DocumentCatalog *Document::catalog() {
     if (file.trailer.dict != nullptr) {
         opt = file.trailer.dict->values.find("Root");
     } else {
-        opt = file.trailer.stream->dictionary->values.find("Root");
+        opt = file.trailer.streamObject->object->as<Stream>()->dictionary->values.find("Root");
     }
     ASSERT(opt.has_value());
 

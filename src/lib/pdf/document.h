@@ -64,7 +64,7 @@ struct CrossReferenceTable {
 struct Trailer {
     CrossReferenceTable crossReferenceTable = {};
     Dictionary *dict                        = nullptr;
-    Stream *stream                          = nullptr;
+    IndirectObject *streamObject                          = nullptr;
     Trailer *prev                           = nullptr;
 };
 

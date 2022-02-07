@@ -163,31 +163,29 @@ size_t write_objects(Document &document, std::ostream &s, std::unordered_map<uin
             continue;
         }
 
-#if 1
         byteOffsets[entry.first] = currentOffset;
         currentOffset += write_object(s, entry.second);
-#else
-        s << entry.second->data;
-        byteOffsets[entry.first] = currentOffset;
-        currentOffset += entry.second->data.size();
-#endif
     }
     return currentOffset;
 }
 
 void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets,
                    size_t startXref) {
-    s << "xref ";
-    s << 0 << " " << byteOffsets.size();
+    if (document.file.trailer.dict != nullptr) {
+        s << "xref ";
+        s << 0 << " " << byteOffsets.size();
 
-    s << "0000000000 65535 f \n";
-    for (size_t i = 0; i < byteOffsets.size(); i++) {
-        write_zero_padded_number(s, byteOffsets[i + 1], 10);
-        s << " 00000 n \n";
+        s << "0000000000 65535 f \n";
+        for (size_t i = 0; i < byteOffsets.size(); i++) {
+            write_zero_padded_number(s, byteOffsets[i + 1], 10);
+            s << " 00000 n \n";
+        }
+
+        s << "trailer\n";
+        write_dictionary_object(s, document.file.trailer.dict);
+    } else {
+        write_indirect_object(s, document.file.trailer.streamObject);
     }
-
-    s << "trailer\n";
-    write_dictionary_object(s, document.file.trailer.dict);
 
     s << "\nstartxref\n" << startXref << "\n%%EOF\n";
 }
