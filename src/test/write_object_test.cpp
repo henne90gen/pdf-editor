@@ -101,7 +101,7 @@ TEST(Writer, write_dictionary) {
     map["World"]          = new pdf::LiteralString("World");
     const auto &staticMap = pdf::StaticMap<std::string, pdf::Object *>::create(allocator, map);
     pdf::write_dictionary_object(s, new pdf::Dictionary(staticMap));
-    const auto &str = s.view();
+    const auto &str = s.str();
     ASSERT_EQ(str, "<</World (World) /Hello 123>>");
 }
 

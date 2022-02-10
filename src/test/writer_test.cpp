@@ -149,8 +149,13 @@ void write_pdf(const std::string &name) {
     auto anError = document.write_to_file(name);
     ASSERT_FALSE(anError.has_error());
 
-    auto expectedResult = process::execute("/usr/bin/pdfinfo", {testFilePath});
-    auto actualResult   = process::execute("/usr/bin/pdfinfo", {name});
+#if _WIN32
+    const char *command = "C:/Program Files/Xpdf/bin64/pdfinfo.exe";
+#else
+    const char *command = "/usr/bin/pdfinfo";
+#endif
+    auto expectedResult = process::execute(command, {testFilePath});
+    auto actualResult   = process::execute(command, {name});
     ASSERT_EQ(expectedResult.status, actualResult.status);
     ASSERT_EQ(expectedResult.error, actualResult.error);
     auto expectedOutputLines = split_by_lines(expectedResult.output);

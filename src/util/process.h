@@ -1,13 +1,6 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-#include <array>
-#include <cstdio>
-#include <fcntl.h>
 #include <string>
-#include <sys/fcntl.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include <vector>
 
 namespace process {

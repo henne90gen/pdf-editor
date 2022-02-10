@@ -4,6 +4,7 @@
 #include <fstream>
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <zlib.h>
 
 #include "operator_parser.h"
 #include "page.h"
@@ -364,7 +365,7 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
     });
 }
 
-#if WIN32
+#if _WIN32
 std::optional<bool> is_executable(const std::string & /*filePath*/) {
     // TODO add is_executable implementation for windows
     return false;

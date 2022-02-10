@@ -1,5 +1,15 @@
 #include "process.h"
 
+#if !WIN32
+
+#include <array>
+#include <cstdio>
+#include <fcntl.h>
+#include <spdlog/spdlog.h>
+#include <sys/fcntl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 namespace process {
 
 char **prepare_argv(const std::string &command, const std::vector<std::string> &args) {
@@ -36,6 +46,7 @@ void manage_child_process(int *outfd, int *errfd, const std::string &command, co
 }
 
 Result execute(const std::string &command, const std::vector<std::string> &args) {
+    // TODO use bigger buffers (e.g. 1024 bytes)
     char outputBuffer;
     char errorBuffer;
     std::string outputResult;
@@ -104,3 +115,5 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
 }
 
 } // namespace process
+
+#endif
