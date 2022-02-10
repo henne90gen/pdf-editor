@@ -167,5 +167,10 @@ TEST(Writer, Blank) { write_pdf("blank.pdf"); }
 TEST(Writer, HelloWorld) { write_pdf("hello-world.pdf"); }
 TEST(Writer, Image1) { write_pdf("image-1.pdf"); }
 TEST(Writer, Image2) { write_pdf("image-2.pdf"); }
-TEST(Writer, DISABLED_ObjectStream) { write_pdf("object-stream.pdf"); }
+TEST(Writer, DISABLED_ObjectStream) {
+    // TODO
+    // All objects (even the ones that are part of an object stream) are loaded into the objectList
+    // They are then all written out into the final pdf file. This is probably problematic.
+    write_pdf("object-stream.pdf");
+}
 TEST(Writer, TwoPages) { write_pdf("two-pages.pdf"); }

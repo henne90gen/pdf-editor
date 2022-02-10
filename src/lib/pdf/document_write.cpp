@@ -33,144 +33,126 @@ size_t count_digits(int64_t number) {
 
 void write_header(std::ostream &s) { s << "%PDF-1.6\n%äüöß\n"; }
 
-size_t write_object(std::ostream &s, Object *object);
-size_t write_boolean_object(std::ostream &s, Boolean *boolean) {
+void write_object(std::ostream &s, Object *object);
+void write_boolean_object(std::ostream &s, Boolean *boolean) {
     if (boolean->value) {
         s << "true";
-        return 4;
     } else {
         s << "false";
-        return 5;
     }
 }
-size_t write_null_object(std::ostream &s, Null *) {
+void write_null_object(std::ostream &s, Null *) {
     // TODO check with the spec again
     s << "null";
-    return 4;
 }
-size_t write_integer_object(std::ostream &s, Integer *integer) {
-    s << integer->value;
-    return count_digits(integer->value);
-}
-size_t write_real_object(std::ostream &s, Real *real) {
+void write_integer_object(std::ostream &s, Integer *integer) { s << integer->value; }
+void write_real_object(std::ostream &s, Real *real) {
     auto str = std::to_string(real->value);
     s << str;
-    return str.size();
 }
-size_t write_hexadecimal_string_object(std::ostream &s, HexadecimalString *hexadecimal) {
+void write_hexadecimal_string_object(std::ostream &s, HexadecimalString *hexadecimal) {
     s << "<" << hexadecimal->value << ">";
-    return 2 + hexadecimal->value.length();
 }
-size_t write_literal_string_object(std::ostream &s, LiteralString *literal) {
-    s << "(" << literal->value << ")";
-    return 2 + literal->value.length();
-}
-size_t write_name_object(std::ostream &s, Name *name) {
-    s << "/" << name->value;
-    return 1 + name->value.size();
-}
-size_t write_array_object(std::ostream &s, Array *array) {
+void write_literal_string_object(std::ostream &s, LiteralString *literal) { s << "(" << literal->value << ")"; }
+void write_name_object(std::ostream &s, Name *name) { s << "/" << name->value; }
+void write_array_object(std::ostream &s, Array *array) {
     s << "[";
-    size_t bytesWritten = 0;
     for (size_t i = 0; i < array->values.size(); i++) {
         const auto obj = array->values[i];
-        bytesWritten += write_object(s, obj);
+        write_object(s, obj);
         if (i < array->values.size() - 1) {
-            bytesWritten++;
             s << " ";
         }
     }
     s << "]";
-    return bytesWritten + 2;
 }
-size_t write_dictionary_object(std::ostream &s, Dictionary *dictionary) {
+void write_dictionary_object(std::ostream &s, Dictionary *dictionary) {
     s << "<<";
-    size_t bytesWritten = 0;
+    int i = 0;
     for (const auto &itr : dictionary->values) {
-        if (bytesWritten != 0) {
+        if (i != 0) {
             s << " ";
-            bytesWritten++;
         }
         s << "/" << itr.key << " ";
-        bytesWritten += 2 + itr.key.length();
-        bytesWritten += write_object(s, itr.value);
+        write_object(s, itr.value);
+        i++;
     }
     s << ">>";
-    return bytesWritten + 4;
 }
-size_t write_indirect_reference_object(std::ostream &s, IndirectReference *reference) {
+void write_indirect_reference_object(std::ostream &s, IndirectReference *reference) {
     s << reference->objectNumber << " " << reference->generationNumber << " R";
-    return 3 + count_digits(reference->objectNumber) + count_digits(reference->generationNumber);
 }
-size_t write_indirect_object(std::ostream &s, IndirectObject *object) {
+void write_indirect_object(std::ostream &s, IndirectObject *object) {
     s << object->objectNumber << " " << object->generationNumber << " obj\n";
-    size_t bytesWritten = 6 + count_digits(object->objectNumber) + count_digits(object->generationNumber);
-    bytesWritten += write_object(s, object->object);
+    write_object(s, object->object);
     s << "\nendobj\n\n";
-    bytesWritten += 9;
-    return bytesWritten;
 }
-size_t write_stream_object(std::ostream &s, Stream *stream) {
-    auto bytesWritten = write_dictionary_object(s, stream->dictionary);
+void write_stream_object(std::ostream &s, Stream *stream) {
+    write_dictionary_object(s, stream->dictionary);
     s << "\nstream\n";
     s << stream->streamData;
     s << "\nendstream\n";
-    bytesWritten += stream->streamData.size();
-    bytesWritten += 19;
-    return bytesWritten;
 }
-size_t write_object_stream_content_object(std::ostream &, ObjectStreamContent *) {
-    ASSERT(false);
-    return 0;
-}
-size_t write_object(std::ostream &s, Object *object) {
+void write_object_stream_content_object(std::ostream &, ObjectStreamContent *) { ASSERT(false); }
+void write_object(std::ostream &s, Object *object) {
     switch (object->type) {
     case Object::Type::BOOLEAN:
-        return write_boolean_object(s, object->as<Boolean>());
+        write_boolean_object(s, object->as<Boolean>());
+        break;
     case Object::Type::INTEGER:
-        return write_integer_object(s, object->as<Integer>());
+        write_integer_object(s, object->as<Integer>());
+        break;
     case Object::Type::REAL:
-        return write_real_object(s, object->as<Real>());
+        write_real_object(s, object->as<Real>());
+        break;
     case Object::Type::HEXADECIMAL_STRING:
-        return write_hexadecimal_string_object(s, object->as<HexadecimalString>());
+        write_hexadecimal_string_object(s, object->as<HexadecimalString>());
+        break;
     case Object::Type::LITERAL_STRING:
-        return write_literal_string_object(s, object->as<LiteralString>());
+        write_literal_string_object(s, object->as<LiteralString>());
+        break;
     case Object::Type::NAME:
-        return write_name_object(s, object->as<Name>());
+        write_name_object(s, object->as<Name>());
+        break;
     case Object::Type::ARRAY:
-        return write_array_object(s, object->as<Array>());
+        write_array_object(s, object->as<Array>());
+        break;
     case Object::Type::DICTIONARY:
-        return write_dictionary_object(s, object->as<Dictionary>());
+        write_dictionary_object(s, object->as<Dictionary>());
+        break;
     case Object::Type::INDIRECT_REFERENCE:
-        return write_indirect_reference_object(s, object->as<IndirectReference>());
+        write_indirect_reference_object(s, object->as<IndirectReference>());
+        break;
     case Object::Type::INDIRECT_OBJECT:
-        return write_indirect_object(s, object->as<IndirectObject>());
+        write_indirect_object(s, object->as<IndirectObject>());
+        break;
     case Object::Type::STREAM:
-        return write_stream_object(s, object->as<Stream>());
+        write_stream_object(s, object->as<Stream>());
+        break;
     case Object::Type::NULL_OBJECT:
-        return write_null_object(s, object->as<Null>());
+        write_null_object(s, object->as<Null>());
+        break;
     case Object::Type::OBJECT_STREAM_CONTENT:
-        return write_object_stream_content_object(s, object->as<ObjectStreamContent>());
+        write_object_stream_content_object(s, object->as<ObjectStreamContent>());
+        break;
     default:
         ASSERT(false);
     }
 }
 
-size_t write_objects(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
-    size_t currentOffset = 19;
+void write_objects(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
     for (auto &entry : document.objectList) {
         if (entry.second == nullptr) {
             continue;
         }
 
-        byteOffsets[entry.first] = currentOffset;
-        currentOffset += write_object(s, entry.second);
+        byteOffsets[entry.first] = s.tellp();
+        write_object(s, entry.second);
     }
-    return currentOffset;
 }
 
-void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets,
-                   size_t startXref) {
+void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
+    auto startXref = s.tellp();
     if (document.file.trailer.dict != nullptr) {
         s << "xref ";
         s << 0 << " " << byteOffsets.size();
@@ -194,9 +176,8 @@ Result write_to_stream(Document &document, std::ostream &s) {
     write_header(s);
 
     std::unordered_map<uint64_t, uint64_t> byteOffsets = {};
-    auto startXref                                     = write_objects(document, s, byteOffsets);
-
-    write_trailer(document, s, byteOffsets, startXref);
+    write_objects(document, s, byteOffsets);
+    write_trailer(document, s, byteOffsets);
 
     return Result::bool_(s.bad(), "Failed to write data to file");
 }
