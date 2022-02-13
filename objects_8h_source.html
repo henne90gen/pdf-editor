@@ -185,7 +185,7 @@ $(function() {
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Dictionary.html">Dictionary</a>(<a class="code" href="structpdf_1_1StaticMap.html">StaticMap&lt;std::string, Object *&gt;</a> map) : <a class="code" href="structpdf_1_1Object.html">Object</a>(staticType()), values(map) {}</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; std::optional&lt;T *&gt; find(<span class="keyword">const</span> std::string &amp;key) {</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keyword">auto</span> opt = values.<a class="code" href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">find</a>(key);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keyword">auto</span> opt = values.find(key);</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordflow">if</span> (!opt.has_value()) {</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
@@ -193,7 +193,7 @@ $(function() {
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; T *must_find(<span class="keyword">const</span> std::string &amp;key) {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> opt = values.<a class="code" href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">find</a>(key);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">auto</span> opt = values.find(key);</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">if</span> (!opt.has_value()) {</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
@@ -267,7 +267,6 @@ $(function() {
 <div class="ttc" id="astructpdf_1_1ObjectStreamContent_html"><div class="ttname"><a href="structpdf_1_1ObjectStreamContent.html">pdf::ObjectStreamContent</a></div><div class="ttdef"><b>Definition:</b> objects.h:177</div></div>
 <div class="ttc" id="astructpdf_1_1EmbeddedFile_html"><div class="ttname"><a href="structpdf_1_1EmbeddedFile.html">pdf::EmbeddedFile</a></div><div class="ttdef"><b>Definition:</b> objects.h:167</div></div>
 <div class="ttc" id="astructpdf_1_1StaticVector_html"><div class="ttname"><a href="structpdf_1_1StaticVector.html">pdf::StaticVector</a></div><div class="ttdef"><b>Definition:</b> static_vector.h:10</div></div>
-<div class="ttc" id="astructpdf_1_1StaticMap_html_afcc9c9b280d0d5a8f9ff835b0b461054"><div class="ttname"><a href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">pdf::StaticMap::find</a></div><div class="ttdeci">std::optional&lt; V &gt; find(const K &amp;key)</div><div class="ttdoc">searches the map for the given key and returns either the found element or an empty optional</div><div class="ttdef"><b>Definition:</b> static_map.h:67</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:61</div></div>
 <div class="ttc" id="astructpdf_1_1IndirectReference_html"><div class="ttname"><a href="structpdf_1_1IndirectReference.html">pdf::IndirectReference</a></div><div class="ttdef"><b>Definition:</b> objects.h:133</div></div>
 <div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:94</div></div>
