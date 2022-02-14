@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: src/lib/pdf/helper/static_map.h Source File</title>
+<title>PDF Editor: src/util/util/static_map.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c85d3e3c5052e9ad9ce18c6863244a25.html">lib</a></li><li class="navelem"><a class="el" href="dir_9a4b695b9cfd6e8301fd48e438a3ddfb.html">pdf</a></li><li class="navelem"><a class="el" href="dir_217b00db1587e4fdd027bde567370cdb.html">helper</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html">util</a></li><li class="navelem"><a class="el" href="dir_ed0c92450c9adab7faa336224bc47028.html">util</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -73,14 +73,14 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;spdlog/spdlog.h&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;spdlog/spdlog.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>pdf {</div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span>util {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">// TODO finish this implementation</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticMap.html">   10</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> K, <span class="keyword">typename</span> V&gt; <span class="keyword">struct </span><a class="code" href="structpdf_1_1StaticMap.html">StaticMap</a> {</div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticMap_1_1Entry.html">   11</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">Entry</a> {</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structutil_1_1StaticMap.html">   10</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> K, <span class="keyword">typename</span> V&gt; <span class="keyword">struct </span><a class="code" href="structutil_1_1StaticMap.html">StaticMap</a> {</div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="structutil_1_1StaticMap_1_1Entry.html">   11</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structutil_1_1StaticMap_1_1Entry.html">Entry</a> {</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <span class="keyword">enum struct</span> Status {</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;            EMPTY  = 0,</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;            FILLED = 1,</div>
@@ -91,41 +91,41 @@ $(function() {
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        K key;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        V value;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    };</div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticMap_1_1Iterator.html">   22</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> {</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="structutil_1_1StaticMap_1_1Iterator.html">   22</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> {</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        <span class="keyword">using</span> iterator_category = std::forward_iterator_tag;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <span class="keyword">using</span> difference_type   = std::ptrdiff_t;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">using</span> <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">value_type</a>        = <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">Entry</a>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">using</span> <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">pointer</a>           = <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">value_type</a> *;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">using</span> <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">reference</a>         = <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">value_type</a> &amp;;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keyword">using</span> <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">value_type</a>        = <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">Entry</a>;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keyword">using</span> <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">pointer</a>           = <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">value_type</a> *;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keyword">using</span> <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">reference</a>         = <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">value_type</a> &amp;;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a>(<a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">pointer</a> ptr) : m_ptr(ptr) {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keyword">explicit</span> <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a>(<a class="code" href="structutil_1_1StaticMap_1_1Entry.html">pointer</a> ptr) : m_ptr(ptr) {</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            <span class="keywordflow">while</span> (m_ptr-&gt;status == Entry::Status::EMPTY) {</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                m_ptr++;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            }</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        }</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">reference</a> operator*()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> *m_ptr; }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">pointer</a> operator-&gt;() { <span class="keywordflow">return</span> m_ptr; }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;operator++() {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">reference</a> operator*()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> *m_ptr; }</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">pointer</a> operator-&gt;() { <span class="keywordflow">return</span> m_ptr; }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;operator++() {</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            m_ptr++;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            <span class="keywordflow">while</span> (m_ptr-&gt;status == Entry::Status::EMPTY) {</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                m_ptr++;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            }</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> operator++(<span class="keywordtype">int</span>) {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> tmp = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> operator++(<span class="keywordtype">int</span>) {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> tmp = *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            ++(*this);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="keywordflow">return</span> tmp;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">friend</span> <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;a, <span class="keyword">const</span> <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;b) { <span class="keywordflow">return</span> a.m_ptr == b.m_ptr; };</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keyword">friend</span> <span class="keywordtype">bool</span> operator!=(<span class="keyword">const</span> <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;a, <span class="keyword">const</span> <a class="code" href="structpdf_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;b) { <span class="keywordflow">return</span> a.m_ptr != b.m_ptr; };</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">friend</span> <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;a, <span class="keyword">const</span> <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;b) { <span class="keywordflow">return</span> a.m_ptr == b.m_ptr; };</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keyword">friend</span> <span class="keywordtype">bool</span> operator!=(<span class="keyword">const</span> <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;a, <span class="keyword">const</span> <a class="code" href="structutil_1_1StaticMap_1_1Iterator.html">Iterator</a> &amp;b) { <span class="keywordflow">return</span> a.m_ptr != b.m_ptr; };</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">pointer</a> m_ptr;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">pointer</a> m_ptr;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    };</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="structpdf_1_1StaticMap_1_1Entry.html">Entry</a> *entries;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="structutil_1_1StaticMap_1_1Entry.html">Entry</a> *entries;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">size_t</span> entryCount;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">size_t</span> capacity;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
@@ -135,7 +135,7 @@ $(function() {
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    Iterator end() { <span class="keywordflow">return</span> Iterator(&amp;entries[capacity]); }</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    Iterator end()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> Iterator(&amp;entries[capacity]); }</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">   67</a></span>&#160;    std::optional&lt;V&gt; <a class="code" href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">find</a>(<span class="keyword">const</span> K &amp;key) {</div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="structutil_1_1StaticMap.html#ae874f0eec499c3b7b1f417c5e747b130">   67</a></span>&#160;    std::optional&lt;V&gt; <a class="code" href="structutil_1_1StaticMap.html#ae874f0eec499c3b7b1f417c5e747b130">find</a>(<span class="keyword">const</span> K &amp;key) {</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">auto</span> i = 0;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">auto</span> h = std::hash&lt;K&gt;()(key);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
@@ -156,7 +156,7 @@ $(function() {
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    }</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticMap.html#af71ccdb84e47782927434d237019c105">   89</a></span>&#160;    std::optional&lt;V&gt; <a class="code" href="structpdf_1_1StaticMap.html#af71ccdb84e47782927434d237019c105">remove</a>(<span class="keyword">const</span> K &amp;key) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="structutil_1_1StaticMap.html#aa0f1adfae9fab7ce37024f842fc54391">   89</a></span>&#160;    std::optional&lt;V&gt; <a class="code" href="structutil_1_1StaticMap.html#aa0f1adfae9fab7ce37024f842fc54391">remove</a>(<span class="keyword">const</span> K &amp;key) {</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keyword">auto</span> i = 0;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keyword">auto</span> h = std::hash&lt;K&gt;()(key);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">while</span> (<span class="keyword">true</span>) {</div>
@@ -181,7 +181,7 @@ $(function() {
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordflow">return</span> {};</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    }</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">static</span> <a class="code" href="structpdf_1_1StaticMap.html">StaticMap&lt;K, V&gt;</a> create(<a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator, <span class="keyword">const</span> std::unordered_map&lt;K, V&gt; &amp;map) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">static</span> <a class="code" href="structutil_1_1StaticMap.html">StaticMap&lt;K, V&gt;</a> create(<a class="code" href="structutil_1_1Allocator.html">Allocator</a> &amp;allocator, <span class="keyword">const</span> std::unordered_map&lt;K, V&gt; &amp;map) {</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keyword">auto</span> entryCount = map.size();</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keyword">auto</span> capacity   = entryCount * 2; <span class="comment">// TODO think about using less memory here</span></div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keyword">auto</span> entries    = (Entry *)allocator.allocate_chunk((capacity + 1) * <span class="keyword">sizeof</span>(Entry));</div>
@@ -217,12 +217,12 @@ $(function() {
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1StaticMap_html_af71ccdb84e47782927434d237019c105"><div class="ttname"><a href="structpdf_1_1StaticMap.html#af71ccdb84e47782927434d237019c105">pdf::StaticMap::remove</a></div><div class="ttdeci">std::optional&lt; V &gt; remove(const K &amp;key)</div><div class="ttdoc">same as find(), except that the element is removed after retrieving it</div><div class="ttdef"><b>Definition:</b> static_map.h:89</div></div>
-<div class="ttc" id="astructpdf_1_1StaticMap_html"><div class="ttname"><a href="structpdf_1_1StaticMap.html">pdf::StaticMap</a></div><div class="ttdef"><b>Definition:</b> static_map.h:10</div></div>
-<div class="ttc" id="astructpdf_1_1StaticMap_1_1Iterator_html"><div class="ttname"><a href="structpdf_1_1StaticMap_1_1Iterator.html">pdf::StaticMap::Iterator</a></div><div class="ttdef"><b>Definition:</b> static_map.h:22</div></div>
-<div class="ttc" id="astructpdf_1_1StaticMap_html_afcc9c9b280d0d5a8f9ff835b0b461054"><div class="ttname"><a href="structpdf_1_1StaticMap.html#afcc9c9b280d0d5a8f9ff835b0b461054">pdf::StaticMap::find</a></div><div class="ttdeci">std::optional&lt; V &gt; find(const K &amp;key)</div><div class="ttdoc">searches the map for the given key and returns either the found element or an empty optional</div><div class="ttdef"><b>Definition:</b> static_map.h:67</div></div>
-<div class="ttc" id="astructpdf_1_1StaticMap_1_1Entry_html"><div class="ttname"><a href="structpdf_1_1StaticMap_1_1Entry.html">pdf::StaticMap::Entry</a></div><div class="ttdef"><b>Definition:</b> static_map.h:11</div></div>
-<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:18</div></div>
+<div class="ttc" id="astructutil_1_1StaticMap_html_aa0f1adfae9fab7ce37024f842fc54391"><div class="ttname"><a href="structutil_1_1StaticMap.html#aa0f1adfae9fab7ce37024f842fc54391">util::StaticMap::remove</a></div><div class="ttdeci">std::optional&lt; V &gt; remove(const K &amp;key)</div><div class="ttdoc">same as find(), except that the element is removed after retrieving it</div><div class="ttdef"><b>Definition:</b> static_map.h:89</div></div>
+<div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:19</div></div>
+<div class="ttc" id="astructutil_1_1StaticMap_1_1Iterator_html"><div class="ttname"><a href="structutil_1_1StaticMap_1_1Iterator.html">util::StaticMap::Iterator</a></div><div class="ttdef"><b>Definition:</b> static_map.h:22</div></div>
+<div class="ttc" id="astructutil_1_1StaticMap_html_ae874f0eec499c3b7b1f417c5e747b130"><div class="ttname"><a href="structutil_1_1StaticMap.html#ae874f0eec499c3b7b1f417c5e747b130">util::StaticMap::find</a></div><div class="ttdeci">std::optional&lt; V &gt; find(const K &amp;key)</div><div class="ttdoc">searches the map for the given key and returns either the found element or an empty optional</div><div class="ttdef"><b>Definition:</b> static_map.h:67</div></div>
+<div class="ttc" id="astructutil_1_1StaticMap_1_1Entry_html"><div class="ttname"><a href="structutil_1_1StaticMap_1_1Entry.html">util::StaticMap::Entry</a></div><div class="ttdef"><b>Definition:</b> static_map.h:11</div></div>
+<div class="ttc" id="astructutil_1_1StaticMap_html"><div class="ttname"><a href="structutil_1_1StaticMap.html">util::StaticMap</a></div><div class="ttdef"><b>Definition:</b> static_map.h:10</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

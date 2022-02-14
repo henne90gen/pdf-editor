@@ -73,8 +73,8 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;helper/allocator.h&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;util/allocator.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;lexer.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;objects.h&quot;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
@@ -91,11 +91,11 @@ $(function() {
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="structpdf_1_1CMapParser.html">   20</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1CMapParser.html">CMapParser</a> {</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;lexer;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordtype">size_t</span> currentTokenIdx    = 0;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    std::vector&lt;Token&gt; tokens = {};</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1CMapParser.html">CMapParser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;_allocator) : lexer(_lexer), allocator(_allocator) {}</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1CMapParser.html">CMapParser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;_allocator) : lexer(_lexer), allocator(_allocator) {}</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="structpdf_1_1CMap.html">CMap</a> *<a class="code" href="structpdf_1_1CMapParser.html#a9a3459a273a4291a9ee5190905565f80">parse</a>(); <span class="comment">// TODO maybe return by value instead of a pointer</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
@@ -110,19 +110,19 @@ $(function() {
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structpdf_1_1CMapStream.html">   41</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1CMapStream.html">CMapStream</a> : <span class="keyword">public</span> <a class="code" href="structpdf_1_1Stream.html">Stream</a> {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::optional&lt;CMap *&gt; read_cmap(<a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    std::optional&lt;CMap *&gt; read_cmap(<a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1CMapStream_html"><div class="ttname"><a href="structpdf_1_1CMapStream.html">pdf::CMapStream</a></div><div class="ttdef"><b>Definition:</b> cmap.h:41</div></div>
 <div class="ttc" id="astructpdf_1_1CMap_html"><div class="ttname"><a href="structpdf_1_1CMap.html">pdf::CMap</a></div><div class="ttdef"><b>Definition:</b> cmap.h:11</div></div>
+<div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:19</div></div>
 <div class="ttc" id="astructpdf_1_1CMapParser_html_a9a3459a273a4291a9ee5190905565f80"><div class="ttname"><a href="structpdf_1_1CMapParser.html#a9a3459a273a4291a9ee5190905565f80">pdf::CMapParser::parse</a></div><div class="ttdeci">CMap * parse()</div><div class="ttdoc">Attempts to parse a CMap from the given lexer.</div><div class="ttdef"><b>Definition:</b> cmap.cpp:243</div></div>
 <div class="ttc" id="astructpdf_1_1Lexer_html"><div class="ttname"><a href="structpdf_1_1Lexer.html">pdf::Lexer</a></div><div class="ttdef"><b>Definition:</b> lexer.h:91</div></div>
-<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:152</div></div>
-<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:18</div></div>
+<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:151</div></div>
 <div class="ttc" id="astructpdf_1_1CMapParser_html"><div class="ttname"><a href="structpdf_1_1CMapParser.html">pdf::CMapParser</a></div><div class="ttdef"><b>Definition:</b> cmap.h:20</div></div>
-<div class="ttc" id="astructpdf_1_1HexadecimalString_html"><div class="ttname"><a href="structpdf_1_1HexadecimalString.html">pdf::HexadecimalString</a></div><div class="ttdef"><b>Definition:</b> objects.h:84</div></div>
+<div class="ttc" id="astructpdf_1_1HexadecimalString_html"><div class="ttname"><a href="structpdf_1_1HexadecimalString.html">pdf::HexadecimalString</a></div><div class="ttdef"><b>Definition:</b> objects.h:83</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: src/lib/pdf/helper/static_vector.h Source File</title>
+<title>PDF Editor: src/util/util/static_vector.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c85d3e3c5052e9ad9ce18c6863244a25.html">lib</a></li><li class="navelem"><a class="el" href="dir_9a4b695b9cfd6e8301fd48e438a3ddfb.html">pdf</a></li><li class="navelem"><a class="el" href="dir_217b00db1587e4fdd027bde567370cdb.html">helper</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html">util</a></li><li class="navelem"><a class="el" href="dir_ed0c92450c9adab7faa336224bc47028.html">util</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -77,9 +77,9 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;allocator.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>pdf {</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>util {</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structpdf_1_1StaticVector.html">   10</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span><a class="code" href="structpdf_1_1StaticVector.html">StaticVector</a> {</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structutil_1_1StaticVector.html">   10</a></span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span><a class="code" href="structutil_1_1StaticVector.html">StaticVector</a> {</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    T *elements;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    <span class="keywordtype">size_t</span> count;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
@@ -99,21 +99,21 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    T *begin() { <span class="keywordflow">return</span> &amp;elements[0]; }</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    T *end() { <span class="keywordflow">return</span> &amp;elements[count]; } <span class="comment">// &#39;count&#39; is out of bounds</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">static</span> <a class="code" href="structpdf_1_1StaticVector.html">StaticVector&lt;T&gt;</a> create(<a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator, <span class="keyword">const</span> std::vector&lt;T&gt; &amp;vec) {</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">static</span> <a class="code" href="structutil_1_1StaticVector.html">StaticVector&lt;T&gt;</a> create(<a class="code" href="structutil_1_1Allocator.html">Allocator</a> &amp;allocator, <span class="keyword">const</span> std::vector&lt;T&gt; &amp;vec) {</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">auto</span> sizeInBytes = vec.size() * <span class="keyword">sizeof</span>(T);</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keyword">auto</span> elements    = (T *)allocator.allocate_chunk(sizeInBytes);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        memcpy(elements, vec.data(), sizeInBytes);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="structpdf_1_1StaticVector.html">StaticVector</a>(elements, vec.size());</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="structutil_1_1StaticVector.html">StaticVector</a>(elements, vec.size());</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    }</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="structpdf_1_1StaticVector.html">StaticVector</a>(T *_elements, <span class="keywordtype">size_t</span> _count) : elements(_elements), count(_count) {}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <a class="code" href="structutil_1_1StaticVector.html">StaticVector</a>(T *_elements, <span class="keywordtype">size_t</span> _count) : elements(_elements), count(_count) {}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1StaticVector_html"><div class="ttname"><a href="structpdf_1_1StaticVector.html">pdf::StaticVector</a></div><div class="ttdef"><b>Definition:</b> static_vector.h:10</div></div>
-<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:18</div></div>
+<div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:19</div></div>
+<div class="ttc" id="astructutil_1_1StaticVector_html"><div class="ttname"><a href="structutil_1_1StaticVector.html">util::StaticVector</a></div><div class="ttdef"><b>Definition:</b> static_vector.h:10</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -73,29 +73,29 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;helper/allocator.h&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;util/allocator.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;objects.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>pdf {</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
 <div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structpdf_1_1Image.html">   10</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1Image.html">Image</a> {</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    int64_t width            = 0;</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    int64_t height           = 0;</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    int64_t bitsPerComponent = 0;</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <a class="code" href="structpdf_1_1Stream.html">Stream</a> *stream           = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    [[nodiscard]] <a class="code" href="classpdf_1_1Result.html">Result</a> <a class="code" href="structpdf_1_1Image.html#afbca15036072abf3e101284d7cb66f54">write_bmp</a>(<span class="keyword">const</span> std::string &amp;fileName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    [[nodiscard]] <a class="code" href="classutil_1_1Result.html">util::Result</a> <a class="code" href="structpdf_1_1Image.html#acff2b484bf27caee43e5160709b8a154">write_bmp</a>(<span class="keyword">const</span> std::string &amp;fileName) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;};</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1Image_html_afbca15036072abf3e101284d7cb66f54"><div class="ttname"><a href="structpdf_1_1Image.html#afbca15036072abf3e101284d7cb66f54">pdf::Image::write_bmp</a></div><div class="ttdeci">Result write_bmp(const std::string &amp;fileName) const</div><div class="ttdoc">writes the image to a .bmp file with the given fileName, returns false on success</div><div class="ttdef"><b>Definition:</b> image.cpp:39</div></div>
+<div class="ttc" id="astructpdf_1_1Image_html_acff2b484bf27caee43e5160709b8a154"><div class="ttname"><a href="structpdf_1_1Image.html#acff2b484bf27caee43e5160709b8a154">pdf::Image::write_bmp</a></div><div class="ttdeci">util::Result write_bmp(const std::string &amp;fileName) const</div><div class="ttdoc">writes the image to a .bmp file with the given fileName, returns false on success</div><div class="ttdef"><b>Definition:</b> image.cpp:39</div></div>
+<div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:19</div></div>
 <div class="ttc" id="astructpdf_1_1Image_html"><div class="ttname"><a href="structpdf_1_1Image.html">pdf::Image</a></div><div class="ttdef"><b>Definition:</b> image.h:10</div></div>
-<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:152</div></div>
-<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:18</div></div>
-<div class="ttc" id="aclasspdf_1_1Result_html"><div class="ttname"><a href="classpdf_1_1Result.html">pdf::Result</a></div><div class="ttdef"><b>Definition:</b> util.h:32</div></div>
+<div class="ttc" id="aclassutil_1_1Result_html"><div class="ttname"><a href="classutil_1_1Result.html">util::Result</a></div><div class="ttdef"><b>Definition:</b> result.h:13</div></div>
+<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:151</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

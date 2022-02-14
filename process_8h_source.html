@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: src/util/process.h Source File</title>
+<title>PDF Editor: src/util/util/process.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html">util</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b7878ad5ecbf2506f4125b9d34c97e45.html">util</a></li><li class="navelem"><a class="el" href="dir_ed0c92450c9adab7faa336224bc47028.html">util</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -75,19 +75,22 @@ $(function() {
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span>process {</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;result.h&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="structprocess_1_1Result.html">    8</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structprocess_1_1Result.html">Result</a> {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    std::string output;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    std::string error;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keywordtype">int</span> status;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;};</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<a class="code" href="structprocess_1_1Result.html">Result</a> execute(<span class="keyword">const</span> std::string &amp;command, <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;args);</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>util {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structutil_1_1Execution.html">   10</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structutil_1_1Execution.html">Execution</a> {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    std::string output;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    std::string error;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <span class="keywordtype">int</span> status;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;};</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;} <span class="comment">// namespace process</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<a class="code" href="classutil_1_1ValueResult.html">ValueResult&lt;Execution&gt;</a> execute(<span class="keyword">const</span> std::string &amp;command, <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;args);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;} <span class="comment">// namespace util</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructprocess_1_1Result_html"><div class="ttname"><a href="structprocess_1_1Result.html">process::Result</a></div><div class="ttdef"><b>Definition:</b> process.h:8</div></div>
+<div class="ttc" id="aclassutil_1_1ValueResult_html"><div class="ttname"><a href="classutil_1_1ValueResult.html">util::ValueResult</a></div><div class="ttdef"><b>Definition:</b> result.h:37</div></div>
+<div class="ttc" id="astructutil_1_1Execution_html"><div class="ttname"><a href="structutil_1_1Execution.html">util::Execution</a></div><div class="ttdef"><b>Definition:</b> process.h:10</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
