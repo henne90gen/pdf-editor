@@ -40,14 +40,14 @@ std::vector<ContentStream *> Page::content_streams() {
     return result;
 }
 
-void ContentStream::for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func) {
+void ContentStream::for_each_operator(util::Allocator &allocator, const std::function<util::ForEachResult(Operator *)> &func) {
     auto textProvider   = StringTextProvider(decode(allocator));
     auto lexer          = TextLexer(textProvider);
     auto operatorParser = OperatorParser(lexer, allocator);
     Operator *op        = operatorParser.get_operator();
     while (op != nullptr) {
-        ForEachResult result = func(op);
-        if (result == ForEachResult::BREAK) {
+        util::ForEachResult result = func(op);
+        if (result == util::ForEachResult::BREAK) {
             break;
         }
         op = operatorParser.get_operator();
@@ -183,7 +183,7 @@ size_t Page::character_count() {
 
             // TODO also count other text operators
 
-            return ForEachResult::CONTINUE;
+            return util::ForEachResult::CONTINUE;
         });
     }
     return result;

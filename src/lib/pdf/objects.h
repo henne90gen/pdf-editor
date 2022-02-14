@@ -3,13 +3,12 @@
 #include <iostream>
 #include <optional>
 #include <unordered_map>
+#include <util/allocator.h>
+#include <util/static_map.h>
+#include <util/static_vector.h>
+#include <util/util.h>
 #include <utility>
 #include <vector>
-
-#include "helper/allocator.h"
-#include "helper/static_map.h"
-#include "helper/static_vector.h"
-#include "helper/util.h"
 
 namespace pdf {
 
@@ -99,19 +98,19 @@ struct Name : public Object {
 };
 
 struct Array : public Object {
-    StaticVector<Object *> values;
+    util::StaticVector<Object *> values;
 
     static Type staticType() { return Type::ARRAY; }
-    explicit Array(StaticVector<Object *> objects) : Object(staticType()), values(objects) {}
+    explicit Array(util::StaticVector<Object *> objects) : Object(staticType()), values(objects) {}
 
     void remove_element(Document &document, size_t index);
 };
 
 struct Dictionary : public Object {
-    StaticMap<std::string, Object *> values = {};
+    util::StaticMap<std::string, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(StaticMap<std::string, Object *> map) : Object(staticType()), values(map) {}
+    explicit Dictionary(util::StaticMap<std::string, Object *> map) : Object(staticType()), values(map) {}
 
     template <typename T> std::optional<T *> find(const std::string &key) {
         auto opt = values.find(key);
@@ -160,7 +159,7 @@ struct Stream : public Object {
     explicit Stream(Dictionary *_dictionary, std::string_view _stream_data)
         : Object(staticType()), dictionary(_dictionary), streamData(_stream_data) {}
 
-    [[nodiscard]] std::string_view decode(Allocator &allocator);
+    [[nodiscard]] std::string_view decode(util::Allocator &allocator);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

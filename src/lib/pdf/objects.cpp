@@ -100,7 +100,7 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::decode(Allocator &allocator) {
+std::string_view Stream::decode(util::Allocator &allocator) {
     if (decodedStream != nullptr) {
         return {decodedStream, decodedStreamSize};
     }

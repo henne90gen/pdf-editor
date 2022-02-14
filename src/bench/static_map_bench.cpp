@@ -1,7 +1,7 @@
 #include <benchmark/benchmark.h>
 
-#include <pdf/helper/allocator.h>
-#include <pdf/helper/static_map.h>
+#include "util/allocator.h"
+#include "util/static_map.h"
 
 static void SM_Create(benchmark::State &state) {
     pdf::Allocator allocator = {};

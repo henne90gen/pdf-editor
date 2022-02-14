@@ -172,22 +172,22 @@ void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint6
     s << "\nstartxref\n" << startXref << "\n%%EOF\n";
 }
 
-Result write_to_stream(Document &document, std::ostream &s) {
+util::Result write_to_stream(Document &document, std::ostream &s) {
     write_header(s);
 
     std::unordered_map<uint64_t, uint64_t> byteOffsets = {};
     write_objects(document, s, byteOffsets);
     write_trailer(document, s, byteOffsets);
 
-    return Result::bool_(s.bad(), "Failed to write data to file");
+    return util::Result::bool_(s.bad(), "Failed to write data to file");
 }
 
-Result Document::write_to_file(const std::string &filePath) {
+util::Result Document::write_to_file(const std::string &filePath) {
     auto os = std::ofstream();
     os.open(filePath, std::ios::out | std::ios::binary);
 
     if (!os.is_open()) {
-        return Result::error("Failed to open pdf file for writing: '{}'", filePath);
+        return util::Result::error("Failed to open pdf file for writing: '{}'", filePath);
     }
 
     auto result = write_to_stream(*this, os);
@@ -195,7 +195,7 @@ Result Document::write_to_file(const std::string &filePath) {
     return result;
 }
 
-Result Document::write_to_memory(char *&buffer, size_t &size) {
+util::Result Document::write_to_memory(char *&buffer, size_t &size) {
     std::stringstream ss;
     auto error = write_to_stream(*this, ss);
     if (error.has_error()) {
@@ -206,6 +206,6 @@ Result Document::write_to_memory(char *&buffer, size_t &size) {
     size        = result.size();
     buffer      = (char *)malloc(size);
     memcpy(buffer, result.data(), size);
-    return Result::ok();
+    return util::Result::ok();
 }
 } // namespace pdf

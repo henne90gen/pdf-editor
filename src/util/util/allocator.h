@@ -4,9 +4,10 @@
 #include <functional>
 #include <vector>
 
+#include "result.h"
 #include "util.h"
 
-namespace pdf {
+namespace util {
 
 struct Allocation {
     char *bufferStart              = nullptr;
@@ -28,7 +29,7 @@ struct Allocator {
     [[nodiscard]] size_t total_bytes_allocated() const;
     [[nodiscard]] size_t num_allocations() const;
 
-    void for_each_allocation(const std::function<ForEachResult(Allocation &)> &func) const;
+    void for_each_allocation(const std::function<util::ForEachResult(Allocation &)> &func) const;
 
     template <typename T, typename... Args> T *allocate(Args &&...args) {
         auto s   = sizeof(T);

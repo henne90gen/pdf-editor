@@ -273,7 +273,7 @@ CMap *CMapParser::parse() {
     return allocator.allocate<CMap>(charmap);
 }
 
-std::optional<CMap *> CMapStream::read_cmap(Allocator &allocator) {
+std::optional<CMap *> CMapStream::read_cmap(util::Allocator &allocator) {
     auto data         = decode(allocator);
     auto textProvider = StringTextProvider(data);
     auto lexer        = TextLexer(textProvider);

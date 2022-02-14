@@ -8,10 +8,10 @@ namespace pdf {
 
 NoopReferenceResolver GlobalNoopReferenceResolver = {};
 
-Parser::Parser(Lexer &_lexer, Allocator &_allocator)
+Parser::Parser(Lexer &_lexer, util::Allocator &_allocator)
     : lexer(_lexer), allocator(_allocator), referenceResolver(&GlobalNoopReferenceResolver) {}
 
-Parser::Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver)
+Parser::Parser(Lexer &_lexer, util::Allocator &_allocator, ReferenceResolver *_referenceResolver)
     : lexer(_lexer), allocator(_allocator), referenceResolver(_referenceResolver) {}
 
 bool Parser::ensure_tokens_have_been_lexed() {
@@ -166,7 +166,7 @@ Array *Parser::parse_array() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
-    auto vec        = StaticVector<Object *>::create(allocator, objects);
+    auto vec        = util::StaticVector<Object *>::create(allocator, objects);
     return allocator.allocate<Array>(vec);
 }
 
@@ -206,7 +206,7 @@ Dictionary *Parser::parse_dictionary() {
     }
 
     currentTokenIdx++;
-    auto map = StaticMap<std::string, Object *>::create(allocator, objects);
+    auto map = util::StaticMap<std::string, Object *>::create(allocator, objects);
     return allocator.allocate<Dictionary>(map);
 }
 

@@ -15,7 +15,7 @@ void ignoreNewLines(char *&ptr) {
     }
 }
 
-Dictionary *parseDict(Allocator &allocator, char *start, size_t length) {
+Dictionary *parseDict(util::Allocator &allocator, char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     const std::string_view input = std::string_view(start, length);
@@ -27,7 +27,7 @@ Dictionary *parseDict(Allocator &allocator, char *start, size_t length) {
     return result->as<Dictionary>();
 }
 
-IndirectObject *parseStream(Allocator &allocator, char *start, size_t length) {
+IndirectObject *parseStream(util::Allocator &allocator, char *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     const std::string_view input = std::string_view(start, length);
@@ -39,8 +39,8 @@ IndirectObject *parseStream(Allocator &allocator, char *start, size_t length) {
     return result->as<IndirectObject>();
 }
 
-Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer);
-Result read_cross_reference_stream(Document &document, IndirectObject *streamObject, Trailer *currentTrailer) {
+util::Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer);
+util::Result read_cross_reference_stream(Document &document, IndirectObject *streamObject, Trailer *currentTrailer) {
     auto stream     = streamObject->object->as<Stream>();
     auto W          = stream->dictionary->must_find<Array>("W");
     auto sizeField0 = W->values[0]->as<Integer>()->value;
@@ -129,14 +129,14 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
 
     auto opt = stream->dictionary->values.find("Prev");
     if (!opt.has_value()) {
-        return Result::ok();
+        return util::Result::ok();
     }
 
     currentTrailer->prev = document.allocator.allocate<Trailer>();
     return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
-Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer) {
+util::Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer) {
     // decide whether xref stream or table
     const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
@@ -199,7 +199,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     while (std::string_view(currentReadPtr, 7) != "trailer") {
         currentReadPtr++;
         if (document.file.data + document.file.sizeInBytes < currentReadPtr + 7) {
-            return Result::error("Unexpectedly reached end of file");
+            return util::Result::error("Unexpectedly reached end of file");
         }
     }
 
@@ -210,7 +210,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     while (std::string_view(currentReadPtr + lengthOfTrailerDict, 9) != "startxref") {
         lengthOfTrailerDict++;
         if (document.file.data + document.file.sizeInBytes < currentReadPtr + lengthOfTrailerDict) {
-            return Result::error("Unexpectedly reached end of file");
+            return util::Result::error("Unexpectedly reached end of file");
         }
     }
 
@@ -219,7 +219,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     currentTrailer->dict = parseDict(document.allocator, currentReadPtr, lengthOfTrailerDict);
     auto opt             = currentTrailer->dict->values.find("Prev");
     if (!opt.has_value()) {
-        return Result::ok();
+        return util::Result::ok();
     }
 
     currentTrailer->prev = document.allocator.allocate<Trailer>();
@@ -284,9 +284,9 @@ std::pair<IndirectObject *, std::string_view> load_object(Document &document, Cr
     ASSERT(false);
 }
 
-Result load_all_objects(Document &document, Trailer *trailer) {
+util::Result load_all_objects(Document &document, Trailer *trailer) {
     if (trailer == nullptr) {
-        return Result::error("Cannot load objects without trailer information (trailer=nullptr)");
+        return util::Result::error("Cannot load objects without trailer information (trailer=nullptr)");
     }
 
     struct NumberedCrossReferenceEntry {
@@ -318,10 +318,10 @@ Result load_all_objects(Document &document, Trailer *trailer) {
         document.file.metadata.objects[object.first]                = {.data = object.second, .isInObjectStream = true};
     }
 
-    return Result::ok();
+    return util::Result::ok();
 }
 
-Result read_data(Document &document, bool loadAllObjects) {
+util::Result read_data(Document &document, bool loadAllObjects) {
     // parse eof
     size_t eofMarkerLength = 5;
     auto eofMarkerStart    = document.file.data + (document.file.sizeInBytes - eofMarkerLength);
@@ -332,7 +332,7 @@ Result read_data(Document &document, bool loadAllObjects) {
         eofMarkerStart--;
     }
     if (std::string_view(eofMarkerStart, eofMarkerLength) != "%%EOF") {
-        return Result::error("Last line did not have '%%EOF'");
+        return util::Result::error("Last line did not have '%%EOF'");
     }
 
     char *lastCrossRefStartPtr = eofMarkerStart - 3;
@@ -341,7 +341,7 @@ Result read_data(Document &document, bool loadAllObjects) {
         lastCrossRefStartPtr--;
     }
     if (document.file.data == lastCrossRefStartPtr) {
-        return Result::error("Unexpectedly reached start of file");
+        return util::Result::error("Unexpectedly reached start of file");
     }
     lastCrossRefStartPtr++;
 
@@ -350,10 +350,10 @@ Result read_data(Document &document, bool loadAllObjects) {
         const auto str                  = std::string(lastCrossRefStartPtr, eofMarkerStart - 1 - lastCrossRefStartPtr);
         document.file.lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
-        return Result::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}",
+        return util::Result::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}",
                              err.what());
     } catch (std::out_of_range &err) {
-        return Result::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}",
+        return util::Result::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}",
                              err.what());
     }
 
@@ -364,18 +364,18 @@ Result read_data(Document &document, bool loadAllObjects) {
         return result;
     }
     if (!loadAllObjects) {
-        return Result::ok();
+        return util::Result::ok();
     }
 
     return load_all_objects(document, &document.file.trailer);
 }
 
-Result Document::read_from_file(const std::string &filePath, Document &document, bool loadAllObjects) {
+util::Result Document::read_from_file(const std::string &filePath, Document &document, bool loadAllObjects) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
-        return Result::error("Failed to open pdf file for reading: '{}'", filePath);
+        return util::Result::error("Failed to open pdf file for reading: '{}'", filePath);
     }
 
     document.file.sizeInBytes = is.tellg();
@@ -389,7 +389,7 @@ Result Document::read_from_file(const std::string &filePath, Document &document,
     return read_data(document, loadAllObjects);
 }
 
-Result Document::read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects) {
+util::Result Document::read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects) {
     // FIXME using the existing buffer collides with the memory management using the Allocator
     document.file.data        = buffer;
     document.file.sizeInBytes = size;

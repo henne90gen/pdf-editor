@@ -5,7 +5,7 @@
 #include <spdlog/spdlog.h>
 #include <windows.h>
 
-namespace process {
+namespace util {
 
 #define BUFFER_SIZE 1024
 

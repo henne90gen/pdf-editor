@@ -13,7 +13,6 @@
 #endfunction()
 
 add_library(pdf
-        pdf/helper/allocator.cpp
         pdf/lexer.cpp
         pdf/parser.cpp
         pdf/document.cpp
@@ -30,8 +29,7 @@ add_library(pdf
 target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog)
-#target_link_cairo(pdf)
+target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog util)
 
 install(TARGETS pdf zlibstatic spdlog EXPORT pdf ARCHIVE)
 install(DIRECTORY pdf TYPE INCLUDE FILES_MATCHING PATTERN "*.h")

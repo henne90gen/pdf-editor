@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "pdf/objects.h"
-#include <pdf/helper/allocator.h>
-#include <pdf/helper/static_map.h>
+#include "util/allocator.h"
+#include "util/static_map.h"
 
 TEST(StaticMap, Create) {
     pdf::Allocator allocator = {};

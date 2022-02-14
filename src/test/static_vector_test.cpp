@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <pdf/helper/allocator.h>
-#include <pdf/helper/static_vector.h>
+#include "util/allocator.h"
+#include "util/static_vector.h"
 
 TEST(StaticVector, Create) {
     pdf::Allocator allocator = {};

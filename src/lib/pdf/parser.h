@@ -4,11 +4,11 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <util/allocator.h>
+#include <util/util.h>
 #include <utility>
 #include <vector>
 
-#include "helper/allocator.h"
-#include "helper/util.h"
 #include "lexer.h"
 #include "objects.h"
 
@@ -24,14 +24,14 @@ struct NoopReferenceResolver : public ReferenceResolver {
 
 struct Parser {
     Lexer &lexer;
-    Allocator &allocator;
+    util::Allocator &allocator;
     ReferenceResolver *referenceResolver;
 
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 
-    explicit Parser(Lexer &_lexer, Allocator &_allocator);
-    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
+    explicit Parser(Lexer &_lexer, util::Allocator &_allocator);
+    explicit Parser(Lexer &_lexer, util::Allocator &_allocator, ReferenceResolver *_referenceResolver);
 
     Object *parse();
 

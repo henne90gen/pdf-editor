@@ -4,7 +4,7 @@
 
 #include <pdf/document.h>
 
-#include "../util/process.h"
+#include "../util/util/process.h"
 #include "test_util.h"
 
 TEST(Writer, DeletePageInvalidPageNum) {

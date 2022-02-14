@@ -1,28 +1,9 @@
-#include <spdlog/fmt/bundled/core.h>
-#include <string>
-#include <utility>
-
 #pragma once
 
-#ifndef __has_builtin
-#define __has_builtin(x) 0 // Compatibility with non-clang compilers.
-#endif
+#include <string>
+#include "spdlog/spdlog.h"
 
-#ifdef _MSC_VER
-#define ASSERT(x)                                                                                                      \
-    if (!(x))                                                                                                          \
-    __debugbreak()
-#else
-#if __has_builtin(__builtin_trap)
-#define ASSERT(x)                                                                                                      \
-    if (!(x))                                                                                                          \
-    __builtin_trap()
-#else
-#define ASSERT(x)
-#endif
-#endif
-
-namespace pdf {
+namespace util {
 
 enum class ForEachResult {
     CONTINUE,
@@ -75,5 +56,4 @@ template <typename T> class ValueResult {
     ValueResult(T v, bool _hasError, std::string _errorMessage)
         : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
 };
-
-} // namespace pdf
+} // namespace util

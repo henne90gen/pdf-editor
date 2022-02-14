@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace process {
+namespace util {
 
 struct Result {
     std::string output;
@@ -13,4 +13,4 @@ struct Result {
 
 Result execute(const std::string &command, const std::vector<std::string> &args);
 
-} // namespace process
+} // namespace util

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <optional>
-#include <spdlog/spdlog.h>
+#include "spdlog/spdlog.h"
 #include <unordered_map>
 
-namespace pdf {
+namespace util {
 
 // TODO finish this implementation
 template <typename K, typename V> struct StaticMap {

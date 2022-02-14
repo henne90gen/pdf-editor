@@ -13,5 +13,6 @@
 #target_include_directories(pdf-debugger PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(pdf-debugger
-        main.cpp)
+        main.cpp
+        application.cpp)
 target_link_libraries(pdf-debugger PRIVATE pdf imgui)

@@ -5,7 +5,7 @@
 
 #include "allocator.h"
 
-namespace pdf {
+namespace util {
 
 template <typename T> struct StaticVector {
     T *elements;

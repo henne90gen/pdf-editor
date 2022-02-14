@@ -1,7 +1,8 @@
 #pragma once
 
+#include <util/util.h>
+
 #include "document.h"
-#include "helper/util.h"
 #include "objects.h"
 #include "operator_parser.h"
 
@@ -44,7 +45,7 @@ struct Resources : public Dictionary {
 };
 
 struct ContentStream : public Stream {
-    void for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func);
+    void for_each_operator(util::Allocator &allocator, const std::function<util::ForEachResult(Operator *)> &func);
 };
 
 struct TextBlock {
