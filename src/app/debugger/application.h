@@ -1,4 +1,6 @@
 #pragma once
 
-void application_init(int argc, char **argv);
-void application_run();
+#include <util/result.h>
+
+util::Result application_init(int argc, char **argv);
+util::Result application_run();

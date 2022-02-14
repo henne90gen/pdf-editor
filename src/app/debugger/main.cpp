@@ -112,10 +112,18 @@ int main(int argc, char **argv) {
     // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL,
     // io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != NULL);
 
-    application_init(argc, argv);
+    auto result = application_init(argc, argv);
+    if (result.has_error()) {
+        if (result.message().empty()) {
+            return 0;
+        }
+        spdlog::error(result.message());
+        return 1;
+    }
 
     // Our state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    int exitCode       = 0;
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -133,7 +141,14 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        application_run();
+        result = application_run();
+        if (result.has_error()) {
+            if (!result.message().empty()) {
+                spdlog::error(result.message());
+                exitCode = 1;
+            }
+            break;
+        }
 
         // Rendering
         ImGui::Render();
@@ -167,5 +182,5 @@ int main(int argc, char **argv) {
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    return 0;
+    return exitCode;
 }

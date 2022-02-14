@@ -10,30 +10,32 @@ struct ApplicationState {
 
 static ApplicationState state;
 
-void application_init(int argc, char **argv) {
+util::Result application_init(int argc, char **argv) {
     spdlog::info("Arguments:");
     for (int i = 0; i < argc; i++) {
         spdlog::info("  {}", argv[i]);
     }
 
     if (argc == 1) {
-        return;
+        return util::Result::ok();
     }
     if (argc != 2) {
-        spdlog::warn("Wrong number of arguments");
-        exit(1);
+        return util::Result::error("Wrong number of arguments");
     }
 
     const std::string filePath = std::string(argv[1]);
-    auto result = pdf::Document::read_from_file(filePath, state.document, false);
+    auto result                = pdf::Document::read_from_file(filePath, state.document, false);
     if (result.has_error()) {
-        spdlog::error(result.message());
-        exit(1);
+        return result;
     }
+
     spdlog::info("Loaded '{}'", filePath);
+    return util::Result::ok();
 }
 
-void application_run() {
-    ImGui::Begin("Test");
+util::Result application_run() {
+    ImGui::Begin("Info");
     ImGui::End();
+
+    return util::Result::ok();
 }

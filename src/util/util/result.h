@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "spdlog/spdlog.h"
+#include <string>
 
 namespace util {
 
@@ -48,6 +48,7 @@ template <typename T> class ValueResult {
     [[nodiscard]] T &value() const { return _value; }
     [[nodiscard]] bool has_error() const { return hasError; }
     [[nodiscard]] std::string message() const { return errorMessage; }
+    [[nodiscard]] Result drop_value() const { return Result::bool_(hasError, "{}", errorMessage); }
 
   private:
     T _value;
