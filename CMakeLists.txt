@@ -54,6 +54,9 @@ FetchContent_MakeAvailable(
 # Glad
 add_subdirectory(glad)
 
+# OpenGL
+find_package(OpenGL REQUIRED)
+
 # Dear ImGui
 add_library(imgui
         "${imgui_SOURCE_DIR}/imgui.cpp"
@@ -63,17 +66,14 @@ add_library(imgui
         "${imgui_SOURCE_DIR}/imgui_demo.cpp"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
         "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
-        )
-target_include_directories(imgui PUBLIC "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends")
-target_link_libraries(imgui PUBLIC glad glfw)
+)
+target_include_directories(imgui PUBLIC
+        "${imgui_SOURCE_DIR}"
+        "${imgui_SOURCE_DIR}/backends"
+        ${OPENGL_INCLUDE_DIR}
+)
+target_link_libraries(imgui PUBLIC glad glfw OpenGL::GL)
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
-
-# OpenGL
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    find_package(OpenGL REQUIRED)
-    target_include_directories(imgui PUBLIC ${OPENGL_INCLUDE_DIR})
-    target_link_libraries(imgui PUBLIC ${OPENGL_gl_LIBRARY})
-endif ()
 
 # Compiler Settings
 set(CMAKE_CXX_STANDARD 20)
