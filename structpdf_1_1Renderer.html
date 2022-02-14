@@ -68,8 +68,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="structpdf_1_1Renderer-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">pdf::Renderer Struct Reference</div>  </div>
@@ -87,9 +85,6 @@ Inheritance diagram for pdf::Renderer:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a330c4aa441978416dd82218152f052ee"><td class="memItemLeft" align="right" valign="top"><a id="a330c4aa441978416dd82218152f052ee"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Renderer</b> (<a class="el" href="structpdf_1_1Page.html">Page</a> &amp;_page, const Cairo::RefPtr&lt; Cairo::Context &gt; &amp;_cr)</td></tr>
-<tr class="separator:a330c4aa441978416dd82218152f052ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72cbf446a7d0d90d55cf079a4edbfddb"><td class="memItemLeft" align="right" valign="top"><a id="a72cbf446a7d0d90d55cf079a4edbfddb"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>render</b> ()</td></tr>
 <tr class="separator:a72cbf446a7d0d90d55cf079a4edbfddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -101,11 +96,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>render</b> ()</td></t
 void&#160;</td><td class="memItemRight" valign="bottom"><b>traverse</b> ()</td></tr>
 <tr class="separator:a5a5bda0a77b908ebabe5afcd89b15270 inherit pub_methods_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a8f9bfd7bd90f8afbdf805c9cc0d0bba8"><td class="memItemLeft" align="right" valign="top"><a id="a8f9bfd7bd90f8afbdf805c9cc0d0bba8"></a>
-const Cairo::RefPtr&lt; Cairo::Context &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>cr</b></td></tr>
-<tr class="separator:a8f9bfd7bd90f8afbdf805c9cc0d0bba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_structpdf_1_1OperatorTraverser"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structpdf_1_1OperatorTraverser')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></td></tr>
 <tr class="memitem:a0864512f4ac2e46b181c8e22eb3700f6 inherit pub_attribs_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a0864512f4ac2e46b181c8e22eb3700f6"></a>
 <a class="el" href="structpdf_1_1Page.html">Page</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>page</b></td></tr>
@@ -116,23 +108,16 @@ const Cairo::RefPtr&lt; Cairo::Context &gt; &amp;&#160;</td><td class="memItemRi
 <tr class="memitem:a5d4731bd09acb960425abcc90f625797 inherit pub_attribs_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a5d4731bd09acb960425abcc90f625797"></a>
 std::vector&lt; <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stateStack</b> = {}</td></tr>
 <tr class="separator:a5d4731bd09acb960425abcc90f625797 inherit pub_attribs_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a4047a221bfc9eff0866bff5c98336e0c"><td class="memItemLeft" align="right" valign="top"><a id="a4047a221bfc9eff0866bff5c98336e0c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>on_show_text</b> (<a class="el" href="structpdf_1_1Operator.html">Operator</a> *op) override</td></tr>
-<tr class="separator:a4047a221bfc9eff0866bff5c98336e0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_structpdf_1_1OperatorTraverser"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_structpdf_1_1OperatorTraverser')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></td></tr>
-<tr class="memitem:a36f461e3fe6ed3a5dd82c02c0e3c6b25 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a36f461e3fe6ed3a5dd82c02c0e3c6b25"></a>
-Cairo::Matrix&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1OperatorTraverser.html#a36f461e3fe6ed3a5dd82c02c0e3c6b25">font_matrix</a> () const</td></tr>
-<tr class="memdesc:a36f461e3fe6ed3a5dd82c02c0e3c6b25 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the current font matrix <br /></td></tr>
-<tr class="separator:a36f461e3fe6ed3a5dd82c02c0e3c6b25 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e13cd27ba496a956d09b1480afc923d inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a5e13cd27ba496a956d09b1480afc923d"></a>
 <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>state</b> ()</td></tr>
 <tr class="separator:a5e13cd27ba496a956d09b1480afc923d inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6975cbcaff63759da50c2e53dd28c833 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a6975cbcaff63759da50c2e53dd28c833"></a>
 const <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>state</b> () const</td></tr>
 <tr class="separator:a6975cbcaff63759da50c2e53dd28c833 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89b8fcd88450e9cb2dfe33a976751972 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memItemLeft" align="right" valign="top"><a id="a89b8fcd88450e9cb2dfe33a976751972"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>on_show_text</b> (<a class="el" href="structpdf_1_1Operator.html">Operator</a> *)</td></tr>
+<tr class="separator:a89b8fcd88450e9cb2dfe33a976751972 inherit pro_methods_structpdf_1_1OperatorTraverser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/lib/pdf/<a class="el" href="renderer_8h_source.html">renderer.h</a></li>
