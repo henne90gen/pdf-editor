@@ -5,7 +5,8 @@
 #include <spdlog/spdlog.h>
 
 struct ApplicationState {
-    pdf::Document document;
+    pdf::Document document = {};
+    bool hasLoadedObjects  = false;
 };
 
 static ApplicationState state;
@@ -35,6 +36,10 @@ util::Result application_init(int argc, char **argv) {
 
 util::Result application_run() {
     ImGui::Begin("Info");
+    if (ImGui::Button("Load Objects")) {
+        state.document.objects();
+    }
+    ImGui::Text("Object count: %ld", state.document.object_count(false));
     ImGui::End();
 
     return util::Result::ok();
