@@ -71,7 +71,7 @@ void PdfArea::on_highlight_text_toggled() {
     if (highlightText && textBlocks.empty()) {
         document.for_each_page([this](pdf::Page *page) {
             textBlocks = page->text_blocks();
-            return pdf::ForEachResult::CONTINUE;
+            return util::ForEachResult::CONTINUE;
         });
     }
 

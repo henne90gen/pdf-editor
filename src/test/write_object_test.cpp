@@ -81,12 +81,12 @@ TEST(Writer, write_name) {
 
 TEST(Writer, write_array) {
     std::stringstream s;
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
     auto vec = std::vector<pdf::Object *>();
     vec.push_back(new pdf::Name("Hello"));
     vec.push_back(new pdf::Name("World"));
-    const auto &staticVector = pdf::StaticVector<pdf::Object *>::create(allocator, vec);
+    const auto &staticVector = util::StaticVector<pdf::Object *>::create(allocator, vec);
     pdf::write_array_object(s, new pdf::Array(staticVector));
     const auto &str = s.str();
     ASSERT_EQ(str, "[/Hello /World]");
@@ -94,12 +94,12 @@ TEST(Writer, write_array) {
 
 TEST(Writer, write_dictionary) {
     std::stringstream s;
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
     auto map              = std::unordered_map<std::string, pdf::Object *>();
     map["Hello"]          = new pdf::Integer(123);
     map["World"]          = new pdf::LiteralString("World");
-    const auto &staticMap = pdf::StaticMap<std::string, pdf::Object *>::create(allocator, map);
+    const auto &staticMap = util::StaticMap<std::string, pdf::Object *>::create(allocator, map);
     pdf::write_dictionary_object(s, new pdf::Dictionary(staticMap));
     const auto &str = s.str();
     ASSERT_EQ(str, "<</World (World) /Hello 123>>");
@@ -121,11 +121,11 @@ TEST(Writer, write_indirect_object) {
 
 TEST(Writer, write_stream) {
     std::stringstream s;
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
     auto m    = std::unordered_map<std::string, pdf::Object *>();
     m["Size"] = new pdf::Integer(123);
-    auto map  = pdf::StaticMap<std::string, pdf::Object *>::create(allocator, m);
+    auto map  = util::StaticMap<std::string, pdf::Object *>::create(allocator, m);
     auto dict = new pdf::Dictionary(map);
     pdf::write_stream_object(s, new pdf::Stream(dict, "abc123"));
     const auto &str = s.str();

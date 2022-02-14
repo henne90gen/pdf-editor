@@ -41,6 +41,7 @@ template <typename T> class ValueResult {
         return {{}, true, fmt::format(fmt, std::forward<Args>(args)...)};
     }
 
+    // TODO add in-place construction similar to emplace_back
     static ValueResult ok(T v) { return {v, false, ""}; }
 
     [[nodiscard]] T &value() { return _value; }

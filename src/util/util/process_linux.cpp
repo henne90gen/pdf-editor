@@ -2,10 +2,10 @@
 
 #if !WIN32
 
+#include "spdlog/spdlog.h"
 #include <array>
 #include <cstdio>
 #include <fcntl.h>
-#include "spdlog/spdlog.h"
 #include <sys/fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -47,7 +47,7 @@ void manage_child_process(int *outfd, int *errfd, const std::string &command, co
 
 #define BUFFER_SIZE 1024
 
-Result execute(const std::string &command, const std::vector<std::string> &args) {
+ValueResult<Execution> execute(const std::string &command, const std::vector<std::string> &args) {
     char outputBuffer[BUFFER_SIZE];
     char errorBuffer[BUFFER_SIZE];
     std::string outputResult;
@@ -55,24 +55,21 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
 
     int outfd[2];
     if (pipe(outfd) == -1) {
-        spdlog::error("pipe for stdout has failed");
-        return {};
+        return ValueResult<Execution>::error("pipe for stdout has failed");
     }
 
     int errfd[2];
     if (pipe(errfd) == -1) {
-        spdlog::error("pipe for stderr has failed");
-        return {};
+        return ValueResult<Execution>::error("pipe for stderr has failed");
     }
 
     auto pid = fork();
     switch (pid) {
     case -1:
-        spdlog::error("fork has failed");
-        return {};
+        return ValueResult<Execution>::error("for has failed");
     case 0: // child
         manage_child_process(outfd, errfd, command, args);
-        return {};
+        return ValueResult<Execution>::error("this should never be reached");
     default: // parent
         break;
     }
@@ -83,8 +80,7 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
     while (true) {
         auto outBytesRead = read(outfd[0], outputBuffer, BUFFER_SIZE);
         if (outBytesRead == -1 && errno != EAGAIN) {
-            spdlog::error("error reading stdout");
-            return {};
+            return ValueResult<Execution>::error("error reading stdout");
         }
         if (outBytesRead > 0) {
             outputResult += std::string(outputBuffer, outBytesRead);
@@ -92,8 +88,7 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
 
         auto errBytesRead = read(errfd[0], errorBuffer, BUFFER_SIZE);
         if (errBytesRead == -1 && errno != EAGAIN) {
-            spdlog::error("error reading stderr");
-            return {};
+            return ValueResult<Execution>::error("error reading stderr");
         }
         if (errBytesRead > 0) {
             errorResult += std::string(errorBuffer, errBytesRead);
@@ -106,13 +101,12 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
 
     int status;
     if (waitpid(pid, &status, 0) == -1) {
-        spdlog::error("failed to get the child status");
-        return {};
+        return ValueResult<Execution>::error("failed to get the child status");
     }
 
-    return {outputResult, errorResult, status};
+    return ValueResult<Execution>::ok({outputResult, errorResult, status});
 }
 
-} // namespace process
+} // namespace util
 
 #endif

@@ -19,7 +19,7 @@ std::pair<double, double> PdfWindow::calculate_content_size() {
         }
         // TODO maybe add some padding between the pages
         height += page->height() + PAGE_PADDING;
-        return pdf::ForEachResult::CONTINUE;
+        return util::ForEachResult::CONTINUE;
     });
 
     return {width, height};

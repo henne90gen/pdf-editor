@@ -1,10 +1,9 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <iostream>
-
 #include <pdf/document.h>
+#include <util/process.h>
 
-#include "../util/util/process.h"
 #include "test_util.h"
 
 TEST(Writer, DeletePageInvalidPageNum) {
@@ -154,14 +153,19 @@ void write_pdf(const std::string &name) {
 #else
     const char *command = "/usr/bin/pdfinfo";
 #endif
-    auto expectedResult = process::execute(command, {testFilePath});
-    auto actualResult   = process::execute(command, {name});
-    ASSERT_EQ(expectedResult.status, actualResult.status);
-    ASSERT_EQ(expectedResult.error, actualResult.error);
-    auto expectedOutputLines = split_by_lines(expectedResult.output);
-    auto actualOutputLines   = split_by_lines(actualResult.output);
+    auto expectedResult = util::execute(command, {testFilePath});
+    ASSERT_FALSE(expectedResult.has_error());
+
+    auto actualResult   = util::execute(command, {name});
+    ASSERT_FALSE(actualResult.has_error());
+    ASSERT_EQ(expectedResult.value().status, actualResult.value().status);
+    ASSERT_EQ(expectedResult.value().error, actualResult.value().error);
+
+    auto expectedOutputLines = split_by_lines(expectedResult.value().output);
+    auto actualOutputLines   = split_by_lines(actualResult.value().output);
     for (size_t i = 0; i < expectedOutputLines.size(); i++) {
         if (expectedOutputLines[i].starts_with("File size:")) {
+            // ignore line with "File size:"
             continue;
         }
         ASSERT_EQ(expectedOutputLines[i], actualOutputLines[i]);

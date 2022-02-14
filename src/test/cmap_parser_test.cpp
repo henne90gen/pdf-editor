@@ -12,7 +12,7 @@ TEST(CMapParser, DISABLED_HelloWorld) {
           "<006C>\n<04> <006F>\n<05> <0020>\n<06> <0057>\n<07> <0072>\n<08> <0064>\nendbfchar\nendcmap\nCMapName "
           "currentdict /CMap defineresource pop\nend\nend");
     auto lexer     = pdf::TextLexer(textProvider);
-    auto allocator = pdf::Allocator();
+    auto allocator = util::Allocator();
     allocator.init(1000);
     auto parser = pdf::CMapParser(lexer, allocator);
     auto result = parser.parse();
@@ -35,7 +35,7 @@ TEST(CMapParser, StandardExample) {
           "<0061> [<00660066> <00660069> <00660066006C>]\nendbfrange\n1 beginbfchar\n<3A51> "
           "<D840DC3E>\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend");
     auto lexer     = pdf::TextLexer(textProvider);
-    auto allocator = pdf::Allocator();
+    auto allocator = util::Allocator();
     allocator.init(1000);
     auto parser = pdf::CMapParser(lexer, allocator);
     auto result = parser.parse();

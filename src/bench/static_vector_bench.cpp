@@ -4,25 +4,25 @@
 #include "util/static_vector.h"
 
 static void SV_Create(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::vector<int> v = {1, 2, 3, 4};
     for (auto _ : state) {
         allocator.clear_current_allocation();
 
-        auto sv = pdf::StaticVector<int>::create(allocator, v);
+        auto sv = util::StaticVector<int>::create(allocator, v);
         benchmark::DoNotOptimize(sv);
     }
 }
 BENCHMARK(SV_Create);
 
 static void SV_Remove(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::vector<int> v = {1, 2, 3, 4};
     for (auto _ : state) {
         allocator.clear_current_allocation();
-        auto sv = pdf::StaticVector<int>::create(allocator, v);
+        auto sv = util::StaticVector<int>::create(allocator, v);
 
         sv.remove(0);
         sv.remove(0);
@@ -33,13 +33,13 @@ static void SV_Remove(benchmark::State &state) {
 BENCHMARK(SV_Remove);
 
 static void SV_Iterate(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::vector<int> v = {1, 2, 3, 4};
     for (auto _ : state) {
         allocator.clear_current_allocation();
 
-        auto sv = pdf::StaticVector<int>::create(allocator, v);
+        auto sv = util::StaticVector<int>::create(allocator, v);
         for (auto &elem : sv) {
             benchmark::DoNotOptimize(elem);
         }
@@ -48,7 +48,7 @@ static void SV_Iterate(benchmark::State &state) {
 BENCHMARK(SV_Iterate);
 
 static void V_Create(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();
@@ -60,7 +60,7 @@ static void V_Create(benchmark::State &state) {
 BENCHMARK(V_Create);
 
 static void V_Remove(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();
@@ -75,7 +75,7 @@ static void V_Remove(benchmark::State &state) {
 BENCHMARK(V_Remove);
 
 static void V_Iterate(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();

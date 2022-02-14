@@ -21,7 +21,7 @@ add_dependencies(test_suite_bfosupport pdf-cli download_test_suites)
 
 function(create_test test_name)
     add_executable(${test_name} ${test_name}.cpp)
-    target_link_libraries(${test_name} gtest_main pdf process)
+    target_link_libraries(${test_name} gtest_main pdf util)
     gtest_discover_tests(${test_name})
 endfunction()
 

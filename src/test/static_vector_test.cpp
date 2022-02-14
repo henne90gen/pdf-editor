@@ -4,11 +4,11 @@
 #include "util/static_vector.h"
 
 TEST(StaticVector, Create) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::vector<int> vec = {1, 2, 3};
-    auto staticVector    = pdf::StaticVector<int>::create(allocator, vec);
+    auto staticVector    = util::StaticVector<int>::create(allocator, vec);
     ASSERT_EQ(staticVector.elements[0], 1);
     ASSERT_EQ(staticVector.elements[1], 2);
     ASSERT_EQ(staticVector.elements[2], 3);
@@ -19,11 +19,11 @@ TEST(StaticVector, Create) {
 }
 
 TEST(StaticVector, Iterate) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::vector<int> vec = {1, 2, 3};
-    auto staticVector    = pdf::StaticVector<int>::create(allocator, vec);
+    auto staticVector    = util::StaticVector<int>::create(allocator, vec);
     int i                = 1;
     for (auto &elem : staticVector) {
         ASSERT_EQ(elem, i);
@@ -32,11 +32,11 @@ TEST(StaticVector, Iterate) {
 }
 
 TEST(StaticVector, Remove) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::vector<int> vec = {1, 2, 3};
-    auto staticVector    = pdf::StaticVector<int>::create(allocator, vec);
+    auto staticVector    = util::StaticVector<int>::create(allocator, vec);
 
     auto removed = staticVector.remove(1);
     ASSERT_EQ(removed, 2);

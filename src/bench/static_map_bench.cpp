@@ -4,26 +4,26 @@
 #include "util/static_map.h"
 
 static void SM_Create(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::unordered_map<int, int> m = {{1, 2}, {2, 3}, {3, 4}, {4, 5}};
     for (auto _ : state) {
         allocator.clear_current_allocation();
 
-        auto sm = pdf::StaticMap<int, int>::create(allocator, m);
+        auto sm = util::StaticMap<int, int>::create(allocator, m);
         benchmark::DoNotOptimize(sm);
     }
 }
 BENCHMARK(SM_Create);
 
 static void SM_Remove(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::unordered_map<int, int> m = {{1, 2}, {2, 3}, {3, 4}, {4, 5}};
     for (auto _ : state) {
         allocator.clear_current_allocation();
 
-        auto sm = pdf::StaticMap<int, int>::create(allocator, m);
+        auto sm = util::StaticMap<int, int>::create(allocator, m);
         sm.remove(1);
         sm.remove(2);
         sm.remove(3);
@@ -33,13 +33,13 @@ static void SM_Remove(benchmark::State &state) {
 BENCHMARK(SM_Remove);
 
 static void SM_Iterate(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     std::unordered_map<int, int> m = {{1, 2}, {2, 3}, {3, 4}, {4, 5}};
     for (auto _ : state) {
         allocator.clear_current_allocation();
 
-        auto sm = pdf::StaticMap<int, int>::create(allocator, m);
+        auto sm = util::StaticMap<int, int>::create(allocator, m);
         for (auto &elem : sm) {
             benchmark::DoNotOptimize(elem);
         }
@@ -48,7 +48,7 @@ static void SM_Iterate(benchmark::State &state) {
 BENCHMARK(SM_Iterate);
 
 static void M_Create(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();
@@ -60,7 +60,7 @@ static void M_Create(benchmark::State &state) {
 BENCHMARK(M_Create);
 
 static void M_Remove(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();
@@ -75,7 +75,7 @@ static void M_Remove(benchmark::State &state) {
 BENCHMARK(M_Remove);
 
 static void M_Iterate(benchmark::State &state) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(10000);
     for (auto _ : state) {
         allocator.clear_current_allocation();

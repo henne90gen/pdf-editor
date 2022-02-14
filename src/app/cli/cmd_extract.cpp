@@ -18,7 +18,7 @@ int cmd_extract(ExtractArgs &args) {
         os.write(content.data(), static_cast<std::streamsize>(content.size()));
         os.close();
 
-        return pdf::ForEachResult::CONTINUE;
+        return util::ForEachResult::CONTINUE;
     });
 
     return 0;

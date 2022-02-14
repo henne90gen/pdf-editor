@@ -5,13 +5,13 @@
 #include "util/static_map.h"
 
 TEST(StaticMap, Create) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::unordered_map<int, int> map = {{1, 2}, {2, 3}, {3, 4}};
-    auto staticMap                   = pdf::StaticMap<int, int>::create(allocator, map);
-    auto empty                       = pdf::StaticMap<int, int>::Entry::Status::EMPTY;
-    auto filled                      = pdf::StaticMap<int, int>::Entry::Status::FILLED;
+    auto staticMap                   = util::StaticMap<int, int>::create(allocator, map);
+    auto empty                       = util::StaticMap<int, int>::Entry::Status::EMPTY;
+    auto filled                      = util::StaticMap<int, int>::Entry::Status::FILLED;
     ASSERT_EQ(staticMap.entries[0].status, empty);
     ASSERT_EQ(staticMap.entries[1].status, filled);
     ASSERT_EQ(staticMap.entries[2].status, filled);
@@ -29,11 +29,11 @@ TEST(StaticMap, Create) {
 }
 
 TEST(StaticMap, Iterate) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::unordered_map<int, int> map = {{1, 2}, {2, 3}, {3, 4}};
-    auto staticMap                   = pdf::StaticMap<int, int>::create(allocator, map);
+    auto staticMap                   = util::StaticMap<int, int>::create(allocator, map);
     auto itr                         = staticMap.begin();
     ASSERT_EQ(itr->key, 1);
     itr++;
@@ -45,25 +45,25 @@ TEST(StaticMap, Iterate) {
 }
 
 TEST(StaticMap, IterateMore) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     auto map              = std::unordered_map<std::string_view, pdf::Object *>();
     map["Hello"]          = new pdf::Integer(123);
     map["World"]          = new pdf::LiteralString("World");
-    const auto &staticMap = pdf::StaticMap<std::string_view, pdf::Object *>::create(allocator, map);
+    const auto &staticMap = util::StaticMap<std::string_view, pdf::Object *>::create(allocator, map);
     for (const auto &entry : staticMap) {
-        auto filled = pdf::StaticMap<std::string_view, pdf::Object *>::Entry::Status::FILLED;
+        auto filled = util::StaticMap<std::string_view, pdf::Object *>::Entry::Status::FILLED;
         ASSERT_EQ(entry.status, filled);
     }
 }
 
 TEST(StaticMap, Find) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::unordered_map<int, int> map = {{1, 2}, {2, 3}, {3, 4}};
-    auto staticMap                   = pdf::StaticMap<int, int>::create(allocator, map);
+    auto staticMap                   = util::StaticMap<int, int>::create(allocator, map);
     auto val                         = staticMap.find(1);
     ASSERT_EQ(val, std::optional(2));
 
@@ -75,11 +75,11 @@ TEST(StaticMap, Find) {
 }
 
 TEST(StaticMap, Remove) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(100);
 
     std::unordered_map<int, int> map = {{1, 2}, {2, 3}, {3, 4}};
-    auto staticMap                   = pdf::StaticMap<int, int>::create(allocator, map);
+    auto staticMap                   = util::StaticMap<int, int>::create(allocator, map);
     auto val                         = staticMap.remove(1);
     ASSERT_EQ(val, std::optional(2));
 
@@ -88,12 +88,12 @@ TEST(StaticMap, Remove) {
 }
 
 TEST(StaticMap, CreateManyTimes) {
-    pdf::Allocator allocator = {};
+    util::Allocator allocator = {};
     allocator.init(1);
 
     for (int i = 0; i < 1000; i++) {
         std::unordered_map<std::string, int> map = {{"1", 2}, {"2", 3}, {"3", 4}};
-        auto staticMap                           = pdf::StaticMap<std::string, int>::create(allocator, map);
+        auto staticMap                           = util::StaticMap<std::string, int>::create(allocator, map);
         ASSERT_EQ(staticMap.size(), 3);
     }
 }
