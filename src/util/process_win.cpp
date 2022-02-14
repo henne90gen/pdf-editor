@@ -1,21 +1,21 @@
+#if _WIN32
+
 #include "process.h"
 
 #include <spdlog/spdlog.h>
-
-#if _WIN32
-
 #include <windows.h>
 
 namespace process {
 
+#define BUFFER_SIZE 1024
+
 std::string readPipeToString(HANDLE pipeHandle) {
     std::string result;
     DWORD bytesRead;
-    int buffSize = 1024;
-    char buf[buffSize];
+    char buf[BUFFER_SIZE];
 
-    for (;;) {
-        auto success = ReadFile(pipeHandle, buf, buffSize, &bytesRead, nullptr);
+    while (true) {
+        auto success = ReadFile(pipeHandle, buf, BUFFER_SIZE, &bytesRead, nullptr);
         if (!success || bytesRead == 0) {
             break;
         }
@@ -110,8 +110,7 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
     // Wait until child process exits.
     WaitForSingleObject(pi.hProcess, INFINITE);
 
-    auto result = Result();
-
+    Result result = {};
     result.output = readPipeToString(stdoutRead);
     result.error  = readPipeToString(stderrRead);
 
@@ -122,7 +121,6 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
         return {};
     }
     result.status = static_cast<int>(exitCode);
-
     // Close handles
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);

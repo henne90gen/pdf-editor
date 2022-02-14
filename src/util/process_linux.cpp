@@ -45,10 +45,11 @@ void manage_child_process(int *outfd, int *errfd, const std::string &command, co
     exit(errno);
 }
 
+#define BUFFER_SIZE 1024
+
 Result execute(const std::string &command, const std::vector<std::string> &args) {
-    // TODO use bigger buffers (e.g. 1024 bytes)
-    char outputBuffer;
-    char errorBuffer;
+    char outputBuffer[BUFFER_SIZE];
+    char errorBuffer[BUFFER_SIZE];
     std::string outputResult;
     std::string errorResult;
 
@@ -79,25 +80,23 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
     close(outfd[1]);
     close(errfd[1]);
 
-    ssize_t outBytesRead;
-    ssize_t errBytesRead;
     while (true) {
-        outBytesRead = read(outfd[0], &outputBuffer, 1);
+        auto outBytesRead = read(outfd[0], outputBuffer, BUFFER_SIZE);
         if (outBytesRead == -1 && errno != EAGAIN) {
             spdlog::error("error reading stdout");
             return {};
         }
         if (outBytesRead > 0) {
-            outputResult += std::string(&outputBuffer, 1);
+            outputResult += std::string(outputBuffer, outBytesRead);
         }
 
-        errBytesRead = read(errfd[0], &errorBuffer, 1);
+        auto errBytesRead = read(errfd[0], errorBuffer, BUFFER_SIZE);
         if (errBytesRead == -1 && errno != EAGAIN) {
             spdlog::error("error reading stderr");
             return {};
         }
         if (errBytesRead > 0) {
-            errorResult += std::string(&errorBuffer, 1);
+            errorResult += std::string(errorBuffer, errBytesRead);
         }
 
         if (outBytesRead == 0 && errBytesRead == 0) {

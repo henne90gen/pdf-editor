@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(pdf-editor)
+project(pdf-editor VERSION 0.0.1)
 
 # Third Party Dependencies
 set(BENCHMARK_ENABLE_TESTING OFF)
@@ -9,6 +9,9 @@ set(BENCHMARK_INSTALL_DOCS OFF)
 set(BUILD_GMOCK OFF)
 set(INSTALL_GTEST OFF)
 set(SKIP_INSTALL_ALL ON)
+set(GLFW_BUILD_EXAMPLES OFF)
+set(GLFW_BUILD_TESTS OFF)
+set(GLFW_BUILD_DOCS OFF)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -51,29 +54,8 @@ FetchContent_MakeAvailable(
         zlib
 )
 
-# Glad
-add_subdirectory(glad)
-
-# OpenGL
-find_package(OpenGL REQUIRED)
-
 # Dear ImGui
-add_library(imgui
-        "${imgui_SOURCE_DIR}/imgui.cpp"
-        "${imgui_SOURCE_DIR}/imgui_draw.cpp"
-        "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
-        "${imgui_SOURCE_DIR}/imgui_tables.cpp"
-        "${imgui_SOURCE_DIR}/imgui_demo.cpp"
-        "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-        "${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
-)
-target_include_directories(imgui PUBLIC
-        "${imgui_SOURCE_DIR}"
-        "${imgui_SOURCE_DIR}/backends"
-        ${OPENGL_INCLUDE_DIR}
-)
-target_link_libraries(imgui PUBLIC glad glfw OpenGL::GL)
-target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
+add_subdirectory(imgui)
 
 # Compiler Settings
 set(CMAKE_CXX_STANDARD 20)
