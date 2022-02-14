@@ -1,4 +1,4 @@
-FROM henne90gen/gtk:gtk-4.4
+FROM henne90gen/opengl:3.1
 
 RUN mkdir -p /app/build
 COPY . /app

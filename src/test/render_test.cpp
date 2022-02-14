@@ -3,6 +3,7 @@
 #include <pdf/document.h>
 #include <pdf/renderer.h>
 
+#if 0
 TEST(Renderer, Blank) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
@@ -37,3 +38,4 @@ TEST(Renderer, HelloWorld) {
         surface->write_to_png(filename);
     }
 }
+#endif

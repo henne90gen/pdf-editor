@@ -1,9 +1,11 @@
 #pragma once
 
+#if 0
 // TODO this is a hack to get the gtkmm4 code to compile on Windows
 #undef WIN32
 #include <cairomm/cairomm.h>
 #include <freetype/freetype.h>
+#endif
 
 #include "cmap.h"
 #include "rectangle.h"
@@ -74,7 +76,9 @@ struct Font : public Dictionary {
 
     /// Character mapping
     std::optional<CMap *> cmap(Document &document);
+    #if 0
     FT_Face load_font_face(Document &document);
+    #endif
 };
 
 struct FontMap : public Dictionary {

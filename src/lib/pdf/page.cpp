@@ -64,7 +64,8 @@ struct TextBlockFinder : public OperatorTraverser {
         return result;
     }
 
-    void on_show_text(Operator *op) override {
+    void on_show_text(Operator */*op*/) override {
+#if 0
         TextFont &textFont = state().textState.textFont;
         auto cmapOpt       = textFont.font->cmap(page.document);
 
@@ -113,6 +114,7 @@ struct TextBlockFinder : public OperatorTraverser {
               .op     = op,
               .cs     = currentContentStream,
         });
+#endif
     }
 };
 
