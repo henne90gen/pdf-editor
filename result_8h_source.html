@@ -115,22 +115,23 @@ $(function() {
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// TODO add in-place construction similar to emplace_back</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> <a class="code" href="classutil_1_1ValueResult.html">ValueResult</a> ok(T v) { <span class="keywordflow">return</span> {v, <span class="keyword">false</span>, <span class="stringliteral">&quot;&quot;</span>}; }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    [[nodiscard]] T &amp;value() { <span class="keywordflow">return</span> _value; }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    [[nodiscard]] T &amp;value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _value; }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> has_error()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> hasError; }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    [[nodiscard]] std::string message()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> errorMessage; }</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    [[nodiscard]] <a class="code" href="classutil_1_1Result.html">Result</a> drop_value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> Result::bool_(hasError, <span class="stringliteral">&quot;{}&quot;</span>, errorMessage); }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    T _value;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">bool</span> hasError = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    std::string errorMessage;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="classutil_1_1ValueResult.html">ValueResult</a>(T v, <span class="keywordtype">bool</span> _hasError, std::string _errorMessage)</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;};</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;} <span class="comment">// namespace util</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">static</span> <a class="code" href="classutil_1_1ValueResult.html">ValueResult</a> of(<a class="code" href="classutil_1_1Result.html">Result</a> r) { <span class="keywordflow">return</span> {{}, r.has_error(), r.message()}; }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    [[nodiscard]] T &amp;value() { <span class="keywordflow">return</span> _value; }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    [[nodiscard]] T &amp;value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _value; }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    [[nodiscard]] <span class="keywordtype">bool</span> has_error()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> hasError; }</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    [[nodiscard]] std::string message()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> errorMessage; }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    [[nodiscard]] <a class="code" href="classutil_1_1Result.html">Result</a> drop_value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> Result::bool_(hasError, <span class="stringliteral">&quot;{}&quot;</span>, errorMessage); }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    T _value;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">bool</span> hasError = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    std::string errorMessage;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classutil_1_1ValueResult.html">ValueResult</a>(T v, <span class="keywordtype">bool</span> _hasError, std::string _errorMessage)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;};</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;} <span class="comment">// namespace util</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassutil_1_1ValueResult_html"><div class="ttname"><a href="classutil_1_1ValueResult.html">util::ValueResult</a></div><div class="ttdef"><b>Definition:</b> result.h:37</div></div>
 <div class="ttc" id="aclassutil_1_1Result_html"><div class="ttname"><a href="classutil_1_1Result.html">util::Result</a></div><div class="ttdef"><b>Definition:</b> result.h:13</div></div>
