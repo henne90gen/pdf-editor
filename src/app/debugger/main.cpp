@@ -14,6 +14,8 @@
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
+#include <glad/glad.h>
+
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and
@@ -31,10 +33,11 @@ static void glfw_error_callback(int error, const char *description) {
 int main(int argc, char **argv) {
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
+    if (!glfwInit()) {
         return 1;
+    }
 
-        // Decide GL+GLSL versions
+    // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100
     const char *glsl_version = "#version 100";
@@ -51,10 +54,10 @@ int main(int argc, char **argv) {
 #else
     // GL 3.0 + GLSL 130
     const char *glsl_version = "#version 130";
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 3.2+ only
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // 3.0+ only
 #endif
 
     // Create window with graphics context
@@ -64,6 +67,11 @@ int main(int argc, char **argv) {
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+
+    if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0) {
+        spdlog::error("failed to initialize GLAD");
+        return 1;
+    }
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -136,6 +144,13 @@ int main(int argc, char **argv) {
         // two flags.
         glfwPollEvents();
 
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
+                     clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -152,12 +167,6 @@ int main(int argc, char **argv) {
 
         // Rendering
         ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
-                     clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Update and Render additional Platform Windows

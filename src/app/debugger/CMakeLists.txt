@@ -14,5 +14,6 @@
 
 add_executable(pdf-debugger
         main.cpp
+        gl.cpp
         application.cpp)
 target_link_libraries(pdf-debugger PRIVATE pdf imgui)
