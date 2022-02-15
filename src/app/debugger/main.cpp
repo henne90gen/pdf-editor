@@ -120,6 +120,7 @@ int main(int argc, char **argv) {
     // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL,
     // io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != NULL);
 
+    // TODO ensure that the window does not open before this function is called (OpenGL context needs to be available already though)
     auto result = application_init(argc, argv);
     if (result.has_error()) {
         if (result.message().empty()) {

@@ -43,6 +43,7 @@ template <typename T> class ValueResult {
 
     // TODO add in-place construction similar to emplace_back
     static ValueResult ok(T v) { return {v, false, ""}; }
+    static ValueResult of(Result r) { return {{}, r.has_error(), r.message()}; }
 
     [[nodiscard]] T &value() { return _value; }
     [[nodiscard]] T &value() const { return _value; }
