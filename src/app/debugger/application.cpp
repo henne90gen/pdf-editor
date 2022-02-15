@@ -13,8 +13,9 @@ struct ApplicationState {
     pdf::Document document = {};
     bool hasLoadedObjects  = false;
 
-    uint32_t program;
-    uint32_t VBO, VAO;
+    uint32_t program = 0;
+    uint32_t VBO     = 0;
+    uint32_t VAO     = 0;
 };
 
 static ApplicationState state;
@@ -88,7 +89,7 @@ util::ValueResult<uint32_t> compileProgram(const std::string &vertexShaderCode, 
 
     GL_Call(glLinkProgram(program));
 
-    TRY_VALUE(uint32_t, checkLinkStatus(program));
+    TRY_VALUE(uint32_t, checkLinkStatus(program))
 
     return util::ValueResult<uint32_t>::ok(program);
 }
@@ -158,7 +159,6 @@ util::Result application_init(int argc, char **argv) {
     }
 
     state.program = compileResult.value();
-    spdlog::info("setting program compile result:{}", state.program);
 
     return util::Result::ok();
 }
@@ -174,8 +174,8 @@ util::Result application_run() {
     GL_Call(glUseProgram(state.program));
 
     // update the uniform color
-    float timeValue  = glfwGetTime();
-    float greenValue = sin(timeValue) / 2.0f + 0.5f;
+    auto timeValue  = glfwGetTime();
+    auto greenValue = std::sin(timeValue) / 2.0 + 0.5;
     GL_Call(auto vertexColorLocation = glGetUniformLocation(state.program, "ourColor"));
     GL_Call(glUniform3f(vertexColorLocation, 0.0f, greenValue, 0.0f));
 
