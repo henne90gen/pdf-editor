@@ -26,10 +26,8 @@ struct Color {
 };
 
 struct TextObjectState {
-#if 0
     Cairo::Matrix textMatrix     = Cairo::identity_matrix();
     Cairo::Matrix textLineMatrix = Cairo::identity_matrix();
-#endif
 };
 
 enum class TextRenderingMode {
@@ -56,10 +54,8 @@ enum class FontType {
 struct TextFont {
     FontType type;
     Font *font;
-#if 0
     FT_Face ftFace;
     Cairo::RefPtr<Cairo::FontFace> cairoFace;
-#endif
 };
 
 struct TextState {
@@ -77,10 +73,8 @@ struct TextState {
 };
 
 struct GraphicsState {
-#if 0
     // default is a matrix that converts default user coordinates to device coordinates (TODO whatever that means)
     Cairo::Matrix currentTransformationMatrix = Cairo::identity_matrix(); // aka CTM
-#endif
 
     double colorSpace      = {};
     Color strokingColor    = {};
@@ -104,10 +98,8 @@ struct OperatorTraverser {
     void traverse();
 
   protected:
-#if 0
     /// calculates the current font matrix
     [[nodiscard]] Cairo::Matrix font_matrix() const;
-#endif
 
     GraphicsState &state() { return stateStack.back(); }
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }

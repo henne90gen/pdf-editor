@@ -8,7 +8,6 @@ namespace pdf {
 
 void Renderer::render() {
     // NOTE the ctm of cairo already translates into the correct coordinate system, this has to be preserved
-#if 0
     cr->save();
 
     auto cropBox = page.crop_box();
@@ -19,9 +18,8 @@ void Renderer::render() {
     traverse();
 
     cr->restore();
-#endif
 }
-#if 0
+
 void Renderer::on_show_text(Operator *op) {
     const auto &textState = state().textState;
     cr->set_font_matrix(font_matrix());
@@ -64,5 +62,5 @@ void Renderer::on_show_text(Operator *op) {
 
     cr->show_glyphs(glyphs);
 }
-#endif
+
 } // namespace pdf

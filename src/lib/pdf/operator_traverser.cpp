@@ -77,18 +77,15 @@ void OperatorTraverser::beginText() {
     ASSERT(!state().textState.textObjectParams.has_value());
     state().textState.textObjectParams = std::optional(TextObjectState());
 
-#if 0
     // TODO this seems wrong (how can we flip the coordinate space on the y axis?)
     state().textState.textObjectParams.value().textLineMatrix.translate(0, page.height());
-#endif
 }
 
 void OperatorTraverser::pushGraphicsState() { stateStack.emplace_back(); }
 
 void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
 
-void OperatorTraverser::moveStartOfNextLine(Operator */*op*/) {
-#if 0
+void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp = Cairo::identity_matrix();
     // TODO this '-' seems wrong (how can we flip the coordinate space on the y axis?)
     tmp.translate(op->data.Td_MoveStartOfNextLine.x, -op->data.Td_MoveStartOfNextLine.y);
@@ -98,7 +95,6 @@ void OperatorTraverser::moveStartOfNextLine(Operator */*op*/) {
 
     state().textState.textObjectParams.value().textLineMatrix = newLineMatrix;
     state().textState.textObjectParams.value().textMatrix     = newLineMatrix;
-#endif
 }
 
 void OperatorTraverser::setTextFontAndSize(Operator *op) {
@@ -117,7 +113,6 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
         return;
     }
 
-#if 0
     auto font                       = fontOpt.value();
     auto fontFace                   = font->load_font_face(page.document);
     state().textState.textFont.font = font;
@@ -125,12 +120,10 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
         state().textState.textFont.ftFace    = fontFace;
         state().textState.textFont.cairoFace = Cairo::FtFontFace::create(fontFace, 0);
     }
-#endif
 }
 
 void OperatorTraverser::showText(Operator *op) { on_show_text(op); }
 
-#if 0
 Cairo::Matrix OperatorTraverser::font_matrix() const {
     const auto &textState = state().textState;
     auto textRenderMatrix = Cairo::identity_matrix();
@@ -139,6 +132,5 @@ Cairo::Matrix OperatorTraverser::font_matrix() const {
 
     return textRenderMatrix * textState.textObjectParams.value().textMatrix;
 }
-#endif
 
 } // namespace pdf

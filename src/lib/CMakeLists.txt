@@ -1,16 +1,14 @@
 
-#find_package(PkgConfig REQUIRED)
-#pkg_check_modules(Cairo REQUIRED cairomm-1.16)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(Cairo REQUIRED cairomm-1.16)
 
-#function(target_link_cairo target)
-#    target_link_libraries(${target} PUBLIC ${Cairo_LIBRARIES})
-#    target_link_options(${target} PUBLIC ${Cairo_LDFLAGS_OTHER})
-#    target_compile_options(${target} PUBLIC ${Cairo_CFLAGS_OTHER})
-#    message(STATUS "${Cairo_LIBRARY_DIRS}")
-#    message(STATUS "${Cairo_INCLUDE_DIRS}")
-#    target_link_directories(${target} PUBLIC ${Cairo_LIBRARY_DIRS})
-#    target_include_directories(${target} PUBLIC ${Cairo_INCLUDE_DIRS})
-#endfunction()
+function(target_link_cairo target)
+    target_link_libraries(${target} PUBLIC ${Cairo_LIBRARIES})
+    target_link_options(${target} PUBLIC ${Cairo_LDFLAGS_OTHER})
+    target_compile_options(${target} PUBLIC ${Cairo_CFLAGS_OTHER})
+    target_link_directories(${target} PUBLIC ${Cairo_LIBRARY_DIRS})
+    target_include_directories(${target} PUBLIC ${Cairo_INCLUDE_DIRS})
+endfunction()
 
 add_library(pdf
         pdf/lexer.cpp
@@ -30,6 +28,7 @@ target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog util)
+target_link_cairo(pdf)
 
 install(TARGETS pdf zlibstatic spdlog EXPORT pdf ARCHIVE)
 install(DIRECTORY pdf TYPE INCLUDE FILES_MATCHING PATTERN "*.h")

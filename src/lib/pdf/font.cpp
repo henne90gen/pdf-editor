@@ -55,7 +55,6 @@ std::optional<CMap *> Font::cmap(Document &document) {
     return cmapStreamOpt.value()->read_cmap(document.allocator);
 }
 
-#if 0
 FT_Face Font::load_font_face(Document &document) {
     auto fontFileOpt = font_program(document);
     if (!fontFileOpt.has_value()) {
@@ -85,6 +84,5 @@ FT_Face Font::load_font_face(Document &document) {
 
     return face;
 }
-#endif
 
 } // namespace pdf
