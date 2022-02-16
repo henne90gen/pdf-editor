@@ -71,8 +71,7 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type) {
 std::string operatorTypeToString(Operator::Type &type) {
 #define __BYTECODE_OP(Name, Description)                                                                               \
     case Operator::Type::Name##_##Description:                                                                         \
-        return "Operator::Type::" #Name "_" #Description;                                                              \
-        break;
+        return "Operator::Type::" #Name "_" #Description;
 
     switch (type) {
         ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
@@ -121,6 +120,11 @@ Operator *OperatorParser::get_operator() {
         currentTokenIdx++;
     }
 }
+
+Operator *OperatorParser::create_operator_q(Operator *result) { return result; }
+Operator *OperatorParser::create_operator_Q(Operator *result) { return result; }
+Operator *OperatorParser::create_operator_BT(Operator *result) { return result; }
+Operator *OperatorParser::create_operator_ET(Operator *result) { return result; }
 
 Operator *OperatorParser::create_operator_w(Operator *result) {
     result->data.w_SetLineWidth.lineWidth = operand<double>(0);
@@ -290,6 +294,197 @@ Operator *OperatorParser::create_operator_Do(Operator *result) {
     return result;
 }
 
+Operator *OperatorParser::create_operator_ri(Operator *result) {
+    // FIXME parse operator 'ri'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_l(Operator *result) {
+    // FIXME parse operator 'l'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_RG(Operator *result) {
+    // FIXME parse operator 'RG'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_k(Operator *result) {
+    // FIXME parse operator 'k'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_K(Operator *result) {
+    // FIXME parse operator 'K'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_h(Operator *result) {
+    // FIXME parse operator 'h'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_TD(Operator *result) {
+    // FIXME parse operator 'TD'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_M(Operator *result) {
+    // FIXME parse operator 'M'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_Tr(Operator *result) {
+    // FIXME parse operator 'Tr'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_UNKNOWN(Operator *result) {
+    // FIXME parse operator 'UNKNOWN'
+    return result;
+}
+
+
+Operator *OperatorParser::create_operator_Tx(Operator *result) {
+    // FIXME parse operator 'Tx'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_TL(Operator *result) {
+    // FIXME parse operator 'TL'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_Ts(Operator *result) {
+    // FIXME parse operator 'Ts'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_j(Operator *result) {
+    // FIXME parse operator 'j'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_v(Operator *result) {
+    // FIXME parse operator 'v'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_y(Operator *result) {
+    // FIXME parse operator 'y'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_F(Operator *result) {
+    // FIXME parse operator 'F'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_fx(Operator *result) {
+    // FIXME parse operator 'fx'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_bx(Operator *result) {
+    // FIXME parse operator 'bx'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_d0(Operator *result) {
+    // FIXME parse operator 'd0'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_d1(Operator *result) {
+    // FIXME parse operator 'd1'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_SCN(Operator *result) {
+    // FIXME parse operator 'SCN'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_scn(Operator *result) {
+    // FIXME parse operator 'scn'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_sh(Operator *result) {
+    // FIXME parse operator 'sh'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_BI(Operator *result) {
+    // FIXME parse operator 'BI'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_ID(Operator *result) {
+    // FIXME parse operator 'ID'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_EI(Operator *result) {
+    // FIXME parse operator 'EI'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_MP(Operator *result) {
+    // FIXME parse operator 'MP'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_DP(Operator *result) {
+    // FIXME parse operator 'DP'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_BMC(Operator *result) {
+    // FIXME parse operator 'BMC'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_BDC(Operator *result) {
+    // FIXME parse operator 'BDC'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_BX(Operator *result) {
+    // FIXME parse operator 'BX'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_EX(Operator *result) {
+    // FIXME parse operator 'EX'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_i(Operator *result) {
+    // FIXME parse operator 'i'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_Bx(Operator *result) {
+    // FIXME parse operator 'Bx'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_b(Operator *result) {
+    // FIXME parse operator 'b'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_cs(Operator *result) {
+    // FIXME parse operator 'cs'
+    return result;
+}
+
+Operator *OperatorParser::create_operator_EMC(Operator *result) {
+    // FIXME parse operator 'EMC'
+    return result;
+}
+
 Operator *OperatorParser::create_operator(Operator::Type type, std::string_view content) {
     auto result = allocator.allocate<Operator>(type, content);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
@@ -300,90 +495,18 @@ Operator *OperatorParser::create_operator(Operator::Type type, std::string_view 
         // operators without operands
         return result;
     }
-    if (type == Operator::Type::w_SetLineWidth) {
-        return create_operator_w(result);
-    }
-    if (type == Operator::Type::re_AppendRectangle) {
-        return create_operator_re(result);
-    }
-    if (type == Operator::Type::rg_SetNonStrokingColorRGB) {
-        return create_operator_rg(result);
-    }
-    if (type == Operator::Type::Td_MoveStartOfNextLine) {
-        return create_operator_Td(result);
-    }
-    if (type == Operator::Type::Tf_SetTextFontAndSize) {
-        return create_operator_Tf(result);
-    }
-    if (type == Operator::Type::Tj_ShowTextString) {
-        return create_operator_Tj(result);
-    }
-    if (type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-        return create_operator_TJ(result);
-    }
-    if (type == Operator::Type::J_SetLineCapStyle) {
-        return create_operator_J(result);
-    }
-    if (type == Operator::Type::Tm_SetTextMatrixAndTextLineMatrix) {
-        return create_operator_Tm(result);
-    }
-    if (type == Operator::Type::cm_ModifyCurrentTransformationMatrix) {
-        return create_operator_cm(result);
-    }
-    if (type == Operator::Type::g_SetNonStrokingColorGray) {
-        return create_operator_g(result);
-    }
-    if (type == Operator::Type::d_SetLineDashPattern) {
-        return create_operator_d(result);
-    }
-    if (type == Operator::Type::c_AppendCubicBezier) {
-        return create_operator_c(result);
-    }
-    if (type == Operator::Type::s_UNKNOWN) {
-        return create_operator_s(result);
-    }
-    if (type == Operator::Type::Tc_SetCharacterSpacing) {
-        return create_operator_Tc(result);
-    }
-    if (type == Operator::Type::CS_UNKNOWN) {
-        return create_operator_CS(result);
-    }
-    if (type == Operator::Type::S_UNKNOWN) {
-        return create_operator_S(result);
-    }
-    if (type == Operator::Type::sc_UNKNOWN) {
-        return create_operator_sc(result);
-    }
-    if (type == Operator::Type::SC_UNKNOWN) {
-        return create_operator_SC(result);
-    }
-    if (type == Operator::Type::m_AppendNewSubpath) {
-        return create_operator_m(result);
-    }
-    if (type == Operator::Type::B_UNKNOWN) {
-        return create_operator_B(result);
-    }
-    if (type == Operator::Type::Tw_SetWordSpacing) {
-        return create_operator_Tw(result);
-    }
-    if (type == Operator::Type::G_SetStrokingColorGray) {
-        return create_operator_G(result);
-    }
-    if (type == Operator::Type::Tz_SetHorizontalScaling) {
-        return create_operator_Tz(result);
-    }
-    if (type == Operator::Type::f_UNKNOWN) {
-        return create_operator_f(result);
-    }
-    if (type == Operator::Type::gs_SetParametersGraphicsState) {
-        return create_operator_gs(result);
-    }
-    if (type == Operator::Type::Do_PaintXObject) {
-        return create_operator_Do(result);
-    }
 
-    spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));
-    ASSERT(false);
+#define __BYTECODE_OP(Name, Description)                                                                               \
+    case Operator::Type::Name##_##Description:                                                                         \
+        return create_operator_##Name(result);
+
+    switch (type) {
+        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+    default:
+        spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));
+        ASSERT(false);
+    }
+#undef __BYTECODE_OP
 
     return result;
 }

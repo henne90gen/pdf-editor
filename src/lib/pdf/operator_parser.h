@@ -3,9 +3,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "util/allocator.h"
 #include "lexer.h"
 #include "objects.h"
+#include "util/allocator.h"
 
 namespace pdf {
 
@@ -161,8 +161,8 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 struct OperatorParser {
     Lexer &lexer;
     util::Allocator &allocator;
-    std::vector<Token> tokens = {};
-    size_t currentTokenIdx    = 0;
+    std::vector<Token> tokens   = {};
+    size_t currentTokenIdx      = 0;
     const char *lastOperatorEnd = nullptr;
 
     explicit OperatorParser(Lexer &_lexer, util::Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
@@ -177,33 +177,10 @@ struct OperatorParser {
     template <typename T> T operand(int) { ASSERT(false); }
 
     Operator *create_operator(Operator::Type type, std::string_view content);
-    Operator *create_operator_w(Operator *result);
-    Operator *create_operator_re(Operator *result);
-    Operator *create_operator_rg(Operator *result);
-    Operator *create_operator_Td(Operator *result);
-    Operator *create_operator_Tf(Operator *result);
-    Operator *create_operator_TJ(Operator *result);
-    Operator *create_operator_J(Operator *result);
-    Operator *create_operator_Tm(Operator *result);
-    Operator *create_operator_Tj(Operator *result);
-    Operator *create_operator_cm(Operator *result);
-    Operator *create_operator_g(Operator *result);
-    Operator *create_operator_d(Operator *result);
-    Operator *create_operator_c(Operator *result);
-    Operator *create_operator_s(Operator *result);
-    Operator *create_operator_Tc(Operator *result);
-    Operator *create_operator_CS(Operator *result);
-    Operator *create_operator_S(Operator *result);
-    Operator *create_operator_sc(Operator *result);
-    Operator *create_operator_SC(Operator *result);
-    Operator *create_operator_m(Operator *result);
-    Operator *create_operator_B(Operator *result);
-    Operator *create_operator_Tw(Operator *result);
-    Operator *create_operator_G(Operator *result);
-    Operator *create_operator_Tz(Operator *result);
-    Operator *create_operator_f(Operator *result);
-    Operator *create_operator_gs(Operator *result);
-    Operator *create_operator_Do(Operator *result);
+
+#define __BYTECODE_OP(Name, Description) Operator *create_operator_##Name(Operator *result);
+    ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+#undef __BYTECODE_OP
 };
 
 } // namespace pdf

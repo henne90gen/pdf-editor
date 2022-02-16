@@ -36,11 +36,18 @@ def download(suite: TestSuite):
         p = Path(suite.url)
         file_name = p.name
         file_path = suite.name + "/" + file_name
-        urllib.request.urlretrieve(suite.url, file_path)
+        request = urllib.request.Request(url=suite.url, data=None, headers={
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:97.0) Gecko/20100101 Firefox/97.0"
+        })
+        response = urllib.request.urlopen(request)
+        content = response.read()
+        with open(file_path, "wb") as f:
+            f.write(content)
 
         if file_name.endswith(".zip"):
             shutil.unpack_archive(file_path, suite.name)
-    except:
+    except Exception as e:
+        print(e)
         print("Failed to download", suite.name)
         shutil.rmtree(suite.name)
 

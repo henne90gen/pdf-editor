@@ -19,7 +19,7 @@ Available Commands:
 
 ### Unix
 
-- install gtkmm3
+- install gtkmm4
 - run cmake
     - `mkdir build && cd build`
     - `cmake .. -G Ninja`
