@@ -48,6 +48,8 @@ IGNORED_TESTS = [
     "veraPDF test suite 6-6-3-t01-pass-c.pdf",
     "pdfa2-6-8-bfo-t01-pass.pdf",
     "pdfa2-6-8-bfo-t02-pass.pdf",
+    "veraPDF test suite 6-3-1-t01-pass-b.pdf",
+    "veraPDF test suite 6-3-1-t01-pass-d.pdf",
 ]
 RUN_WITH_VALGRIND = False
 
@@ -69,7 +71,7 @@ def run_test_on_file(executable: str, file_path: str) -> bool:
     cmd.extend([executable, "info", file_path])
 
     try:
-        process = subprocess.run(cmd, capture_output=True, timeout=1)
+        process = subprocess.run(cmd, capture_output=True, timeout=2)
     except Exception as e:
         print(e)
         has_error = True
