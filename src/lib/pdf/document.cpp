@@ -188,7 +188,7 @@ void Document::for_each_page(const std::function<util::ForEachResult(Page *)> &f
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->is_page()) {
-                Page *page           = allocator.allocate<Page>(*this, resolvedKid);
+                Page *page                 = allocator.allocate<Page>(*this, resolvedKid);
                 util::ForEachResult result = func(page);
                 if (result == util::ForEachResult::BREAK) {
                     return;
@@ -243,7 +243,7 @@ util::Result Document::delete_page(size_t pageNum) {
 
     if (pageNum < 1 || pageNum > count) {
         return util::Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum,
-                             count);
+                                   count);
     }
 
     size_t currentPageNum = 1;
@@ -365,23 +365,6 @@ void Document::for_each_image(const std::function<util::ForEachResult(Image &)> 
     });
 }
 
-#if _WIN32
-std::optional<bool> is_executable(const std::string & /*filePath*/) {
-    // TODO add is_executable implementation for windows
-    return false;
-}
-#else
-#include <sys/stat.h>
-#include <zlib.h>
-std::optional<bool> is_executable(const std::string &filePath) {
-    struct stat st = {};
-    if (stat(filePath.c_str(), &st)) {
-        return {};
-    }
-    return st.st_mode & S_IXUSR;
-}
-#endif
-
 void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
     // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
     destSize = srcSize * 2;
@@ -416,19 +399,13 @@ void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, 
     }
 }
 
-util::Result create_stream_for_file(const std::string &filePath, size_t objectNumber, std::ifstream &is,
-                              std::stringstream &ss) {
+util::Result create_embedded_file_stream(const std::string &filePath, size_t objectNumber, std::ifstream &is,
+                                         std::stringstream &ss) {
     auto fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
 
     size_t fileSize = is.tellg();
     is.seekg(0);
     spdlog::info("Embedding {} bytes of file '{}'", fileSize, filePath);
-
-    auto isExecutableOpt = is_executable(filePath);
-    if (!isExecutableOpt.has_value()) {
-        return util::Result::error("Failed to get executable status");
-    }
-    auto isExecutableStr = isExecutableOpt.value() ? "true" : "false";
 
     char *fileData = (char *)malloc(fileSize);
     is.read(fileData, static_cast<std::streamsize>(fileSize));
@@ -442,7 +419,6 @@ util::Result create_stream_for_file(const std::string &filePath, size_t objectNu
     ss << "/Filter /FlateDecode\n";
     ss << "/FileMetadata << ";
     ss << "/Name (" << fileName << ") ";
-    ss << "/Executable " << isExecutableStr;
     ss << " >>\n";
     ss << ">> stream\n";
     ss << std::string_view(encodedData, encodedDataSize);
@@ -454,6 +430,7 @@ util::Result create_stream_for_file(const std::string &filePath, size_t objectNu
 }
 
 util::Result Document::embed_file(const std::string &filePath) {
+    // FIXME Use "Embedded File Streams" here (described in Section 3.10.3)
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
@@ -462,7 +439,7 @@ util::Result Document::embed_file(const std::string &filePath) {
     }
 
     std::stringstream ss;
-    auto result = create_stream_for_file(filePath, next_object_number(), is, ss);
+    auto result = create_embedded_file_stream(filePath, next_object_number(), is, ss);
     if (result.has_error()) {
         return result;
     }
