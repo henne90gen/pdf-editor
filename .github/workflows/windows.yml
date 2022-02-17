@@ -19,6 +19,8 @@ jobs:
           install: git cmake ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
       - name: CI-Build
         run: |
+          mkdir build
+          cd build
           cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=/usr/bin/clang-13 -D CMAKE_CXX_COMPILER=/usr/bin/clang++-13
           cmake --build .
           ctest --output-on-failure
