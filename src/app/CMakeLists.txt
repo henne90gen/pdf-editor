@@ -25,11 +25,35 @@ add_subdirectory(common)
 add_subdirectory(debugger)
 add_subdirectory(editor)
 
-install(TARGETS pdf-cli pdf-editor pdf-debugger
-        RUNTIME DESTINATION bin)
+if (MINGW)
+    get_filename_component(MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
 
-# TODO https://decovar.dev/blog/2021/09/23/cmake-cpack-package-deb-apt/#an-example-project
-#include(CPack)
-#set(CPACK_DEB ON)
-#set(CPACK_TZ OFF)
-#set(CPACK_SOURCE_TZ OFF)
+    # GLib Schemas
+    add_custom_target(copy_glib_schemas
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${MINGW_PATH}/../share/glib-2.0/schemas
+            ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
+    add_custom_target(compile_glib_schemas
+            COMMAND glib-compile-schemas ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
+    add_dependencies(compile_glib_schemas copy_glib_schemas)
+    add_dependencies(pdf-editor compile_glib_schemas)
+    add_dependencies(pdf-debugger compile_glib_schemas)
+
+    install(TARGETS pdf-cli pdf-editor pdf-debugger
+            RUNTIME_DEPENDENCIES
+            DIRECTORIES ${MINGW_PATH}
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" >
+            RUNTIME DESTINATION bin
+            COMPONENT applications)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas
+            DESTINATION share/glib-2.0
+            COMPONENT applications)
+    install(DIRECTORY ${MINGW_PATH}/../share/icons
+            DESTINATION share
+            COMPONENT applications)
+else ()
+    install(TARGETS pdf-cli pdf-editor pdf-debugger
+            RUNTIME DESTINATION bin
+            COMPONENT applications)
+endif ()

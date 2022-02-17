@@ -30,7 +30,10 @@ target_include_directories(pdf PUBLIC
 target_link_libraries(pdf PUBLIC zlibstatic freetype spdlog::spdlog util)
 target_link_cairo(pdf)
 
-install(TARGETS pdf zlibstatic spdlog EXPORT pdf ARCHIVE)
-install(DIRECTORY pdf TYPE INCLUDE FILES_MATCHING PATTERN "*.h")
-install(FILES pdf-config.cmake TYPE LIB)
+install(TARGETS pdf zlibstatic spdlog
+        EXPORT pdf
+        ARCHIVE
+        COMPONENT libraries)
+install(DIRECTORY pdf TYPE INCLUDE COMPONENT headers FILES_MATCHING PATTERN "*.h")
+install(FILES pdf-config.cmake TYPE LIB COMPONENT libraries)
 install(EXPORT pdf DESTINATION lib)
