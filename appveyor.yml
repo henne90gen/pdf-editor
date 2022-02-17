@@ -2,7 +2,7 @@
 #      general configuration      #
 #---------------------------------#
 
-version: 0.9.{build}
+version: 1.0.{build}
 
 branches:
   except:
@@ -15,7 +15,7 @@ max_jobs: 1
 #    environment configuration    #
 #---------------------------------#
 
-clone_folder: c:\projects\RacingToHell
+clone_folder: c:\projects\pdf-editor
 
 #---------------------------------#
 #       build configuration       #
@@ -47,7 +47,7 @@ build_script:
   - set PATH=C:/projects/pdf-editor/llvm-mingw-20211002-msvcrt-x86_64/bin;"C:/Program Files (x86)/CMake/bin";"C:/Program Files/Git/bin"
 
   #  Generate build files
-  - cmake -G "Ninja" ../
+  - cmake -G "MinGW Makefiles" ../
 
   #  Build
   - cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release
