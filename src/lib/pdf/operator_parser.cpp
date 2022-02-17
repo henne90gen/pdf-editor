@@ -121,10 +121,13 @@ Operator *OperatorParser::get_operator() {
     }
 }
 
+Operator *OperatorParser::create_operator_n(Operator *result) { return result; }
 Operator *OperatorParser::create_operator_q(Operator *result) { return result; }
 Operator *OperatorParser::create_operator_Q(Operator *result) { return result; }
 Operator *OperatorParser::create_operator_BT(Operator *result) { return result; }
 Operator *OperatorParser::create_operator_ET(Operator *result) { return result; }
+Operator *OperatorParser::create_operator_W(Operator *result) { return result; }
+Operator *OperatorParser::create_operator_Wx(Operator *result) { return result; }
 
 Operator *OperatorParser::create_operator_w(Operator *result) {
     result->data.w_SetLineWidth.lineWidth = operand<double>(0);
@@ -343,7 +346,6 @@ Operator *OperatorParser::create_operator_UNKNOWN(Operator *result) {
     // FIXME parse operator 'UNKNOWN'
     return result;
 }
-
 
 Operator *OperatorParser::create_operator_Tx(Operator *result) {
     // FIXME parse operator 'Tx'
