@@ -1,5 +1,5 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <pdf/document.h>
 
 #include "cmd_delete_page.cpp"
@@ -108,7 +108,9 @@ int parse_text_args(int argc, char **argv, TextArgs &result) {
 }
 
 int main(int argc, char **argv) {
+#ifndef NDEBUG
     spdlog::set_level(spdlog::level::trace);
+#endif
 
     auto commandType = parse_command_type(argc, argv);
     switch (commandType) {
