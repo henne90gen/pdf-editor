@@ -26,7 +26,7 @@ std::string readPipeToString(HANDLE pipeHandle) {
     return result;
 }
 
-void logError(DWORD error) {
+std::string getErrorMessage(DWORD error) {
     LPSTR messageBuffer = nullptr;
     size_t size =
           FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -34,10 +34,10 @@ void logError(DWORD error) {
 
     std::string message(messageBuffer, size);
     LocalFree(messageBuffer);
-    spdlog::error(message);
+    return message;
 }
 
-Result execute(const std::string &command, const std::vector<std::string> &args) {
+ValueResult<Execution> execute(const std::string &command, const std::vector<std::string> &args) {
     LPCTSTR lpApplicationName = command.c_str();
 
     SECURITY_ATTRIBUTES saAttr;
@@ -48,23 +48,19 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
     HANDLE stdoutRead  = nullptr;
     HANDLE stdoutWrite = nullptr;
     if (!CreatePipe(&stdoutRead, &stdoutWrite, &saAttr, 0)) {
-        spdlog::error("Failed to create pipe for stdout");
-        return {};
+        return ValueResult<Execution>::error("failed to create pipe for stdout");
     }
     if (!SetHandleInformation(stdoutRead, HANDLE_FLAG_INHERIT, 0)) {
-        spdlog::error("Failed to configure pipe for stdout");
-        return {};
+        return ValueResult<Execution>::error("failed to configure pipe for stdout");
     }
 
     HANDLE stderrRead  = nullptr;
     HANDLE stderrWrite = nullptr;
     if (!CreatePipe(&stderrRead, &stderrWrite, &saAttr, 0)) {
-        spdlog::error("Failed to create pipe for stderr");
-        return {};
+        return ValueResult<Execution>::error("failed to create pipe for stderr");
     }
     if (!SetHandleInformation(stderrRead, HANDLE_FLAG_INHERIT, 0)) {
-        spdlog::error("Failed to configure pipe for stderr");
-        return {};
+        return ValueResult<Execution>::error("failed to configure pipe for stdout");
     }
 
     // additional information
@@ -97,10 +93,9 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
                                         &pi // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
            );
     if (!success) {
-        auto error = GetLastError();
-        spdlog::error("Failed to start child process");
-        logError(error);
-        return {};
+        auto error        = GetLastError();
+        auto errorMessage = getErrorMessage(error);
+        return ValueResult<Execution>::error("failed to start child process: {}", errorMessage);
     }
 
     // Close handles to the ends of the pipes that have been taken over by the child process
@@ -110,24 +105,24 @@ Result execute(const std::string &command, const std::vector<std::string> &args)
     // Wait until child process exits.
     WaitForSingleObject(pi.hProcess, INFINITE);
 
-    Result result = {};
-    result.output = readPipeToString(stdoutRead);
-    result.error  = readPipeToString(stderrRead);
+    Execution result = {};
+    result.output    = readPipeToString(stdoutRead);
+    result.error     = readPipeToString(stderrRead);
 
     DWORD exitCode;
     success = GetExitCodeProcess(pi.hProcess, &exitCode);
     if (!success) {
-        spdlog::error("Failed to get exit code of child process");
-        return {};
+        return ValueResult<Execution>::error("failed to get exit code of child process");
     }
     result.status = static_cast<int>(exitCode);
+
     // Close handles
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    return result;
+    return ValueResult<Execution>::ok(result);
 }
 
-} // namespace process
+} // namespace util
 
 #endif
