@@ -1,17 +1,14 @@
-name: Build and Test
+name: Build and Test on Ubuntu
 
 on: push
 
 jobs:
   build:
-    name: "Build and Test"
+    name: "Build and Test on Ubuntu"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      - uses: actions/checkout@v2
 
       # TODO Building has to be done inside a docker image, because gtk-4 is only available in Ubuntu 21.04 and later
       - name: Build and Test

@@ -1,0 +1,30 @@
+name: Build and Test on Windows
+
+on: push
+
+jobs:
+  build:
+    name: "Build and Test on Windows"
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: git mingw-w64-cmake mingw-w64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
+      - name: CI-Build
+        run: |
+          cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=/usr/bin/clang-13 -D CMAKE_CXX_COMPILER=/usr/bin/clang++-13
+          cmake --build .
+          ctest --output-on-failure
+          cmake --build . --target test_files
+          cmake --build . --target test_suite_verapdf
+          cmake --build . --target test_suite_isartor
+          cmake --build . --target test_suite_bfosupport
+          cmake --build . --target package
+          cmake --build . --target package_source
