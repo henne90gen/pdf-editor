@@ -18,5 +18,5 @@ RUN cmake --build . --target test_suite_isartor
 RUN cmake --build . --target test_suite_bfosupport
 
 # Package
-#RUN cmake --build . --target package
-#RUN cmake --build . --target package_source
+RUN cpack -G DEB
+RUN cmake --build . --target package_source
