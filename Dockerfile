@@ -18,4 +18,4 @@ RUN cmake --build . --target test_suite_isartor
 RUN cmake --build . --target test_suite_bfosupport
 
 # Package
-RUN cpack -G DEB
+RUN cpack -G ZIP

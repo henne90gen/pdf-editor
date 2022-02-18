@@ -25,35 +25,34 @@ add_subdirectory(common)
 add_subdirectory(debugger)
 add_subdirectory(editor)
 
-if (MINGW)
-    get_filename_component(MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
+get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} PATH)
+message(STATUS "Compiler path: ${COMPILER_PATH}")
+# GLib Schemas
+add_custom_target(copy_glib_schemas
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${COMPILER_PATH}/../share/glib-2.0/schemas
+        ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
+add_custom_target(compile_glib_schemas
+        COMMAND glib-compile-schemas ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
+add_dependencies(compile_glib_schemas copy_glib_schemas)
+add_dependencies(pdf-editor compile_glib_schemas)
+add_dependencies(pdf-debugger compile_glib_schemas)
 
-    # GLib Schemas
-    add_custom_target(copy_glib_schemas
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${MINGW_PATH}/../share/glib-2.0/schemas
-            ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
-    add_custom_target(compile_glib_schemas
-            COMMAND glib-compile-schemas ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas)
-    add_dependencies(compile_glib_schemas copy_glib_schemas)
-    add_dependencies(pdf-editor compile_glib_schemas)
-    add_dependencies(pdf-debugger compile_glib_schemas)
+install(TARGETS pdf-cli pdf-editor pdf-debugger
+        RUNTIME_DEPENDENCIES
+        DIRECTORIES $<$<PLATFORM_ID:Windows>:${COMPILER_PATH}> ${COMPILER_PATH}/../lib
+        PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" "libc.so.6"
+        POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" >
+        RUNTIME DESTINATION bin
+        COMPONENT applications)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas
+        DESTINATION share/glib-2.0
+        COMPONENT applications)
+install(DIRECTORY ${COMPILER_PATH}/../share/icons
+        DESTINATION share
+        COMPONENT applications)
 
-    install(TARGETS pdf-cli pdf-editor pdf-debugger
-            RUNTIME_DEPENDENCIES
-            DIRECTORIES ${MINGW_PATH}
-            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
-            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" >
-            RUNTIME DESTINATION bin
-            COMPONENT applications)
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas
-            DESTINATION share/glib-2.0
-            COMPONENT applications)
-    install(DIRECTORY ${MINGW_PATH}/../share/icons
-            DESTINATION share
-            COMPONENT applications)
-else ()
-    install(TARGETS pdf-cli pdf-editor pdf-debugger
-            RUNTIME DESTINATION bin
-            COMPONENT applications)
-endif ()
+set(CMAKE_INSTALL_RPATH $ORIGIN/../lib)
+set_target_properties(pdf-cli PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+set_target_properties(pdf-debugger PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+set_target_properties(pdf-editor PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")

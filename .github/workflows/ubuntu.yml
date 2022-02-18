@@ -12,4 +12,16 @@ jobs:
 
       # TODO Building has to be done inside a docker image, because gtk-4 is only available in Ubuntu 21.04 and later
       - name: Build and Test
-        run: docker build .
+        run: docker build . -t build-image
+
+      - name: Retrieve Build Artifact
+        run: |
+          id=$(docker create build-image)
+          docker cp $id:/app/build/PDF-Editor-1.0.0-Linux.zip PDF-Editor-1.0.0-Linux.zip
+          docker rm -v $id
+
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux
+          path: PDF-Editor-1.0.0-Linux.zip
