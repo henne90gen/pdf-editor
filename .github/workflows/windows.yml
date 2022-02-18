@@ -17,11 +17,11 @@ jobs:
           msystem: MINGW64
           update: true
           install: git cmake ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
-      - name: CI-Build
+      - name: Build and Test
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=C:/msys64/mingw64/bin/clang -D CMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/clang++
+          cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER="C:/msys64/mingw64/bin/clang.exe" -D CMAKE_CXX_COMPILER="C:/msys64/mingw64/bin/clang++.exe"
           cmake --build .
           ctest --output-on-failure
           cmake --build . --target test_files
