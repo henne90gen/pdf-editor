@@ -16,7 +16,7 @@ jobs:
         with:
           msystem: MINGW64
           update: true
-          install: git mingw-w64-cmake mingw-w64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
+          install: git mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
       - name: Build and Test
         run: |
           mkdir build
