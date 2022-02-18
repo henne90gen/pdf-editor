@@ -20,6 +20,7 @@ jobs:
           docker cp $id:/app/build/PDF-Editor-1.0.0-Linux.zip PDF-Editor-1.0.0-Linux.zip
           docker rm -v $id
 
+      # TODO prevent double zipping (maybe unpack before archiving?)
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
