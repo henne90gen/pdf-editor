@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER="C:\\msys64\\mingw64\\bin\\clang" -D CMAKE_CXX_COMPILER="C:\\msys64\\mingw64\\bin\\clang++"
+          cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release
           cmake --build .
           ctest --output-on-failure
           cmake --build . --target test_files
