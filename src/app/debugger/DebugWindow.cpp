@@ -1,9 +1,13 @@
 #include "DebugWindow.h"
 
 #include <glibmm/main.h>
+#include <gtkmm/cssprovider.h>
 #include <gtkmm/eventcontrollermotion.h>
+#include <gtkmm/paned.h>
 #include <iomanip>
 #include <sstream>
+
+#include "style.css.h"
 
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
@@ -14,6 +18,12 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     }
     set_title(filePath);
 
+    // apply css
+    Glib::RefPtr<Gtk::CssProvider> cssProvider = Gtk::CssProvider::create();
+    cssProvider->load_from_data(embedded::get_style_css());
+    get_style_context()->add_provider_for_display(get_display(), cssProvider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    // get widget references
     selectedByteLabel   = builder->get_widget<Gtk::Label>("SelectedByteLabel");
     hoveredByteLabel    = builder->get_widget<Gtk::Label>("HoveredByteLabel");
     memoryUsageLabel    = builder->get_widget<Gtk::Label>("MemoryUsageLabel");
@@ -25,6 +35,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     documentTree        = Gtk::Builder::get_widget_derived<DocumentTree>(builder, "DocumentTree", document);
     detailsLabel        = builder->get_widget<Gtk::Label>("DetailsLabel");
 
+    // connect signals
     parseDocumentButton->signal_clicked().connect(sigc::mem_fun(*documentTree, &DocumentTree::fill_tree));
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
     objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
@@ -42,7 +53,17 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
           },
           500);
 
-    Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+    auto mainContentPaned = builder->get_widget<Gtk::Paned>("MainContentPaned");
+    mainContentPaned->set_shrink_end_child(false);
+    mainContentPaned->set_shrink_start_child(false);
+    mainContentPaned->set_resize_end_child(false);
+    mainContentPaned->set_resize_start_child(true);
+
+    auto contentWindow = Gtk::Builder::get_widget_derived<ContentWindow>(builder, "ContentWindow", document);
+    contentWindow->set_size_request(300, -1);
+
+    auto detailsPane = builder->get_widget<Gtk::Box>("DetailsPane");
+    detailsPane->set_size_request(200, -1);
 }
 
 void DebugWindow::update_selected_byte_label(int b) {

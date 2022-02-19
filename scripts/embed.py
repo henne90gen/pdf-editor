@@ -23,6 +23,7 @@ def embed(file: str, destination_name: str):
 
     result = ""
     result += f"#include \"{file_name}.h\"\n\n"
+    result += "namespace embedded {\n"
     result += f"uint8_t {c_identifier}_data[] = {{"
 
     for c in range(0, len(hexContent), 2):
@@ -35,19 +36,37 @@ def embed(file: str, destination_name: str):
 
     result += "\n"
     result += "};\n"
-    result += f"uint32_t {c_identifier}_size = sizeof({c_identifier}_data);\n"
+    result += f"""
 
-    c_file = destination_name + ".c"
+uint32_t {c_identifier}_size = sizeof({c_identifier}_data);
+
+auto {c_identifier}_string = std::string((const char *){c_identifier}_data, {c_identifier}_size);
+
+const std::string &get_{c_identifier}() {{
+    return {c_identifier}_string;
+}}
+
+}} // namespace embedded
+"""
+
+    c_file = destination_name + ".cpp"
     with open(c_file, "w+") as f:
         f.write(result)
 
     h_file_content = f"""\
 #pragma once
 
-#include "stdint.h"
+#include <stdint.h>
+#include <string>
+
+namespace embedded {{
 
 extern uint8_t {c_identifier}_data[];
 extern uint32_t {c_identifier}_size;
+
+const std::string &get_{c_identifier}();
+
+}} // namespace embedded
 """
     h_file = destination_name + ".h"
     with open(h_file, "w+") as f:

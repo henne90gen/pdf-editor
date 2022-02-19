@@ -11,8 +11,9 @@ function(target_link_gtk4 target)
 endfunction()
 
 function(embed_file file generated_c)
+    # TODO replace this with "glib-compile-resources tfe3.gresource.xml --target=resources.c --generate-source"
     get_filename_component(file_name ${file} NAME)
-    set(c_file ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.c)
+    set(c_file ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.cpp)
     add_custom_command(
             OUTPUT ${c_file} ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.h
             COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/embed.py ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${CMAKE_CURRENT_BINARY_DIR}/${file_name}

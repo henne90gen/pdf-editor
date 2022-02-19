@@ -11,8 +11,7 @@ DebugApplication::DebugApplication() : PdfApplication("de.henne90gen.pdf.debugge
 
 void DebugApplication::open_window(const std::string &filePath) {
     try {
-        auto builderString = std::string((char *)debugger_xml_data, debugger_xml_size);
-        auto builder       = Gtk::Builder::create_from_string(builderString);
+        auto builder       = Gtk::Builder::create_from_string(embedded::get_debugger_xml());
         auto window        = Gtk::Builder::get_widget_derived<DebugWindow>(builder, "DebugWindow", filePath);
         add_window(*window);
         window->present();

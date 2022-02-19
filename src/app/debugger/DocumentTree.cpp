@@ -13,6 +13,11 @@ DocumentTree::DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
 }
 
 void DocumentTree::fill_tree() {
+    if (documentHasBeenParsed) {
+        return;
+    }
+    documentHasBeenParsed = true;
+
     spdlog::info("Filling document tree view");
     if (document.file.trailer.dict != nullptr) {
         auto &row           = *treeStore->append();

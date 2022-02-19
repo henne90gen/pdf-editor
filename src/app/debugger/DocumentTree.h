@@ -37,7 +37,9 @@ class DocumentTree : public Gtk::TreeView {
   private:
     pdf::Document &document;
     Glib::RefPtr<Gtk::TreeStore> treeStore;
+    bool documentHasBeenParsed   = false;
     DocumentModelColumns columns = DocumentModelColumns();
+
     type_signal_object_selected signalObjectSelected;
 
     void create_row(pdf::Object *object, Gtk::TreeRow &parentRow, std::unordered_set<pdf::Object *> &alreadyVisited);

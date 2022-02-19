@@ -7,7 +7,6 @@
         <property name="default-height">600</property>
         <child>
             <object class="GtkBox">
-                <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
                     <object class="GtkBox">
@@ -71,9 +70,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="homogeneous">True</property>
+                    <object class="GtkPaned" id="MainContentPaned">
                         <property name="orientation">horizontal</property>
                         <child>
                             <object class="GtkScrolledWindow" id="ContentWindow">
@@ -98,8 +95,7 @@
                             </object>
                         </child>
                         <child>
-                            <object class="GtkBox">
-                                <property name="visible">True</property>
+                            <object class="GtkBox" id="DetailsPane">
                                 <property name="orientation">vertical</property>
                                 <child>
                                     <object class="GtkScrolledWindow">
