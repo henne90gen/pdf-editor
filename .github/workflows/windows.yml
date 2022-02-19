@@ -17,6 +17,7 @@ jobs:
           msystem: MINGW64
           update: true
           install: git mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
+
       - name: Build and Test
         # TODO enable tests on windows:
         #  ctest --output-on-failure
@@ -31,3 +32,9 @@ jobs:
           cmake --build .
           cmake --build . --target package
           cmake --build . --target package_source
+
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows
+          path: build/PDF-Editor-1.0.0-win64.exe
