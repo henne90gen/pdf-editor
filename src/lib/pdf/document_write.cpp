@@ -85,13 +85,13 @@ void write_indirect_reference_object(std::ostream &s, IndirectReference *referen
 void write_indirect_object(std::ostream &s, IndirectObject *object) {
     s << object->objectNumber << " " << object->generationNumber << " obj\n";
     write_object(s, object->object);
-    s << "\nendobj\n\n";
+    s << "\nendobj\n";
 }
 void write_stream_object(std::ostream &s, Stream *stream) {
     write_dictionary_object(s, stream->dictionary);
     s << "\nstream\n";
     s << stream->streamData;
-    s << "\nendstream\n";
+    s << "\nendstream";
 }
 void write_object_stream_content_object(std::ostream &, ObjectStreamContent *) { ASSERT(false); }
 void write_object(std::ostream &s, Object *object) {
@@ -154,8 +154,8 @@ void write_objects(Document &document, std::ostream &s, std::unordered_map<uint6
 void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
     auto startXref = s.tellp();
     if (document.file.trailer.dict != nullptr) {
-        s << "xref ";
-        s << 0 << " " << byteOffsets.size();
+        s << "xref\n";
+        s << 0 << " " << byteOffsets.size() << "\n";
 
         s << "0000000000 65535 f \n";
         for (size_t i = 0; i < byteOffsets.size(); i++) {

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "font.h"
-#include "util/allocator.h"
 #include "image.h"
 #include "objects.h"
 #include "parser.h"
+#include "util/allocator.h"
 
 #include <functional>
 #include <unordered_set>
@@ -64,7 +64,7 @@ struct CrossReferenceTable {
 struct Trailer {
     CrossReferenceTable crossReferenceTable = {};
     Dictionary *dict                        = nullptr;
-    IndirectObject *streamObject                          = nullptr;
+    IndirectObject *streamObject            = nullptr;
     Trailer *prev                           = nullptr;
 };
 
@@ -92,9 +92,9 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    util::Allocator allocator   = {};
-    DocumentFile file     = {};
-    DocumentCatalog *root = nullptr; // TODO make this private?
+    util::Allocator allocator = {};
+    DocumentFile file         = {};
+    DocumentCatalog *root     = nullptr; // TODO make this private?
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -165,7 +165,7 @@ struct Document : public ReferenceResolver {
     util::Result embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
-    void add_object(int64_t objectNumber, const std::string &content);
+    int64_t add_object(Object *object);
 
     /// Finds the IndirectObject that wraps the given Object
     IndirectObject *find_existing_object(Object *object);

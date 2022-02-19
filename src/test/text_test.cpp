@@ -5,7 +5,7 @@
 
 #include "test_util.h"
 
-TEST(Text, DISABLED_HelloWorldTextBlocks) {
+TEST(Text, HelloWorldTextBlocks) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
 

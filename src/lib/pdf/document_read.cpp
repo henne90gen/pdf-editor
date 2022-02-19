@@ -169,6 +169,13 @@ util::Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *
     currentTrailer->crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
     currentTrailer->crossReferenceTable.objectCount       = std::stoll(metaData.substr(spaceLocation));
 
+    for (int64_t objectNumber = currentTrailer->crossReferenceTable.firstObjectNumber;
+         objectNumber <
+         currentTrailer->crossReferenceTable.firstObjectNumber + currentTrailer->crossReferenceTable.objectCount;
+         objectNumber++) {
+        document.objectList[objectNumber] = nullptr;
+    }
+
     ignoreNewLines(currentReadPtr);
 
     for (int i = 0; i < currentTrailer->crossReferenceTable.objectCount; i++) {
@@ -298,7 +305,7 @@ util::Result load_all_objects(Document &document, Trailer *trailer) {
     for (uint64_t objectNumber = crt.firstObjectNumber;
          objectNumber < static_cast<uint64_t>(crt.firstObjectNumber + crt.objectCount); objectNumber++) {
         auto itr = document.objectList.find(objectNumber);
-        if (itr != document.objectList.end()) {
+        if (itr != document.objectList.end() && itr->second != nullptr) {
             continue;
         }
         CrossReferenceEntry &entry = crt.entries[objectNumber - crt.firstObjectNumber];
@@ -351,10 +358,10 @@ util::Result read_data(Document &document, bool loadAllObjects) {
         document.file.lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
         return util::Result::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}",
-                             err.what());
+                                   err.what());
     } catch (std::out_of_range &err) {
         return util::Result::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}",
-                             err.what());
+                                   err.what());
     }
 
     auto crossRefStartPtr = document.file.data + document.file.lastCrossRefStart;

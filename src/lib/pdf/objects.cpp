@@ -157,6 +157,76 @@ std::string_view Stream::decode(util::Allocator &allocator) {
     return {output, outputSize};
 }
 
+void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
+    // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
+    destSize = srcSize * 2;
+    destData = (char *)malloc(destSize);
+
+    z_stream stream  = {};
+    stream.zalloc    = Z_NULL;
+    stream.zfree     = Z_NULL;
+    stream.opaque    = Z_NULL;
+    stream.avail_in  = (uInt)srcSize;     // size of input
+    stream.next_in   = (Bytef *)srcData;  // input char array
+    stream.avail_out = (uInt)destSize;    // size of output
+    stream.next_out  = (Bytef *)destData; // output char array
+
+    auto ret = deflateInit(&stream, Z_BEST_COMPRESSION);
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+
+    ret = deflate(&stream, Z_FULL_FLUSH);
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+
+    ret      = deflateEnd(&stream);
+    destSize = stream.total_out;
+    if (ret != Z_OK) {
+        // TODO error handling
+        return;
+    }
+}
+
+void Stream::encode(util::Allocator &allocator, const std::string &data) {
+    const char *encodedData = nullptr;
+    size_t encodedDataSize  = 0;
+    deflate_buffer(data.data(), data.size(), encodedData, encodedDataSize);
+
+    auto newStreamData = allocator.allocate_chunk(encodedDataSize);
+    memcpy(newStreamData, encodedData, encodedDataSize);
+    free((void *)encodedData);
+
+    streamData = std::string_view(newStreamData, encodedDataSize);
+    // TODO update the dictionary with the correct length
+}
+
+Stream *Stream::create_from_unencoded_data(util::Allocator &allocator,
+                                           const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
+                                           std::string_view unencodedData) {
+    const char *encodedData = nullptr;
+    size_t encodedDataSize  = 0;
+    deflate_buffer(unencodedData.data(), unencodedData.size(), encodedData, encodedDataSize);
+
+    std::unordered_map<std::string, Object *> dict = {};
+    for (const auto &entry : additionalDictionaryEntries) {
+        dict[entry.first] = entry.second;
+    }
+    dict["Length"] = allocator.allocate<Integer>(encodedDataSize);
+    dict["Filter"] = allocator.allocate<Name>("FlateDecode");
+
+    // TODO this might be inefficient: maybe place the stream data after the stream object into the allocator
+    auto streamData = allocator.allocate_chunk(encodedDataSize);
+    memcpy(streamData, encodedData, encodedDataSize);
+    free((void *)encodedData);
+
+    auto dictionary = Dictionary::create(allocator, dict);
+    return allocator.allocate<Stream>(dictionary, std::string_view(streamData, encodedDataSize));
+}
+
 std::string HexadecimalString::to_string() const {
     // TODO this is quite hacky
     std::string tmp = value;
@@ -183,25 +253,29 @@ std::string HexadecimalString::to_string() const {
     return result;
 }
 
-void Array::remove_element(Document &/*document*/, size_t index) {
+void Array::remove_element(Document & /*document*/, size_t index) {
     ASSERT(index < values.size());
     values.remove(index);
     // TODO track the deletion of the i-th element
 }
 
-void Integer::set(Document &/*document*/, int64_t i) {
+void Integer::set(Document & /*document*/, int64_t i) {
     value = i;
     // TODO track the change of this value
 }
 
-std::string_view EmbeddedFile::name() {
-    auto fileMetadata = dictionary->must_find<Dictionary>("FileMetadata");
-    return fileMetadata->must_find<LiteralString>("Name")->value;
-}
+std::optional<int64_t> EmbeddedFile::size() {
+    const auto &paramsOpt = dictionary->find<Dictionary>("Params");
+    if (!paramsOpt.has_value()) {
+        return {};
+    }
 
-bool EmbeddedFile::is_executable() {
-    auto fileMetadata = dictionary->must_find<Dictionary>("FileMetadata");
-    return fileMetadata->must_find<Boolean>("Executable")->value;
+    const auto &sizeOpt = paramsOpt.value()->find<Integer>("Size");
+    if (!sizeOpt.has_value()) {
+        return {};
+    }
+
+    return {sizeOpt.value()->value};
 }
 
 } // namespace pdf

@@ -45,7 +45,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     free(buffer);
 }
 
-TEST(Writer, DISABLED_Embed) {
+TEST(Writer, Embed) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
@@ -56,34 +56,10 @@ TEST(Writer, DISABLED_Embed) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 6867,
-                              "14 0 obj <<\n/Length 6650\n/Filter /FlateDecode\n/FileMetadata << /Name "
-                              "(hello-world.pdf) /Executable false >>\n>> stream\n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 13635, "endstream endobj\n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 13652, "xref\n0 15\n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 13922, "0000006692 00000 n");
-}
-
-TEST(Writer, DISABLED_AddRawSection) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
-
-    //    char buf[7] = "/Hello";
-    //    document.add_raw_section(document.file.data + 6059, buf, 6);
-
-    char *buffer = nullptr;
-    size_t size  = 0;
-    ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
-    ASSERT_NE(buffer, nullptr);
-    ASSERT_NE(size, 0);
-
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 6057, "<</Hello/Type");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 6903, "0000006333");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 6963, "0000006502");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 7083, "0000006246");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 7123, "0000006601");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 7143, "0000006698");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 7345, "6873");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 19,
+                              "14 0 obj\n<</Filter /FlateDecode /Params <</Size 7350>> /Length 6650 /Type /EmbeddedFile>>\nstream\n");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 6767, "endstream\nendobj\n");
+    ASSERT_BUFFER_CONTAINS_AT(buffer, 13639, "xref\n0 14\n");
 }
 
 TEST(Writer, Header) {
@@ -156,7 +132,7 @@ void write_pdf(const std::string &name) {
     auto expectedResult = util::execute(command, {testFilePath});
     ASSERT_FALSE(expectedResult.has_error());
 
-    auto actualResult   = util::execute(command, {name});
+    auto actualResult = util::execute(command, {name});
     ASSERT_FALSE(actualResult.has_error());
     ASSERT_EQ(expectedResult.value().status, actualResult.value().status);
     ASSERT_EQ(expectedResult.value().error, actualResult.value().error);

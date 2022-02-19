@@ -116,7 +116,7 @@ TEST(Writer, write_indirect_object) {
     std::stringstream s;
     pdf::write_indirect_object(s, new pdf::IndirectObject(12, 3, new pdf::Integer(5)));
     const auto &str = s.str();
-    ASSERT_EQ(str, "12 3 obj\n5\nendobj\n\n");
+    ASSERT_EQ(str, "12 3 obj\n5\nendobj\n");
 }
 
 TEST(Writer, write_stream) {
@@ -129,5 +129,5 @@ TEST(Writer, write_stream) {
     auto dict = new pdf::Dictionary(map);
     pdf::write_stream_object(s, new pdf::Stream(dict, "abc123"));
     const auto &str = s.str();
-    ASSERT_EQ(str, "<</Size 123>>\nstream\nabc123\nendstream\n");
+    ASSERT_EQ(str, "<</Size 123>>\nstream\nabc123\nendstream");
 }

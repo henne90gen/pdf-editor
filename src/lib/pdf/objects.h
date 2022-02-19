@@ -111,6 +111,9 @@ struct Dictionary : public Object {
 
     static Type staticType() { return Type::DICTIONARY; }
     explicit Dictionary(util::StaticMap<std::string, Object *> map) : Object(staticType()), values(map) {}
+    static Dictionary *create(util::Allocator &allocator, const std::unordered_map<std::string, Object *> &dict) {
+        return allocator.allocate<Dictionary>(util::StaticMap<std::string, Object *>::create(allocator, dict));
+    }
 
     template <typename T> std::optional<T *> find(const std::string &key) {
         auto opt = values.find(key);
@@ -156,16 +159,24 @@ struct Stream : public Object {
     size_t decodedStreamSize  = 0;
 
     static Type staticType() { return Type::STREAM; }
-    explicit Stream(Dictionary *_dictionary, std::string_view _stream_data)
-        : Object(staticType()), dictionary(_dictionary), streamData(_stream_data) {}
+    explicit Stream(Dictionary *_dictionary, std::string_view encodedData)
+        : Object(staticType()), dictionary(_dictionary), streamData(encodedData) {}
+
+    static Stream *
+    create_from_unencoded_data(util::Allocator &allocator,
+                               const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
+                               std::string_view unencodedData);
 
     [[nodiscard]] std::string_view decode(util::Allocator &allocator);
+    void encode(util::Allocator &allocator, const std::string &data);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 
 struct EmbeddedFile : public Stream {
-    std::string_view name();
-    bool is_executable();
+    std::optional<int64_t> size();
+    // TODO void creation_date();
+    // TODO void mod_date();
+    // TODO check_sum();
 };
 
 struct Null : public Object {

@@ -136,10 +136,12 @@ void CMapParser::parse_bf_char(std::unordered_map<uint8_t, std::string> &charmap
             return;
         }
 
-        auto dstCode    = tokens[currentTokenIdx];
-        // FIXME remove '<' and '>' before creating the HexadecimalString
-        auto srcCodeStr = HexadecimalString(std::string(srcCode.content)).to_string();
-        auto dstCodeStr = HexadecimalString(std::string(dstCode.content)).to_string();
+        auto dstCode = tokens[currentTokenIdx];
+
+        const auto &srcCodeTmp = std::string(srcCode.content.substr(1, srcCode.content.size() - 2));
+        const auto &dstCodeTmp = std::string(dstCode.content.substr(1, dstCode.content.size() - 2));
+        auto srcCodeStr        = HexadecimalString(srcCodeTmp).to_string();
+        auto dstCodeStr        = HexadecimalString(dstCodeTmp).to_string();
         while (dstCodeStr[0] == '\0') {
             dstCodeStr = dstCodeStr.substr(1);
         }
@@ -194,7 +196,6 @@ void CMapParser::parse_bf_range(std::unordered_map<uint8_t, std::string> &charma
         }
 
         auto srcCodeHi = tokens[currentTokenIdx];
-        // FIXME use srcCodeHi somehow
 
         // FIXME remove '<' and '>' before creating the HexadecimalString
         auto srcCodeLoStr = HexadecimalString(std::string(srcCodeLo.content)).to_string();
@@ -210,7 +211,7 @@ void CMapParser::parse_bf_range(std::unordered_map<uint8_t, std::string> &charma
 
             uint8_t code = srcCodeLoStr.at(srcCodeLoStr.size() - 1);
             while (current_token_is(Token::Type::HEXADECIMAL_STRING)) {
-                auto dstCode    = tokens[currentTokenIdx];
+                auto dstCode = tokens[currentTokenIdx];
                 // FIXME remove '<' and '>' before creating the HexadecimalString
                 auto dstCodeStr = HexadecimalString(std::string(dstCode.content)).to_string();
                 charmap[code]   = dstCodeStr;

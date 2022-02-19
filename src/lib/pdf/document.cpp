@@ -365,44 +365,15 @@ void Document::for_each_image(const std::function<util::ForEachResult(Image &)> 
     });
 }
 
-void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
-    // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
-    destSize = srcSize * 2;
-    destData = (char *)malloc(destSize);
+util::ValueResult<Stream *> create_embedded_file_stream(util::Allocator &allocator, const std::string &filePath) {
+    auto is = std::ifstream();
+    is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
-    z_stream stream  = {};
-    stream.zalloc    = Z_NULL;
-    stream.zfree     = Z_NULL;
-    stream.opaque    = Z_NULL;
-    stream.avail_in  = (uInt)srcSize;     // size of input
-    stream.next_in   = (Bytef *)srcData;  // input char array
-    stream.avail_out = (uInt)destSize;    // size of output
-    stream.next_out  = (Bytef *)destData; // output char array
-
-    auto ret = deflateInit(&stream, Z_BEST_COMPRESSION);
-    if (ret != Z_OK) {
-        // TODO error handling
-        return;
+    if (!is.is_open()) {
+        return util::ValueResult<Stream *>::error("Failed to open file for reading: '{}'", filePath);
     }
 
-    ret = deflate(&stream, Z_FULL_FLUSH);
-    if (ret != Z_OK) {
-        // TODO error handling
-        return;
-    }
-
-    ret      = deflateEnd(&stream);
-    destSize = stream.total_out;
-    if (ret != Z_OK) {
-        // TODO error handling
-        return;
-    }
-}
-
-util::Result create_embedded_file_stream(const std::string &filePath, size_t objectNumber, std::ifstream &is,
-                                         std::stringstream &ss) {
-    auto fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
-
+    auto fileName   = filePath.substr(filePath.find_last_of("/\\") + 1);
     size_t fileSize = is.tellg();
     is.seekg(0);
     spdlog::info("Embedding {} bytes of file '{}'", fileSize, filePath);
@@ -410,92 +381,55 @@ util::Result create_embedded_file_stream(const std::string &filePath, size_t obj
     char *fileData = (char *)malloc(fileSize);
     is.read(fileData, static_cast<std::streamsize>(fileSize));
 
-    const char *encodedData = nullptr;
-    size_t encodedDataSize  = 0;
-    deflate_buffer(fileData, fileSize, encodedData, encodedDataSize);
+    std::unordered_map<std::string, Object *> params = {
+          {"Size", allocator.allocate<Integer>(fileSize)},
+          // TODO add CreationDate
+          // TODO add ModDate
+          // TODO add CheckSum
+    };
+    std::unordered_map<std::string, Object *> dict = {
+          {"Type", allocator.allocate<Name>("EmbeddedFile")},
+          // {"SubType", MIME type}, // TODO parse MIME type and add as SubType
+          {"Params", Dictionary::create(allocator, params)},
+    };
 
-    ss << objectNumber << " 0 obj <<\n";
-    ss << "/Length " << encodedDataSize << "\n";
-    ss << "/Filter /FlateDecode\n";
-    ss << "/FileMetadata << ";
-    ss << "/Name (" << fileName << ") ";
-    ss << " >>\n";
-    ss << ">> stream\n";
-    ss << std::string_view(encodedData, encodedDataSize);
-    ss << "endstream endobj\n";
-
+    auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view(fileData, fileSize));
     free(fileData);
-    free((void *)encodedData);
-    return util::Result::ok();
+    return util::ValueResult<Stream *>::ok(result);
 }
 
 util::Result Document::embed_file(const std::string &filePath) {
     // FIXME Use "Embedded File Streams" here (described in Section 3.10.3)
-    auto is = std::ifstream();
-    is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
-
-    if (!is.is_open()) {
-        return util::Result::error("Failed to open file for reading: '{}'", filePath);
-    }
-
-    std::stringstream ss;
-    auto result = create_embedded_file_stream(filePath, next_object_number(), is, ss);
+    auto result = create_embedded_file_stream(allocator, filePath);
     if (result.has_error()) {
-        return result;
+        return result.drop_value();
     }
 
-    auto s            = ss.str();
-    auto objectNumber = next_object_number();
-    add_object(objectNumber, s);
+    add_object(result.value());
 
     return util::Result::ok();
 }
 
-void Document::add_object(int64_t /*objectNumber*/, const std::string &content) {
-    size_t chunkSize = content.size();
-    auto chunk       = allocator.allocate_chunk(chunkSize);
-    memcpy(chunk, content.data(), chunkSize);
-#if CHANGE_SECTIONS
-    changeSections.push_back({
-          .type         = ChangeSectionType::ADDED,
-          .objectNumber = objectNumber,
-          .added =
-                {
-                      .insertion_point    = file.data + file.lastCrossRefStart,
-                      .new_content        = chunk,
-                      .new_content_length = chunkSize,
-                },
-    });
-#endif
-
-    file.trailer.crossReferenceTable.objectCount++;
-
-    file.trailer.crossReferenceTable.entries.push_back({
-          .type = CrossReferenceEntryType::NORMAL,
-          .normal =
-                {
-                      .byteOffset       = static_cast<uint64_t>(file.lastCrossRefStart),
-                      .generationNumber = 0,
-                },
-    });
+int64_t Document::add_object(Object *object) {
+    auto objectNumber        = next_object_number();
+    objectList[objectNumber] = allocator.allocate<IndirectObject>(objectNumber, 0, object);
+    return objectNumber;
 }
 
-int64_t Document::next_object_number() const {
-    return file.trailer.crossReferenceTable.firstObjectNumber + file.trailer.crossReferenceTable.objectCount;
-}
+int64_t Document::next_object_number() const { return objectList.size(); }
 
-void create_stream(int64_t objectNumber, const std::string &content, std::stringstream &ss) {
-    const char *encodedData = nullptr;
-    size_t encodedDataSize  = 0;
-    deflate_buffer(content.data(), content.size(), encodedData, encodedDataSize);
-
-    ss << objectNumber << " 0 obj <<\n";
-    ss << "/Length " << encodedDataSize << "\n";
-    ss << "/Filter /FlateDecode\n";
-    ss << ">> stream\n";
-    ss << std::string_view(encodedData, encodedDataSize);
-    ss << "endstream endobj\n";
-}
+// void create_stream(int64_t objectNumber, const std::string &content, std::stringstream &ss) {
+//     const char *encodedData = nullptr;
+//     size_t encodedDataSize  = 0;
+//     deflate_buffer(content.data(), content.size(), encodedData, encodedDataSize);
+//
+//     ss << objectNumber << " 0 obj <<\n";
+//     ss << "/Length " << encodedDataSize << "\n";
+//     ss << "/Filter /FlateDecode\n";
+//     ss << ">> stream\n";
+//     ss << std::string_view(encodedData, encodedDataSize);
+//     ss << "endstream endobj\n";
+// }
 
 IndirectObject *Document::find_existing_object(Object *object) {
     for (auto &entry : objectList) {
@@ -507,14 +441,19 @@ IndirectObject *Document::find_existing_object(Object *object) {
 }
 
 void Document::for_each_embedded_file(const std::function<util::ForEachResult(EmbeddedFile *)> &func) {
+    // TODO iterate file specifications instead and pass file name and EmbeddedFile to func
+
     for_each_object([&func](pdf::IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
             return util::ForEachResult::CONTINUE;
         }
 
-        const auto stream          = obj->object->as<Stream>();
-        const auto fileMetadataOpt = stream->dictionary->find<Dictionary>("FileMetadata");
-        if (!fileMetadataOpt.has_value()) {
+        const auto stream   = obj->object->as<Stream>();
+        const auto dictType = stream->dictionary->find<Name>("Type");
+        if (!dictType.has_value()) {
+            return util::ForEachResult::CONTINUE;
+        }
+        if (dictType.value()->value != "EmbeddedFile") {
             return util::ForEachResult::CONTINUE;
         }
 

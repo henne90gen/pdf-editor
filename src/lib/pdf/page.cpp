@@ -64,8 +64,7 @@ struct TextBlockFinder : public OperatorTraverser {
         return result;
     }
 
-    void on_show_text(Operator */*op*/) override {
-#if 0
+    void on_show_text(Operator *op) override {
         TextFont &textFont = state().textState.textFont;
         auto cmapOpt       = textFont.font->cmap(page.document);
 
@@ -114,7 +113,6 @@ struct TextBlockFinder : public OperatorTraverser {
               .op     = op,
               .cs     = currentContentStream,
         });
-#endif
     }
 };
 
@@ -219,10 +217,11 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) {
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
+    cs->encode(document.allocator, ss.str());
     //    auto s              = ss.str();
     //    auto indirectObject = document.find_existing_object(cs);
     //    document.replace_stream(indirectObject->objectNumber, s);
-    // TODO save the change that were made to the stream
+    // TODO save the changes that were made to the stream
 }
 
 } // namespace pdf
