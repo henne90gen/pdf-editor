@@ -10,11 +10,3 @@ int main(int argc, char **argv) {
     auto application = DebugApplication::create();
     return application->run(argc, argv);
 }
-
-//#if _WIN32
-//#include <windows.h>
-//int WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int /*nShowCmd*/) {
-//    spdlog::info("Using win main");
-//    return main(__argc, __argv);
-//}
-//#endif
