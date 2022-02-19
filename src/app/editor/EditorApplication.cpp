@@ -11,8 +11,7 @@ EditorApplication::EditorApplication() : PdfApplication("de.henne90gen.pdf.edito
 
 void EditorApplication::open_window(const std::string &filePath) {
     try {
-        auto builderString = std::string((char *)editor_xml_data, editor_xml_size);
-        auto builder       = Gtk::Builder::create_from_string(builderString);
+        auto builder       = Gtk::Builder::create_from_string(embedded::get_editor_xml());
         auto window        = Gtk::Builder::get_widget_derived<EditorWindow>(builder, "EditorWindow", filePath);
         add_window(*window);
         window->present();
