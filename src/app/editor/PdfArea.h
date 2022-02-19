@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <spdlog/spdlog.h>
-
-// TODO this is a hack to get the gtkmm4 code to compile on Windows
-#undef WIN32
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/box.h>
@@ -18,6 +13,8 @@
 #include <gtkmm/treestore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/viewport.h>
+#include <iostream>
+#include <spdlog/spdlog.h>
 
 #include <pdf/document.h>
 #include <pdf/page.h>

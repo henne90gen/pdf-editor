@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO this is a hack to get the gtkmm4 code to compile on Windows
-#undef WIN32
 #include <gtkmm/adjustment.h>
 #include <gtkmm/builder.h>
 #include <gtkmm/fixed.h>

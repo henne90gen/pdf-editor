@@ -1,12 +1,9 @@
 #pragma once
 
 #include <filesystem>
-#include <iostream>
-
-// TODO this is a hack to get the gtkmm4 code to compile on Windows
-#undef WIN32
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/builder.h>
+#include <iostream>
 
 #include "PdfArea.h"
 

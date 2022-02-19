@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO this is a hack to get the gtkmm4 code to compile on Windows
-#undef WIN32
 #include <gtkmm/builder.h>
 #include <gtkmm/drawingarea.h>
 
@@ -14,7 +12,7 @@ constexpr int BYTES_PER_ROW   = 50;
 
 class ContentArea : public ScrolledZoomedContent {
   public:
-    double _zoom = 1.0;
+    double _zoom = 0.4;
 
     [[maybe_unused]] ContentArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &_builder,
                                  pdf::Document &_document);
