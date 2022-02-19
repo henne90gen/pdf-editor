@@ -7,8 +7,6 @@
 #include <iomanip>
 #include <sstream>
 
-#include "style.css.h"
-
 DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
     auto result = pdf::Document::read_from_file(filePath, document, false);
@@ -20,7 +18,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
 
     // apply css
     Glib::RefPtr<Gtk::CssProvider> cssProvider = Gtk::CssProvider::create();
-    cssProvider->load_from_data(embedded::get_style_css());
+    cssProvider->load_from_resource("/com/github/henne90gen/pdf-debugger/style.css");
     get_style_context()->add_provider_for_display(get_display(), cssProvider, GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // get widget references
