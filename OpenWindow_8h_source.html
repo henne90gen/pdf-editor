@@ -72,30 +72,28 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// TODO this is a hack to get the gtkmm4 code to compile on Windows</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#undef WIN32</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;gtkmm/applicationwindow.h&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;gtkmm/button.h&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;gtkmm/filechooserdialog.h&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;gtkmm/headerbar.h&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classOpenWindow.html">   11</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOpenWindow.html">OpenWindow</a> : <span class="keyword">public</span> Gtk::ApplicationWindow {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <a class="code" href="classOpenWindow.html">OpenWindow</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder,</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;               std::function&lt;<span class="keywordtype">void</span>(<span class="keyword">const</span> std::string &amp;)&gt; _func);</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keywordtype">void</span> on_open_file();</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keywordtype">void</span> on_open_response(<span class="keywordtype">int</span> response);</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">const</span> std::function&lt;void(<span class="keyword">const</span> std::string &amp;)&gt; func;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    Gtk::HeaderBar *titlebar           = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    Gtk::Button *openButton            = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    Gtk::FileChooserDialog *openDialog = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;};</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;gtkmm/applicationwindow.h&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;gtkmm/button.h&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;gtkmm/filechooserdialog.h&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;gtkmm/headerbar.h&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classOpenWindow.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classOpenWindow.html">OpenWindow</a> : <span class="keyword">public</span> Gtk::ApplicationWindow {</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <a class="code" href="classOpenWindow.html">OpenWindow</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder,</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;               std::function&lt;<span class="keywordtype">void</span>(<span class="keyword">const</span> std::string &amp;)&gt; _func);</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <span class="keywordtype">void</span> on_open_file();</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">void</span> on_open_response(<span class="keywordtype">int</span> response);</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">const</span> std::function&lt;void(<span class="keyword">const</span> std::string &amp;)&gt; func;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    Gtk::HeaderBar *titlebar           = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    Gtk::Button *openButton            = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    Gtk::FileChooserDialog *openDialog = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassOpenWindow_html"><div class="ttname"><a href="classOpenWindow.html">OpenWindow</a></div><div class="ttdef"><b>Definition:</b> OpenWindow.h:11</div></div>
+<div class="ttc" id="aclassOpenWindow_html"><div class="ttname"><a href="classOpenWindow.html">OpenWindow</a></div><div class="ttdef"><b>Definition:</b> OpenWindow.h:9</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

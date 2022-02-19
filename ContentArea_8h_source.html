@@ -72,74 +72,72 @@ $(function() {
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// TODO this is a hack to get the gtkmm4 code to compile on Windows</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#undef WIN32</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;gtkmm/drawingarea.h&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;gtkmm/drawingarea.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;pdf/document.h&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;pdf/document.h&gt;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;ScrolledZoomedWindow.h&quot;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;ScrolledZoomedWindow.h&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;constexpr <span class="keywordtype">int</span> PIXELS_PER_BYTE = 50;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;constexpr <span class="keywordtype">int</span> BYTES_PER_ROW   = 50;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classContentArea.html">   15</a></span>&#160;<span class="keyword">class </span><a class="code" href="classContentArea.html">ContentArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <span class="keywordtype">double</span> _zoom = 1.0;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    [[maybe_unused]] <a class="code" href="classContentArea.html">ContentArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;_builder,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;                                 <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keyword">using</span> type_signal_byte = sigc::signal&lt;void(<span class="keywordtype">int</span>)&gt;;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    type_signal_byte signal_hovered_byte() { <span class="keywordflow">return</span> signalHoveredByte; }</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    type_signal_byte signal_selected_byte() { <span class="keywordflow">return</span> signalSelectedByte; }</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keywordtype">void</span> toggle_highlight_trailer();</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> toggle_highlight_objects();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> set_selected_byte(<span class="keywordtype">int</span> <span class="keywordtype">byte</span>) {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        selectedByte = byte;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        signalSelectedByte.emit(selectedByte);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    }</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> on_mouse_leave();</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span> on_mouse_enter(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> on_mouse_motion(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> on_mouse_click(<span class="keywordtype">int</span> numPress, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">double</span> offsetX              = 0.0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">double</span> offsetY              = 0.0;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">bool</span> shouldHighlightTrailer = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> shouldHighlightObjects = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">int</span> hoveredByte             = -1;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">int</span> selectedByte            = -1;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    type_signal_byte signalHoveredByte;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    type_signal_byte signalSelectedByte;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> draw_text(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> highlight_trailer(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">void</span> highlight_objects(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">void</span> update_hovered_byte(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">int</span> find_byte(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> highlight_range(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keyword">const</span> <span class="keywordtype">char</span> *startPtr, <span class="keywordtype">size_t</span> length, <span class="keywordtype">double</span> r,</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                         <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> b) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> highlight_byte(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> <span class="keywordtype">byte</span>, <span class="keywordtype">double</span> r, <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> b);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;constexpr <span class="keywordtype">int</span> PIXELS_PER_BYTE = 50;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;constexpr <span class="keywordtype">int</span> BYTES_PER_ROW   = 50;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classContentArea.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classContentArea.html">ContentArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <span class="keywordtype">double</span> _zoom = 0.4;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    [[maybe_unused]] <a class="code" href="classContentArea.html">ContentArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;_builder,</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;                                 <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">using</span> type_signal_byte = sigc::signal&lt;void(<span class="keywordtype">int</span>)&gt;;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    type_signal_byte signal_hovered_byte() { <span class="keywordflow">return</span> signalHoveredByte; }</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    type_signal_byte signal_selected_byte() { <span class="keywordflow">return</span> signalSelectedByte; }</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordtype">void</span> toggle_highlight_trailer();</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordtype">void</span> toggle_highlight_objects();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">void</span> set_selected_byte(<span class="keywordtype">int</span> <span class="keywordtype">byte</span>) {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        selectedByte = byte;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        signalSelectedByte.emit(selectedByte);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">void</span> on_mouse_leave();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">void</span> on_mouse_enter(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> on_mouse_motion(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span> on_mouse_click(<span class="keywordtype">int</span> numPress, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">double</span> offsetX              = 0.0;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">double</span> offsetY              = 0.0;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">bool</span> shouldHighlightTrailer = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">bool</span> shouldHighlightObjects = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">int</span> hoveredByte             = -1;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">int</span> selectedByte            = -1;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    type_signal_byte signalHoveredByte;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    type_signal_byte signalSelectedByte;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> draw_text(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">void</span> highlight_trailer(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> highlight_objects(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> update_hovered_byte(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">int</span> find_byte(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">void</span> highlight_range(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keyword">const</span> <span class="keywordtype">char</span> *startPtr, <span class="keywordtype">size_t</span> length, <span class="keywordtype">double</span> r,</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                         <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> b) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> highlight_byte(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> <span class="keywordtype">byte</span>, <span class="keywordtype">double</span> r, <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> b);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:94</div></div>
-<div class="ttc" id="aclassScrolledZoomedContent_html"><div class="ttname"><a href="classScrolledZoomedContent.html">ScrolledZoomedContent</a></div><div class="ttdef"><b>Definition:</b> ScrolledZoomedWindow.h:10</div></div>
-<div class="ttc" id="aclassContentArea_html"><div class="ttname"><a href="classContentArea.html">ContentArea</a></div><div class="ttdef"><b>Definition:</b> ContentArea.h:15</div></div>
+<div class="ttc" id="aclassScrolledZoomedContent_html"><div class="ttname"><a href="classScrolledZoomedContent.html">ScrolledZoomedContent</a></div><div class="ttdef"><b>Definition:</b> ScrolledZoomedWindow.h:8</div></div>
+<div class="ttc" id="aclassContentArea_html"><div class="ttname"><a href="classContentArea.html">ContentArea</a></div><div class="ttdef"><b>Definition:</b> ContentArea.h:13</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

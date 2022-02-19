@@ -73,25 +73,22 @@ $(function() {
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;filesystem&gt;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// TODO this is a hack to get the gtkmm4 code to compile on Windows</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#undef WIN32</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;gtkmm/applicationwindow.h&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;PdfArea.h&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classEditorWindow.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classEditorWindow.html">EditorWindow</a> : <span class="keyword">public</span> Gtk::ApplicationWindow {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    [[maybe_unused]] <a class="code" href="classEditorWindow.html">EditorWindow</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder,</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;                                  <span class="keyword">const</span> std::string &amp;filePath);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> document;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;};</div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;gtkmm/applicationwindow.h&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;gtkmm/builder.h&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;PdfArea.h&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classEditorWindow.html">   10</a></span>&#160;<span class="keyword">class </span><a class="code" href="classEditorWindow.html">EditorWindow</a> : <span class="keyword">public</span> Gtk::ApplicationWindow {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    [[maybe_unused]] <a class="code" href="classEditorWindow.html">EditorWindow</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder,</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;                                  <span class="keyword">const</span> std::string &amp;filePath);</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> document;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassEditorWindow_html"><div class="ttname"><a href="classEditorWindow.html">EditorWindow</a></div><div class="ttdef"><b>Definition:</b> EditorWindow.h:13</div></div>
+<div class="ttc" id="aclassEditorWindow_html"><div class="ttname"><a href="classEditorWindow.html">EditorWindow</a></div><div class="ttdef"><b>Definition:</b> EditorWindow.h:10</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:94</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
