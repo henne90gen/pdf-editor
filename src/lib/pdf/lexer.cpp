@@ -375,11 +375,6 @@ std::optional<Token> findToken(const std::string_view &word) {
         return wordToken;
     }
 
-    auto operatorToken = matchOperator(word);
-    if (operatorToken.has_value()) {
-        return operatorToken;
-    }
-
     // NOTE indirect reference and object start have to be lexed before float or int
     auto indirectReferenceToken = matchIndirectReference(word);
     if (indirectReferenceToken.has_value()) {
@@ -409,6 +404,11 @@ std::optional<Token> findToken(const std::string_view &word) {
     auto commentToken = matchComment(word);
     if (commentToken.has_value()) {
         return commentToken;
+    }
+
+    auto operatorToken = matchOperator(word);
+    if (operatorToken.has_value()) {
+        return operatorToken;
     }
 
     return {};

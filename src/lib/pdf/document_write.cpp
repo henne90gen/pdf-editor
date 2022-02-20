@@ -187,7 +187,7 @@ util::Result Document::write_to_file(const std::string &filePath) {
     os.open(filePath, std::ios::out | std::ios::binary);
 
     if (!os.is_open()) {
-        return util::Result::error("Failed to open pdf file for writing: '{}'", filePath);
+        return util::Result::error("Failed to open file for writing: '{}'", filePath);
     }
 
     auto result = write_to_stream(*this, os);
