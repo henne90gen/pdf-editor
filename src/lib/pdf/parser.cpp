@@ -166,8 +166,7 @@ Array *Parser::parse_array() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
-    auto vec        = util::StaticVector<Object *>::create(allocator, objects);
-    return allocator.allocate<Array>(vec);
+    return allocator.allocate<Array>(objects);
 }
 
 void Parser::ignore_new_line_tokens() {
@@ -206,8 +205,7 @@ Dictionary *Parser::parse_dictionary() {
     }
 
     currentTokenIdx++;
-    auto map = util::StaticMap<std::string, Object *>::create(allocator, objects);
-    return allocator.allocate<Dictionary>(map);
+    return allocator.allocate<Dictionary>(objects);
 }
 
 IndirectReference *Parser::parse_indirect_reference() {
@@ -304,15 +302,15 @@ Object *Parser::parse_stream_or_dictionary() {
     }
     currentTokenIdx++;
 
-    auto opt = dictionary->values.find("Length");
-    if (!opt.has_value()) {
+    auto itr = dictionary->values.find("Length");
+    if (itr==dictionary->values.end()) {
         // TODO add logging
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
     }
 
     int64_t length = -1;
-    auto &value    = opt.value();
+    auto &value    = itr->second;
     if (value->is<Integer>()) {
         length = value->as<Integer>()->value;
     } else if (value->is<IndirectReference>()) {

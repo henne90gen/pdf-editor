@@ -38,4 +38,4 @@ template <typename T> struct StaticVector {
     StaticVector(T *_elements, size_t _count) : elements(_elements), count(_count) {}
 };
 
-} // namespace pdf
+} // namespace util

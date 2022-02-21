@@ -27,10 +27,13 @@ class DebugWindow : public Gtk::ApplicationWindow {
     void update_details_label(pdf::Object *object);
     void open_jump_to_byte_dialog();
     void response_jump_to_byte_dialog(int response);
+    void document_changed(const Glib::RefPtr<Gio::File> &file, const Glib::RefPtr<Gio::File> &otherFile,
+                          Gio::FileMonitor::Event event);
 
   private:
     pdf::Document document;
     pdf::ReadMetadata metadata;
+    Glib::RefPtr<Gio::FileMonitor> fileMonitor;
 
     Gtk::Label *selectedByteLabel      = nullptr;
     Gtk::Label *hoveredByteLabel       = nullptr;

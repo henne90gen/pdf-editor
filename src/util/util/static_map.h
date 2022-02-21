@@ -1,7 +1,7 @@
 #pragma once
 
-#include <optional>
 #include "spdlog/spdlog.h"
+#include <optional>
 #include <unordered_map>
 
 namespace util {
@@ -145,4 +145,4 @@ template <typename K, typename V> struct StaticMap {
     }
 };
 
-} // namespace pdf
+} // namespace util

@@ -50,12 +50,16 @@ TEST(Writer, Embed) {
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
 
+    ASSERT_FALSE(document.write_to_file("test.pdf").has_error());
+
     char *buffer = nullptr;
     size_t size  = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
+    // TODO this fails, because it depends on the order of an unordered_map
+    // TODO fix: get the area in question from the buffer, parse it into an IndirectObject and to assertions on that
     ASSERT_BUFFER_CONTAINS_AT(buffer, 19,
                               "14 0 obj\n<</Filter /FlateDecode /Params <</Size 7350>> /Length 6650 /Type /EmbeddedFile>>\nstream\n");
     ASSERT_BUFFER_CONTAINS_AT(buffer, 6767, "endstream\nendobj\n");

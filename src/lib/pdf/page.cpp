@@ -218,10 +218,6 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) {
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
     cs->encode(document.allocator, ss.str());
-    //    auto s              = ss.str();
-    //    auto indirectObject = document.find_existing_object(cs);
-    //    document.replace_stream(indirectObject->objectNumber, s);
-    // TODO save the changes that were made to the stream
 }
 
 } // namespace pdf

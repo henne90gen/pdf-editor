@@ -55,7 +55,7 @@ void Allocator::clear_current_allocation() const {
 char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     while (currentAllocation->bufferPosition + sizeInBytes >
-        currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
+           currentAllocation->bufferStart + currentAllocation->sizeInBytes) {
         spdlog::trace("Failed to fit object of size {} bytes into the existing memory, allocating more", sizeInBytes);
 
         auto newAllocationSize = currentAllocation->sizeInBytes * 2;
@@ -103,4 +103,4 @@ size_t Allocator::total_bytes_used() const {
     return result;
 }
 
-} // namespace pdf
+} // namespace util

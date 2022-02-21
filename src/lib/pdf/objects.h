@@ -4,8 +4,6 @@
 #include <optional>
 #include <unordered_map>
 #include <util/allocator.h>
-#include <util/static_map.h>
-#include <util/static_vector.h>
 #include <util/util.h>
 #include <utility>
 #include <vector>
@@ -98,37 +96,37 @@ struct Name : public Object {
 };
 
 struct Array : public Object {
-    util::StaticVector<Object *> values;
+    std::vector<Object *> values;
 
     static Type staticType() { return Type::ARRAY; }
-    explicit Array(util::StaticVector<Object *> objects) : Object(staticType()), values(objects) {}
+    explicit Array(std::vector<Object *> objects) : Object(staticType()), values(std::move(objects)) {}
 
     void remove_element(Document &document, size_t index);
 };
 
 struct Dictionary : public Object {
-    util::StaticMap<std::string, Object *> values = {};
+    std::unordered_map<std::string, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(util::StaticMap<std::string, Object *> map) : Object(staticType()), values(map) {}
+    explicit Dictionary(std::unordered_map<std::string, Object *> map) : Object(staticType()), values(std::move(map)) {}
     static Dictionary *create(util::Allocator &allocator, const std::unordered_map<std::string, Object *> &dict) {
-        return allocator.allocate<Dictionary>(util::StaticMap<std::string, Object *>::create(allocator, dict));
+        return allocator.allocate<Dictionary>(dict);
     }
 
     template <typename T> std::optional<T *> find(const std::string &key) {
-        auto opt = values.find(key);
-        if (!opt.has_value()) {
+        auto itr = values.find(key);
+        if (itr == values.end()) {
             return {};
         }
-        return opt.value()->as<T>();
+        return itr->second->as<T>();
     }
 
     template <typename T> T *must_find(const std::string &key) {
-        auto opt = values.find(key);
-        if (!opt.has_value()) {
+        auto itr = values.find(key);
+        if (itr == values.end()) {
             return nullptr;
         }
-        return opt.value()->as<T>();
+        return itr->second->as<T>();
     }
 };
 
@@ -174,9 +172,9 @@ struct Stream : public Object {
 
 struct EmbeddedFile : public Stream {
     std::optional<int64_t> size();
-    // TODO void creation_date();
-    // TODO void mod_date();
-    // TODO check_sum();
+    // TODO std::optional creation_date();
+    // TODO std::optional mod_date();
+    // TODO std::optional check_sum();
 };
 
 struct Null : public Object {

@@ -80,17 +80,17 @@ std::string to_string(Object *object) {
 #endif
 
 std::vector<std::string> Stream::filters() const {
-    auto opt = dictionary->values.find("Filter");
-    if (!opt.has_value()) {
+    auto itr = dictionary->values.find("Filter");
+    if (itr == dictionary->values.end()) {
         return {};
     }
 
-    if (opt.value()->is<Name>()) {
+    if (itr->second->is<Name>()) {
         // TODO is this conversion to a string really necessary?
-        return {std::string(opt.value()->as<Name>()->value)};
+        return {std::string(itr->second->as<Name>()->value)};
     }
 
-    auto array  = opt.value()->as<Array>();
+    auto array  = itr->second->as<Array>();
     auto result = std::vector<std::string>();
     result.reserve(array->values.size());
     for (auto filter : array->values) {
@@ -201,7 +201,7 @@ void Stream::encode(util::Allocator &allocator, const std::string &data) {
     free((void *)encodedData);
 
     streamData = std::string_view(newStreamData, encodedDataSize);
-    // TODO update the dictionary with the correct length
+    dictionary->values["Length"] = allocator.allocate<Integer>(encodedDataSize);
 }
 
 Stream *Stream::create_from_unencoded_data(util::Allocator &allocator,
@@ -255,13 +255,11 @@ std::string HexadecimalString::to_string() const {
 
 void Array::remove_element(Document & /*document*/, size_t index) {
     ASSERT(index < values.size());
-    values.remove(index);
-    // TODO track the deletion of the i-th element
+    values.erase(values.begin() + index);
 }
 
 void Integer::set(Document & /*document*/, int64_t i) {
     value = i;
-    // TODO track the change of this value
 }
 
 std::optional<int64_t> EmbeddedFile::size() {

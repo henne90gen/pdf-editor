@@ -127,7 +127,7 @@ util::Result read_cross_reference_stream(Document &document, IndirectObject *str
         }
     }
 
-    auto opt = stream->dictionary->values.find("Prev");
+    auto opt = stream->dictionary->find<Integer>("Prev");
     if (!opt.has_value()) {
         return util::Result::ok();
     }
@@ -224,13 +224,13 @@ util::Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *
     document.file.metadata.trailers[currentTrailer] =
           std::string_view(crossRefStartPtr, (currentReadPtr - crossRefStartPtr) + lengthOfTrailerDict);
     currentTrailer->dict = parseDict(document.allocator, currentReadPtr, lengthOfTrailerDict);
-    auto opt             = currentTrailer->dict->values.find("Prev");
+    auto opt             = currentTrailer->dict->find<Integer>("Prev");
     if (!opt.has_value()) {
         return util::Result::ok();
     }
 
     currentTrailer->prev = document.allocator.allocate<Trailer>();
-    return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
+    return read_trailers(document, document.file.data + opt.value()->value, currentTrailer->prev);
 }
 
 std::pair<IndirectObject *, std::string_view> load_object(Document &document, CrossReferenceEntry &entry) {

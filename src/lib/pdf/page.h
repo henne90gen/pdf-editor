@@ -17,9 +17,9 @@ struct PageTreeNode : public Dictionary {
 
     template <typename T>
     std::optional<T *> attribute(Document &document, const std::string &attributeName, bool inheritable) {
-        auto opt = values.find(attributeName);
-        if (opt.has_value()) {
-            return document.get<T>(opt.value());
+        auto itr = values.find(attributeName);
+        if (itr != values.end()) {
+            return document.get<T>(itr->second);
         }
 
         if (!inheritable) {

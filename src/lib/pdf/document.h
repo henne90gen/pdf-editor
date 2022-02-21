@@ -93,8 +93,8 @@ struct ReadMetadata {
 
 struct Document : public ReferenceResolver {
     util::Allocator allocator = {};
-    DocumentFile file         = {};
-    DocumentCatalog *root     = nullptr; // TODO make this private?
+
+    DocumentFile file = {};
 
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -171,6 +171,8 @@ struct Document : public ReferenceResolver {
     IndirectObject *find_existing_object(Object *object);
 
   private:
+    DocumentCatalog *rootCache = nullptr;
+
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);
 };

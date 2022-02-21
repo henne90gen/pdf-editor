@@ -160,11 +160,11 @@ size_t Document::object_count(const bool parseObjects) {
 }
 
 PageTreeNode *PageTreeNode::parent(Document &document) {
-    auto opt = values.find("Parent");
-    if (!opt.has_value()) {
+    auto itr = values.find("Parent");
+    if (itr == values.end()) {
         return nullptr;
     }
-    return document.get<PageTreeNode>(opt.value());
+    return document.get<PageTreeNode>(itr->second);
 }
 
 void Document::for_each_page(const std::function<util::ForEachResult(Page *)> &func) {
@@ -201,20 +201,20 @@ void Document::for_each_page(const std::function<util::ForEachResult(Page *)> &f
 }
 
 DocumentCatalog *Document::catalog() {
-    if (root != nullptr) {
-        return root;
+    if (rootCache != nullptr) {
+        return rootCache;
     }
 
-    std::optional<Object *> opt;
+    Object *obj;
     if (file.trailer.dict != nullptr) {
-        opt = file.trailer.dict->values.find("Root");
+        obj = file.trailer.dict->must_find<Object>("Root");
     } else {
-        opt = file.trailer.streamObject->object->as<Stream>()->dictionary->values.find("Root");
+        obj = file.trailer.streamObject->object->as<Stream>()->dictionary->must_find<Object>("Root");
     }
-    ASSERT(opt.has_value());
+    ASSERT(obj != nullptr);
 
-    root = get<DocumentCatalog>(opt.value());
-    return root;
+    rootCache = get<DocumentCatalog>(obj);
+    return rootCache;
 }
 
 std::vector<Page *> Document::pages() {
@@ -291,7 +291,7 @@ util::Result Document::delete_page(size_t pageNum) {
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
-    auto opt = values.find("Pages");
+    auto opt = find<Object>("Pages");
     if (!opt.has_value()) {
         return nullptr;
     }

@@ -73,8 +73,8 @@ void write_dictionary_object(std::ostream &s, Dictionary *dictionary) {
         if (i != 0) {
             s << " ";
         }
-        s << "/" << itr.key << " ";
-        write_object(s, itr.value);
+        s << "/" << itr.first << " ";
+        write_object(s, itr.second);
         i++;
     }
     s << ">>";

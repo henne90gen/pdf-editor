@@ -42,6 +42,10 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
     documentTree->signal_object_selected().connect(sigc::mem_fun(*this, &DebugWindow::update_details_label));
 
+    auto gioFile = Gio::File::create_for_path(filePath);
+    fileMonitor  = gioFile->monitor_file(Gio::FileMonitorFlags::NONE);
+    fileMonitor->signal_changed().connect(sigc::mem_fun(*this, &DebugWindow::document_changed));
+
     update_memory_usage_label();
     // NOTE using polling seems to be the only reasonable solution
     Glib::signal_timeout().connect(
@@ -172,4 +176,14 @@ void DebugWindow::update_details_label(pdf::Object *object) {
     case pdf::Object::Type::OBJECT_STREAM_CONTENT:
         break;
     }
+}
+
+void DebugWindow::document_changed(const Glib::RefPtr<Gio::File> &file, const Glib::RefPtr<Gio::File> &otherFile,
+                                   Gio::FileMonitor::Event event) {
+    spdlog::trace("DebugWindow::document_changed(file={}, otherFile={}, event={})", file->get_path(),
+                  otherFile->get_path(), event);
+    if (event != Gio::FileMonitor::Event::CHANGES_DONE_HINT) {
+        return;
+    }
+    // TODO reload document and refresh UI
 }
