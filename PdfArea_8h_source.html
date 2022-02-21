@@ -95,36 +95,46 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;constexpr <span class="keywordtype">int</span> PAGE_PADDING = 10;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classPdfArea.html">   26</a></span>&#160;<span class="keyword">class </span><a class="code" href="classPdfArea.html">PdfArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">double</span> _zoom = 1.0;</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="structPageTextBlocks.html">   26</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPageTextBlocks.html">PageTextBlocks</a> {</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">double</span> pageOffset                = 0.0;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::vector&lt;pdf::TextBlock&gt; textBlocks = {};</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    [[maybe_unused]] <a class="code" href="classPdfArea.html">PdfArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp; <span class="comment">/*builder*/</span>,</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                             <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">void</span> on_highlight_text_toggled();</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> offsetX = 0.0;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">double</span> offsetY = 0.0;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">bool</span> highlightText                     = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::vector&lt;pdf::TextBlock&gt; textBlocks = {};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">void</span> render_pages(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> render_text_blocks(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="structPageTextBlocks.html">PageTextBlocks</a>(<span class="keywordtype">double</span> _pageOffset, std::vector&lt;pdf::TextBlock&gt; _textBlocks)</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        : pageOffset(_pageOffset), textBlocks(std::move(_textBlocks)) {}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classPdfArea.html">   34</a></span>&#160;<span class="keyword">class </span><a class="code" href="classPdfArea.html">PdfArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">double</span> _zoom = 1.0;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    [[maybe_unused]] <a class="code" href="classPdfArea.html">PdfArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp; <span class="comment">/*builder*/</span>,</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                             <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">double</span> scrollOffsetX = 0.0;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">double</span> scrollOffsetY = 0.0;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">double</span> mouseX  = 0.0;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">double</span> mouseY  = 0.0;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::vector&lt;PageTextBlocks&gt; pageTextBlocks = {};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> mouse_moved(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">void</span> render_pages(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">void</span> render_text_blocks(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:94</div></div>
 <div class="ttc" id="aclassScrolledZoomedContent_html"><div class="ttname"><a href="classScrolledZoomedContent.html">ScrolledZoomedContent</a></div><div class="ttdef"><b>Definition:</b> ScrolledZoomedWindow.h:8</div></div>
-<div class="ttc" id="aclassPdfArea_html"><div class="ttname"><a href="classPdfArea.html">PdfArea</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:26</div></div>
+<div class="ttc" id="astructPageTextBlocks_html"><div class="ttname"><a href="structPageTextBlocks.html">PageTextBlocks</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:26</div></div>
+<div class="ttc" id="aclassPdfArea_html"><div class="ttname"><a href="classPdfArea.html">PdfArea</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:34</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

@@ -99,26 +99,29 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> update_details_label(<a class="code" href="structpdf_1_1Object.html">pdf::Object</a> *<span class="keywordtype">object</span>);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> open_jump_to_byte_dialog();</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> response_jump_to_byte_dialog(<span class="keywordtype">int</span> response);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> document;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="structpdf_1_1ReadMetadata.html">pdf::ReadMetadata</a> metadata;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    Gtk::Label *selectedByteLabel      = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    Gtk::Label *hoveredByteLabel       = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    Gtk::Label *memoryUsageLabel       = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    Gtk::Label *detailsLabel           = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    Gtk::CheckButton *trailerHighlight = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    Gtk::CheckButton *objectsHighlight = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    Gtk::Button *jumpToByteButton      = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    Gtk::Button *parseDocumentButton   = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classContentArea.html">ContentArea</a> *contentArea           = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classDocumentTree.html">DocumentTree</a> *documentTree         = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classJumpToByteDialog.html">JumpToByteDialog</a> *jumpToByteDialog = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> document_changed(<span class="keyword">const</span> Glib::RefPtr&lt;Gio::File&gt; &amp;file, <span class="keyword">const</span> Glib::RefPtr&lt;Gio::File&gt; &amp;otherFile,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                          Gio::FileMonitor::Event event);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> document;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="structpdf_1_1ReadMetadata.html">pdf::ReadMetadata</a> metadata;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    Glib::RefPtr&lt;Gio::FileMonitor&gt; fileMonitor;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    Gtk::Label *selectedByteLabel      = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    Gtk::Label *hoveredByteLabel       = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    Gtk::Label *memoryUsageLabel       = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    Gtk::Label *detailsLabel           = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    Gtk::CheckButton *trailerHighlight = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    Gtk::CheckButton *objectsHighlight = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    Gtk::Button *jumpToByteButton      = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    Gtk::Button *parseDocumentButton   = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classContentArea.html">ContentArea</a> *contentArea           = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classDocumentTree.html">DocumentTree</a> *documentTree         = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classJumpToByteDialog.html">JumpToByteDialog</a> *jumpToByteDialog = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
+<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:31</div></div>
 <div class="ttc" id="aclassDocumentTree_html"><div class="ttname"><a href="classDocumentTree.html">DocumentTree</a></div><div class="ttdef"><b>Definition:</b> DocumentTree.h:23</div></div>
 <div class="ttc" id="aclassJumpToByteDialog_html"><div class="ttname"><a href="classJumpToByteDialog.html">JumpToByteDialog</a></div><div class="ttdef"><b>Definition:</b> JumpToByteDialog.h:7</div></div>
 <div class="ttc" id="aclassDebugWindow_html"><div class="ttname"><a href="classDebugWindow.html">DebugWindow</a></div><div class="ttdef"><b>Definition:</b> DebugWindow.h:19</div></div>

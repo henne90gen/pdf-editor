@@ -89,9 +89,9 @@ $(function() {
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    std::optional&lt;T *&gt; attribute(<a class="code" href="structpdf_1_1Document.html">Document</a> &amp;document, <span class="keyword">const</span> std::string &amp;attributeName, <span class="keywordtype">bool</span> inheritable) {</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">auto</span> opt = values.find(attributeName);</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordflow">if</span> (opt.has_value()) {</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            <span class="keywordflow">return</span> document.get&lt;T&gt;(opt.value());</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        <span class="keyword">auto</span> itr = values.find(attributeName);</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <span class="keywordflow">if</span> (itr != values.end()) {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            <span class="keywordflow">return</span> document.get&lt;T&gt;(itr-&gt;second);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        }</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordflow">if</span> (!inheritable) {</div>
@@ -163,19 +163,19 @@ $(function() {
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
-<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:100</div></div>
+<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:31</div></div>
+<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:98</div></div>
 <div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:64</div></div>
-<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:109</div></div>
+<div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:107</div></div>
 <div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:19</div></div>
-<div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:60</div></div>
+<div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:58</div></div>
 <div class="ttc" id="astructpdf_1_1FontMap_html"><div class="ttname"><a href="structpdf_1_1FontMap.html">pdf::FontMap</a></div><div class="ttdef"><b>Definition:</b> font.h:78</div></div>
 <div class="ttc" id="astructpdf_1_1Tf__SetTextFontSize_html"><div class="ttname"><a href="structpdf_1_1Tf__SetTextFontSize.html">pdf::Tf_SetTextFontSize</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:104</div></div>
 <div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:47</div></div>
-<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:93</div></div>
+<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:91</div></div>
 <div class="ttc" id="astructpdf_1_1PageTreeNode_html"><div class="ttname"><a href="structpdf_1_1PageTreeNode.html">pdf::PageTreeNode</a></div><div class="ttdef"><b>Definition:</b> page.h:11</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:94</div></div>
-<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:154</div></div>
+<div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:152</div></div>
 <div class="ttc" id="astructpdf_1_1TextBlock_html"><div class="ttname"><a href="structpdf_1_1TextBlock.html">pdf::TextBlock</a></div><div class="ttdef"><b>Definition:</b> page.h:51</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
 <div class="ttc" id="astructpdf_1_1Rectangle_html"><div class="ttname"><a href="structpdf_1_1Rectangle.html">pdf::Rectangle</a></div><div class="ttdef"><b>Definition:</b> rectangle.h:7</div></div>
