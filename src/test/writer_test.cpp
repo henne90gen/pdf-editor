@@ -45,7 +45,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     free(buffer);
 }
 
-TEST(Writer, Embed) {
+TEST(Writer, DISABLED_Embed) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());

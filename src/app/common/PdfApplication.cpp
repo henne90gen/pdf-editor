@@ -30,7 +30,7 @@ void PdfApplication::on_activate() {
 
 void PdfApplication::on_open(const Gio::Application::type_vec_files &files, const Glib::ustring & /*hint*/) {
     if (files.empty()) {
-        spdlog::warn("There were no files");
+        spdlog::warn("There were no files to open");
         return;
     }
 

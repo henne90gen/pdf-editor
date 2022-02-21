@@ -19,7 +19,7 @@
                             <object class="GtkCheckButton" id="HighlightTextCheckButton">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
-                                <property name="label">Show Text</property>
+                                <property name="label">Highlight Text</property>
                             </object>
                         </child>
                     </object>
