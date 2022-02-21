@@ -5,7 +5,6 @@
 #include <spdlog/spdlog.h>
 
 #include "OpenWindow.h"
-#include "open.ui.h"
 
 PdfApplication::PdfApplication(const std::string &appId)
     : Gtk::Application(appId, Gio::Application::Flags::HANDLES_OPEN) {}
@@ -14,7 +13,7 @@ void PdfApplication::on_activate() {
     spdlog::trace("Activating application");
 
     try {
-        auto builder       = Gtk::Builder::create_from_string(embedded::get_open_ui());
+        auto builder       = Gtk::Builder::create_from_resource("/com/github/henne90gen/pdf-common/../common/open.ui");
         auto window =
               Gtk::Builder::get_widget_derived<OpenWindow>(builder, "OpenWindow", [this](const std::string &filePath) {
                   spdlog::info("Opening file '{}'", filePath);

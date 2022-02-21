@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
+    <gresource prefix="/com/github/henne90gen/pdf-common">
+        <file>../common/open.ui</file>
+    </gresource>
     <gresource prefix="/com/github/henne90gen/pdf-debugger">
         <file>debugger.ui</file>
         <file>style.css</file>
