@@ -3,7 +3,6 @@
 #include <vector>
 
 #include <pdf/document.h>
-#include "util/static_vector.h"
 
 namespace pdf {
 void write_object(std::ostream &s, Object *object);
