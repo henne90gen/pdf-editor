@@ -23,6 +23,14 @@
 
 constexpr int PAGE_PADDING = 10;
 
+struct PageTextBlocks {
+    double pageOffset                = 0.0;
+    std::vector<pdf::TextBlock> textBlocks = {};
+
+    PageTextBlocks(double _pageOffset, std::vector<pdf::TextBlock> _textBlocks)
+        : pageOffset(_pageOffset), textBlocks(std::move(_textBlocks)) {}
+};
+
 class PdfArea : public ScrolledZoomedContent {
   public:
     double _zoom = 1.0;
@@ -35,17 +43,18 @@ class PdfArea : public ScrolledZoomedContent {
     double zoom() override { return _zoom; }
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
-    void on_highlight_text_toggled();
 
   private:
     pdf::Document &document;
 
-    double offsetX = 0.0;
-    double offsetY = 0.0;
+    double scrollOffsetX = 0.0;
+    double scrollOffsetY = 0.0;
+    double mouseX  = 0.0;
+    double mouseY  = 0.0;
 
-    bool highlightText                     = false;
-    std::vector<pdf::TextBlock> textBlocks = {};
+    std::vector<PageTextBlocks> pageTextBlocks = {};
 
+    void mouse_moved(double x, double y);
     void render_pages(const Cairo::RefPtr<Cairo::Context> &cr);
     void render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr);
 };

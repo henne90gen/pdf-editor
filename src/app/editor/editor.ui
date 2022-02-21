@@ -13,18 +13,6 @@
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">True</property>
                 <child>
-                    <object class="GtkBox">
-                        <property name="orientation">horizontal</property>
-                        <child>
-                            <object class="GtkCheckButton" id="HighlightTextCheckButton">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="label">Highlight Text</property>
-                            </object>
-                        </child>
-                    </object>
-                </child>
-                <child>
                     <object class="GtkScrolledWindow" id="PdfWindow">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
