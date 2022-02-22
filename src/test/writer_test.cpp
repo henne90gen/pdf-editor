@@ -45,7 +45,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     free(buffer);
 }
 
-TEST(Writer, DISABLED_Embed) {
+TEST(Writer, Embed) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
@@ -58,12 +58,19 @@ TEST(Writer, DISABLED_Embed) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    // TODO this fails, because it depends on the order of an unordered_map
-    // TODO fix: get the area in question from the buffer, parse it into an IndirectObject and to assertions on that
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 19,
-                              "14 0 obj\n<</Filter /FlateDecode /Params <</Size 7350>> /Length 6650 /Type /EmbeddedFile>>\nstream\n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 6767, "endstream\nendobj\n");
-    ASSERT_BUFFER_CONTAINS_AT(buffer, 13639, "xref\n0 14\n");
+    auto assertFunc = [](pdf::EmbeddedFile *embeddedFile) {
+        ASSERT_EQ("EmbeddedFile", embeddedFile->dictionary->must_find<pdf::Name>("Type)")->value);
+        ASSERT_EQ(6650, embeddedFile->dictionary->must_find<pdf::Integer>("Length)")->value);
+        auto params = embeddedFile->dictionary->must_find<pdf::Dictionary>("Params");
+        ASSERT_EQ(7350, params->must_find<pdf::Integer>("Size")->value);
+    };
+
+    pdf::Document doc;
+    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, doc).has_error());
+    doc.for_each_embedded_file([&assertFunc](pdf::EmbeddedFile *embeddedFile) {
+        assertFunc(embeddedFile);
+        return util::ForEachResult::CONTINUE;
+    });
 }
 
 TEST(Writer, Header) {
