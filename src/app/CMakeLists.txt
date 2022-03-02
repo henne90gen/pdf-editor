@@ -17,9 +17,9 @@ pkg_check_modules(GTK4 REQUIRED
         xcb-shm
         mount
         expat
-        sqlite3
-        json-glib-1.0
-        lzo2
+#        sqlite3
+#        json-glib-1.0
+#        lzo2
         blkid
         libjpeg
         zlib
@@ -29,7 +29,7 @@ pkg_check_modules(GTK4 REQUIRED
         libpcre
         libbrotlidec
         libbrotlicommon
-        libzstd
+#        libzstd
         liblzma
         xi
         x11
@@ -43,11 +43,11 @@ pkg_check_modules(GTK4 REQUIRED
         xau
         xdmcp
         pangoft2
-        tracker-sparql-3.0
-        cloudproviders
+#        tracker-sparql-3.0
+#        cloudproviders
         libtiff-4
         pixman-1
-        bzip2
+#        bzip2
         icu-uc
         icu-i18n
         libxml-2.0
