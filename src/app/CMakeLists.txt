@@ -55,7 +55,7 @@ pkg_check_modules(GTK4 REQUIRED
         )
 
 function(target_link_gtk4 target)
-    target_link_libraries(${target} PRIVATE ${GTK4_LIBRARIES} $<$<PLATFORM_ID:Linux>:cairo-script-interpreter> $<$<PLATFORM_ID:Linux>:stemmer>)
+    target_link_libraries(${target} PRIVATE ${GTK4_LIBRARIES} $<$<PLATFORM_ID:Linux>:cairo-script-interpreter>)
     target_link_options(${target} PRIVATE ${GTK4_LDFLAGS_OTHER})
     target_compile_options(${target} PRIVATE ${GTK4_CFLAGS_OTHER})
     target_link_directories(${target} PRIVATE ${GTK4_LIBRARY_DIRS})
