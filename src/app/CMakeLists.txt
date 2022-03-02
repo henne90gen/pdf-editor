@@ -1,9 +1,61 @@
 
+set(CMAKE_INSTALL_RPATH $ORIGIN/../lib)
+
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK4 REQUIRED gtkmm-4.0)
+pkg_check_modules(GTK4 REQUIRED
+        gtkmm-4.0
+        gmodule-2.0
+        fribidi
+        fontconfig
+        epoxy
+        xkbcommon
+        wayland-client
+        wayland-egl
+        graphite2
+        xcb
+        xcb-render
+        xcb-shm
+        mount
+        expat
+        sqlite3
+        json-glib-1.0
+        lzo2
+        blkid
+        libjpeg
+        zlib
+        libpng16
+        libthai
+        libffi
+        libpcre
+        libbrotlidec
+        libbrotlicommon
+        libzstd
+        liblzma
+        xi
+        x11
+        xext
+        xcursor
+        xdamage
+        xfixes
+        xrandr
+        xinerama
+        xrender
+        xau
+        xdmcp
+        pangoft2
+        tracker-sparql-3.0
+        cloudproviders
+        libtiff-4
+        pixman-1
+        bzip2
+        icu-uc
+        icu-i18n
+        libxml-2.0
+        datrie-0.2
+        )
 
 function(target_link_gtk4 target)
-    target_link_libraries(${target} PRIVATE ${GTK4_LIBRARIES})
+    target_link_libraries(${target} PRIVATE ${GTK4_LIBRARIES} $<$<PLATFORM_ID:Linux>:cairo-script-interpreter stemmer>)
     target_link_options(${target} PRIVATE ${GTK4_LDFLAGS_OTHER})
     target_compile_options(${target} PRIVATE ${GTK4_CFLAGS_OTHER})
     target_link_directories(${target} PRIVATE ${GTK4_LIBRARY_DIRS})
@@ -53,7 +105,6 @@ install(DIRECTORY ${COMPILER_PATH}/../share/icons
         DESTINATION share
         COMPONENT applications)
 
-set(CMAKE_INSTALL_RPATH $ORIGIN/../lib)
 set_target_properties(pdf-cli PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
 set_target_properties(pdf-debugger PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
 set_target_properties(pdf-editor PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
