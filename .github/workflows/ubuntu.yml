@@ -24,5 +24,4 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: linux
-          path: PDF-Editor-1.0.0-Linux.zip
+          path: PDF-Editor-0.0.1-Linux.zip
