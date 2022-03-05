@@ -9,6 +9,7 @@ set(BENCHMARK_INSTALL_DOCS OFF)
 set(BUILD_GMOCK OFF)
 set(INSTALL_GTEST OFF)
 set(SKIP_INSTALL_ALL ON)
+set(SPDLOG_INSTALL OFF)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -56,7 +57,7 @@ add_subdirectory(src)
 # TODO Window installer: https://dominoc925.blogspot.com/2016/09/create-windows-installer-using-cmake.html
 # TODO improve installer texts
 
-set(CPACK_PACKAGE_NAME "PDF-Editor")
+set(CPACK_PACKAGE_NAME "pdf-editor")
 set(CPACK_PACKAGE_VENDOR "Hendrik Müller")
 set(CPACK_PACKAGE_CONTACT "henne90gen@gmail.com")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Hendrik Müller")
@@ -99,11 +100,13 @@ set(CPACK_COMPONENT_HEADERS_INSTALL_TYPES Full)
 set(CPACK_COMPONENT_APPLICATIONS_INSTALL_TYPES Full User)
 
 # https://unix.stackexchange.com/a/11552/254512
-set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/pdf-editor")
+# set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 set(CPACK_VERBATIM_VARIABLES YES)
 
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
 set(CPACK_DEB_COMPONENT_INSTALL YES)
+
+set(CPACK_SOURCE_IGNORE_FILES cmake-build-.*;build/;install;)
 
 include(CPack)

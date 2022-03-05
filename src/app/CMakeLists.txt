@@ -27,16 +27,22 @@ add_dependencies(compile_glib_schemas copy_glib_schemas)
 add_dependencies(pdf-editor compile_glib_schemas)
 add_dependencies(pdf-debugger compile_glib_schemas)
 
-install(TARGETS pdf-cli pdf-editor pdf-debugger
-        RUNTIME_DEPENDENCIES
-        DIRECTORIES $<$<PLATFORM_ID:Windows>:${COMPILER_PATH}> ${COMPILER_PATH}/../lib
-        PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" "libc.so.6"
-        POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" >
-        RUNTIME DESTINATION bin
-        COMPONENT applications)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas
-        DESTINATION share/glib-2.0
-        COMPONENT applications)
-install(DIRECTORY ${COMPILER_PATH}/../share/icons
-        DESTINATION share
-        COMPONENT applications)
+if (WIN32)
+        install(TARGETS pdf-cli pdf-editor pdf-debugger
+                RUNTIME_DEPENDENCIES
+                DIRECTORIES $<$<PLATFORM_ID:Windows>:${COMPILER_PATH}> ${COMPILER_PATH}/../lib
+                PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-" "libc.so.6"
+                POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" >
+                RUNTIME DESTINATION bin
+                COMPONENT applications)
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/glib-2.0/schemas
+                DESTINATION share/glib-2.0
+                COMPONENT applications)
+        install(DIRECTORY ${COMPILER_PATH}/../share/icons
+                DESTINATION share
+                COMPONENT applications)
+else ()
+        install(TARGETS pdf-cli pdf-editor pdf-debugger
+                RUNTIME DESTINATION bin
+                COMPONENT applications)
+endif()

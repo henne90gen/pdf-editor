@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <pdf/document.h>
-#include <util/process.h>
+#include <pdf/util/process.h>
 
 #include "test_util.h"
 

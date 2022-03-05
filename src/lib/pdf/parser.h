@@ -4,13 +4,13 @@
 #include <list>
 #include <string>
 #include <unordered_map>
-#include <util/allocator.h>
-#include <util/util.h>
 #include <utility>
 #include <vector>
 
 #include "lexer.h"
 #include "objects.h"
+#include "util/allocator.h"
+#include "util/util.h"
 
 namespace pdf {
 
