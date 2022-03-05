@@ -1,0 +1,47 @@
+# Maintainer: Hendrik Müller <henne90gen@gmail.com>
+pkgname="pdf-editor"
+pkgver="0.0.1"
+pkgrel=1
+pkgdesc="PDF Editor"
+arch=("x86_64")
+url="https://github.com/henne90gen/pdf-editor"
+license=('GPL')
+groups=()
+depends=("gtkmm-4.0")
+makedepends=("cmake" "ninja")
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("$pkgname-$pkgver-Source.tar.gz")
+noextract=()
+sha512sums=("SKIP")
+validpgpkeys=()
+
+# prepare() {
+	# cd "$pkgname-$pkgver-Source"
+	# patch -p1 -i "$srcdir/$pkgname-$pkgver.patch"
+# }
+
+build() {
+	cd "$pkgname-$pkgver-Source"
+    mkdir -p build
+    cd build
+    cmake .. -G Ninja -D CMAKE_INSTALL_PREFIX="$pkgdir/usr"
+    cmake --build .
+}
+
+# check() {
+	# cd "$pkgname-$pkgver"
+	# make -k check
+# }
+
+package() {
+	cd "$pkgname-$pkgver-Source/build"
+    cmake --build . --target install
+}
