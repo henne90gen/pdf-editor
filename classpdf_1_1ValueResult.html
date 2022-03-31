@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: util::Result Class Reference</title>
+<title>PDF Editor: pdf::ValueResult&lt; T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,41 +62,49 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>util</b></li><li class="navelem"><a class="el" href="classutil_1_1Result.html">Result</a></li>  </ul>
+<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="classutil_1_1Result-members.html">List of all members</a>  </div>
+<a href="classpdf_1_1ValueResult-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">util::Result Class Reference</div>  </div>
+<div class="title">pdf::ValueResult&lt; T &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2cb3464f79a2dd47658b5097c9272baf"><td class="memItemLeft" align="right" valign="top"><a id="a2cb3464f79a2dd47658b5097c9272baf"></a>
+<tr class="memitem:a3c6653cff5377efebf4c50ed60eb61cf"><td class="memItemLeft" align="right" valign="top"><a id="a3c6653cff5377efebf4c50ed60eb61cf"></a>
+T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>value</b> ()</td></tr>
+<tr class="separator:a3c6653cff5377efebf4c50ed60eb61cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad040fc531f15f12bcb46b78dd137ff22"><td class="memItemLeft" align="right" valign="top"><a id="ad040fc531f15f12bcb46b78dd137ff22"></a>
+T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>value</b> () const</td></tr>
+<tr class="separator:ad040fc531f15f12bcb46b78dd137ff22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbf0cde0be7fec7b48c2ed51407aa7a7"><td class="memItemLeft" align="right" valign="top"><a id="abbf0cde0be7fec7b48c2ed51407aa7a7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>has_error</b> () const</td></tr>
-<tr class="separator:a2cb3464f79a2dd47658b5097c9272baf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39d82b7b8610703bd699c0dea41e328f"><td class="memItemLeft" align="right" valign="top"><a id="a39d82b7b8610703bd699c0dea41e328f"></a>
+<tr class="separator:abbf0cde0be7fec7b48c2ed51407aa7a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbcca4dab4a8759e80186d51d5e9db29"><td class="memItemLeft" align="right" valign="top"><a id="afbcca4dab4a8759e80186d51d5e9db29"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>message</b> () const</td></tr>
-<tr class="separator:a39d82b7b8610703bd699c0dea41e328f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:afbcca4dab4a8759e80186d51d5e9db29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9d5200b38a4f750b57a4a0714dba5b"><td class="memItemLeft" align="right" valign="top"><a id="adb9d5200b38a4f750b57a4a0714dba5b"></a>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><b>drop_value</b> () const</td></tr>
+<tr class="separator:adb9d5200b38a4f750b57a4a0714dba5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af6a84f71a801ab3e9ec41bf8baaca1a7"><td class="memTemplParams" colspan="2"><a id="af6a84f71a801ab3e9ec41bf8baaca1a7"></a>
+<tr class="memitem:a97237ecf7890960a3ad475ab2d09b1bd"><td class="memTemplParams" colspan="2"><a id="a97237ecf7890960a3ad475ab2d09b1bd"></a>
 template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:af6a84f71a801ab3e9ec41bf8baaca1a7"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classutil_1_1Result.html">Result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>error</b> (fmt::format_string&lt; Args... &gt; fmt, Args &amp;&amp;...args)</td></tr>
-<tr class="separator:af6a84f71a801ab3e9ec41bf8baaca1a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a510f2d1ea2f4979be589f9bd5481e6e5"><td class="memItemLeft" align="right" valign="top"><a id="a510f2d1ea2f4979be589f9bd5481e6e5"></a>
-static <a class="el" href="classutil_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ok</b> ()</td></tr>
-<tr class="separator:a510f2d1ea2f4979be589f9bd5481e6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27dd38c94f42e76c136c66d8e4cfea7d"><td class="memTemplParams" colspan="2"><a id="a27dd38c94f42e76c136c66d8e4cfea7d"></a>
-template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:a27dd38c94f42e76c136c66d8e4cfea7d"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classutil_1_1Result.html">Result</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>bool_</b> (bool hasError, fmt::format_string&lt; Args... &gt; fmt, Args &amp;&amp;...args)</td></tr>
-<tr class="separator:a27dd38c94f42e76c136c66d8e4cfea7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97237ecf7890960a3ad475ab2d09b1bd"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>error</b> (fmt::format_string&lt; Args... &gt; fmt, Args &amp;&amp;...args)</td></tr>
+<tr class="separator:a97237ecf7890960a3ad475ab2d09b1bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f5982b001d2973e974fc78239a78e7c"><td class="memItemLeft" align="right" valign="top"><a id="a5f5982b001d2973e974fc78239a78e7c"></a>
+static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ok</b> (T v)</td></tr>
+<tr class="separator:a5f5982b001d2973e974fc78239a78e7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cfa64fd49f6794bda00077748d7b67d"><td class="memItemLeft" align="right" valign="top"><a id="a7cfa64fd49f6794bda00077748d7b67d"></a>
+static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&#160;</td><td class="memItemRight" valign="bottom"><b>of</b> (<a class="el" href="classpdf_1_1Result.html">Result</a> r)</td></tr>
+<tr class="separator:a7cfa64fd49f6794bda00077748d7b67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/lib/pdf/util/<a class="el" href="result_8h_source.html">result.h</a></li>

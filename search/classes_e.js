@@ -6,5 +6,5 @@ var searchData=
   ['referenceresolver_190',['ReferenceResolver',['../structpdf_1_1ReferenceResolver.html',1,'pdf']]],
   ['renderer_191',['Renderer',['../structpdf_1_1Renderer.html',1,'pdf']]],
   ['resources_192',['Resources',['../structpdf_1_1Resources.html',1,'pdf']]],
-  ['result_193',['Result',['../classutil_1_1Result.html',1,'util']]]
+  ['result_193',['Result',['../classpdf_1_1Result.html',1,'pdf']]]
 ];

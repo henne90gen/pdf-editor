@@ -106,18 +106,18 @@ template&lt;typename T &gt; </td></tr>
 std::vector&lt; <a class="el" href="structpdf_1_1Page.html">Page</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a01043eaededd2c194634a8cd13941404">pages</a> ()</td></tr>
 <tr class="memdesc:a01043eaededd2c194634a8cd13941404"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of pages. <br /></td></tr>
 <tr class="separator:a01043eaededd2c194634a8cd13941404"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6defe9f193ee5a61afa2df3d543d0a24"><td class="memItemLeft" align="right" valign="top"><a id="a6defe9f193ee5a61afa2df3d543d0a24"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a6defe9f193ee5a61afa2df3d543d0a24">for_each_page</a> (const std::function&lt; util::ForEachResult(<a class="el" href="structpdf_1_1Page.html">Page</a> *)&gt; &amp;func)</td></tr>
-<tr class="memdesc:a6defe9f193ee5a61afa2df3d543d0a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all pages in the document. <br /></td></tr>
-<tr class="separator:a6defe9f193ee5a61afa2df3d543d0a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdc4985767823f3a31b5d49d9f0c3985"><td class="memItemLeft" align="right" valign="top"><a id="afdc4985767823f3a31b5d49d9f0c3985"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#afdc4985767823f3a31b5d49d9f0c3985">for_each_page</a> (const std::function&lt; ForEachResult(<a class="el" href="structpdf_1_1Page.html">Page</a> *)&gt; &amp;func)</td></tr>
+<tr class="memdesc:afdc4985767823f3a31b5d49d9f0c3985"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all pages in the document. <br /></td></tr>
+<tr class="separator:afdc4985767823f3a31b5d49d9f0c3985"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f9943e9c4e8b27613433369f44222d8"><td class="memItemLeft" align="right" valign="top"><a id="a1f9943e9c4e8b27613433369f44222d8"></a>
 std::vector&lt; <a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a1f9943e9c4e8b27613433369f44222d8">objects</a> ()</td></tr>
 <tr class="memdesc:a1f9943e9c4e8b27613433369f44222d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">List of objects. <br /></td></tr>
 <tr class="separator:a1f9943e9c4e8b27613433369f44222d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab05d7dba6de741bde17e2156321f69ba"><td class="memItemLeft" align="right" valign="top"><a id="ab05d7dba6de741bde17e2156321f69ba"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#ab05d7dba6de741bde17e2156321f69ba">for_each_object</a> (const std::function&lt; util::ForEachResult(<a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> *)&gt; &amp;func)</td></tr>
-<tr class="memdesc:ab05d7dba6de741bde17e2156321f69ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all objects in the document. <br /></td></tr>
-<tr class="separator:ab05d7dba6de741bde17e2156321f69ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4afa18bbcc369509793fb7344aa0c6d3"><td class="memItemLeft" align="right" valign="top"><a id="a4afa18bbcc369509793fb7344aa0c6d3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a4afa18bbcc369509793fb7344aa0c6d3">for_each_object</a> (const std::function&lt; ForEachResult(<a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> *)&gt; &amp;func)</td></tr>
+<tr class="memdesc:a4afa18bbcc369509793fb7344aa0c6d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all objects in the document. <br /></td></tr>
+<tr class="separator:a4afa18bbcc369509793fb7344aa0c6d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28bfd341260ef11bae7c41b881d34fd1"><td class="memItemLeft" align="right" valign="top"><a id="a28bfd341260ef11bae7c41b881d34fd1"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a28bfd341260ef11bae7c41b881d34fd1">object_count</a> (bool parseObjects=true)</td></tr>
 <tr class="memdesc:a28bfd341260ef11bae7c41b881d34fd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of indirect objects. <br /></td></tr>
@@ -138,34 +138,34 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="st
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#ad7e8b694e0521c460b757a1988b33d21">character_count</a> ()</td></tr>
 <tr class="memdesc:ad7e8b694e0521c460b757a1988b33d21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of characters. <br /></td></tr>
 <tr class="separator:ad7e8b694e0521c460b757a1988b33d21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8f83e1a24c63294d0c96f77cc589594"><td class="memItemLeft" align="right" valign="top"><a id="ab8f83e1a24c63294d0c96f77cc589594"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#ab8f83e1a24c63294d0c96f77cc589594">for_each_image</a> (const std::function&lt; util::ForEachResult(<a class="el" href="structpdf_1_1Image.html">Image</a> &amp;)&gt; &amp;func)</td></tr>
-<tr class="memdesc:ab8f83e1a24c63294d0c96f77cc589594"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all images in the document. <br /></td></tr>
-<tr class="separator:ab8f83e1a24c63294d0c96f77cc589594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe3628dbc0686d3f0335ef85e7920f00"><td class="memItemLeft" align="right" valign="top"><a id="abe3628dbc0686d3f0335ef85e7920f00"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#abe3628dbc0686d3f0335ef85e7920f00">for_each_embedded_file</a> (const std::function&lt; util::ForEachResult(<a class="el" href="structpdf_1_1EmbeddedFile.html">EmbeddedFile</a> *)&gt; &amp;func)</td></tr>
-<tr class="memdesc:abe3628dbc0686d3f0335ef85e7920f00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all embedded files in the document. <br /></td></tr>
-<tr class="separator:abe3628dbc0686d3f0335ef85e7920f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21800e1e5f32822bb56a092d6ccc7a21"><td class="memItemLeft" align="right" valign="top"><a id="a21800e1e5f32822bb56a092d6ccc7a21"></a>
-<a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a21800e1e5f32822bb56a092d6ccc7a21">write_to_file</a> (const std::string &amp;filePath)</td></tr>
-<tr class="memdesc:a21800e1e5f32822bb56a092d6ccc7a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the PDF-document to the given filePath, returns 0 on success. <br /></td></tr>
-<tr class="separator:a21800e1e5f32822bb56a092d6ccc7a21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe8fc383a272533afd0649dd8b07b704"><td class="memItemLeft" align="right" valign="top"><a id="abe8fc383a272533afd0649dd8b07b704"></a>
-<a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#abe8fc383a272533afd0649dd8b07b704">write_to_memory</a> (char *&amp;buffer, size_t &amp;size)</td></tr>
-<tr class="memdesc:abe8fc383a272533afd0649dd8b07b704"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the PDF-document to a newly allocated buffer, returns 0 on success. <br /></td></tr>
-<tr class="separator:abe8fc383a272533afd0649dd8b07b704"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec8141a3bac8a8aff1e5161f0a641e17"><td class="memItemLeft" align="right" valign="top"><a id="aec8141a3bac8a8aff1e5161f0a641e17"></a>
-<a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#aec8141a3bac8a8aff1e5161f0a641e17">delete_page</a> (size_t pageNum)</td></tr>
-<tr class="memdesc:aec8141a3bac8a8aff1e5161f0a641e17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the page with the given page number, returns 0 on success. <br /></td></tr>
-<tr class="separator:aec8141a3bac8a8aff1e5161f0a641e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62598cd0df57c02ac92fa58e1cfabb03"><td class="memItemLeft" align="right" valign="top"><a id="a62598cd0df57c02ac92fa58e1cfabb03"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a62598cd0df57c02ac92fa58e1cfabb03">for_each_image</a> (const std::function&lt; ForEachResult(<a class="el" href="structpdf_1_1Image.html">Image</a> &amp;)&gt; &amp;func)</td></tr>
+<tr class="memdesc:a62598cd0df57c02ac92fa58e1cfabb03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all images in the document. <br /></td></tr>
+<tr class="separator:a62598cd0df57c02ac92fa58e1cfabb03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3604171c351dfb3dafaad5fddbbd68b5"><td class="memItemLeft" align="right" valign="top"><a id="a3604171c351dfb3dafaad5fddbbd68b5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a3604171c351dfb3dafaad5fddbbd68b5">for_each_embedded_file</a> (const std::function&lt; ForEachResult(<a class="el" href="structpdf_1_1EmbeddedFile.html">EmbeddedFile</a> *)&gt; &amp;func)</td></tr>
+<tr class="memdesc:a3604171c351dfb3dafaad5fddbbd68b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all embedded files in the document. <br /></td></tr>
+<tr class="separator:a3604171c351dfb3dafaad5fddbbd68b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a493079c7c64279d5e87990ca3a16b9d1"><td class="memItemLeft" align="right" valign="top"><a id="a493079c7c64279d5e87990ca3a16b9d1"></a>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a493079c7c64279d5e87990ca3a16b9d1">write_to_file</a> (const std::string &amp;filePath)</td></tr>
+<tr class="memdesc:a493079c7c64279d5e87990ca3a16b9d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the PDF-document to the given filePath, returns 0 on success. <br /></td></tr>
+<tr class="separator:a493079c7c64279d5e87990ca3a16b9d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdd353739c691825261a94a5bfcfcb4d"><td class="memItemLeft" align="right" valign="top"><a id="abdd353739c691825261a94a5bfcfcb4d"></a>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#abdd353739c691825261a94a5bfcfcb4d">write_to_memory</a> (char *&amp;buffer, size_t &amp;size)</td></tr>
+<tr class="memdesc:abdd353739c691825261a94a5bfcfcb4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the PDF-document to a newly allocated buffer, returns 0 on success. <br /></td></tr>
+<tr class="separator:abdd353739c691825261a94a5bfcfcb4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61fc07704d72e9770567d23dbe31123b"><td class="memItemLeft" align="right" valign="top"><a id="a61fc07704d72e9770567d23dbe31123b"></a>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a61fc07704d72e9770567d23dbe31123b">delete_page</a> (size_t pageNum)</td></tr>
+<tr class="memdesc:a61fc07704d72e9770567d23dbe31123b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the page with the given page number, returns 0 on success. <br /></td></tr>
+<tr class="separator:a61fc07704d72e9770567d23dbe31123b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2546bab5077d4dc0c58ee836d12aaac5"><td class="memItemLeft" align="right" valign="top"><a id="a2546bab5077d4dc0c58ee836d12aaac5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a2546bab5077d4dc0c58ee836d12aaac5">insert_document</a> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;otherDocument, size_t atPageNum)</td></tr>
 <tr class="memdesc:a2546bab5077d4dc0c58ee836d12aaac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert another document into this one so that the first page of the inserted document has the given page number. <br /></td></tr>
 <tr class="separator:a2546bab5077d4dc0c58ee836d12aaac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf9cba9dc968aeaf18405918f6bd14f9"><td class="memItemLeft" align="right" valign="top"><a id="abf9cba9dc968aeaf18405918f6bd14f9"></a>
-<a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#abf9cba9dc968aeaf18405918f6bd14f9">embed_file</a> (const std::string &amp;filePath)</td></tr>
-<tr class="memdesc:abf9cba9dc968aeaf18405918f6bd14f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a file into the pdf document, returns 0 on success. <br /></td></tr>
-<tr class="separator:abf9cba9dc968aeaf18405918f6bd14f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b55ce463b50a5ae469ab97d34454767"><td class="memItemLeft" align="right" valign="top"><a id="a8b55ce463b50a5ae469ab97d34454767"></a>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a8b55ce463b50a5ae469ab97d34454767">embed_file</a> (const std::string &amp;filePath)</td></tr>
+<tr class="memdesc:a8b55ce463b50a5ae469ab97d34454767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a file into the pdf document, returns 0 on success. <br /></td></tr>
+<tr class="separator:a8b55ce463b50a5ae469ab97d34454767"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89615b15e6213761f209c57adf080a7c"><td class="memItemLeft" align="right" valign="top"><a id="a89615b15e6213761f209c57adf080a7c"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>next_object_number</b> () const</td></tr>
 <tr class="separator:a89615b15e6213761f209c57adf080a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,20 +179,20 @@ int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>add_object</b> (<a
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a7ec2b18eea752f5708f6d099945ae3b3"><td class="memItemLeft" align="right" valign="top"><a id="a7ec2b18eea752f5708f6d099945ae3b3"></a>
-static <a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a7ec2b18eea752f5708f6d099945ae3b3">read_from_file</a> (const std::string &amp;filePath, <a class="el" href="structpdf_1_1Document.html">Document</a> &amp;document, bool loadAllObjects=true)</td></tr>
-<tr class="memdesc:a7ec2b18eea752f5708f6d099945ae3b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document specified by the given filePath, returns 0 on success. <br /></td></tr>
-<tr class="separator:a7ec2b18eea752f5708f6d099945ae3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2005bba8f86c02f9f45b115befb99c82"><td class="memItemLeft" align="right" valign="top"><a id="a2005bba8f86c02f9f45b115befb99c82"></a>
-static <a class="el" href="classutil_1_1Result.html">util::Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a2005bba8f86c02f9f45b115befb99c82">read_from_memory</a> (char *buffer, size_t size, <a class="el" href="structpdf_1_1Document.html">Document</a> &amp;document, bool loadAllObjects=true)</td></tr>
-<tr class="memdesc:a2005bba8f86c02f9f45b115befb99c82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document from the given buffer, returns 0 on success. <br /></td></tr>
-<tr class="separator:a2005bba8f86c02f9f45b115befb99c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb7f125e387b02719fa7af51fa6aa512"><td class="memItemLeft" align="right" valign="top"><a id="aeb7f125e387b02719fa7af51fa6aa512"></a>
+static <a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#aeb7f125e387b02719fa7af51fa6aa512">read_from_file</a> (const std::string &amp;filePath, <a class="el" href="structpdf_1_1Document.html">Document</a> &amp;document, bool loadAllObjects=true)</td></tr>
+<tr class="memdesc:aeb7f125e387b02719fa7af51fa6aa512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document specified by the given filePath, returns 0 on success. <br /></td></tr>
+<tr class="separator:aeb7f125e387b02719fa7af51fa6aa512"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7cfb0fcecf582c276af9ad20627fd22"><td class="memItemLeft" align="right" valign="top"><a id="ad7cfb0fcecf582c276af9ad20627fd22"></a>
+static <a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#ad7cfb0fcecf582c276af9ad20627fd22">read_from_memory</a> (char *buffer, size_t size, <a class="el" href="structpdf_1_1Document.html">Document</a> &amp;document, bool loadAllObjects=true)</td></tr>
+<tr class="memdesc:ad7cfb0fcecf582c276af9ad20627fd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document from the given buffer, returns 0 on success. <br /></td></tr>
+<tr class="separator:ad7cfb0fcecf582c276af9ad20627fd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a7315d75b04c9343a25287856fcef55a3"><td class="memItemLeft" align="right" valign="top"><a id="a7315d75b04c9343a25287856fcef55a3"></a>
-<a class="el" href="structutil_1_1Allocator.html">util::Allocator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b> = {}</td></tr>
-<tr class="separator:a7315d75b04c9343a25287856fcef55a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memItemLeft" align="right" valign="top"><a id="aa4d2c121fdb6d73bbcb51f83bd1a2109"></a>
+<a class="el" href="structpdf_1_1Allocator.html">Allocator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b> = {}</td></tr>
+<tr class="separator:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aab13479934667f8f4bb9632a4bf34e"><td class="memItemLeft" align="right" valign="top"><a id="a5aab13479934667f8f4bb9632a4bf34e"></a>
 <a class="el" href="structpdf_1_1DocumentFile.html">DocumentFile</a>&#160;</td><td class="memItemRight" valign="bottom"><b>file</b> = {}</td></tr>
 <tr class="separator:a5aab13479934667f8f4bb9632a4bf34e"><td class="memSeparator" colspan="2">&#160;</td></tr>

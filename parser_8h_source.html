@@ -96,14 +96,14 @@ $(function() {
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="structpdf_1_1Parser.html">   25</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1Parser.html">Parser</a> {</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;lexer;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="structpdf_1_1ReferenceResolver.html">ReferenceResolver</a> *referenceResolver;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    std::vector&lt;Token&gt; tokens = {};</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keywordtype">size_t</span> currentTokenIdx    = 0;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Parser.html">Parser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;_allocator);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Parser.html">Parser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;_allocator, <a class="code" href="structpdf_1_1ReferenceResolver.html">ReferenceResolver</a> *_referenceResolver);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Parser.html">Parser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;_allocator);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Parser.html">Parser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;_allocator, <a class="code" href="structpdf_1_1ReferenceResolver.html">ReferenceResolver</a> *_referenceResolver);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="structpdf_1_1Object.html">Object</a> *parse();</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
@@ -135,12 +135,12 @@ $(function() {
 <div class="ttc" id="astructpdf_1_1IndirectObject_html"><div class="ttname"><a href="structpdf_1_1IndirectObject.html">pdf::IndirectObject</a></div><div class="ttdef"><b>Definition:</b> objects.h:145</div></div>
 <div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:100</div></div>
 <div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:109</div></div>
-<div class="ttc" id="astructutil_1_1Allocator_html"><div class="ttname"><a href="structutil_1_1Allocator.html">util::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:26</div></div>
 <div class="ttc" id="astructpdf_1_1ReferenceResolver_html"><div class="ttname"><a href="structpdf_1_1ReferenceResolver.html">pdf::ReferenceResolver</a></div><div class="ttdef"><b>Definition:</b> parser.h:17</div></div>
 <div class="ttc" id="astructpdf_1_1Lexer_html"><div class="ttname"><a href="structpdf_1_1Lexer.html">pdf::Lexer</a></div><div class="ttdef"><b>Definition:</b> lexer.h:91</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:60</div></div>
 <div class="ttc" id="astructpdf_1_1IndirectReference_html"><div class="ttname"><a href="structpdf_1_1IndirectReference.html">pdf::IndirectReference</a></div><div class="ttdef"><b>Definition:</b> objects.h:136</div></div>
 <div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:93</div></div>
+<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> allocator.h:25</div></div>
 <div class="ttc" id="astructpdf_1_1Null_html"><div class="ttname"><a href="structpdf_1_1Null.html">pdf::Null</a></div><div class="ttdef"><b>Definition:</b> objects.h:183</div></div>
 <div class="ttc" id="astructpdf_1_1NoopReferenceResolver_html"><div class="ttname"><a href="structpdf_1_1NoopReferenceResolver.html">pdf::NoopReferenceResolver</a></div><div class="ttdef"><b>Definition:</b> parser.h:21</div></div>
 <div class="ttc" id="astructpdf_1_1LiteralString_html"><div class="ttname"><a href="structpdf_1_1LiteralString.html">pdf::LiteralString</a></div><div class="ttdef"><b>Definition:</b> objects.h:76</div></div>
