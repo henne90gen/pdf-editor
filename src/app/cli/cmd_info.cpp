@@ -6,7 +6,9 @@ struct InfoArgs {
 
 int cmd_info(const InfoArgs &args) {
     pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.source), document).has_error()) {
+    const auto result = pdf::Document::read_from_file(std::string(args.source), document);
+    if (result.has_error()) {
+        spdlog::error(result.message());
         return 1;
     }
 

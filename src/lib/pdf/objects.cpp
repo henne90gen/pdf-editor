@@ -200,7 +200,7 @@ void Stream::encode(util::Allocator &allocator, const std::string &data) {
     memcpy(newStreamData, encodedData, encodedDataSize);
     free((void *)encodedData);
 
-    streamData = std::string_view(newStreamData, encodedDataSize);
+    streamData                   = std::string_view(newStreamData, encodedDataSize);
     dictionary->values["Length"] = allocator.allocate<Integer>(encodedDataSize);
 }
 
@@ -258,9 +258,7 @@ void Array::remove_element(Document & /*document*/, size_t index) {
     values.erase(values.begin() + index);
 }
 
-void Integer::set(Document & /*document*/, int64_t i) {
-    value = i;
-}
+void Integer::set(Document & /*document*/, int64_t i) { value = i; }
 
 std::optional<int64_t> EmbeddedFile::size() {
     const auto &paramsOpt = dictionary->find<Dictionary>("Params");
@@ -274,6 +272,16 @@ std::optional<int64_t> EmbeddedFile::size() {
     }
 
     return {sizeOpt.value()->value};
+}
+
+std::string Object::type_string() const {
+    switch (type) {
+#define DECLARE_CASE(Name)                                                                                             \
+    case Type::Name:                                                                                                   \
+        return #Name;
+        ENUMERATE_OBJECT_TYPES(DECLARE_CASE)
+#undef DECLARE_CASE
+    }
 }
 
 } // namespace pdf

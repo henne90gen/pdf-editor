@@ -84,6 +84,11 @@ struct DocumentFile {
     int64_t lastCrossRefStart     = {};
     Trailer trailer               = {};
     DocumentFileMetadata metadata = {};
+
+    /// Points to the byte right after the end of the data buffer
+    char* end_ptr(){
+        return data + sizeInBytes;
+    }
 };
 
 struct ReadMetadata {
@@ -92,13 +97,11 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    util::Allocator allocator = {};
-
-    DocumentFile file = {};
-
+    util::Allocator allocator                                 = {};
+    DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
-    virtual ~Document() = default;
+    ~Document();
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {

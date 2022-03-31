@@ -21,7 +21,7 @@ add_dependencies(test_suite_bfosupport pdf-cli download_test_suites)
 
 function(create_test test_name)
     add_executable(${test_name} ${test_name}.cpp)
-    target_link_libraries(${test_name} gtest_main pdf util)
+    target_link_libraries(${test_name} gtest_main pdf)
     gtest_discover_tests(${test_name})
 endfunction()
 
@@ -34,3 +34,8 @@ create_test(render_test)
 create_test(text_test)
 create_test(writer_test)
 create_test(write_object_test)
+
+add_executable(fuzzer fuzzer.cpp)
+target_link_libraries(fuzzer pdf)
+target_link_options(fuzzer PRIVATE -fsanitize=fuzzer,address)
+target_compile_options(fuzzer PRIVATE -fsanitize=fuzzer,address)

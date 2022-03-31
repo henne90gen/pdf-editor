@@ -3,10 +3,16 @@
 #include <spdlog/spdlog.h>
 
 #include "util.h"
+#include "pdf/objects.h"
 
 namespace util {
 
 Allocator::~Allocator() {
+    for (auto object : objects) {
+        object->~Object();
+    }
+    spdlog::trace("Freed {} objects", objects.size());
+
     size_t allocationsFreed = 0;
     size_t bytesFreed       = 0;
 

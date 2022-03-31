@@ -7,7 +7,14 @@
 #include "result.h"
 #include "util.h"
 
+namespace pdf {
+struct Object;
+}
+
 namespace util {
+
+template <class T, class U>
+concept Derived = std::is_base_of<U, T>::value;
 
 struct Allocation {
     char *bufferStart              = nullptr;
@@ -17,7 +24,8 @@ struct Allocation {
 };
 
 struct Allocator {
-    Allocation *currentAllocation = nullptr;
+    Allocation *currentAllocation      = nullptr;
+    std::vector<pdf::Object *> objects = {};
 
     ~Allocator();
     void init(size_t sizeOfPdfFile);
@@ -30,6 +38,15 @@ struct Allocator {
     [[nodiscard]] size_t num_allocations() const;
 
     void for_each_allocation(const std::function<util::ForEachResult(Allocation &)> &func) const;
+
+    template <Derived<pdf::Object> T, typename... Args> T *allocate(Args &&...args) {
+        auto s   = sizeof(T);
+        auto buf = allocate_chunk(s);
+        ASSERT(buf != nullptr);
+        T *result = new (buf) T(args...);
+        objects.push_back(result);
+        return result;
+    }
 
     template <typename T, typename... Args> T *allocate(Args &&...args) {
         auto s   = sizeof(T);

@@ -35,6 +35,22 @@ size_t ChangeSection::size() const {
 }
 #endif
 
+Document::~Document() {
+    bool isFirst        = true;
+    auto currentTrailer = &file.trailer;
+    while (currentTrailer != nullptr) {
+        auto nextTrailer = currentTrailer->prev;
+
+        if (!isFirst) {
+            currentTrailer->~Trailer();
+        }
+
+        currentTrailer = nextTrailer;
+        isFirst        = false;
+    }
+}
+
+// TODO return a ValueResult instead, for better error messages
 std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t objectNumber) {
     CrossReferenceEntry *entry = nullptr;
     for (Trailer *t = &file.trailer; t != nullptr; t = t->prev) {
@@ -67,7 +83,9 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
         auto lexer  = TextLexer(text);
         auto parser = Parser(lexer, allocator, this);
         auto result = parser.parse();
-        ASSERT(result != nullptr);
+        if (result == nullptr || !result->is<IndirectObject>()) {
+            return {nullptr, {}};
+        }
         return {result->as<IndirectObject>(), input};
     } else if (entry->type == CrossReferenceEntryType::COMPRESSED) {
         auto streamObject = get_object(entry->compressed.objectNumberOfStream);

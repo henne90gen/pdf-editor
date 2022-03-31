@@ -443,7 +443,6 @@ std::optional<Token> TextLexer::get_token() {
     }
 
     if (!currentWord.empty()) {
-        std::cerr << "Found an invalid token: '" << currentWord << "'" << std::endl;
         return Token(Token::Type::INVALID, currentWord);
     }
 

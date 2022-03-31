@@ -5,7 +5,9 @@
 
 TEST(Reader, Blank) {
     pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    ASSERT_FALSE(result.has_error());
+
     std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 8);
 

@@ -47,6 +47,7 @@ struct Object {
         return (T *)this;
     }
     template <typename T> bool is() { return T::staticType() == type || T::staticType() == Type::OBJECT; }
+    std::string type_string() const;
 };
 
 struct Boolean : public Object {
@@ -109,8 +110,9 @@ struct Dictionary : public Object {
     std::unordered_map<std::string, Object *> values = {};
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(std::unordered_map<std::string, Object *> map) : Object(staticType()), values(std::move(map)) {}
-    static Dictionary *create(util::Allocator &allocator, const std::unordered_map<std::string, Object *> &dict) {
+    explicit Dictionary(std::unordered_map<std::string, Object *> &map)
+        : Object(staticType()), values(std::move(map)) {}
+    static Dictionary *create(util::Allocator &allocator, std::unordered_map<std::string, Object *> &dict) {
         return allocator.allocate<Dictionary>(dict);
     }
 
@@ -189,7 +191,5 @@ struct ObjectStreamContent : public Object {
 };
 
 std::ostream &operator<<(std::ostream &os, Object::Type &type);
-
-std::string to_string(Object *object);
 
 } // namespace pdf
