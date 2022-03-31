@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "result.h"
+#include <pdf/util/result.h>
 
 // TODO move this closer to the tests?
 

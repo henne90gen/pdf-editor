@@ -20,7 +20,7 @@ add_custom_target(test_suite_bfosupport
 add_dependencies(test_suite_bfosupport pdf-cli download_test_suites)
 
 function(create_test test_name)
-    add_executable(${test_name} ${test_name}.cpp)
+    add_executable(${test_name} ${test_name}.cpp process_win.cpp process_linux.cpp)
     target_link_libraries(${test_name} gtest_main pdf)
     gtest_discover_tests(${test_name})
 endfunction()

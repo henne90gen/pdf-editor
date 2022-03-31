@@ -24,9 +24,7 @@ add_library(pdf
         pdf/image.cpp
         pdf/renderer.cpp
         pdf/operator_traverser.cpp
-        pdf/util/allocator.cpp
-        pdf/util/process_linux.cpp
-        pdf/util/process_win.cpp)
+        pdf/util/allocator.cpp)
 target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
