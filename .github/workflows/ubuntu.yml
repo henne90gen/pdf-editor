@@ -17,11 +17,11 @@ jobs:
       - name: Retrieve Build Artifact
         run: |
           id=$(docker create build-image)
-          docker cp $id:/app/build/PDF-Editor-1.0.0-Linux.zip PDF-Editor-1.0.0-Linux.zip
+          docker cp $id:/app/build/pdf-editor-0.0.1-Linux.zip pdf-editor-0.0.1-Linux.zip
           docker rm -v $id
 
       # TODO prevent double zipping (maybe unpack before archiving?)
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: PDF-Editor-0.0.1-Linux.zip
+          path: pdf-editor-0.0.1-Linux.zip

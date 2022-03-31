@@ -35,4 +35,4 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: build/PDF-Editor-0.0.1-win64.exe
+          path: build/pdf-editor-0.0.1-win64.exe
