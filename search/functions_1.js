@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['delete_5fpage_216',['delete_page',['../structpdf_1_1Document.html#aec8141a3bac8a8aff1e5161f0a641e17',1,'pdf::Document']]]
+  ['delete_5fpage_217',['delete_page',['../structpdf_1_1Document.html#aec8141a3bac8a8aff1e5161f0a641e17',1,'pdf::Document']]]
 ];

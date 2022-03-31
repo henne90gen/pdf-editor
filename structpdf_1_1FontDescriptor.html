@@ -146,9 +146,9 @@ std::optional&lt; <a class="el" href="structpdf_1_1Stream.html">Stream</a> * &gt
 <tr class="memitem:ab7374885597120f0b952caf81cda7fa5"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structpdf_1_1Object.html">Object</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1FontDescriptor.html#ab7374885597120f0b952caf81cda7fa5">char_set</a> ()</td></tr>
 <tr class="separator:ab7374885597120f0b952caf81cda7fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structpdf_1_1Dictionary"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structpdf_1_1Dictionary')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></td></tr>
-<tr class="memitem:a50929e45572f85345b873476d92272b8 inherit pub_methods_structpdf_1_1Dictionary"><td class="memItemLeft" align="right" valign="top"><a id="a50929e45572f85345b873476d92272b8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Dictionary</b> (std::unordered_map&lt; std::string, <a class="el" href="structpdf_1_1Object.html">Object</a> * &gt; map)</td></tr>
-<tr class="separator:a50929e45572f85345b873476d92272b8 inherit pub_methods_structpdf_1_1Dictionary"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d9c68cd2e05ca45d5933c96be1d99da inherit pub_methods_structpdf_1_1Dictionary"><td class="memItemLeft" align="right" valign="top"><a id="a0d9c68cd2e05ca45d5933c96be1d99da"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Dictionary</b> (std::unordered_map&lt; std::string, <a class="el" href="structpdf_1_1Object.html">Object</a> * &gt; &amp;map)</td></tr>
+<tr class="separator:a0d9c68cd2e05ca45d5933c96be1d99da inherit pub_methods_structpdf_1_1Dictionary"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac305fd5fb3349a284c4892cf4a0b64de inherit pub_methods_structpdf_1_1Dictionary"><td class="memTemplParams" colspan="2"><a id="ac305fd5fb3349a284c4892cf4a0b64de"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ac305fd5fb3349a284c4892cf4a0b64de inherit pub_methods_structpdf_1_1Dictionary"><td class="memTemplItemLeft" align="right" valign="top">std::optional&lt; T * &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>find</b> (const std::string &amp;key)</td></tr>
@@ -169,6 +169,9 @@ template&lt;typename T &gt; </td></tr>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:aab659b391b9901b1f157205a91c52e25 inherit pub_methods_structpdf_1_1Object"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>is</b> ()</td></tr>
 <tr class="separator:aab659b391b9901b1f157205a91c52e25 inherit pub_methods_structpdf_1_1Object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abecb74263bd4fa0969cff28f667e408c inherit pub_methods_structpdf_1_1Object"><td class="memItemLeft" align="right" valign="top"><a id="abecb74263bd4fa0969cff28f667e408c"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>type_string</b> () const</td></tr>
+<tr class="separator:abecb74263bd4fa0969cff28f667e408c inherit pub_methods_structpdf_1_1Object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -180,9 +183,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:ae08dd6b072af17749ac6adef5322a6ac inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memItemLeft" align="right" valign="top"><a id="ae08dd6b072af17749ac6adef5322a6ac"></a>
 static Type&#160;</td><td class="memItemRight" valign="bottom"><b>staticType</b> ()</td></tr>
 <tr class="separator:ae08dd6b072af17749ac6adef5322a6ac inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87c1c84738aa279d47fe56ca52bca228 inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memItemLeft" align="right" valign="top"><a id="a87c1c84738aa279d47fe56ca52bca228"></a>
-static <a class="el" href="structpdf_1_1Dictionary.html">Dictionary</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator, const std::unordered_map&lt; std::string, <a class="el" href="structpdf_1_1Object.html">Object</a> * &gt; &amp;dict)</td></tr>
-<tr class="separator:a87c1c84738aa279d47fe56ca52bca228 inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2d6fc295ec9a03658422bdce4d84ee0 inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memItemLeft" align="right" valign="top"><a id="af2d6fc295ec9a03658422bdce4d84ee0"></a>
+static <a class="el" href="structpdf_1_1Dictionary.html">Dictionary</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> (<a class="el" href="structutil_1_1Allocator.html">util::Allocator</a> &amp;allocator, std::unordered_map&lt; std::string, <a class="el" href="structpdf_1_1Object.html">Object</a> * &gt; &amp;dict)</td></tr>
+<tr class="separator:af2d6fc295ec9a03658422bdce4d84ee0 inherit pub_static_methods_structpdf_1_1Dictionary"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_structpdf_1_1Object"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_structpdf_1_1Object')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="structpdf_1_1Object.html">pdf::Object</a></td></tr>
 <tr class="memitem:aaabaab1619297d7faf0202ac13fffc7a inherit pub_static_methods_structpdf_1_1Object"><td class="memItemLeft" align="right" valign="top"><a id="aaabaab1619297d7faf0202ac13fffc7a"></a>
 static Type&#160;</td><td class="memItemRight" valign="bottom"><b>staticType</b> ()</td></tr>

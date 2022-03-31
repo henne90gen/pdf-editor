@@ -102,6 +102,10 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>num_allocations</b>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>for_each_allocation</b> (const std::function&lt; util::ForEachResult(<a class="el" href="structutil_1_1Allocation.html">Allocation</a> &amp;)&gt; &amp;func) const</td></tr>
 <tr class="separator:a38a088a6a033702022c59d2222df7a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3564f0113759c8c46eb97b7689721c4b"><td class="memTemplParams" colspan="2"><a id="a3564f0113759c8c46eb97b7689721c4b"></a>
+template&lt;Derived&lt; pdf::Object &gt; T, typename... Args&gt; </td></tr>
+<tr class="memitem:a3564f0113759c8c46eb97b7689721c4b"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>allocate</b> (Args &amp;&amp;...args)</td></tr>
+<tr class="separator:a3564f0113759c8c46eb97b7689721c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3564f0113759c8c46eb97b7689721c4b"><td class="memTemplParams" colspan="2"><a id="a3564f0113759c8c46eb97b7689721c4b"></a>
 template&lt;typename T , typename... Args&gt; </td></tr>
 <tr class="memitem:a3564f0113759c8c46eb97b7689721c4b"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>allocate</b> (Args &amp;&amp;...args)</td></tr>
 <tr class="separator:a3564f0113759c8c46eb97b7689721c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -111,6 +115,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:af6861db3a3e9b88b3f0b49d7fd8d34fc"><td class="memItemLeft" align="right" valign="top"><a id="af6861db3a3e9b88b3f0b49d7fd8d34fc"></a>
 <a class="el" href="structutil_1_1Allocation.html">Allocation</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>currentAllocation</b> = nullptr</td></tr>
 <tr class="separator:af6861db3a3e9b88b3f0b49d7fd8d34fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af47917ef33c49fe0cd8a9d8a0f72709c"><td class="memItemLeft" align="right" valign="top"><a id="af47917ef33c49fe0cd8a9d8a0f72709c"></a>
+std::vector&lt; <a class="el" href="structpdf_1_1Object.html">pdf::Object</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>objects</b> = {}</td></tr>
+<tr class="separator:af47917ef33c49fe0cd8a9d8a0f72709c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/lib/pdf/util/<a class="el" href="allocator_8h_source.html">allocator.h</a></li>
