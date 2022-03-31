@@ -424,7 +424,7 @@ Result read_data(Document &document, bool loadAllObjects) {
     }
 
     const auto header = std::string_view(document.file.data, 7);
-    if (header != "%PDF-1.") {
+    if (header != "%PDF-1." && header != "%PDF-2.") {
         return Result::error("Missing PDF header");
     }
 
