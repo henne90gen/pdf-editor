@@ -69,7 +69,7 @@ TEST(Writer, Embed) {
     ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, doc).has_error());
     doc.for_each_embedded_file([&assertFunc](pdf::EmbeddedFile *embeddedFile) {
         assertFunc(embeddedFile);
-        return util::ForEachResult::CONTINUE;
+        return pdf::ForEachResult::CONTINUE;
     });
 }
 
@@ -140,10 +140,10 @@ void write_pdf(const std::string &name) {
 #else
     const char *command = "/usr/bin/pdfinfo";
 #endif
-    auto expectedResult = util::execute(command, {testFilePath});
+    auto expectedResult = pdf::execute(command, {testFilePath});
     ASSERT_FALSE(expectedResult.has_error());
 
-    auto actualResult = util::execute(command, {name});
+    auto actualResult = pdf::execute(command, {name});
     ASSERT_FALSE(actualResult.has_error());
     ASSERT_EQ(expectedResult.value().status, actualResult.value().status);
     ASSERT_EQ(expectedResult.value().error, actualResult.value().error);

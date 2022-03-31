@@ -8,10 +8,10 @@ namespace pdf {
 
 NoopReferenceResolver GlobalNoopReferenceResolver = {};
 
-Parser::Parser(Lexer &_lexer, util::Allocator &_allocator)
+Parser::Parser(Lexer &_lexer, Allocator &_allocator)
     : lexer(_lexer), allocator(_allocator), referenceResolver(&GlobalNoopReferenceResolver) {}
 
-Parser::Parser(Lexer &_lexer, util::Allocator &_allocator, ReferenceResolver *_referenceResolver)
+Parser::Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver)
     : lexer(_lexer), allocator(_allocator), referenceResolver(_referenceResolver) {}
 
 bool Parser::ensure_tokens_have_been_lexed() {

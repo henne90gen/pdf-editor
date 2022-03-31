@@ -5,7 +5,9 @@
 
 #include "result.h"
 
-namespace util {
+// TODO move this closer to the tests?
+
+namespace pdf {
 
 struct Execution {
     std::string output;

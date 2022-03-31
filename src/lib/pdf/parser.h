@@ -24,14 +24,14 @@ struct NoopReferenceResolver : public ReferenceResolver {
 
 struct Parser {
     Lexer &lexer;
-    util::Allocator &allocator;
+    Allocator &allocator;
     ReferenceResolver *referenceResolver;
 
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 
-    explicit Parser(Lexer &_lexer, util::Allocator &_allocator);
-    explicit Parser(Lexer &_lexer, util::Allocator &_allocator, ReferenceResolver *_referenceResolver);
+    explicit Parser(Lexer &_lexer, Allocator &_allocator);
+    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
 
     Object *parse();
 

@@ -2,7 +2,7 @@
 
 #if !WIN32
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 #include <array>
 #include <cstdio>
 #include <fcntl.h>
@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-namespace util {
+namespace pdf {
 
 char **prepare_argv(const std::string &command, const std::vector<std::string> &args) {
     char **argv = (char **)malloc((args.size() + 2) * sizeof(char *));

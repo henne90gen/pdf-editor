@@ -12,7 +12,7 @@ void OperatorTraverser::traverse() {
         s->for_each_operator(page.document.allocator, [this](Operator *op) {
             apply_operator(op);
 
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         });
     }
 }

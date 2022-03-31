@@ -8,10 +8,9 @@
 #include "util.h"
 
 namespace pdf {
-struct Object;
-}
 
-namespace util {
+// Forward declaring Object
+struct Object;
 
 template <class T, class U>
 concept Derived = std::is_base_of<U, T>::value;
@@ -30,14 +29,13 @@ struct Allocator {
     ~Allocator();
     void init(size_t sizeOfPdfFile);
     void extend(size_t size);
-    void clear_current_allocation() const;
     char *allocate_chunk(size_t sizeInBytes);
 
     [[nodiscard]] size_t total_bytes_used() const;
     [[nodiscard]] size_t total_bytes_allocated() const;
     [[nodiscard]] size_t num_allocations() const;
 
-    void for_each_allocation(const std::function<util::ForEachResult(Allocation &)> &func) const;
+    void for_each_allocation(const std::function<ForEachResult(Allocation &)> &func) const;
 
     template <Derived<pdf::Object> T, typename... Args> T *allocate(Args &&...args) {
         auto s   = sizeof(T);
@@ -56,4 +54,4 @@ struct Allocator {
     }
 };
 
-} // namespace util
+} // namespace pdf

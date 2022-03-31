@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 #include <string>
 
-namespace util {
+namespace pdf {
 
 enum class ForEachResult {
     CONTINUE,

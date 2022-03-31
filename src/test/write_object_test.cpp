@@ -80,8 +80,6 @@ TEST(Writer, write_name) {
 
 TEST(Writer, write_array) {
     std::stringstream s;
-    util::Allocator allocator = {};
-    allocator.init(100);
     auto vec = std::vector<pdf::Object *>();
     vec.push_back(new pdf::Name("Hello"));
     vec.push_back(new pdf::Name("World"));
@@ -92,8 +90,6 @@ TEST(Writer, write_array) {
 
 TEST(Writer, write_dictionary) {
     std::stringstream s;
-    util::Allocator allocator = {};
-    allocator.init(100);
     auto map              = std::unordered_map<std::string, pdf::Object *>();
     map["Hello"]          = new pdf::Integer(123);
     map["World"]          = new pdf::LiteralString("World");
@@ -118,8 +114,6 @@ TEST(Writer, write_indirect_object) {
 
 TEST(Writer, write_stream) {
     std::stringstream s;
-    util::Allocator allocator = {};
-    allocator.init(100);
     auto m    = std::unordered_map<std::string, pdf::Object *>();
     m["Size"] = new pdf::Integer(123);
     auto dict = new pdf::Dictionary(m);

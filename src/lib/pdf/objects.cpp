@@ -100,7 +100,7 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::decode(util::Allocator &allocator) {
+std::string_view Stream::decode(Allocator &allocator) {
     if (decodedStream != nullptr) {
         return {decodedStream, decodedStreamSize};
     }
@@ -191,7 +191,7 @@ void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, 
     }
 }
 
-void Stream::encode(util::Allocator &allocator, const std::string &data) {
+void Stream::encode(Allocator &allocator, const std::string &data) {
     const char *encodedData = nullptr;
     size_t encodedDataSize  = 0;
     deflate_buffer(data.data(), data.size(), encodedData, encodedDataSize);
@@ -204,7 +204,7 @@ void Stream::encode(util::Allocator &allocator, const std::string &data) {
     dictionary->values["Length"] = allocator.allocate<Integer>(encodedDataSize);
 }
 
-Stream *Stream::create_from_unencoded_data(util::Allocator &allocator,
+Stream *Stream::create_from_unencoded_data(Allocator &allocator,
                                            const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                            std::string_view unencodedData) {
     const char *encodedData = nullptr;

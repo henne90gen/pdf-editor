@@ -139,12 +139,12 @@ std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};
     for_each_object([&result](IndirectObject *obj) {
         result.push_back(obj);
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
 
-void Document::for_each_object(const std::function<util::ForEachResult(IndirectObject *)> &func) {
+void Document::for_each_object(const std::function<ForEachResult(IndirectObject *)> &func) {
     // FIXME this does not consider objects from 'Prev'-ious trailers
     for (int64_t i = 0; i < static_cast<int64_t>(file.trailer.crossReferenceTable.entries.size()); i++) {
         auto object = get_object(i);
@@ -152,8 +152,8 @@ void Document::for_each_object(const std::function<util::ForEachResult(IndirectO
             continue;
         }
 
-        util::ForEachResult result = func(object);
-        if (result == util::ForEachResult::BREAK) {
+        ForEachResult result = func(object);
+        if (result == ForEachResult::BREAK) {
             break;
         }
     }
@@ -164,7 +164,7 @@ size_t Document::object_count(const bool parseObjects) {
     if (parseObjects) {
         for_each_object([&result](IndirectObject *) {
             result++;
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         });
     } else {
         for (auto &entry : file.trailer.crossReferenceTable.entries) {
@@ -185,7 +185,7 @@ PageTreeNode *PageTreeNode::parent(Document &document) {
     return document.get<PageTreeNode>(itr->second);
 }
 
-void Document::for_each_page(const std::function<util::ForEachResult(Page *)> &func) {
+void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
     auto c            = catalog();
     auto pageTreeRoot = c->page_tree_root(*this);
     if (pageTreeRoot == nullptr) {
@@ -207,8 +207,8 @@ void Document::for_each_page(const std::function<util::ForEachResult(Page *)> &f
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->is_page()) {
                 Page *page                 = allocator.allocate<Page>(*this, resolvedKid);
-                util::ForEachResult result = func(page);
-                if (result == util::ForEachResult::BREAK) {
+                ForEachResult result = func(page);
+                if (result == ForEachResult::BREAK) {
                     return;
                 }
             } else {
@@ -239,7 +239,7 @@ std::vector<Page *> Document::pages() {
     auto result = std::vector<Page *>();
     for_each_page([&result](auto page) {
         result.push_back(page);
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -248,19 +248,19 @@ size_t Document::page_count() {
     size_t result = 0;
     for_each_page([&result](auto) {
         result++;
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
 
-util::Result Document::delete_page(size_t pageNum) {
+Result Document::delete_page(size_t pageNum) {
     auto count = page_count();
     if (count == 1) {
-        return util::Result::error("Cannot delete last page of document");
+        return Result::error("Cannot delete last page of document");
     }
 
     if (pageNum < 1 || pageNum > count) {
-        return util::Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum,
+        return Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum,
                                    count);
     }
 
@@ -268,7 +268,7 @@ util::Result Document::delete_page(size_t pageNum) {
     for_each_page([&currentPageNum, &pageNum, this](Page *page) {
         if (currentPageNum != pageNum) {
             currentPageNum++;
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         auto parent = page->node->parent(*this);
@@ -300,12 +300,12 @@ util::Result Document::delete_page(size_t pageNum) {
             parent->count()->set(*this, static_cast<int64_t>(parent->kids()->values.size()));
         }
 
-        return util::ForEachResult::BREAK;
+        return ForEachResult::BREAK;
     });
 
     // TODO clean up objects that are no longer required
 
-    return util::Result::ok();
+    return Result::ok();
 }
 
 PageTreeNode *DocumentCatalog::page_tree_root(Document &document) {
@@ -335,41 +335,41 @@ size_t Document::character_count() {
     size_t result = 0;
     for_each_page([&result](Page *page) {
         result += page->character_count();
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
 
-void Document::for_each_image(const std::function<util::ForEachResult(Image &)> &func) {
+void Document::for_each_image(const std::function<ForEachResult(Image &)> &func) {
     for_each_object([this, &func](IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto stream  = obj->object->as<Stream>();
         const auto typeOpt = stream->dictionary->find<Name>("Type");
         if (!typeOpt.has_value() || typeOpt.value()->value != "XObject") {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto subtypeOpt = stream->dictionary->find<Name>("Subtype");
         if (!subtypeOpt.has_value() || subtypeOpt.value()->value != "Image") {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto widthOpt = stream->dictionary->find<Integer>("Width");
         if (!widthOpt.has_value()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto heightOpt = stream->dictionary->find<Integer>("Height");
         if (!heightOpt.has_value()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto bitsPerComponentOpt = stream->dictionary->find<Integer>("BitsPerComponent");
         if (!bitsPerComponentOpt.has_value()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         Image image = {
@@ -383,12 +383,12 @@ void Document::for_each_image(const std::function<util::ForEachResult(Image &)> 
     });
 }
 
-util::ValueResult<Stream *> create_embedded_file_stream(util::Allocator &allocator, const std::string &filePath) {
+ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const std::string &filePath) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
     if (!is.is_open()) {
-        return util::ValueResult<Stream *>::error("Failed to open file for reading: '{}'", filePath);
+        return ValueResult<Stream *>::error("Failed to open file for reading: '{}'", filePath);
     }
 
     auto fileName   = filePath.substr(filePath.find_last_of("/\\") + 1);
@@ -413,10 +413,10 @@ util::ValueResult<Stream *> create_embedded_file_stream(util::Allocator &allocat
 
     auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view(fileData, fileSize));
     free(fileData);
-    return util::ValueResult<Stream *>::ok(result);
+    return ValueResult<Stream *>::ok(result);
 }
 
-util::Result Document::embed_file(const std::string &filePath) {
+Result Document::embed_file(const std::string &filePath) {
     // FIXME Use "Embedded File Streams" here (described in Section 3.10.3)
     auto result = create_embedded_file_stream(allocator, filePath);
     if (result.has_error()) {
@@ -425,7 +425,7 @@ util::Result Document::embed_file(const std::string &filePath) {
 
     add_object(result.value());
 
-    return util::Result::ok();
+    return Result::ok();
 }
 
 int64_t Document::add_object(Object *object) {
@@ -458,26 +458,26 @@ IndirectObject *Document::find_existing_object(Object *object) {
     return nullptr;
 }
 
-void Document::for_each_embedded_file(const std::function<util::ForEachResult(EmbeddedFile *)> &func) {
+void Document::for_each_embedded_file(const std::function<ForEachResult(EmbeddedFile *)> &func) {
     // TODO iterate file specifications instead and pass file name and EmbeddedFile to func
 
     for_each_object([&func](pdf::IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         const auto stream   = obj->object->as<Stream>();
         const auto dictType = stream->dictionary->find<Name>("Type");
         if (!dictType.has_value()) {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
         if (dictType.value()->value != "EmbeddedFile") {
-            return util::ForEachResult::CONTINUE;
+            return ForEachResult::CONTINUE;
         }
 
         func(stream->as<EmbeddedFile>());
 
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
 }
 

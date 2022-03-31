@@ -16,7 +16,7 @@ int cmd_text(const TextArgs &args) {
         for (auto &textBlock : textBlocks) {
             spdlog::info(textBlock.text);
         }
-        return util::ForEachResult::CONTINUE;
+        return pdf::ForEachResult::CONTINUE;
     });
 
     return 0;

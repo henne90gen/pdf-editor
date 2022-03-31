@@ -161,12 +161,12 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
 struct OperatorParser {
     Lexer &lexer;
-    util::Allocator &allocator;
+    Allocator &allocator;
     std::vector<Token> tokens   = {};
     size_t currentTokenIdx      = 0;
     const char *lastOperatorEnd = nullptr;
 
-    explicit OperatorParser(Lexer &_lexer, util::Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
+    explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
 
     Operator *get_operator();
 

@@ -97,7 +97,7 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    util::Allocator allocator                                 = {};
+    Allocator allocator                                 = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -129,11 +129,11 @@ struct Document : public ReferenceResolver {
     /// List of pages
     std::vector<Page *> pages();
     /// Iterates over all pages in the document
-    void for_each_page(const std::function<util::ForEachResult(Page *)> &func);
+    void for_each_page(const std::function<ForEachResult(Page *)> &func);
     /// List of objects
     std::vector<IndirectObject *> objects();
     /// Iterates over all objects in the document
-    void for_each_object(const std::function<util::ForEachResult(IndirectObject *)> &func);
+    void for_each_object(const std::function<ForEachResult(IndirectObject *)> &func);
 
     /// Number of indirect objects
     size_t object_count(bool parseObjects = true);
@@ -147,25 +147,25 @@ struct Document : public ReferenceResolver {
     size_t character_count();
 
     /// Iterates over all images in the document
-    void for_each_image(const std::function<util::ForEachResult(Image &)> &func);
+    void for_each_image(const std::function<ForEachResult(Image &)> &func);
     /// Iterates over all embedded files in the document
-    void for_each_embedded_file(const std::function<util::ForEachResult(EmbeddedFile *)> &func);
+    void for_each_embedded_file(const std::function<ForEachResult(EmbeddedFile *)> &func);
 
     /// Writes the PDF-document to the given filePath, returns 0 on success
-    [[nodiscard]] util::Result write_to_file(const std::string &filePath);
+    [[nodiscard]] Result write_to_file(const std::string &filePath);
     /// Writes the PDF-document to a newly allocated buffer, returns 0 on success
-    [[nodiscard]] util::Result write_to_memory(char *&buffer, size_t &size);
+    [[nodiscard]] Result write_to_memory(char *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath, returns 0 on success
-    static util::Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
+    static Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
     /// Reads the PDF-document from the given buffer, returns 0 on success
-    static util::Result read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects = true);
+    static Result read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects = true);
 
     /// Deletes the page with the given page number, returns 0 on success
-    util::Result delete_page(size_t pageNum);
+    Result delete_page(size_t pageNum);
     /// Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
     /// Inserts a file into the pdf document, returns 0 on success
-    util::Result embed_file(const std::string &filePath);
+    Result embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
     int64_t add_object(Object *object);

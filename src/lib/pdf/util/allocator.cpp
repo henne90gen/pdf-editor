@@ -2,10 +2,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include "util.h"
 #include "pdf/objects.h"
+#include "util.h"
 
-namespace util {
+namespace pdf {
 
 Allocator::~Allocator() {
     for (auto object : objects) {
@@ -20,7 +20,7 @@ Allocator::~Allocator() {
         bytesFreed += allocation.sizeInBytes;
         free(&allocation);
         allocationsFreed++;
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
 
     spdlog::trace("Freed {} allocations ({} bytes total)", allocationsFreed, bytesFreed);
@@ -54,10 +54,6 @@ void Allocator::extend(size_t size) {
     currentAllocation              = allocation;
 }
 
-void Allocator::clear_current_allocation() const {
-    currentAllocation->bufferPosition = currentAllocation->bufferStart + sizeof(Allocation);
-}
-
 char *Allocator::allocate_chunk(size_t sizeInBytes) {
     ASSERT(currentAllocation->bufferStart != nullptr);
     while (currentAllocation->bufferPosition + sizeInBytes >
@@ -73,7 +69,7 @@ char *Allocator::allocate_chunk(size_t sizeInBytes) {
     return result;
 }
 
-void Allocator::for_each_allocation(const std::function<util::ForEachResult(Allocation &)> &func) const {
+void Allocator::for_each_allocation(const std::function<ForEachResult(Allocation &)> &func) const {
     auto allocation = currentAllocation;
     while (allocation != nullptr) {
         auto prev = allocation->previousAllocation;
@@ -86,7 +82,7 @@ size_t Allocator::total_bytes_allocated() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation &allocation) {
         result += allocation.sizeInBytes;
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -95,7 +91,7 @@ size_t Allocator::num_allocations() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation & /*allocation*/) {
         result++;
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
@@ -104,9 +100,9 @@ size_t Allocator::total_bytes_used() const {
     size_t result = 0;
     for_each_allocation([&result](Allocation &allocation) {
         result += allocation.bufferPosition - allocation.bufferStart;
-        return util::ForEachResult::CONTINUE;
+        return ForEachResult::CONTINUE;
     });
     return result;
 }
 
-} // namespace util
+} // namespace pdf

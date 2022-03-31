@@ -20,7 +20,7 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = util::Allocator();
+    auto allocator    = pdf::Allocator();
     allocator.init(1000);
     auto parser = pdf::Parser(lexer, allocator);
     auto result = parser.parse();
@@ -34,7 +34,7 @@ void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceR
                                        std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = util::Allocator();
+    auto allocator    = pdf::Allocator();
     allocator.init(1000);
     auto parser = pdf::Parser(lexer, allocator, referenceResolver);
     auto result = parser.parse();
@@ -225,7 +225,7 @@ TEST(Parser, CatalogDict) {
 TEST(Parser, MultipleObjects) {
     auto textProvider = pdf::StringTextProvider("5\n 6 7");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = util::Allocator();
+    auto allocator    = pdf::Allocator();
     allocator.init(1000);
     auto parser = pdf::Parser(lexer, allocator);
 
@@ -259,7 +259,7 @@ TEST(Parser, IndirectObject1) {
           "pdfaid:part=\"2\" pdfaid:conformance=\"B\"/>\r  </rdf:RDF>\r</x:xmpmeta>\r<?xpacket "
           "end='w'?>\rendstream\nendobj");
     auto lexer     = pdf::TextLexer(textProvider);
-    auto allocator = util::Allocator();
+    auto allocator = pdf::Allocator();
     allocator.init(1000);
     auto parser = pdf::Parser(lexer, allocator);
 

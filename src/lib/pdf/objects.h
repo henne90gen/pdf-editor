@@ -112,7 +112,7 @@ struct Dictionary : public Object {
     static Type staticType() { return Type::DICTIONARY; }
     explicit Dictionary(std::unordered_map<std::string, Object *> &map)
         : Object(staticType()), values(std::move(map)) {}
-    static Dictionary *create(util::Allocator &allocator, std::unordered_map<std::string, Object *> &dict) {
+    static Dictionary *create(Allocator &allocator, std::unordered_map<std::string, Object *> &dict) {
         return allocator.allocate<Dictionary>(dict);
     }
 
@@ -164,12 +164,12 @@ struct Stream : public Object {
         : Object(staticType()), dictionary(_dictionary), streamData(encodedData) {}
 
     static Stream *
-    create_from_unencoded_data(util::Allocator &allocator,
+    create_from_unencoded_data(Allocator &allocator,
                                const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                std::string_view unencodedData);
 
-    [[nodiscard]] std::string_view decode(util::Allocator &allocator);
-    void encode(util::Allocator &allocator, const std::string &data);
+    [[nodiscard]] std::string_view decode(Allocator &allocator);
+    void encode(Allocator &allocator, const std::string &data);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

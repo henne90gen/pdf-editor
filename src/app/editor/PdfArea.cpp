@@ -24,7 +24,7 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
         }
 
         pageOffset += page->height() + PAGE_PADDING;
-        return util::ForEachResult::CONTINUE;
+        return pdf::ForEachResult::CONTINUE;
     });
 }
 

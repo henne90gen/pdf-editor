@@ -36,7 +36,7 @@ struct BmpFile {
 };
 #pragma pack(pop)
 
-util::Result Image::write_bmp(const std::string &fileName) const {
+Result Image::write_bmp(const std::string &fileName) const {
     BmpFileHeader fileHeader   = {};
     fileHeader.fileSizeInBytes = fileHeader.pixelOffset + width * height * 3;
 
@@ -90,7 +90,7 @@ util::Result Image::write_bmp(const std::string &fileName) const {
     file.flush();
     file.close();
 
-    return util::Result::ok();
+    return Result::ok();
 }
 
 } // namespace pdf
