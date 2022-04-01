@@ -13,7 +13,7 @@
 #include <pdf/document.h>
 
 #include "ContentWindow.h"
-#include "DocumentTree.h"
+#include "ObjectList.h"
 #include "JumpToByteDialog.h"
 
 class DebugWindow : public Gtk::ApplicationWindow {
@@ -45,6 +45,6 @@ class DebugWindow : public Gtk::ApplicationWindow {
     Gtk::Button *parseDocumentButton   = nullptr;
 
     ContentArea *contentArea           = nullptr;
-    DocumentTree *documentTree         = nullptr;
+    ObjectList *documentTree         = nullptr;
     JumpToByteDialog *jumpToByteDialog = nullptr;
 };

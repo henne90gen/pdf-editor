@@ -20,9 +20,9 @@ struct DocumentModelColumns : public Gtk::TreeModel::ColumnRecord {
     }
 };
 
-class DocumentTree : public Gtk::TreeView {
+class ObjectList : public Gtk::TreeView {
   public:
-    DocumentTree(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
+    ObjectList(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
 
     void fill_tree();
 
@@ -39,6 +39,8 @@ class DocumentTree : public Gtk::TreeView {
     DocumentModelColumns columns = DocumentModelColumns();
 
     type_signal_object_selected signalObjectSelected;
+
+    void create_child_rows(Gtk::TreeRow &parentRow, pdf::Object *object);
 
     void create_row(pdf::Object *object, Gtk::TreeRow &parentRow, std::unordered_set<pdf::Object *> &alreadyVisited);
     void create_rows(pdf::Dictionary *dictionary, Gtk::TreeRow &parentRow,

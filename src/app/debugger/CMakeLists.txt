@@ -9,7 +9,7 @@ add_executable(pdf-debugger
         DebugWindow.cpp
         ContentWindow.cpp
         ContentArea.cpp
-        DocumentTree.cpp
+        ObjectList.cpp
         JumpToByteDialog.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/resources.c)
 target_link_gtk4(pdf-debugger)

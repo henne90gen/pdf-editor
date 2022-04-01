@@ -30,11 +30,11 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     jumpToByteButton    = builder->get_widget<Gtk::Button>("JumpToByteButton");
     parseDocumentButton = builder->get_widget<Gtk::Button>("ParseDocumentButton");
     contentArea         = Gtk::Builder::get_widget_derived<ContentArea>(builder, "ContentArea", document);
-    documentTree        = Gtk::Builder::get_widget_derived<DocumentTree>(builder, "DocumentTree", document);
+    documentTree        = Gtk::Builder::get_widget_derived<ObjectList>(builder, "DocumentTree", document);
     detailsLabel        = builder->get_widget<Gtk::Label>("DetailsLabel");
 
     // connect signals
-    parseDocumentButton->signal_clicked().connect(sigc::mem_fun(*documentTree, &DocumentTree::fill_tree));
+    parseDocumentButton->signal_clicked().connect(sigc::mem_fun(*documentTree, &ObjectList::fill_tree));
     trailerHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_trailer));
     objectsHighlight->signal_toggled().connect(sigc::mem_fun(*contentArea, &ContentArea::toggle_highlight_objects));
     contentArea->signal_selected_byte().connect(sigc::mem_fun(*this, &DebugWindow::update_selected_byte_label));
