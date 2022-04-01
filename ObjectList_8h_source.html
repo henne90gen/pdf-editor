@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: src/app/debugger/DocumentTree.h Source File</title>
+<title>PDF Editor: src/app/debugger/ObjectList.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,7 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">DocumentTree.h</div>  </div>
+<div class="title">ObjectList.h</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
@@ -92,9 +92,9 @@ $(function() {
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    }</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;};</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classDocumentTree.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classDocumentTree.html">DocumentTree</a> : <span class="keyword">public</span> Gtk::TreeView {</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classObjectList.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classObjectList.html">ObjectList</a> : <span class="keyword">public</span> Gtk::TreeView {</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="code" href="classDocumentTree.html">DocumentTree</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder, <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="code" href="classObjectList.html">ObjectList</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder, <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document);</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> fill_tree();</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
@@ -112,17 +112,19 @@ $(function() {
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    type_signal_object_selected signalObjectSelected;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> create_row(<a class="code" href="structpdf_1_1Object.html">pdf::Object</a> *<span class="keywordtype">object</span>, Gtk::TreeRow &amp;parentRow, std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> create_rows(<a class="code" href="structpdf_1_1Dictionary.html">pdf::Dictionary</a> *dictionary, Gtk::TreeRow &amp;parentRow,</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                     std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> create_rows(<a class="code" href="structpdf_1_1Array.html">pdf::Array</a> *array, Gtk::TreeRow &amp;parentRow, std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> create_child_rows(Gtk::TreeRow &amp;parentRow, <a class="code" href="structpdf_1_1Object.html">pdf::Object</a> *<span class="keywordtype">object</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> create_row(<a class="code" href="structpdf_1_1Object.html">pdf::Object</a> *<span class="keywordtype">object</span>, Gtk::TreeRow &amp;parentRow, std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> create_rows(<a class="code" href="structpdf_1_1Dictionary.html">pdf::Dictionary</a> *dictionary, Gtk::TreeRow &amp;parentRow,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                     std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">void</span> create_rows(<a class="code" href="structpdf_1_1Array.html">pdf::Array</a> *array, Gtk::TreeRow &amp;parentRow, std::unordered_set&lt;pdf::Object *&gt; &amp;alreadyVisited);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:32</div></div>
 <div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:100</div></div>
-<div class="ttc" id="astructDocumentModelColumns_html"><div class="ttname"><a href="structDocumentModelColumns.html">DocumentModelColumns</a></div><div class="ttdef"><b>Definition:</b> DocumentTree.h:11</div></div>
-<div class="ttc" id="aclassDocumentTree_html"><div class="ttname"><a href="classDocumentTree.html">DocumentTree</a></div><div class="ttdef"><b>Definition:</b> DocumentTree.h:23</div></div>
+<div class="ttc" id="astructDocumentModelColumns_html"><div class="ttname"><a href="structDocumentModelColumns.html">DocumentModelColumns</a></div><div class="ttdef"><b>Definition:</b> ObjectList.h:11</div></div>
 <div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:109</div></div>
+<div class="ttc" id="aclassObjectList_html"><div class="ttname"><a href="classObjectList.html">ObjectList</a></div><div class="ttdef"><b>Definition:</b> ObjectList.h:23</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:99</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
