@@ -158,6 +158,10 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
 
 Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer) {
     // decide whether xref stream or table
+    if (document.file.is_out_of_range(crossRefStartPtr + 4)) {
+        return Result::error("Unexpectedly reached end of file");
+    }
+
     const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
         //  stream -> parse stream
@@ -198,21 +202,26 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     try {
         currentTrailer->crossReferenceTable.firstObjectNumber = std::stoll(metaData.substr(0, spaceLocation));
     } catch (std::invalid_argument &err) {
-        return Result::error(
-              "Failed to parse first object number of cross reference table (std::invalid_argument): {}", err.what());
+        return Result::error("Failed to parse first object number of cross reference table (std::invalid_argument): {}",
+                             err.what());
     } catch (std::out_of_range &err) {
-        return Result::error(
-              "Failed to parse first object number of cross reference table (std::out_of_range): {}", err.what());
+        return Result::error("Failed to parse first object number of cross reference table (std::out_of_range): {}",
+                             err.what());
     }
 
     try {
         currentTrailer->crossReferenceTable.objectCount = std::stoll(metaData.substr(spaceLocation));
     } catch (std::invalid_argument &err) {
         return Result::error("Failed to parse object count of cross reference table (std::invalid_argument): {}",
-                                   err.what());
+                             err.what());
     } catch (std::out_of_range &err) {
         return Result::error("Failed to parse object count of cross reference table (std::out_of_range): {}",
-                                   err.what());
+                             err.what());
+    }
+
+    if (currentTrailer->crossReferenceTable.objectCount > 1000000) {
+        return Result::error("Too many objects in cross reference table: {}",
+                             currentTrailer->crossReferenceTable.objectCount);
     }
 
     for (int64_t objectNumber = currentTrailer->crossReferenceTable.firstObjectNumber;
@@ -225,6 +234,10 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     ignoreNewLines(currentReadPtr);
 
     for (int i = 0; i < currentTrailer->crossReferenceTable.objectCount; i++) {
+        if (currentReadPtr + 20 >= document.file.end_ptr()) {
+            return Result::error("Invalid cross reference table");
+        }
+
         // nnnnnnnnnn ggggg f__
         auto s = std::string(currentReadPtr, 20);
 
@@ -235,10 +248,9 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
             num1 = std::stoll(s.substr(11, 16));
         } catch (std::invalid_argument &err) {
             return Result::error("Failed to parse number in cross reference table (std::invalid_argument): {}",
-                                       err.what());
+                                 err.what());
         } catch (std::out_of_range &err) {
-            return Result::error("Failed to parse number in cross reference table (std::out_of_range): {}",
-                                       err.what());
+            return Result::error("Failed to parse number in cross reference table (std::out_of_range): {}", err.what());
         }
 
         CrossReferenceEntry entry = {};
@@ -272,7 +284,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     size_t lengthOfTrailerDict = 1;
     while (std::string_view(currentReadPtr + lengthOfTrailerDict, 9) != "startxref") {
         lengthOfTrailerDict++;
-        if (document.file.data + document.file.sizeInBytes < currentReadPtr + lengthOfTrailerDict) {
+        if (document.file.end_ptr() <= currentReadPtr + lengthOfTrailerDict + 9) {
             return Result::error("Unexpectedly reached end of file");
         }
     }
@@ -311,7 +323,7 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
         size_t length = 0;
         while (std::string_view(start + length, 6) != "endobj") {
             length++;
-            if (start + length >= fileEnd) {
+            if (start + length + 6 >= fileEnd) {
                 return LoadObjectResult::error("Unexpectedly reached end of file");
             }
         }
@@ -457,10 +469,10 @@ Result read_data(Document &document, bool loadAllObjects) {
         document.file.lastCrossRefStart = std::stoll(str);
     } catch (std::invalid_argument &err) {
         return Result::error("Failed to parse byte offset of cross reference table (std::invalid_argument): {}",
-                                   err.what());
+                             err.what());
     } catch (std::out_of_range &err) {
         return Result::error("Failed to parse byte offset of cross reference table (std::out_of_range): {}",
-                                   err.what());
+                             err.what());
     }
 
     auto crossRefStartPtr = document.file.data + document.file.lastCrossRefStart;
@@ -500,7 +512,6 @@ Result Document::read_from_file(const std::string &filePath, Document &document,
 }
 
 Result Document::read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects) {
-    // FIXME using the existing buffer collides with the memory management using the Allocator
     document.file.data        = buffer;
     document.file.sizeInBytes = size;
     document.allocator.init(document.file.sizeInBytes);

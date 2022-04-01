@@ -86,9 +86,9 @@ struct DocumentFile {
     DocumentFileMetadata metadata = {};
 
     /// Points to the byte right after the end of the data buffer
-    char* end_ptr(){
-        return data + sizeInBytes;
-    }
+    char *end_ptr() const { return data + sizeInBytes; }
+    /// Returns true if the given pointer is outside of the range of the data buffer
+    bool is_out_of_range(char *ptr) const { return ptr < data || ptr >= end_ptr(); }
 };
 
 struct ReadMetadata {
@@ -97,7 +97,7 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    Allocator allocator                                 = {};
+    Allocator allocator                                       = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 

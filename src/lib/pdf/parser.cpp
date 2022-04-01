@@ -298,7 +298,6 @@ Object *Parser::parse_stream_or_dictionary() {
 
     if (!current_token_is(Token::Type::NEW_LINE)) {
         currentTokenIdx = beforeTokenIdx;
-        dictionary->~Dictionary();
         return nullptr;
     }
     currentTokenIdx++;
@@ -307,7 +306,6 @@ Object *Parser::parse_stream_or_dictionary() {
     if (itr == dictionary->values.end()) {
         // TODO add logging
         currentTokenIdx = beforeTokenIdx;
-        dictionary->~Dictionary();
         return nullptr;
     }
 
@@ -319,24 +317,20 @@ Object *Parser::parse_stream_or_dictionary() {
         auto obj = referenceResolver->resolve(value->as<IndirectReference>());
         if (obj == nullptr) {
             // TODO add logging
-            dictionary->~Dictionary();
             return nullptr;
         }
         if (!obj->is<IndirectObject>()) {
             // TODO add logging
-            dictionary->~Dictionary();
             return nullptr;
         }
         if (!obj->as<IndirectObject>()->object->is<Integer>()) {
             // TODO add logging
-            dictionary->~Dictionary();
             return nullptr;
         }
         length = obj->as<IndirectObject>()->object->as<Integer>()->value;
     } else {
         // TODO add logging
         currentTokenIdx = beforeTokenIdx;
-        dictionary->~Dictionary();
         return nullptr;
     }
 
@@ -345,7 +339,6 @@ Object *Parser::parse_stream_or_dictionary() {
 
     if (!current_token_is(Token::Type::STREAM_END)) {
         currentTokenIdx = beforeTokenIdx;
-        dictionary->~Dictionary();
         return nullptr;
     }
 

@@ -12,7 +12,7 @@ RUN cmake --build .
 
 # Test
 RUN ctest --output-on-failure
-RUN cmake --build . --target test_files
+RUN cmake --build . --target test_fuzzer
 RUN cmake --build . --target test_suite_verapdf
 RUN cmake --build . --target test_suite_isartor
 RUN cmake --build . --target test_suite_bfosupport

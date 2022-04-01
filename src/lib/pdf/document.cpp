@@ -70,11 +70,17 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
 
     if (entry->type == CrossReferenceEntryType::NORMAL) {
         auto start = file.data + entry->normal.byteOffset;
+        if (file.is_out_of_range(start)) {
+            return {nullptr, {}};
+        }
 
-        // TODO this is dangerous (it might read past the end of the stream)
         size_t length = 0;
         while (std::string_view(start + length, 6) != "endobj") {
             length++;
+            if (file.is_out_of_range(start + length + 6)) {
+                // return Result::error("Unexpectedly reached end of file");
+                return {nullptr, {}};
+            }
         }
         length += 6;
 
@@ -206,7 +212,7 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->is_page()) {
-                Page *page                 = allocator.allocate<Page>(*this, resolvedKid);
+                Page *page           = allocator.allocate<Page>(*this, resolvedKid);
                 ForEachResult result = func(page);
                 if (result == ForEachResult::BREAK) {
                     return;
@@ -261,7 +267,7 @@ Result Document::delete_page(size_t pageNum) {
 
     if (pageNum < 1 || pageNum > count) {
         return Result::error("Tried to delete page {}, which is outside of the inclusive range [1, {}]", pageNum,
-                                   count);
+                             count);
     }
 
     size_t currentPageNum = 1;

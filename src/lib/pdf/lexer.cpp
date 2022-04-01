@@ -234,6 +234,10 @@ std::optional<Token> matchString(const std::string_view &word) {
         }
     }
 
+    if (openParenthesis != 0) {
+        return {};
+    }
+
     return Token(Token::Type::LITERAL_STRING, word.substr(0, stringLength + 1));
 }
 
@@ -351,9 +355,13 @@ std::optional<Token> matchComment(const std::string_view &word) {
         return {};
     }
 
-    int idx = 1;
-    while (word[idx] != '\n' && word[idx] != '\r') {
+    size_t idx = 1;
+    while (idx < word.length() && word[idx] != '\n' && word[idx] != '\r') {
         idx++;
+    }
+
+    if (idx >= word.length()) {
+        return {};
     }
 
     return Token(Token::Type::COMMENT, word.substr(0, idx));
@@ -450,6 +458,11 @@ std::optional<Token> TextLexer::get_token() {
 }
 
 std::string_view TextLexer::advance_stream(size_t characters) {
+    if (currentWord.length() <= characters) {
+        // TODO fetch more text from the textProvider
+        return {};
+    }
+
     auto tmp    = currentWord.substr(0, characters);
     currentWord = currentWord.substr(characters);
     return tmp;
