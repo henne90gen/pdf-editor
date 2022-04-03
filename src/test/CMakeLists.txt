@@ -22,6 +22,7 @@ function(create_test test_name)
 endfunction()
 
 create_test(cmap_parser_test)
+create_test(image_test)
 create_test(lexer_test)
 create_test(operator_parser_test)
 create_test(parser_test)

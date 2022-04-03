@@ -378,13 +378,11 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
             return ForEachResult::CONTINUE;
         }
 
-        Image image = {
-              .allocator        = allocator,
-              .width            = widthOpt.value()->value,
-              .height           = heightOpt.value()->value,
-              .bitsPerComponent = bitsPerComponentOpt.value()->value,
-              .stream           = stream,
-        };
+        auto image             = Image(allocator);
+        image.width            = widthOpt.value()->value;
+        image.height           = heightOpt.value()->value;
+        image.bitsPerComponent = bitsPerComponentOpt.value()->value;
+        image.stream           = stream;
         return func(image);
     });
 }
