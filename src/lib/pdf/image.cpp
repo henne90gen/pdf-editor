@@ -74,34 +74,32 @@ Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uin
                              infoHeader.bitsPerPixel);
     }
 
-    auto pBuf           = (uint8_t *)pixels.data();
     auto currentRowSize = static_cast<int32_t>((infoHeader.bitsPerPixel * width) / 32.0 * 4.0);
     auto paddedRowSize  = static_cast<int32_t>(std::ceil((infoHeader.bitsPerPixel * width) / 32.0)) * 4;
     auto pixelsSize     = static_cast<size_t>(paddedRowSize * height);
-    auto padding        = paddedRowSize - currentRowSize;
-    bool needsPadding = pixelsSize != pixels.length() && padding != 0;
-    if (needsPadding) {
-        // we have to create a copy of the pixels to account for additional padding
-        // that is necessary at the end of each pixel row
+    ASSERT(pixels.size() == static_cast<size_t>(currentRowSize * height));
 
-        spdlog::trace("Adding {} bytes of padding to the end of each pixel row", padding);
+    auto pBuf = reinterpret_cast<uint8_t *>(std::malloc(pixelsSize));
+    std::memset(pBuf, 0, pixelsSize);
 
-        pBuf = reinterpret_cast<uint8_t *>(std::malloc(pixelsSize));
-        std::memset(pBuf, 0, pixelsSize);
+    auto padding = paddedRowSize - currentRowSize;
 
-        // TODO this could be optimized with omp and memcpy (copying each row instead of each pixel)
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                auto pBufIndex      = row * paddedRowSize + col * 3;
-                auto pixelsIndex    = static_cast<int32_t>(row * currentRowSize + col * 3);
-                pBuf[pBufIndex + 0] = pixels[pixelsIndex + 0];
-                pBuf[pBufIndex + 1] = pixels[pixelsIndex + 1];
-                pBuf[pBufIndex + 2] = pixels[pixelsIndex + 2];
-            }
+    spdlog::trace("Adding {} bytes of padding to the end of each pixel row", padding);
+
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            auto pBufIndex      = (height - row - 1) * paddedRowSize + col * 3;
+            auto pixelsIndex    = static_cast<int32_t>(row * currentRowSize + col * 3);
+            pBuf[pBufIndex + 0] = pixels[pixelsIndex + 2];
+            pBuf[pBufIndex + 1] = pixels[pixelsIndex + 1];
+            pBuf[pBufIndex + 2] = pixels[pixelsIndex + 0];
         }
     }
 
-    std::ofstream file(fileName, std::ios::binary);
+    std::ofstream file(fileName, std::ios::out | std::ios::binary);
+    if (!file) {
+        return Result::error("Failed to open file '{}' for writing", fileName);
+    }
 
     BmpFileHeader fileHeader   = {};
     fileHeader.fileSizeInBytes = fileHeader.pixelOffset + (paddedRowSize * height);
@@ -114,24 +112,12 @@ Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uin
         return Result::error("Failed to write to file '{}'", fileName);
     }
 
-    file.write(reinterpret_cast<const char *>(pBuf), pixelsSize);
+    file.write(reinterpret_cast<const char *>(pBuf), static_cast<int64_t>(pixelsSize));
     if (file.bad()) {
         return Result::error("Failed to write to file '{}'", fileName);
     }
 
-    file.flush();
-    file.close();
-
-    std::cout << "Write BMP" << std::endl;
-    std::cout << std::hex << std::setfill('0');
-    for (size_t i = 0; i < pixelsSize; i++) {
-        std::cout << std::setw(2) << static_cast<unsigned>(pBuf[i]) << " ";
-    }
-    std::cout << std::endl;
-
-    if (needsPadding) {
-        std::free(pBuf);
-    }
+    std::free(pBuf);
 
     return Result::ok();
 }
@@ -160,12 +146,7 @@ ValueResult<Image *> Image::read_bmp(Allocator &allocator, const std::string &fi
     auto pixels        = reinterpret_cast<uint8_t *>(std::malloc(pixelSize));
     file.read(reinterpret_cast<char *>(pixels), pixelSize);
 
-    std::cout << "Read BMP" << std::endl;
-    std::cout << std::hex << std::setfill('0');
-    for (size_t i = 0; i < pixelSize; i++) {
-        std::cout << std::setw(2) << static_cast<unsigned>(pixels[i]) << " ";
-    }
-    std::cout << std::endl;
+    // TODO flip BGR to RGB and remove padding
 
     auto image              = allocator.allocate<Image>(allocator);
     image->width            = infoHeader.width;

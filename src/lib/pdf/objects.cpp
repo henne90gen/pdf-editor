@@ -105,8 +105,8 @@ std::string_view Stream::decode(Allocator &allocator) {
         return {decodedStream, decodedStreamSize};
     }
 
-    const char *output = streamData.data();
-    size_t outputSize  = streamData.length();
+    char *output      = const_cast<char *>(streamData.data());
+    size_t outputSize = streamData.length();
 
     auto fs = filters();
     if (fs.empty()) {
@@ -118,12 +118,13 @@ std::string_view Stream::decode(Allocator &allocator) {
             // FIXME implement handling of "DecodeParms" from stream dictionary
             //  Example values: Predictor=12, Columns=4
 
-            // TODO this works, but is not optimal
-            const char *input = output;
-            size_t inputSize  = outputSize;
+            char *input      = output;
+            size_t inputSize = outputSize;
 
-            outputSize = inputSize * 3;
-            output     = allocator.allocate_chunk(outputSize);
+            outputSize = inputSize;
+            output = (char *)malloc(outputSize);
+            std::vector<const char *> outputs = {};
+            outputs.push_back(output);
 
             z_stream infstream;
             infstream.zalloc    = Z_NULL;
@@ -136,31 +137,48 @@ std::string_view Stream::decode(Allocator &allocator) {
 
             // TODO error handling
             inflateInit(&infstream);
-            inflate(&infstream, Z_NO_FLUSH);
+            while (true) {
+                inflate(&infstream, Z_NO_FLUSH);
+                if (infstream.avail_out != 0) {
+                    break;
+                }
+
+                output = (char *)malloc(outputSize);
+                infstream.avail_out = (uInt)outputSize;
+                infstream.next_out  = (Bytef *)output;
+                outputs.push_back(output);
+            }
+
             inflateEnd(&infstream);
 
-            outputSize = infstream.total_out;
-
             // copy the result into a buffer that fits exactly
-            char *tmp = allocator.allocate_chunk(outputSize);
-            memcpy(tmp, output, outputSize);
+            char *tmp = allocator.allocate_chunk(infstream.total_out);
+            for (size_t i = 0; i < outputs.size(); i++) {
+                const char *ptr = outputs[i];
+                memcpy(tmp + i * outputSize, ptr, outputSize);
+                free((void *)ptr);
+            }
+
             output = tmp;
+
+            outputSize = infstream.total_out;
         } else {
+            // TODO handle more filters
             spdlog::error("Unknown filter: {}", filter);
             ASSERT(false);
         }
-        // TODO handle more filters
     }
 
     decodedStream     = output;
     decodedStreamSize = outputSize;
+
     return {output, outputSize};
 }
 
 void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
     // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
     destSize = srcSize * 2;
-    destData = (char *)malloc(destSize);
+    destData = (char *)std::malloc(destSize);
 
     z_stream stream  = {};
     stream.zalloc    = Z_NULL;
@@ -220,8 +238,8 @@ Stream *Stream::create_from_unencoded_data(Allocator &allocator,
 
     // TODO this might be inefficient: maybe place the stream data after the stream object into the allocator
     auto streamData = allocator.allocate_chunk(encodedDataSize);
-    memcpy(streamData, encodedData, encodedDataSize);
-    free((void *)encodedData);
+    std::memcpy(streamData, encodedData, encodedDataSize);
+    std::free((void *)encodedData);
 
     auto dictionary = Dictionary::create(allocator, dict);
     return allocator.allocate<Stream>(dictionary, std::string_view(streamData, encodedDataSize));
