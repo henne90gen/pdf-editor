@@ -158,11 +158,11 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
 
 Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *currentTrailer) {
     // decide whether xref stream or table
-    if (document.file.is_out_of_range(crossRefStartPtr + 4)) {
+    const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
+    if (document.file.is_out_of_range(xrefKeyword)) {
         return Result::error("Unexpectedly reached end of file");
     }
 
-    const auto xrefKeyword = std::string_view(crossRefStartPtr, 4);
     if (xrefKeyword != "xref") {
         //  stream -> parse stream
         // TODO how long is the stream? (just using the end of the file for parsing purposes)
@@ -234,7 +234,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     ignoreNewLines(currentReadPtr);
 
     for (int i = 0; i < currentTrailer->crossReferenceTable.objectCount; i++) {
-        if (currentReadPtr + 20 >= document.file.end_ptr()) {
+        if (document.file.is_out_of_range(currentReadPtr, 20)) {
             return Result::error("Invalid cross reference table");
         }
 
@@ -271,9 +271,11 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     ignoreNewLines(currentReadPtr);
 
     // parse trailer dict
-    while (std::string_view(currentReadPtr, 7) != "trailer") {
+    auto view = std::string_view(currentReadPtr, 7);
+    while (view != "trailer") {
         currentReadPtr++;
-        if (document.file.data + document.file.sizeInBytes < currentReadPtr + 7) {
+        view = std::string_view(currentReadPtr, 7);
+        if (document.file.is_out_of_range(view)) {
             return Result::error("Unexpectedly reached end of file");
         }
     }
@@ -282,9 +284,11 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     ignoreNewLines(currentReadPtr);
 
     size_t lengthOfTrailerDict = 1;
-    while (std::string_view(currentReadPtr + lengthOfTrailerDict, 9) != "startxref") {
+    view = std::string_view(currentReadPtr + lengthOfTrailerDict, 9);
+    while (view != "startxref") {
         lengthOfTrailerDict++;
-        if (document.file.end_ptr() <= currentReadPtr + lengthOfTrailerDict + 9) {
+        view = std::string_view(currentReadPtr + lengthOfTrailerDict, 9);
+        if (document.file.is_out_of_range(view)) {
             return Result::error("Unexpectedly reached end of file");
         }
     }

@@ -88,7 +88,9 @@ struct DocumentFile {
     /// Points to the byte right after the end of the data buffer
     char *end_ptr() const { return data + sizeInBytes; }
     /// Returns true if the given pointer is outside of the range of the data buffer
-    bool is_out_of_range(char *ptr) const { return ptr < data || ptr >= end_ptr(); }
+    bool is_out_of_range(const char *ptr) const { return ptr < data || ptr >= end_ptr(); }
+    bool is_out_of_range(const char *ptr, size_t size) const { return ptr < data || ptr + size >= end_ptr(); }
+    bool is_out_of_range(std::string_view sv) const { return sv.data() < data || sv.data() + sv.size() >= end_ptr(); }
 };
 
 struct ReadMetadata {
