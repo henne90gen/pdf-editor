@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jumptobytedialog_60',['JumpToByteDialog',['../classJumpToByteDialog.html',1,'']]]
+  ['jumptobytedialog_67',['JumpToByteDialog',['../classJumpToByteDialog.html',1,'']]]
 ];

@@ -7,12 +7,14 @@ var searchData=
   ['cmapparser_11',['CMapParser',['../structpdf_1_1CMapParser.html',1,'pdf']]],
   ['cmapstream_12',['CMapStream',['../structpdf_1_1CMapStream.html',1,'pdf']]],
   ['color_13',['Color',['../structpdf_1_1Color.html',1,'pdf']]],
-  ['contentarea_14',['ContentArea',['../classContentArea.html',1,'']]],
-  ['contentstream_15',['ContentStream',['../structpdf_1_1ContentStream.html',1,'pdf']]],
-  ['contentwindow_16',['ContentWindow',['../classContentWindow.html',1,'']]],
-  ['crossreferenceentry_17',['CrossReferenceEntry',['../structpdf_1_1CrossReferenceEntry.html',1,'pdf']]],
-  ['crossreferenceentrycompressed_18',['CrossReferenceEntryCompressed',['../structpdf_1_1CrossReferenceEntryCompressed.html',1,'pdf']]],
-  ['crossreferenceentryfree_19',['CrossReferenceEntryFree',['../structpdf_1_1CrossReferenceEntryFree.html',1,'pdf']]],
-  ['crossreferenceentrynormal_20',['CrossReferenceEntryNormal',['../structpdf_1_1CrossReferenceEntryNormal.html',1,'pdf']]],
-  ['crossreferencetable_21',['CrossReferenceTable',['../structpdf_1_1CrossReferenceTable.html',1,'pdf']]]
+  ['colorsused_14',['colorsUsed',['../structpdf_1_1BmpInfoHeader.html#a7f431f650677be33825f4a5124642ed2',1,'pdf::BmpInfoHeader']]],
+  ['compression_15',['compression',['../structpdf_1_1BmpInfoHeader.html#a3bb1bdbc8a1b22397b298d1b4e708b84',1,'pdf::BmpInfoHeader']]],
+  ['contentarea_16',['ContentArea',['../classContentArea.html',1,'']]],
+  ['contentstream_17',['ContentStream',['../structpdf_1_1ContentStream.html',1,'pdf']]],
+  ['contentwindow_18',['ContentWindow',['../classContentWindow.html',1,'']]],
+  ['crossreferenceentry_19',['CrossReferenceEntry',['../structpdf_1_1CrossReferenceEntry.html',1,'pdf']]],
+  ['crossreferenceentrycompressed_20',['CrossReferenceEntryCompressed',['../structpdf_1_1CrossReferenceEntryCompressed.html',1,'pdf']]],
+  ['crossreferenceentryfree_21',['CrossReferenceEntryFree',['../structpdf_1_1CrossReferenceEntryFree.html',1,'pdf']]],
+  ['crossreferenceentrynormal_22',['CrossReferenceEntryNormal',['../structpdf_1_1CrossReferenceEntryNormal.html',1,'pdf']]],
+  ['crossreferencetable_23',['CrossReferenceTable',['../structpdf_1_1CrossReferenceTable.html',1,'pdf']]]
 ];

@@ -76,22 +76,41 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aded2a3280774de1f580c30a97eef5e53"><td class="memItemLeft" align="right" valign="top"><a id="aded2a3280774de1f580c30a97eef5e53"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>identifier</b> = 0x4D42</td></tr>
+<tr class="memitem:aded2a3280774de1f580c30a97eef5e53"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1BmpFileHeader.html#aded2a3280774de1f580c30a97eef5e53">identifier</a> = 0x4D42</td></tr>
 <tr class="separator:aded2a3280774de1f580c30a97eef5e53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac533e6c6ab35afbf5e74c5145fdc453d"><td class="memItemLeft" align="right" valign="top"><a id="ac533e6c6ab35afbf5e74c5145fdc453d"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>fileSizeInBytes</b></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1BmpFileHeader.html#ac533e6c6ab35afbf5e74c5145fdc453d">fileSizeInBytes</a></td></tr>
+<tr class="memdesc:ac533e6c6ab35afbf5e74c5145fdc453d"><td class="mdescLeft">&#160;</td><td class="mdescRight">02 2 4 - The size of the BMP file in bytes <br /></td></tr>
 <tr class="separator:ac533e6c6ab35afbf5e74c5145fdc453d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac93feb6c29eed050f06cbd5b36534dfb"><td class="memItemLeft" align="right" valign="top"><a id="ac93feb6c29eed050f06cbd5b36534dfb"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>reserved0</b> = 0</td></tr>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1BmpFileHeader.html#ac93feb6c29eed050f06cbd5b36534dfb">reserved0</a> = 0</td></tr>
+<tr class="memdesc:ac93feb6c29eed050f06cbd5b36534dfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">06 6 2 - Reserved; actual value depends on the application that creates the image, if created manually can be 0 <br /></td></tr>
 <tr class="separator:ac93feb6c29eed050f06cbd5b36534dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae083f941cf04a4cc85d27e4dd0634f7"><td class="memItemLeft" align="right" valign="top"><a id="aae083f941cf04a4cc85d27e4dd0634f7"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>reserved1</b> = 0</td></tr>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1BmpFileHeader.html#aae083f941cf04a4cc85d27e4dd0634f7">reserved1</a> = 0</td></tr>
+<tr class="memdesc:aae083f941cf04a4cc85d27e4dd0634f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">08 8 2 - Reserved; actual value depends on the application that creates the image, if created manually can be 0 <br /></td></tr>
 <tr class="separator:aae083f941cf04a4cc85d27e4dd0634f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3dd5e73b188ea4b5e2eec8924c00b35"><td class="memItemLeft" align="right" valign="top"><a id="ac3dd5e73b188ea4b5e2eec8924c00b35"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>pixelOffset</b> = 54</td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1BmpFileHeader.html#ac3dd5e73b188ea4b5e2eec8924c00b35">pixelOffset</a> = 54</td></tr>
+<tr class="memdesc:ac3dd5e73b188ea4b5e2eec8924c00b35"><td class="mdescLeft">&#160;</td><td class="mdescRight">0A 10 4 - The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found. <br /></td></tr>
 <tr class="separator:ac3dd5e73b188ea4b5e2eec8924c00b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="aded2a3280774de1f580c30a97eef5e53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aded2a3280774de1f580c30a97eef5e53">&#9670;&nbsp;</a></span>identifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t pdf::BmpFileHeader::identifier = 0x4D42</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>00 0 2 - The header field used to identify the BMP and DIB file is 0x42 0x4D in hexadecimal, same as 'BM' in ASCII. </p>
+
+</div>
+</div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/lib/pdf/image.cpp</li>
 </ul>
