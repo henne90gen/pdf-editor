@@ -497,9 +497,7 @@ Result read_data(Document &document, bool loadAllObjects) {
 }
 
 Result Document::read_from_file(const std::string &filePath, Document &document, bool loadAllObjects) {
-    auto is = std::ifstream();
-    is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
-
+    auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
     if (!is.is_open()) {
         return Result::error("Failed to open pdf file for reading: '{}'", filePath);
     }

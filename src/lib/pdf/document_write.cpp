@@ -183,16 +183,12 @@ Result write_to_stream(Document &document, std::ostream &s) {
 }
 
 Result Document::write_to_file(const std::string &filePath) {
-    auto os = std::ofstream();
-    os.open(filePath, std::ios::out | std::ios::binary);
-
+    auto os = std::ofstream(filePath, std::ios::out | std::ios::binary);
     if (!os.is_open()) {
         return Result::error("Failed to open file for writing: '{}'", filePath);
     }
 
-    auto result = write_to_stream(*this, os);
-    os.close();
-    return result;
+    return write_to_stream(*this, os);
 }
 
 Result Document::write_to_memory(char *&buffer, size_t &size) {
@@ -208,4 +204,5 @@ Result Document::write_to_memory(char *&buffer, size_t &size) {
     memcpy(buffer, result.data(), size);
     return Result::ok();
 }
+
 } // namespace pdf

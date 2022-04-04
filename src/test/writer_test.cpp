@@ -117,6 +117,7 @@ TEST(SplitByLines, Simple) {
     ASSERT_EQ("def", lines[1]);
     ASSERT_EQ("ghi", lines[2]);
 }
+
 TEST(SplitByLines, EndsWithNewline) {
     auto input = "abc\ndef\nghi\n";
     auto lines = split_by_lines(input);
@@ -163,6 +164,7 @@ TEST(Writer, Blank) { write_pdf("blank.pdf"); }
 TEST(Writer, HelloWorld) { write_pdf("hello-world.pdf"); }
 TEST(Writer, Image1) { write_pdf("image-1.pdf"); }
 TEST(Writer, Image2) { write_pdf("image-2.pdf"); }
+TEST(Writer, Image3) { write_pdf("image-3.pdf"); }
 TEST(Writer, DISABLED_ObjectStream) {
     // TODO
     // All objects (even the ones that are part of an object stream) are loaded into the objectList
