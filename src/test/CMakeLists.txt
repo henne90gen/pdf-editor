@@ -15,6 +15,10 @@ add_custom_target(test_suite_bfosupport
         COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/integration_test.py $<TARGET_FILE:pdf-cli> ${CMAKE_CURRENT_BINARY_DIR}/test-suites BFOSupport)
 add_dependencies(test_suite_bfosupport pdf-cli download_test_suites)
 
+add_executable(md5_test md5_test.cpp)
+target_link_libraries(md5_test gtest_main md5)
+gtest_discover_tests(md5_test)
+
 function(create_test test_name)
     add_executable(${test_name} ${test_name}.cpp process_win.cpp process_linux.cpp)
     target_link_libraries(${test_name} gtest_main pdf)
