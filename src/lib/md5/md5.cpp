@@ -33,7 +33,7 @@ static inline uint32_t H(uint32_t X, uint32_t Y, uint32_t Z) { return X ^ Y ^ Z;
 static inline uint32_t I(uint32_t X, uint32_t Y, uint32_t Z) { return Y ^ (X | ~Z); }
 
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
-#define ROUND1(a, b, c, d, k, s, i) a = (b) + ROTATE_LEFT(((a) + F(b, c, d) + X[k] + T[(i)-1]), (s))
+#define ROUND1(a, b, c, d, k, s, i) a = (b) + ROTATE_LEFT(((a) + F(b, c, d) + X[k] + (i)), (s))
 #define ROUND2(a, b, c, d, k, s, i) a = (b) + ROTATE_LEFT(((a) + G(b, c, d) + X[k] + T[(i)-1]), (s))
 #define ROUND3(a, b, c, d, k, s, i) a = (b) + ROTATE_LEFT(((a) + H(b, c, d) + X[k] + T[(i)-1]), (s))
 #define ROUND4(a, b, c, d, k, s, i) a = (b) + ROTATE_LEFT(((a) + I(b, c, d) + X[k] + T[(i)-1]), (s))
@@ -55,19 +55,21 @@ static inline uint32_t I(uint32_t X, uint32_t Y, uint32_t Z) { return Y ^ (X | ~
 #define S43 15
 #define S44 21
 
+MD5Hash calculate_checksum(const std::string &str) { return calculate_checksum((uint8_t *)str.c_str(), str.size()); }
+
+uint32_t T[64] = {
+      0,          0,          0,          0,          0,          0,          0,          0,
+      0,          0,          0,          0,          0,          0,          0,          0,
+      0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x2441453,  0xd8a1e681, 0xe7d3fbc8,
+      0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+      0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+      0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x4881d05,  0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+      0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+      0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
+};
+
 MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
     auto [bytes, sizeInBytes] = apply_padding(bytesIn, sizeInBytesIn);
-
-    uint32_t T[64] = {
-          0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
-          0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
-          0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x2441453,  0xd8a1e681, 0xe7d3fbc8,
-          0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
-          0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
-          0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x4881d05,  0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
-          0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
-          0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
-    };
 
     uint32_t A = 0x67452301;
     uint32_t B = 0xefcdab89;
@@ -76,30 +78,38 @@ MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
 
     // process input in 16-word (64 byte) chunks
     for (uint64_t i = 0; i < sizeInBytes / 64; i++) {
+#if 1
         uint32_t X[16];
         std::memcpy(X, bytes + i * 64, 64);
+#else
+        // NOTE:
+        //  this only works in Debug mode, not in Release (tested on Windows)
+        auto X = (uint32_t *)(bytes + (i * 64));
+        //  adding the std::cout line fixes the bug???
+        //        std::cout << X[0] << std::endl;
+#endif
 
         auto AA = A;
         auto BB = B;
         auto CC = C;
         auto DD = D;
 
-        ROUND1(A, B, C, D, 0, S11, 1);
-        ROUND1(D, A, B, C, 1, S12, 2);
-        ROUND1(C, D, A, B, 2, S13, 3);
-        ROUND1(B, C, D, A, 3, S14, 4);
-        ROUND1(A, B, C, D, 4, S11, 5);
-        ROUND1(D, A, B, C, 5, S12, 6);
-        ROUND1(C, D, A, B, 6, S13, 7);
-        ROUND1(B, C, D, A, 7, S14, 8);
-        ROUND1(A, B, C, D, 8, S11, 9);
-        ROUND1(D, A, B, C, 9, S12, 10);
-        ROUND1(C, D, A, B, 10, S13, 11);
-        ROUND1(B, C, D, A, 11, S14, 12);
-        ROUND1(A, B, C, D, 12, S11, 13);
-        ROUND1(D, A, B, C, 13, S12, 14);
-        ROUND1(C, D, A, B, 14, S13, 15); // ERROR c has the wrong value after this line!
-        ROUND1(B, C, D, A, 15, S14, 16);
+        ROUND1(A, B, C, D, 0, S11, 0xd76aa478);
+        ROUND1(D, A, B, C, 1, S12, 0xe8c7b756);
+        ROUND1(C, D, A, B, 2, S13, 0x242070db);
+        ROUND1(B, C, D, A, 3, S14, 0xc1bdceee);
+        ROUND1(A, B, C, D, 4, S11, 0xf57c0faf);
+        ROUND1(D, A, B, C, 5, S12, 0x4787c62a);
+        ROUND1(C, D, A, B, 6, S13, 0xa8304613);
+        ROUND1(B, C, D, A, 7, S14, 0xfd469501);
+        ROUND1(A, B, C, D, 8, S11, 0x698098d8);
+        ROUND1(D, A, B, C, 9, S12, 0x8b44f7af);
+        ROUND1(C, D, A, B, 10, S13, 0xffff5bb1);
+        ROUND1(B, C, D, A, 11, S14, 0x895cd7be);
+        ROUND1(A, B, C, D, 12, S11, 0x6b901122);
+        ROUND1(D, A, B, C, 13, S12, 0xfd987193);
+        ROUND1(C, D, A, B, 14, S13, 0xa679438e);
+        ROUND1(B, C, D, A, 15, S14, 0x49b40821);
 
         ROUND2(A, B, C, D, 1, S21, 17);
         ROUND2(D, A, B, C, 6, S22, 18);
