@@ -150,7 +150,7 @@ static void MDTimeTrial() {
 static void MDTestSuite() {
     printf("MD%d test suite:\n", MD);
 
-//    MDString("");
+    MDString("");
     MDString("a");
     MDString("abc");
     MDString("message digest");

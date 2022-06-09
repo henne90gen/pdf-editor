@@ -36,84 +36,49 @@ TEST(MD5_calculate_checksum, abc) {
     ASSERT_EQ("900150983cd24fb0d6963f7d28e17f72", md5::to_hex_string(result));
 }
 
-namespace md5 {
-std::pair<uint8_t *, size_t> apply_padding(const uint8_t *bytesIn, size_t sizeInBytesIn);
-uint32_t F(uint32_t X, uint32_t Y, uint32_t Z);
-uint32_t G(uint32_t X, uint32_t Y, uint32_t Z);
-uint32_t H(uint32_t X, uint32_t Y, uint32_t Z);
-uint32_t I(uint32_t X, uint32_t Y, uint32_t Z);
-} // namespace md5
-
-TEST(MD5_apply_padding, abc) {
+TEST(MD5_calculate_checksum, message_digest) {
     // GIVEN
-    const std::string s = "abc";
+    const std::string s = "message digest";
 
     // WHEN
-    auto [hash, sizeInBytes] = md5::apply_padding((uint8_t *)s.c_str(), s.size());
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
 
     // THEN
-    ASSERT_EQ(64, sizeInBytes);
-    ASSERT_EQ(hash[3], 0b10000000);
-    for (int i = 4; i < 56; i++) {
-        ASSERT_EQ(hash[i], 0);
-    }
-    ASSERT_EQ(*(uint64_t *)(hash + 56), s.size() * 8);
+    ASSERT_EQ("f96b697d7cb7938d525a2f31aaf161d0", md5::to_hex_string(result));
 }
 
-TEST(MD5_apply_padding, InputWithLength55) {
+TEST(MD5_calculate_checksum, abcdefghijklmnopqrstuvwxyz) {
     // GIVEN
-    std::string s;
-    for (int i = 0; i < 55; i++) {
-        s += "a";
-    }
+    const std::string s = "abcdefghijklmnopqrstuvwxyz";
 
     // WHEN
-    auto [hash, sizeInBytes] = md5::apply_padding((uint8_t *)s.c_str(), s.size());
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
 
     // THEN
-    ASSERT_EQ(64, sizeInBytes);
-    ASSERT_EQ(hash[55], 0b10000000);
-    ASSERT_EQ(*(uint64_t *)(hash + 56), s.size() * 8);
+    ASSERT_EQ("c3fcd3d76192e4007dfb496cca67e13b", md5::to_hex_string(result));
 }
 
-TEST(MD5_apply_padding, InputWithLength56) {
+TEST(MD5_calculate_checksum, ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789) {
     // GIVEN
-    std::string s;
-    for (int i = 0; i < 56; i++) {
-        s += "a";
-    }
+    const std::string s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     // WHEN
-    auto [hash, sizeInBytes] = md5::apply_padding((uint8_t *)s.c_str(), s.size());
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
 
     // THEN
-    ASSERT_EQ(128, sizeInBytes);
-    ASSERT_EQ(hash[56], 0b10000000);
-    for (int i = 57; i < 120; i++) {
-        ASSERT_EQ(hash[i], 0) << i;
-    }
-    ASSERT_EQ(*(uint64_t *)(hash + 120), s.size() * 8);
+    ASSERT_EQ("d174ab98d277d9f5a5611c2c9f419d9f", md5::to_hex_string(result));
 }
 
-// TEST(MD5_auxiliary_functions, F) {
-//     ASSERT_EQ(0x10000001, md5::F(0x00000001, 0x00000001, 0x10000000));
-//     ASSERT_EQ(0x11110000, md5::F(0x11111111, 0x11110000, 0x00000000));
-// }
-//
-// TEST(MD5_auxiliary_functions, G) {
-//     ASSERT_EQ(0x10000001, md5::G(0x10000000, 0x00000001, 0x10000000));
-//     ASSERT_EQ(0x11110000, md5::G(0x11111111, 0x11110000, 0x00000000));
-// }
-//
-// TEST(MD5_auxiliary_functions, H) {
-//     ASSERT_EQ(0x10000000, md5::H(0x00000001, 0x00000001, 0x10000000));
-//     ASSERT_EQ(0x00001111, md5::H(0x11111111, 0x11110000, 0x00000000));
-// }
-//
-// TEST(MD5_auxiliary_functions, I) {
-//     ASSERT_EQ(0xeffffffe, md5::I(0x00000001, 0x00000001, 0x10000000));
-//     ASSERT_EQ(0xeeeeffff, md5::I(0x11111111, 0x11110000, 0x00000000));
-// }
+TEST(MD5_calculate_checksum, _12345678901234567890123456789012345678901234567890123456789012345678901234567890) {
+    // GIVEN
+    const std::string s = "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
+
+    // WHEN
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
+
+    // THEN
+    ASSERT_EQ("57edf4a22be3c955ac49da2e2107b67a", md5::to_hex_string(result));
+}
 
 TEST(MD5_to_hex_string, AllZeros) {
     // GIVEN
