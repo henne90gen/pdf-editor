@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ypixelsperm_136',['yPixelsPerM',['../structpdf_1_1BmpInfoHeader.html#ad06e4eea045cc549f42220b7a3a5d907',1,'pdf::BmpInfoHeader']]]
+  ['xpixelsperm_136',['xPixelsPerM',['../structpdf_1_1BmpInfoHeader.html#a39c26f6951b5a782cd2422f6e719e4c3',1,'pdf::BmpInfoHeader']]]
 ];

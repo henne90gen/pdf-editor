@@ -1,15 +1,15 @@
 var searchData=
 [
-  ['read_5fbmp_97',['read_bmp',['../structpdf_1_1Image.html#a9a670758b66735e4b7b8fccc3cd34770',1,'pdf::Image']]],
-  ['read_5ffrom_5ffile_98',['read_from_file',['../structpdf_1_1Document.html#aeb7f125e387b02719fa7af51fa6aa512',1,'pdf::Document']]],
-  ['read_5ffrom_5fmemory_99',['read_from_memory',['../structpdf_1_1Document.html#ad7cfb0fcecf582c276af9ad20627fd22',1,'pdf::Document']]],
-  ['readmetadata_100',['ReadMetadata',['../structpdf_1_1ReadMetadata.html',1,'pdf']]],
-  ['real_101',['Real',['../structpdf_1_1Real.html',1,'pdf']]],
-  ['rectangle_102',['Rectangle',['../structpdf_1_1Rectangle.html',1,'pdf']]],
-  ['referenceresolver_103',['ReferenceResolver',['../structpdf_1_1ReferenceResolver.html',1,'pdf']]],
-  ['renderer_104',['Renderer',['../structpdf_1_1Renderer.html',1,'pdf']]],
-  ['reserved0_105',['reserved0',['../structpdf_1_1BmpFileHeader.html#ac93feb6c29eed050f06cbd5b36534dfb',1,'pdf::BmpFileHeader']]],
-  ['reserved1_106',['reserved1',['../structpdf_1_1BmpFileHeader.html#aae083f941cf04a4cc85d27e4dd0634f7',1,'pdf::BmpFileHeader']]],
-  ['resources_107',['Resources',['../structpdf_1_1Resources.html',1,'pdf']]],
-  ['result_108',['Result',['../classpdf_1_1Result.html',1,'pdf']]]
+  ['pdf_20editor_86',['PDF Editor',['../md_README.html',1,'']]],
+  ['page_87',['Page',['../structpdf_1_1Page.html',1,'pdf']]],
+  ['page_5fcount_88',['page_count',['../structpdf_1_1Document.html#af289140a25f7d11c6291c653ac50e02d',1,'pdf::Document']]],
+  ['pages_89',['pages',['../structpdf_1_1Document.html#a01043eaededd2c194634a8cd13941404',1,'pdf::Document']]],
+  ['pagetextblocks_90',['PageTextBlocks',['../structPageTextBlocks.html',1,'']]],
+  ['pagetreenode_91',['PageTreeNode',['../structpdf_1_1PageTreeNode.html',1,'pdf']]],
+  ['parse_92',['parse',['../structpdf_1_1CMapParser.html#a9a3459a273a4291a9ee5190905565f80',1,'pdf::CMapParser']]],
+  ['parser_93',['Parser',['../structpdf_1_1Parser.html',1,'pdf']]],
+  ['pdfapplication_94',['PdfApplication',['../classPdfApplication.html',1,'']]],
+  ['pdfarea_95',['PdfArea',['../classPdfArea.html',1,'']]],
+  ['pdfwindow_96',['PdfWindow',['../classPdfWindow.html',1,'']]],
+  ['pixeloffset_97',['pixelOffset',['../structpdf_1_1BmpFileHeader.html#ac3dd5e73b188ea4b5e2eec8924c00b35',1,'pdf::BmpFileHeader']]]
 ];
