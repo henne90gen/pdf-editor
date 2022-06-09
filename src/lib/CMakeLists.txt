@@ -48,3 +48,6 @@ add_library(md5 md5/md5.cpp)
 target_include_directories(md5 PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+add_executable(md5_reference md5/md5_reference.c md5/mddriver.c)
+target_compile_options(md5_reference PRIVATE -Wno-unused-parameter -Wno-unused-function)
