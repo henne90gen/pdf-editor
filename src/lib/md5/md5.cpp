@@ -78,16 +78,8 @@ MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
 
     // process input in 16-word (64 byte) chunks
     for (uint64_t i = 0; i < sizeInBytes / 64; i++) {
-#if 1
         uint32_t X[16];
         std::memcpy(X, bytes + i * 64, 64);
-#else
-        // NOTE:
-        //  this only works in Debug mode, not in Release (tested on Windows)
-        auto X = (uint32_t *)(bytes + (i * 64));
-        //  adding the std::cout line fixes the bug???
-        //        std::cout << X[0] << std::endl;
-#endif
 
         auto AA = A;
         auto BB = B;
