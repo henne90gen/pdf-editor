@@ -11,6 +11,7 @@ struct MD5_CTX {
 extern "C" void MD5Init(MD5_CTX *);
 extern "C" void MD5Update(MD5_CTX *, unsigned char *, unsigned int);
 extern "C" void MD5Final(unsigned char[16], MD5_CTX *);
+extern "C" void MDPrint(unsigned char digest[16]);
 
 static void BM_Reference_abc(benchmark::State &state) {
     std::string testString = "abc";

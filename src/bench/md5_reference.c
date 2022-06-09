@@ -25,6 +25,8 @@ documentation and/or software.
 
 #include "md5_reference.h"
 
+#include <stdio.h>
+
 /* Constants for MD5Transform routine.
  */
 
@@ -302,12 +304,16 @@ unsigned int len;
 
 /* Note: Replace "for loop" with standard memset if possible.
  */
-static void MD5_memset(output, value, len) POINTER output;
-int value;
-unsigned int len;
-{
+static void MD5_memset(POINTER output, int value, unsigned int len) {
     unsigned int i;
-
     for (i = 0; i < len; i++)
         ((char *)output)[i] = (char)value;
+}
+
+/* Prints a message digest in hexadecimal.
+ */
+void MDPrint(unsigned char digest[16]) {
+    unsigned int i;
+    for (i = 0; i < 16; i++)
+        printf("%02x", digest[i]);
 }

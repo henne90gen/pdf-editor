@@ -5,28 +5,6 @@
 
 namespace md5 {
 
-std::pair<uint8_t *, size_t> apply_padding(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
-    size_t sizeInBytesPadded = 0;
-    if (sizeInBytesIn % 64 >= 56) {
-        sizeInBytesPadded = sizeInBytesIn + 56 + (64 - (sizeInBytesIn % 64));
-    } else {
-        sizeInBytesPadded = sizeInBytesIn + 56 - (sizeInBytesIn % 64);
-    }
-
-    auto bytes = (uint8_t *)malloc(sizeInBytesPadded + 8);
-    std::memcpy(bytes, bytesIn, sizeInBytesIn);
-    bytes[sizeInBytesIn] = 0b10000000;
-    for (size_t i = sizeInBytesIn + 1; i < sizeInBytesPadded; i++) {
-        bytes[i] = 0;
-    }
-
-    auto ptr            = (uint64_t *)(bytes + sizeInBytesPadded);
-    uint64_t sizeInBits = sizeInBytesIn << 3;
-    *ptr                = sizeInBits;
-
-    return {bytes, sizeInBytesPadded + 8};
-}
-
 static inline uint32_t F(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Y) | (~X & Z); }
 static inline uint32_t G(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Z) | (Y & ~Z); }
 static inline uint32_t H(uint32_t X, uint32_t Y, uint32_t Z) { return X ^ Y ^ Z; }
@@ -69,7 +47,13 @@ uint32_t T[64] = {
 };
 
 MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
-    auto [bytes, sizeInBytes] = apply_padding(bytesIn, sizeInBytesIn);
+    size_t sizeInBytesPadded;
+    if (sizeInBytesIn % 64 >= 56) {
+        sizeInBytesPadded = sizeInBytesIn + 56 + (64 - (sizeInBytesIn % 64));
+    } else {
+        sizeInBytesPadded = sizeInBytesIn + 56 - (sizeInBytesIn % 64);
+    }
+    uint64_t sizeInBytesFinal = sizeInBytesPadded + 8;
 
     uint32_t A = 0x67452301;
     uint32_t B = 0xefcdab89;
@@ -77,9 +61,32 @@ MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
     uint32_t D = 0x10325476;
 
     // process input in 16-word (64 byte) chunks
-    for (uint64_t i = 0; i < sizeInBytes / 64; i++) {
+    for (uint64_t i = 0; i < sizeInBytesFinal / 64; i++) {
         uint32_t X[16];
-        std::memcpy(X, bytes + i * 64, 64);
+        auto offset = i * 64;
+        std::memcpy(X, bytesIn + offset, std::min((uint64_t)64, sizeInBytesIn - offset));
+        if (offset + 64 > sizeInBytesIn) {
+            if (offset < sizeInBytesIn) {
+                ((uint8_t *)X)[sizeInBytesIn % 64] = 0b10000000;
+                for (size_t j = (sizeInBytesIn % 64) + 1;
+                     j < std::max(sizeInBytesPadded % 64, sizeInBytesPadded - sizeInBytesIn); j++) {
+                    ((uint8_t *)X)[j] = 0;
+                }
+            } else {
+                for (size_t j = 0; j < 56; j++) {
+                    ((uint8_t *)X)[j] = 0;
+                }
+                if (offset == sizeInBytesIn) {
+                    ((uint8_t *)X)[sizeInBytesIn % 64] = 0b10000000;
+                }
+            }
+
+            if (sizeInBytesIn % 64 < 56 || offset > sizeInBytesIn) {
+                auto ptr            = (uint64_t *)(((uint8_t *)X) + (sizeInBytesPadded % 64));
+                uint64_t sizeInBits = sizeInBytesIn << 3;
+                *ptr                = sizeInBits;
+            }
+        }
 
         auto AA = A;
         auto BB = B;

@@ -80,6 +80,39 @@ TEST(MD5_calculate_checksum, _12345678901234567890123456789012345678901234567890
     ASSERT_EQ("57edf4a22be3c955ac49da2e2107b67a", md5::to_hex_string(result));
 }
 
+TEST(MD5_calculate_checksum, Length63) {
+    // GIVEN
+    const std::string s = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc";
+
+    // WHEN
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
+
+    // THEN
+    ASSERT_EQ("25982a1d97e97318d387f77aa0252ac4", md5::to_hex_string(result));
+}
+
+TEST(MD5_calculate_checksum, Length64) {
+    // GIVEN
+    const std::string s = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabca";
+
+    // WHEN
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
+
+    // THEN
+    ASSERT_EQ("efefeedae197ed614b582e1490f9e33e", md5::to_hex_string(result));
+}
+
+TEST(MD5_calculate_checksum, Length65) {
+    // GIVEN
+    const std::string s = "abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcab";
+
+    // WHEN
+    auto result = md5::calculate_checksum((uint8_t *)s.c_str(), s.size());
+
+    // THEN
+    ASSERT_EQ("017d572b274249897ce1c9234c92711e", md5::to_hex_string(result));
+}
+
 TEST(MD5_to_hex_string, AllZeros) {
     // GIVEN
     md5::MD5Hash hash = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
