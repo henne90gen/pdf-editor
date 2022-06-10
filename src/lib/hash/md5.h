@@ -5,6 +5,9 @@
 
 namespace hash {
 
+// https://datatracker.ietf.org/doc/html/rfc1321
+// https://datatracker.ietf.org/doc/html/rfc6151
+
 typedef std::array<uint32_t, 4> MD5Hash;
 
 MD5Hash md5_checksum(const std::string &str);
