@@ -46,14 +46,17 @@ uint32_t T[64] = {
       0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
 };
 
-MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
-    size_t sizeInBytesPadded;
+static inline uint64_t getPaddedSize(uint64_t sizeInBytesIn) {
     if (sizeInBytesIn % 64 >= 56) {
-        sizeInBytesPadded = sizeInBytesIn + 56 + (64 - (sizeInBytesIn % 64));
-    } else {
-        sizeInBytesPadded = sizeInBytesIn + 56 - (sizeInBytesIn % 64);
+        return sizeInBytesIn + 56 + (64 - (sizeInBytesIn % 64));
     }
-    uint64_t sizeInBytesFinal = sizeInBytesPadded + 8;
+
+    return sizeInBytesIn + 56 - (sizeInBytesIn % 64);
+}
+
+MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
+    uint64_t sizeInBytesPadded = getPaddedSize(sizeInBytesIn);
+    uint64_t sizeInBytesFinal  = sizeInBytesPadded + 8;
 
     uint32_t A = 0x67452301;
     uint32_t B = 0xefcdab89;

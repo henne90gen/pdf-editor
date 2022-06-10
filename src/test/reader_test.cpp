@@ -72,10 +72,10 @@ TEST(Reader, HelloWorldFont) {
     ASSERT_EQ(font->base_font()->value, "BAAAAA+LiberationSerif");
 
     auto fontDescriptor = font->font_descriptor(document);
-    ASSERT_NE(fontDescriptor, nullptr);
-    ASSERT_EQ(fontDescriptor->font_name()->value, "BAAAAA+LiberationSerif");
+    ASSERT_TRUE(fontDescriptor.has_value());
+    ASSERT_EQ(fontDescriptor.value()->font_name()->value, "BAAAAA+LiberationSerif");
 
-    auto flags = fontDescriptor->flags();
+    auto flags = fontDescriptor.value()->flags();
     ASSERT_TRUE(flags->symbolic());
 
     auto encodingOpt = font->encoding(document);
