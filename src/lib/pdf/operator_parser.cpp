@@ -113,7 +113,7 @@ Operator *OperatorParser::get_operator() {
         }
 
         if (tokens[currentTokenIdx].type == Token::Type::INVALID) {
-            spdlog::warn("Found an invalid token in the operator stream");
+            spdlog::warn("Found an invalid token in the operator stream: {}", tokens[currentTokenIdx].content);
             return nullptr;
         }
 

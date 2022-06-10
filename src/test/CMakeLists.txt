@@ -45,5 +45,4 @@ if (NOT WIN32)
     add_custom_target(test_fuzzer
             COMMAND $<TARGET_FILE:fuzzer> -runs=0 fuzzing-corpus
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-    add_dependencies(test_fuzzer fuzzer)
 endif ()

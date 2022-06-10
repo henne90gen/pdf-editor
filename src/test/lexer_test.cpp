@@ -249,6 +249,16 @@ TEST(Lexer, PathPaintingOperators) {
     assertNoMoreTokens(lexer);
 }
 
+TEST(Lexer, SetColorOperators) {
+    auto textProvider = pdf::StringTextProvider("SC sc SCN scn");
+    auto lexer        = pdf::TextLexer(textProvider);
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "SC");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "sc");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "SCN");
+    assertNextToken(lexer, pdf::Token::Type::OPERATOR, "scn");
+    assertNoMoreTokens(lexer);
+}
+
 TEST(Lexer, CMap) {
     auto textProvider = pdf::StringTextProvider("begin end findresource defineresource CMapName currentdict pop def "
                                                 "dict dup begincmap endcmap usecmap usefont begincodespacerange "

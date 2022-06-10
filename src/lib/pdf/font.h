@@ -65,7 +65,7 @@ struct Font : public Dictionary {
     Integer *first_char() { return must_find<Integer>("FirstChar"); }
     Integer *last_char() { return must_find<Integer>("LastChar"); }
     Array *widths(Document &document);
-    FontDescriptor *font_descriptor(Document &document);
+    std::optional<FontDescriptor *> font_descriptor(Document &document);
     std::optional<Object *> encoding(Document &document);
     std::optional<CMapStream *> to_unicode(Document &document);
     std::optional<Stream *> font_program(Document &document);

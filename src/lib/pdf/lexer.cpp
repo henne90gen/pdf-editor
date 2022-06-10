@@ -8,7 +8,7 @@ namespace pdf {
 
 static std::array<std::string, 59> operators = {
       // Unsorted Operators
-      "SC", "SCN", "sc", "scn",
+      "SCN", "SC", "scn", "sc",
       // Text Operators
       "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts",
       // Graphics Operators

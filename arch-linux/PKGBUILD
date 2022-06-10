@@ -23,23 +23,22 @@ noextract=()
 sha512sums=("SKIP")
 validpgpkeys=()
 
-# prepare() {
-	# cd "$pkgname-$pkgver-Source"
-	# patch -p1 -i "$srcdir/$pkgname-$pkgver.patch"
-# }
-
-build() {
+prepare() {
 	cd "$pkgname-$pkgver-Source"
     mkdir -p build
     cd build
     cmake .. -G Ninja -D CMAKE_INSTALL_PREFIX="$pkgdir/usr"
+}
+
+build() {
+	cd "$pkgname-$pkgver-Source/build"
     cmake --build .
 }
 
-# check() {
-	# cd "$pkgname-$pkgver"
-	# make -k check
-# }
+check() {
+	cd "$pkgname-$pkgver-Source/build"
+	ctest
+}
 
 package() {
 	cd "$pkgname-$pkgver-Source/build"

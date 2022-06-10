@@ -21,8 +21,17 @@ std::optional<CMapStream *> Font::to_unicode(Document &document) {
     return document.get<CMapStream>(find<Object>("ToUnicode"));
 }
 
-FontDescriptor *Font::font_descriptor(Document &document) {
-    return document.get<FontDescriptor>(must_find<Object>("FontDescriptor"));
+std::optional<FontDescriptor *> Font::font_descriptor(Document &document) {
+    auto objectOpt = find<Object>("FontDescriptor");
+    if (!objectOpt.has_value()) {
+        spdlog::warn("Failed to find FontDescriptor in dictionary:");
+        for (auto &itr : values) {
+            spdlog::warn("    key={}, value={}", itr.first, itr.second->type);
+        }
+        return nullptr;
+    }
+
+    return document.get<FontDescriptor>(objectOpt.value());
 }
 
 std::optional<Object *> Font::encoding(Document &document) { return document.get<Object>(find<Object>("Encoding")); }
@@ -30,12 +39,21 @@ std::optional<Object *> Font::encoding(Document &document) { return document.get
 Array *Font::widths(Document &document) { return document.get<Array>(must_find<Object>("Widths")); }
 
 std::optional<Stream *> Font::font_program(Document &document) {
+    const std::optional<FontDescriptor *> &fontDescriptor = font_descriptor(document);
     if (is_true_type()) {
-        return font_descriptor(document)->font_file2(document);
+        if (!fontDescriptor.has_value()) {
+            return {};
+        }
+        return fontDescriptor.value()->font_file2(document);
     }
+
     if (is_type1()) {
-        return font_descriptor(document)->font_file(document);
+        if (!fontDescriptor.has_value()) {
+            return {};
+        }
+        return fontDescriptor.value()->font_file(document);
     }
+
     // TODO Get font program for this type of font
     return {};
 }
