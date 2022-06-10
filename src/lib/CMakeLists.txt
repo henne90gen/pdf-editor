@@ -44,7 +44,10 @@ install(FILES pdf-config.cmake
         COMPONENT libraries)
 install(EXPORT pdf DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pdf)
 
-add_library(md5 md5/md5.cpp)
-target_include_directories(md5 PUBLIC
+add_library(hash
+        hash/md5.cpp
+        hash/sha1.cpp
+        hash/util.cpp)
+target_include_directories(hash PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace md5 {
+namespace hash {
 
 static inline uint32_t F(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Y) | (~X & Z); }
 static inline uint32_t G(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Z) | (Y & ~Z); }
@@ -43,7 +43,7 @@ static inline uint32_t I(uint32_t X, uint32_t Y, uint32_t Z) { return Y ^ (X | ~
 #define S43 15
 #define S44 21
 
-MD5Hash calculate_checksum(const std::string &str) { return calculate_checksum((uint8_t *)str.c_str(), str.size()); }
+MD5Hash md5_checksum(const std::string &str) { return md5_checksum((uint8_t *)str.c_str(), str.size()); }
 
 #if USE_ARRAY
 uint32_t T[64] = {
@@ -66,7 +66,7 @@ static inline uint64_t getPaddedSize(uint64_t sizeInBytesIn) {
     return sizeInBytesIn + 56 - (sizeInBytesIn % 64);
 }
 
-MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
+MD5Hash md5_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
     uint64_t sizeInBytesPadded = getPaddedSize(sizeInBytesIn);
     uint64_t sizeInBytesFinal  = sizeInBytesPadded + 8;
 
@@ -251,36 +251,16 @@ MD5Hash calculate_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
         D += DD;
     }
 
-    std::array<uint32_t, 4> input  = {A, B, C, D};
-    std::array<uint8_t, 16> output = {};
-    for (unsigned int i = 0, j = 0; j < 16; i++, j += 4) {
-        output[j]     = (unsigned char)(input[i] & 0xff);
-        output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
-        output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
-        output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
-    }
+    std::array<uint32_t, 4> output  = {A, B, C, D};
+//    std::array<uint8_t, 16> output = {};
+//    for (unsigned int i = 0, j = 0; j < 16; i++, j += 4) {
+//        output[j]     = (unsigned char)(input[i] & 0xff);
+//        output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
+//        output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
+//        output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
+//    }
 
     return output;
-}
-
-std::string to_hex_string(const MD5Hash &hash) {
-    std::string result = "00000000000000000000000000000000";
-
-    for (size_t i = 0; i < hash.size(); i++) {
-        char b1 = '0' + (hash[i] >> 4);
-        if (b1 > '9') {
-            b1 += 39;
-        }
-        result[i * 2] = b1;
-
-        char b2 = '0' + (hash[i] & 0x0f);
-        if (b2 > '9') {
-            b2 += 39;
-        }
-        result[i * 2 + 1] = b2;
-    }
-
-    return result;
 }
 
 } // namespace md5

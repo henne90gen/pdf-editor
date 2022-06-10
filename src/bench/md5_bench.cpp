@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include <md5/md5.h>
+#include <hash/md5.h>
 
 typedef unsigned long int UINT4;
 struct MD5_CTX {
@@ -29,7 +29,7 @@ BENCHMARK(BM_Reference_abc);
 static void BM_abc(benchmark::State &state) {
     std::string testString = "abc";
     for (auto _ : state) {
-        auto hash = md5::calculate_checksum(testString);
+        auto hash = hash::md5_checksum(testString);
         benchmark::DoNotOptimize(hash);
     }
 }
