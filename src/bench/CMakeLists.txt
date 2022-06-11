@@ -5,5 +5,9 @@ target_link_libraries(reader_bench benchmark::benchmark pdf)
 add_executable(writer_bench writer_bench.cpp)
 target_link_libraries(writer_bench benchmark::benchmark pdf)
 
-add_executable(md5_bench md5_bench.cpp md5_reference.c)
-target_link_libraries(md5_bench benchmark::benchmark hash)
+add_executable(hash_bench hash_bench.cpp)
+target_link_libraries(hash_bench
+        benchmark::benchmark
+        hash
+        md5_reference
+        sha1_reference)

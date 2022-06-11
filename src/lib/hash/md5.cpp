@@ -1,7 +1,8 @@
 #include "md5.h"
 
 #include <cmath>
-#include <cstring>
+
+#include "util.h"
 
 namespace hash {
 
@@ -58,16 +59,37 @@ uint32_t T[64] = {
 };
 #endif
 
-static inline uint64_t getPaddedSize(uint64_t sizeInBytesIn) {
-    if (sizeInBytesIn % 64 >= 56) {
-        return sizeInBytesIn + 56 + (64 - (sizeInBytesIn % 64));
+inline void fill_X_and_apply_padding(std::array<uint32_t, 16> &X, const uint8_t *bytesIn, uint64_t offset, uint64_t sizeInBytesIn,
+                                     uint64_t sizeInBytesPadded) {
+    std::memcpy(X.data(), bytesIn + offset, std::min((uint64_t)64, sizeInBytesIn - offset));
+    if (offset + 64 <= sizeInBytesIn) {
+        return;
     }
 
-    return sizeInBytesIn + 56 - (sizeInBytesIn % 64);
+    if (offset < sizeInBytesIn) {
+        ((uint8_t *)X.data())[sizeInBytesIn % 64] = 0b10000000;
+        for (size_t j = (sizeInBytesIn % 64) + 1;
+             j < std::max(sizeInBytesPadded % 64, sizeInBytesPadded - sizeInBytesIn); j++) {
+            ((uint8_t *)X.data())[j] = 0;
+        }
+    } else {
+        for (size_t j = 0; j < 56; j++) {
+            ((uint8_t *)X.data())[j] = 0;
+        }
+        if (offset == sizeInBytesIn) {
+            ((uint8_t *)X.data())[sizeInBytesIn % 64] = 0b10000000;
+        }
+    }
+
+    if (sizeInBytesIn % 64 < 56 || offset > sizeInBytesIn) {
+        auto ptr            = (uint64_t *)(((uint8_t *)X.data()) + (sizeInBytesPadded % 64));
+        uint64_t sizeInBits = sizeInBytesIn << 3;
+        *ptr                = sizeInBits;
+    }
 }
 
-MD5Hash md5_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
-    uint64_t sizeInBytesPadded = getPaddedSize(sizeInBytesIn);
+MD5Hash md5_checksum(const uint8_t *bytes, uint64_t sizeInBytes) {
+    uint64_t sizeInBytesPadded = calculate_padded_size(sizeInBytes);
     uint64_t sizeInBytesFinal  = sizeInBytesPadded + 8;
 
     uint32_t A = 0x67452301;
@@ -76,32 +98,10 @@ MD5Hash md5_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
     uint32_t D = 0x10325476;
 
     // process input in 16-word (64 byte) chunks
+    std::array<uint32_t, 16> X = {};
     for (uint64_t i = 0; i < sizeInBytesFinal / 64; i++) {
-        uint32_t X[16];
         auto offset = i * 64;
-        std::memcpy(X, bytesIn + offset, std::min((uint64_t)64, sizeInBytesIn - offset));
-        if (offset + 64 > sizeInBytesIn) {
-            if (offset < sizeInBytesIn) {
-                ((uint8_t *)X)[sizeInBytesIn % 64] = 0b10000000;
-                for (size_t j = (sizeInBytesIn % 64) + 1;
-                     j < std::max(sizeInBytesPadded % 64, sizeInBytesPadded - sizeInBytesIn); j++) {
-                    ((uint8_t *)X)[j] = 0;
-                }
-            } else {
-                for (size_t j = 0; j < 56; j++) {
-                    ((uint8_t *)X)[j] = 0;
-                }
-                if (offset == sizeInBytesIn) {
-                    ((uint8_t *)X)[sizeInBytesIn % 64] = 0b10000000;
-                }
-            }
-
-            if (sizeInBytesIn % 64 < 56 || offset > sizeInBytesIn) {
-                auto ptr            = (uint64_t *)(((uint8_t *)X) + (sizeInBytesPadded % 64));
-                uint64_t sizeInBits = sizeInBytesIn << 3;
-                *ptr                = sizeInBits;
-            }
-        }
+        fill_X_and_apply_padding(X, bytes, offset, sizeInBytes, sizeInBytesPadded);
 
         auto AA = A;
         auto BB = B;
@@ -251,16 +251,16 @@ MD5Hash md5_checksum(const uint8_t *bytesIn, uint64_t sizeInBytesIn) {
         D += DD;
     }
 
-    std::array<uint32_t, 4> output  = {A, B, C, D};
-//    std::array<uint8_t, 16> output = {};
-//    for (unsigned int i = 0, j = 0; j < 16; i++, j += 4) {
-//        output[j]     = (unsigned char)(input[i] & 0xff);
-//        output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
-//        output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
-//        output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
-//    }
+    std::array<uint32_t, 4> output = {A, B, C, D};
+    //    std::array<uint8_t, 16> output = {};
+    //    for (unsigned int i = 0, j = 0; j < 16; i++, j += 4) {
+    //        output[j]     = (unsigned char)(input[i] & 0xff);
+    //        output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
+    //        output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
+    //        output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
+    //    }
 
     return output;
 }
 
-} // namespace md5
+} // namespace hash

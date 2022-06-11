@@ -52,6 +52,7 @@ endif ()
 # Source Code
 enable_testing()
 add_subdirectory(src)
+add_subdirectory(third-party)
 
 # TODO Debian package: https://decovar.dev/blog/2021/09/23/cmake-cpack-package-deb-apt/#an-example-project
 # TODO Window installer: https://dominoc925.blogspot.com/2016/09/create-windows-installer-using-cmake.html
