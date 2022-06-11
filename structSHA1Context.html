@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: MD5_CTX Struct Reference</title>
+<title>PDF Editor: SHA1Context Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -64,27 +64,39 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structMD5__CTX-members.html">List of all members</a>  </div>
+<a href="structSHA1Context-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">MD5_CTX Struct Reference</div>  </div>
+<div class="title">SHA1Context Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a453bbde421f79a19eb2503c8316e8b0d"><td class="memItemLeft" align="right" valign="top"><a id="a453bbde421f79a19eb2503c8316e8b0d"></a>
-UINT4&#160;</td><td class="memItemRight" valign="bottom"><b>state</b> [4]</td></tr>
-<tr class="separator:a453bbde421f79a19eb2503c8316e8b0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa578ed7b523e0270f703e797d427e5cb"><td class="memItemLeft" align="right" valign="top"><a id="aa578ed7b523e0270f703e797d427e5cb"></a>
-UINT4&#160;</td><td class="memItemRight" valign="bottom"><b>count</b> [2]</td></tr>
-<tr class="separator:aa578ed7b523e0270f703e797d427e5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c7c847375e515d1fa3a453b6f999917"><td class="memItemLeft" align="right" valign="top"><a id="a9c7c847375e515d1fa3a453b6f999917"></a>
-unsigned char&#160;</td><td class="memItemRight" valign="bottom"><b>buffer</b> [64]</td></tr>
-<tr class="separator:a9c7c847375e515d1fa3a453b6f999917"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b71d65e48ddd487bbfe362780338e8"><td class="memItemLeft" align="right" valign="top"><a id="a92b71d65e48ddd487bbfe362780338e8"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>Intermediate_Hash</b> [5]</td></tr>
+<tr class="separator:a92b71d65e48ddd487bbfe362780338e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac352e4c9ff22eef52af0d76b52765426"><td class="memItemLeft" align="right" valign="top"><a id="ac352e4c9ff22eef52af0d76b52765426"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>Length_Low</b></td></tr>
+<tr class="separator:ac352e4c9ff22eef52af0d76b52765426"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01654134ccdc020bb9a855b4d5198116"><td class="memItemLeft" align="right" valign="top"><a id="a01654134ccdc020bb9a855b4d5198116"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>Length_High</b></td></tr>
+<tr class="separator:a01654134ccdc020bb9a855b4d5198116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af59a4b732989a1b7c11c03a177a810ba"><td class="memItemLeft" align="right" valign="top"><a id="af59a4b732989a1b7c11c03a177a810ba"></a>
+int_least16_t&#160;</td><td class="memItemRight" valign="bottom"><b>Message_Block_Index</b></td></tr>
+<tr class="separator:af59a4b732989a1b7c11c03a177a810ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a859a7e59082957463d0059b89af36cc5"><td class="memItemLeft" align="right" valign="top"><a id="a859a7e59082957463d0059b89af36cc5"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>Message_Block</b> [64]</td></tr>
+<tr class="separator:a859a7e59082957463d0059b89af36cc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3722d8be51c7a1a4e8083c3f1a5adfa1"><td class="memItemLeft" align="right" valign="top"><a id="a3722d8be51c7a1a4e8083c3f1a5adfa1"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>Computed</b></td></tr>
+<tr class="separator:a3722d8be51c7a1a4e8083c3f1a5adfa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af549987a735051dc4b3b50b106fde5bb"><td class="memItemLeft" align="right" valign="top"><a id="af549987a735051dc4b3b50b106fde5bb"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>Corrupted</b></td></tr>
+<tr class="separator:af549987a735051dc4b3b50b106fde5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/bench/hash_bench.cpp</li>
-<li>third-party/hash/<a class="el" href="md5__reference_8h_source.html">md5_reference.h</a></li>
+<li>third-party/hash/<a class="el" href="sha1__reference_8h_source.html">sha1_reference.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
