@@ -112,4 +112,26 @@ static void BM_SHA1_abc(benchmark::State &state) {
 }
 BENCHMARK(BM_SHA1_abc);
 
+static void BM_SHA1_Reference_File(benchmark::State &state) {
+    auto file = read_file("../../../test-files/image-1.pdf");
+    for (auto _ : state) {
+        SHA1Context ctx = {};
+        SHA1Reset(&ctx);
+        SHA1Input(&ctx, file.first, file.second);
+        unsigned char digest[16];
+        SHA1Result(&ctx, digest);
+        benchmark::DoNotOptimize(digest);
+    }
+}
+BENCHMARK(BM_SHA1_Reference_File);
+
+static void BM_SHA1_File(benchmark::State &state) {
+    auto file = read_file("../../../test-files/image-1.pdf");
+    for (auto _ : state) {
+        auto hash = hash::sha1_checksum(file.first, file.second);
+        benchmark::DoNotOptimize(hash);
+    }
+}
+BENCHMARK(BM_SHA1_File);
+
 BENCHMARK_MAIN();

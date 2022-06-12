@@ -45,7 +45,7 @@ int main() {
      *  Perform SHA-1 tests
      */
     for (j = 0; j < 4; ++j) {
-        printf("\nTest %d: %d, '%s'\n", j + 1, repeatcount[j], testarray[j]);
+        printf("\nTest %d: %d, '%s'\n", j + 1, (int)repeatcount[j], testarray[j]);
 
         err = SHA1Reset(&sha);
         if (err) {
