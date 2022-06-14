@@ -59,8 +59,8 @@ uint32_t T[64] = {
 };
 #endif
 
-inline void fill_X_and_apply_padding(std::array<uint32_t, 16> &X, const uint8_t *bytesIn, uint64_t offset, uint64_t sizeInBytesIn,
-                                     uint64_t sizeInBytesPadded) {
+inline void fill_X_and_apply_padding(std::array<uint32_t, 16> &X, const uint8_t *bytesIn, uint64_t offset,
+                                     uint64_t sizeInBytesIn, uint64_t sizeInBytesPadded) {
     std::memcpy(X.data(), bytesIn + offset, std::min((uint64_t)64, sizeInBytesIn - offset));
     if (offset + 64 <= sizeInBytesIn) {
         return;
@@ -88,9 +88,20 @@ inline void fill_X_and_apply_padding(std::array<uint32_t, 16> &X, const uint8_t 
     }
 }
 
+#define COMPILER_BUG_TEST 0
+
 MD5Hash md5_checksum(const uint8_t *bytes, uint64_t sizeInBytes) {
+#if !COMPILER_BUG_TEST
     uint64_t sizeInBytesPadded = calculate_padded_size(sizeInBytes);
-    uint64_t sizeInBytesFinal  = sizeInBytesPadded + 8;
+#else
+    uint64_t sizeInBytesPadded = 0;
+    if (sizeInBytes % 64 >= 56) {
+        sizeInBytesPadded = sizeInBytes + 56 + (64 - (sizeInBytes % 64));
+    } else {
+        sizeInBytesPadded = sizeInBytes + 56 - (sizeInBytes % 64);
+    }
+#endif
+    uint64_t sizeInBytesFinal = sizeInBytesPadded + 8;
 
     uint32_t A = 0x67452301;
     uint32_t B = 0xefcdab89;
