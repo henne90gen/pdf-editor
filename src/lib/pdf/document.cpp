@@ -2,6 +2,8 @@
 
 #include <bitset>
 #include <fstream>
+#include <hash/md5.h>
+#include <hash/util.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <zlib.h>
@@ -10,30 +12,6 @@
 #include "page.h"
 
 namespace pdf {
-
-#if CHANGE_SECTIONS
-const char *pdf::ChangeSection::start_pointer() const {
-    switch (type) {
-    case ChangeSectionType::NONE:
-        return nullptr;
-    case ChangeSectionType::ADDED:
-        return added.insertion_point;
-    case ChangeSectionType::DELETED:
-        return deleted.deleted_area.data();
-    }
-}
-
-size_t ChangeSection::size() const {
-    switch (type) {
-    case ChangeSectionType::NONE:
-        return 0;
-    case ChangeSectionType::ADDED:
-        return added.new_content_length;
-    case ChangeSectionType::DELETED:
-        return deleted.deleted_area.size();
-    }
-}
-#endif
 
 Document::~Document() {
     bool isFirst        = true;
@@ -403,11 +381,13 @@ ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const st
     char *fileData = (char *)malloc(fileSize);
     is.read(fileData, static_cast<std::streamsize>(fileSize));
 
+    auto checksum    = hash::md5_checksum(reinterpret_cast<const uint8_t *>(fileData), fileSize);
+    auto checksumStr = hash::to_hex_string(checksum);
     std::unordered_map<std::string, Object *> params = {
           {"Size", allocator.allocate<Integer>(fileSize)},
           // TODO add CreationDate
           // TODO add ModDate
-          // TODO add CheckSum
+          {"CheckSum", allocator.allocate<LiteralString>(checksumStr)},
     };
     std::unordered_map<std::string, Object *> dict = {
           {"Type", allocator.allocate<Name>("EmbeddedFile")},
@@ -421,7 +401,6 @@ ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const st
 }
 
 Result Document::embed_file(const std::string &filePath) {
-    // FIXME Use "Embedded File Streams" here (described in Section 3.10.3)
     auto result = create_embedded_file_stream(allocator, filePath);
     if (result.has_error()) {
         return result.drop_value();

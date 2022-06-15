@@ -1,4 +1,12 @@
 
+add_library(hash
+        hash/md5.cpp
+        hash/sha1.cpp
+        hash/util.cpp)
+target_include_directories(hash PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Cairo REQUIRED cairomm-1.16)
 
@@ -28,10 +36,10 @@ add_library(pdf
 target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(pdf PUBLIC $<BUILD_INTERFACE:zlibstatic> $<BUILD_INTERFACE:spdlog::spdlog> freetype)
+target_link_libraries(pdf PUBLIC $<BUILD_INTERFACE:zlibstatic> $<BUILD_INTERFACE:spdlog::spdlog> freetype hash)
 target_link_cairo(pdf)
 
-install(TARGETS pdf
+install(TARGETS pdf hash
         EXPORT pdf
         ARCHIVE
         COMPONENT libraries)
@@ -43,11 +51,3 @@ install(FILES pdf-config.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pdf
         COMPONENT libraries)
 install(EXPORT pdf DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pdf)
-
-add_library(hash
-        hash/md5.cpp
-        hash/sha1.cpp
-        hash/util.cpp)
-target_include_directories(hash PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)

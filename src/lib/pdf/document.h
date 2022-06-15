@@ -153,20 +153,20 @@ struct Document : public ReferenceResolver {
     /// Iterates over all embedded files in the document
     void for_each_embedded_file(const std::function<ForEachResult(EmbeddedFile *)> &func);
 
-    /// Writes the PDF-document to the given filePath, returns 0 on success
+    /// Writes the PDF-document to the given filePath
     [[nodiscard]] Result write_to_file(const std::string &filePath);
-    /// Writes the PDF-document to a newly allocated buffer, returns 0 on success
+    /// Writes the PDF-document to a newly allocated buffer
     [[nodiscard]] Result write_to_memory(char *&buffer, size_t &size);
-    /// Reads the PDF-document specified by the given filePath, returns 0 on success
+    /// Reads the PDF-document specified by the given filePath
     static Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
-    /// Reads the PDF-document from the given buffer, returns 0 on success
+    /// Reads the PDF-document from the given buffer
     static Result read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects = true);
 
-    /// Deletes the page with the given page number, returns 0 on success
+    /// Deletes the page with the given page number
     Result delete_page(size_t pageNum);
     /// Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
-    /// Inserts a file into the pdf document, returns 0 on success
+    /// Inserts a file into the pdf document
     Result embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
