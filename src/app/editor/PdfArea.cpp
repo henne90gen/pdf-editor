@@ -54,21 +54,32 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 
 void PdfArea::render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->set_source_rgba(0, 0, 1, 0.1);
+
     for (const auto &pageTextBlock : pageTextBlocks) {
         auto verticalOffset = pageTextBlock.pageOffset - scrollOffsetY;
         for (const auto &textBlock : pageTextBlock.textBlocks) {
             graphene_rect_t r = {
-                  {static_cast<float>(textBlock.x),
-                   static_cast<float>(textBlock.y - textBlock.height + verticalOffset)},
-                  {static_cast<float>(textBlock.width), static_cast<float>(textBlock.height)},
+                  {static_cast<float>(textBlock.x),                     //
+                   static_cast<float>(textBlock.y - textBlock.height)}, //
+                  {static_cast<float>(textBlock.width),                 //
+                   static_cast<float>(textBlock.height)},               //
             };
+
+            graphene_rect_t scaledRect = {};
+            graphene_rect_scale(&r, static_cast<float>(_zoom), static_cast<float>(_zoom), &scaledRect);
+            graphene_rect_offset(&scaledRect, -scrollOffsetX, verticalOffset);
+
             graphene_point_t p = {static_cast<float>(mouseX), static_cast<float>(mouseY)};
-            if (!graphene_rect_contains_point(&r, &p)) {
+            if (!graphene_rect_contains_point(&scaledRect, &p)) {
                 continue;
             }
 
-            cr->rectangle(textBlock.x, textBlock.y - textBlock.height + pageTextBlock.pageOffset, textBlock.width,
-                          textBlock.height);
+            cr->rectangle(                                                   //
+                  textBlock.x,                                               //
+                  textBlock.y - textBlock.height + pageTextBlock.pageOffset, //
+                  textBlock.width,                                           //
+                  textBlock.height                                           //
+            );
             cr->fill();
         }
     }
