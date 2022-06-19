@@ -46,7 +46,7 @@ void ScrolledZoomedWindow::on_key_released(guint keyValue, guint /*keyCode*/, Gd
 
 bool ScrolledZoomedWindow::on_scroll(double /*x*/, double y) {
     if (isControlDown) {
-        content().update_zoom(y);
+        content().update_zoom(-y);
         update_container_size();
         return true;
     }
