@@ -162,7 +162,7 @@ $(function() {
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
 <div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="structpdf_1_1OperatorTraverser.html">   91</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1OperatorTraverser.html">OperatorTraverser</a> {</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <a class="code" href="structpdf_1_1Page.html">Page</a> &amp;page;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="structpdf_1_1ContentStream.html">ContentStream</a>* currentContentStream;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="structpdf_1_1ContentStream.html">ContentStream</a> *currentContentStream   = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    std::vector&lt;GraphicsState&gt; stateStack = {};</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1OperatorTraverser.html">OperatorTraverser</a>(<a class="code" href="structpdf_1_1Page.html">Page</a> &amp;_page) : page(_page) { stateStack.emplace_back(); }</div>
@@ -176,18 +176,18 @@ $(function() {
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    [[nodiscard]] <span class="keyword">const</span> <a class="code" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &amp;state()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> stateStack.back(); }</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> on_show_text(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *) {}</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordtype">void</span> apply_operator(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keywordtype">void</span> setNonStrokingColor(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> endText();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">void</span> beginText();</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> pushGraphicsState();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> popGraphicsState();</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> moveStartOfNextLine(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> setTextFontAndSize(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">void</span> showText(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> on_do(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *) {}</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordtype">void</span> apply_operator(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> setNonStrokingColor(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">void</span> endText();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> beginText();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> pushGraphicsState();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> popGraphicsState();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> moveStartOfNextLine(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">void</span> setTextFontAndSize(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">void</span> endPathWithoutFillingOrStroking() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">void</span> modifyClippingPathUsingEvenOddRule() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">void</span> appendRectangle() <span class="keyword">const</span>;</div>
@@ -197,12 +197,12 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1Color_html"><div class="ttname"><a href="structpdf_1_1Color.html">pdf::Color</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:10</div></div>
 <div class="ttc" id="astructpdf_1_1TextObjectState_html"><div class="ttname"><a href="structpdf_1_1TextObjectState.html">pdf::TextObjectState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:28</div></div>
-<div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:63</div></div>
+<div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:91</div></div>
 <div class="ttc" id="astructpdf_1_1OperatorTraverser_html_a36f461e3fe6ed3a5dd82c02c0e3c6b25"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html#a36f461e3fe6ed3a5dd82c02c0e3c6b25">pdf::OperatorTraverser::font_matrix</a></div><div class="ttdeci">Cairo::Matrix font_matrix() const</div><div class="ttdoc">calculates the current font matrix</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:127</div></div>
 <div class="ttc" id="astructpdf_1_1GraphicsState_html"><div class="ttname"><a href="structpdf_1_1GraphicsState.html">pdf::GraphicsState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:75</div></div>
 <div class="ttc" id="astructpdf_1_1OperatorTraverser_html"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:91</div></div>
 <div class="ttc" id="astructpdf_1_1TextState_html"><div class="ttname"><a href="structpdf_1_1TextState.html">pdf::TextState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:61</div></div>
-<div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:46</div></div>
+<div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:51</div></div>
 <div class="ttc" id="astructpdf_1_1Font_html"><div class="ttname"><a href="structpdf_1_1Font.html">pdf::Font</a></div><div class="ttdef"><b>Definition:</b> font.h:54</div></div>
 <div class="ttc" id="astructpdf_1_1TextFont_html"><div class="ttname"><a href="structpdf_1_1TextFont.html">pdf::TextFont</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:54</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
