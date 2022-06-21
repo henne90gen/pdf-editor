@@ -11,7 +11,6 @@ void OperatorTraverser::traverse() {
         currentContentStream = s;
         s->for_each_operator(page.document.allocator, [this](Operator *op) {
             apply_operator(op);
-
             return ForEachResult::CONTINUE;
         });
     }
@@ -41,9 +40,12 @@ void OperatorTraverser::apply_operator(Operator *op) {
     } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
         setTextFontAndSize(op);
     } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
-        showText(op);
+        on_show_text(op);
+    } else if (op->type == Operator::Type::Do_PaintXObject) {
+        on_do(op);
     } else {
         // TODO unknown operator
+        spdlog::trace("OperatorTraverser::apply_operator() - unknown operator {}", op->type);
     }
 }
 
@@ -121,8 +123,6 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
         state().textState.textFont.cairoFace = Cairo::FtFontFace::create(fontFace, 0);
     }
 }
-
-void OperatorTraverser::showText(Operator *op) { on_show_text(op); }
 
 Cairo::Matrix OperatorTraverser::font_matrix() const {
     const auto &textState = state().textState;

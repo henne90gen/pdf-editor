@@ -39,7 +39,12 @@ struct PageTreeNode : public Dictionary {
     }
 };
 
+struct XObjectMap : public Dictionary {};
+
 struct Resources : public Dictionary {
+    std::optional<XObjectMap *> x_objects(Document &document) {
+        return document.get<XObjectMap>(find<Object>("XObject"));
+    }
     std::optional<FontMap *> fonts(Document &document) { return document.get<FontMap>(find<Object>("Font")); }
 };
 
@@ -57,7 +62,30 @@ struct TextBlock {
     Operator *op      = nullptr;
     ContentStream *cs = nullptr;
 
-    void move(Document &document, double xOffset, double yOffset);
+    void move(Document &document, double xOffset, double yOffset) const;
+};
+
+struct XObjectImage : public Stream {
+    int64_t width() { return dictionary->must_find<Integer>("Width")->value; }
+    int64_t height() { return dictionary->must_find<Integer>("Height")->value; }
+    std::optional<Object *> color_space() { return dictionary->find<Object>("ColorSpace"); }
+    std::optional<Integer *> bits_per_component() { return dictionary->find<Integer>("BitsPerComponent"); }
+    bool image_mask() {
+        const auto opt = dictionary->find<Boolean>("ImageMask");
+        if (!opt.has_value()) {
+            return false;
+        }
+        return opt.value()->value;
+    }
+};
+
+struct PageImage {
+    double xOffset      = 0.0;
+    double yOffset      = 0.0;
+    XObjectImage *image = nullptr;
+
+    PageImage(double _xOffset, double _yOffset, XObjectImage *_image)
+        : xOffset(_xOffset), yOffset(_yOffset), image(_image) {}
 };
 
 struct Page {
@@ -80,6 +108,8 @@ struct Page {
     std::optional<Object *> contents() { return node->attribute<Object>(document, "Contents", false); }
     std::vector<ContentStream *> content_streams();
     std::vector<TextBlock> text_blocks();
+    std::vector<PageImage> images();
+    void for_each_image(const std::function<ForEachResult(PageImage)> &func);
 
     int64_t rotate();
     double width();

@@ -14,9 +14,9 @@ struct Image {
     int64_t bitsPerComponent = 0;
     Stream *stream           = nullptr;
 
-    Image(Allocator &_allocator) : allocator(_allocator) {}
+    explicit Image(Allocator &_allocator) : allocator(_allocator) {}
 
-    /// writes the image to a .bmp file with the given fileName, returns false on success
+    /// writes the image to a .bmp file with the given fileName
     [[nodiscard]] Result write_bmp(const std::string &fileName) const;
 
     /// reads the image file specified by the given file name

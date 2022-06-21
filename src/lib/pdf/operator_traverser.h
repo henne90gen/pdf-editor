@@ -90,7 +90,7 @@ struct GraphicsState {
 
 struct OperatorTraverser {
     Page &page;
-    ContentStream* currentContentStream;
+    ContentStream *currentContentStream   = nullptr;
     std::vector<GraphicsState> stateStack = {};
 
     explicit OperatorTraverser(Page &_page) : page(_page) { stateStack.emplace_back(); }
@@ -105,6 +105,7 @@ struct OperatorTraverser {
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
 
     virtual void on_show_text(Operator *) {}
+    virtual void on_do(Operator *) {}
 
   private:
     void apply_operator(Operator *op);
@@ -116,7 +117,6 @@ struct OperatorTraverser {
     void popGraphicsState();
     void moveStartOfNextLine(Operator *op);
     void setTextFontAndSize(Operator *op);
-    void showText(Operator *op);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;

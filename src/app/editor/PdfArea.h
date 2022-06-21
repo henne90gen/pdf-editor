@@ -24,7 +24,7 @@
 constexpr int PAGE_PADDING = 10;
 
 struct PageTextBlocks {
-    double pageOffset                = 0.0;
+    double pageOffset                      = 0.0;
     std::vector<pdf::TextBlock> textBlocks = {};
 
     PageTextBlocks(double _pageOffset, std::vector<pdf::TextBlock> _textBlocks)
@@ -49,12 +49,14 @@ class PdfArea : public ScrolledZoomedContent {
 
     double scrollOffsetX = 0.0;
     double scrollOffsetY = 0.0;
-    double mouseX  = 0.0;
-    double mouseY  = 0.0;
+    double mouseX        = 0.0;
+    double mouseY        = 0.0;
 
     std::vector<PageTextBlocks> pageTextBlocks = {};
+    std::vector<std::vector<pdf::PageImage>> pageImages = {};
 
     void mouse_moved(double x, double y);
     void render_pages(const Cairo::RefPtr<Cairo::Context> &cr);
-    void render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr);
+    void render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
+    void render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
 };

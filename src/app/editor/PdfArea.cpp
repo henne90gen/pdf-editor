@@ -23,6 +23,8 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
             spdlog::info("TextBlock: {},{} - {},{}", textBlock.x, textBlock.y, textBlock.width, textBlock.height);
         }
 
+        pageImages.push_back(page->images());
+
         pageOffset += page->height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
     });
@@ -35,7 +37,8 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int he
     cr->scale(_zoom, _zoom);
 
     render_pages(cr);
-    render_text_blocks(cr);
+    render_text_highlight(cr);
+    render_image_highlight(cr);
 }
 
 void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
@@ -52,7 +55,7 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->restore();
 }
 
-void PdfArea::render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr) {
+void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->set_source_rgba(0, 0, 1, 0.1);
 
     for (const auto &pageTextBlock : pageTextBlocks) {
@@ -67,7 +70,7 @@ void PdfArea::render_text_blocks(const Cairo::RefPtr<Cairo::Context> &cr) {
 
             graphene_rect_t scaledRect = {};
             graphene_rect_scale(&r, static_cast<float>(_zoom), static_cast<float>(_zoom), &scaledRect);
-            graphene_rect_offset(&scaledRect, -scrollOffsetX, verticalOffset);
+            graphene_rect_offset(&scaledRect, static_cast<float>(-scrollOffsetX), static_cast<float>(verticalOffset));
 
             graphene_point_t p = {static_cast<float>(mouseX), static_cast<float>(mouseY)};
             if (!graphene_rect_contains_point(&scaledRect, &p)) {
@@ -107,3 +110,5 @@ void PdfArea::mouse_moved(double x, double y) {
     mouseY = y;
     queue_draw();
 }
+
+void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &/*cr*/) {}

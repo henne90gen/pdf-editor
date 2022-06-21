@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+#include "operator_parser.h"
 #include "operator_traverser.h"
 
 namespace pdf {
@@ -187,7 +188,57 @@ size_t Page::character_count() {
     return result;
 }
 
-void TextBlock::move(Document &document, double xOffset, double yOffset) {
+std::vector<PageImage> Page::images() {
+    auto result = std::vector<PageImage>();
+    for_each_image([&result](PageImage image) {
+        result.push_back(image);
+        return ForEachResult::CONTINUE;
+    });
+    return result;
+}
+
+struct ImageFinder : public OperatorTraverser {
+    const std::function<ForEachResult(PageImage)> &func;
+    std::vector<PageImage> result = {};
+
+    explicit ImageFinder(Page &page, const std::function<ForEachResult(PageImage)> &_func)
+        : OperatorTraverser(page), func(_func) {}
+
+    void on_do(Operator *op) override {
+        const auto &xObjectName = op->data.Do_PaintXObject.name->value;
+
+        const auto xObjectMapOpt = page.resources()->x_objects(page.document);
+        if (!xObjectMapOpt.has_value()) {
+            return;
+        }
+
+        const auto &xObjectMap   = xObjectMapOpt.value();
+        const auto &xObjectKey   = xObjectName.substr(1, xObjectName.size() - 1);
+        const auto xObjectRefOpt = xObjectMap->find<IndirectReference>(xObjectKey);
+        const auto xObjectOpt    = page.document.get<Stream>(xObjectRefOpt);
+        if (!xObjectOpt.has_value()) {
+            return;
+        }
+
+        const auto xObject = xObjectOpt.value();
+        const auto subtype = xObject->dictionary->must_find<Name>("Subtype");
+        if (subtype->value != "Image") {
+            return;
+        }
+
+        spdlog::info("Found Image object: {}", xObjectKey);
+        // TODO set xOffset and yOffset correctly
+        auto pageImage = PageImage(0.0, 0.0, xObject->as<XObjectImage>());
+        func(pageImage);
+    }
+};
+
+void Page::for_each_image(const std::function<ForEachResult(PageImage)> &func) {
+    auto finder = ImageFinder(*this, func);
+    finder.traverse();
+}
+
+void TextBlock::move(Document &document, double xOffset, double yOffset) const {
     // BT 56.8 724.1 Td /F1 12 Tf            [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ              ET Q Q
     // BT 56.8 724.1 Td /F1 12 Tf _x_ _y_ Td [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ -_x_ -_y_ Td ET Q Q
     std::stringstream ss;
