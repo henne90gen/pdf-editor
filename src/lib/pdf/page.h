@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "document.h"
 #include "objects.h"
 #include "operator_parser.h"
@@ -80,12 +82,13 @@ struct XObjectImage : public Stream {
 };
 
 struct PageImage {
+    std::string name;
     double xOffset      = 0.0;
     double yOffset      = 0.0;
     XObjectImage *image = nullptr;
 
-    PageImage(double _xOffset, double _yOffset, XObjectImage *_image)
-        : xOffset(_xOffset), yOffset(_yOffset), image(_image) {}
+    PageImage(std::string _name, double _xOffset, double _yOffset, XObjectImage *_image)
+        : name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image) {}
 };
 
 struct Page {

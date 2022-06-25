@@ -16,14 +16,20 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
     int i             = 0;
     double pageOffset = 0.0;
     document.for_each_page([this, &i, &pageOffset](pdf::Page *page) {
-        spdlog::info("Page {} with offset {}:", i++, pageOffset);
+        spdlog::info("Page {} with offset {}", i++, pageOffset);
 
         pageTextBlocks.emplace_back(pageOffset, page->text_blocks());
         for (const auto &textBlock : pageTextBlocks.back().textBlocks) {
-            spdlog::info("TextBlock: {},{} - {},{}", textBlock.x, textBlock.y, textBlock.width, textBlock.height);
+            spdlog::info("Found TextBlock at position {},{} with size {}x{}", textBlock.x, textBlock.y, textBlock.width,
+                         textBlock.height);
         }
 
-        pageImages.push_back(page->images());
+        const auto &images = page->images();
+        for (const auto &img : images) {
+            spdlog::info("Found Image {} at position {},{} with size {}x{}", img.name, img.xOffset, img.yOffset,
+                         img.image->width(), img.image->height());
+        }
+        pageImages.push_back(images);
 
         pageOffset += page->height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
@@ -83,9 +89,9 @@ void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
                   textBlock.width,                                           //
                   textBlock.height                                           //
             );
-            cr->fill();
         }
     }
+    cr->fill();
 }
 
 void PdfArea::set_offsets(const double x, const double y) {
@@ -111,4 +117,15 @@ void PdfArea::mouse_moved(double x, double y) {
     queue_draw();
 }
 
-void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &/*cr*/) {}
+void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
+    cr->set_source_rgba(0, 0, 1, 0.1);
+    for (const auto &p : pageImages) {
+        for (const auto &image : p) {
+            cr->rectangle(image.xOffset,                             //
+                          image.yOffset,                             //
+                          static_cast<double>(image.image->width()), //
+                          static_cast<double>(image.image->height()));
+        }
+    }
+    cr->fill();
+}

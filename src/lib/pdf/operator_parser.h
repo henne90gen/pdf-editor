@@ -129,6 +129,9 @@ struct Operator {
             std::array<double, 4> rect;
         } re_AppendRectangle;
         struct {
+            std::array<double, 6> matrix;
+        } cm_ModifyCurrentTransformationMatrix;
+        struct {
             double r, g, b;
         } rg_SetNonStrokingColorRGB;
         struct {

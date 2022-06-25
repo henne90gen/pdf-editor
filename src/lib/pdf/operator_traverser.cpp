@@ -31,6 +31,8 @@ void OperatorTraverser::apply_operator(Operator *op) {
         endPathWithoutFillingOrStroking();
     } else if (op->type == Operator::Type::rg_SetNonStrokingColorRGB) {
         setNonStrokingColor(op);
+    } else if (op->type == Operator::Type::cm_ModifyCurrentTransformationMatrix) {
+        modifyCurrentTransformationMatrix(op);
     } else if (op->type == Operator::Type::BT_BeginText) {
         beginText();
     } else if (op->type == Operator::Type::ET_EndText) {
@@ -47,6 +49,12 @@ void OperatorTraverser::apply_operator(Operator *op) {
         // TODO unknown operator
         spdlog::trace("OperatorTraverser::apply_operator() - unknown operator {}", op->type);
     }
+}
+
+void OperatorTraverser::modifyCurrentTransformationMatrix(Operator *op) {
+    const auto &m1 = op->data.cm_ModifyCurrentTransformationMatrix.matrix;
+    auto matrix    = Cairo::Matrix(m1[0], m1[1], m1[2], m1[3], m1[4], m1[5]);
+    state().currentTransformationMatrix.multiply(state().currentTransformationMatrix, matrix);
 }
 
 void OperatorTraverser::appendRectangle() const { // TODO append rectangle to the current path

@@ -117,6 +117,7 @@ struct OperatorTraverser {
     void popGraphicsState();
     void moveStartOfNextLine(Operator *op);
     void setTextFontAndSize(Operator *op);
+    void modifyCurrentTransformationMatrix(Operator *op);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;

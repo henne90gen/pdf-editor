@@ -104,7 +104,7 @@ struct TextBlockFinder : public OperatorTraverser {
         fontMatrix.transform_point(x, y);
 
         Cairo::TextExtents extents = {};
-        cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), glyphs.size(), &extents);
+        cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), static_cast<int>(glyphs.size()), &extents);
         result.push_back({
               .text   = text,
               .x      = x,
@@ -226,9 +226,10 @@ struct ImageFinder : public OperatorTraverser {
             return;
         }
 
-        spdlog::info("Found Image object: {}", xObjectKey);
-        // TODO set xOffset and yOffset correctly
-        auto pageImage = PageImage(0.0, 0.0, xObject->as<XObjectImage>());
+        double xOffset = 0.0;
+        double yOffset = 0.0;
+        state().currentTransformationMatrix.transform_point(xOffset, yOffset);
+        auto pageImage = PageImage(xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>());
         func(pageImage);
     }
 };

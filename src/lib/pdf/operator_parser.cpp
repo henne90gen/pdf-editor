@@ -207,7 +207,9 @@ Operator *OperatorParser::create_operator_Tj(Operator *result) {
 }
 
 Operator *OperatorParser::create_operator_cm(Operator *result) {
-    // FIXME parse operator 'cm'
+    for (int i = 0; i < 6; i++) {
+        result->data.cm_ModifyCurrentTransformationMatrix.matrix[i] = operand<double>(6 - 1);
+    }
     return result;
 }
 
