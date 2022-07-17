@@ -188,21 +188,22 @@ $(function() {
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> popGraphicsState();</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> moveStartOfNextLine(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">void</span> setTextFontAndSize(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">void</span> endPathWithoutFillingOrStroking() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">void</span> modifyClippingPathUsingEvenOddRule() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">void</span> appendRectangle() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;};</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;} <span class="comment">// namespace pdf</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">void</span> modifyCurrentTransformationMatrix(<a class="code" href="structpdf_1_1Operator.html">Operator</a> *op);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">void</span> endPathWithoutFillingOrStroking() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">void</span> modifyClippingPathUsingEvenOddRule() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">void</span> appendRectangle() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;};</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;} <span class="comment">// namespace pdf</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="astructpdf_1_1Color_html"><div class="ttname"><a href="structpdf_1_1Color.html">pdf::Color</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:10</div></div>
 <div class="ttc" id="astructpdf_1_1TextObjectState_html"><div class="ttname"><a href="structpdf_1_1TextObjectState.html">pdf::TextObjectState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:28</div></div>
-<div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:91</div></div>
-<div class="ttc" id="astructpdf_1_1OperatorTraverser_html_a36f461e3fe6ed3a5dd82c02c0e3c6b25"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html#a36f461e3fe6ed3a5dd82c02c0e3c6b25">pdf::OperatorTraverser::font_matrix</a></div><div class="ttdeci">Cairo::Matrix font_matrix() const</div><div class="ttdoc">calculates the current font matrix</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:127</div></div>
+<div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:94</div></div>
+<div class="ttc" id="astructpdf_1_1OperatorTraverser_html_a36f461e3fe6ed3a5dd82c02c0e3c6b25"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html#a36f461e3fe6ed3a5dd82c02c0e3c6b25">pdf::OperatorTraverser::font_matrix</a></div><div class="ttdeci">Cairo::Matrix font_matrix() const</div><div class="ttdoc">calculates the current font matrix</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:135</div></div>
 <div class="ttc" id="astructpdf_1_1GraphicsState_html"><div class="ttname"><a href="structpdf_1_1GraphicsState.html">pdf::GraphicsState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:75</div></div>
 <div class="ttc" id="astructpdf_1_1OperatorTraverser_html"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:91</div></div>
 <div class="ttc" id="astructpdf_1_1TextState_html"><div class="ttname"><a href="structpdf_1_1TextState.html">pdf::TextState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:61</div></div>
-<div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:51</div></div>
+<div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:53</div></div>
 <div class="ttc" id="astructpdf_1_1Font_html"><div class="ttname"><a href="structpdf_1_1Font.html">pdf::Font</a></div><div class="ttdef"><b>Definition:</b> font.h:54</div></div>
 <div class="ttc" id="astructpdf_1_1TextFont_html"><div class="ttname"><a href="structpdf_1_1TextFont.html">pdf::TextFont</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:54</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
