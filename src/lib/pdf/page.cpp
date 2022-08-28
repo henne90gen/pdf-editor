@@ -229,7 +229,7 @@ struct ImageFinder : public OperatorTraverser {
         double xOffset = 0.0;
         double yOffset = 0.0;
         state().currentTransformationMatrix.transform_point(xOffset, yOffset);
-        auto pageImage = PageImage(xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>());
+        auto pageImage = PageImage(xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, currentContentStream);
         func(pageImage);
     }
 };
@@ -237,6 +237,38 @@ struct ImageFinder : public OperatorTraverser {
 void Page::for_each_image(const std::function<ForEachResult(PageImage)> &func) {
     auto finder = ImageFinder(*this, func);
     finder.traverse();
+}
+
+void PageImage::move(Document &document, double xOffset, double yOffset) const {
+    std::stringstream ss;
+
+    // write everything up to the operator we want to wrap
+    auto decoded = cs->decode(document.allocator);
+    ss << decoded.substr(0, op->content.data() - decoded.data());
+
+    // wrap operator with offset
+    if (op->content[0] != ' ') {
+        ss << " ";
+    }
+    ss << xOffset;
+    ss << " ";
+    ss << -yOffset;
+    ss << " Td ";
+
+    // write operator
+    ss << op->content;
+
+    // wrap operator with negative offset
+    ss << " ";
+    ss << -xOffset;
+    ss << " ";
+    ss << yOffset;
+    ss << " Td";
+
+    ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
+
+    cs->encode(document.allocator, ss.str());
+    spdlog::info("Moved image '{}' by x={} and y={}", name, xOffset, yOffset);
 }
 
 void TextBlock::move(Document &document, double xOffset, double yOffset) const {
@@ -270,6 +302,7 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) const {
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
     cs->encode(document.allocator, ss.str());
+    spdlog::info("Moved text block '{}' by x={} and y={}", text, xOffset, yOffset);
 }
 
 } // namespace pdf

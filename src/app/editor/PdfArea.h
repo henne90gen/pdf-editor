@@ -51,12 +51,22 @@ class PdfArea : public ScrolledZoomedContent {
     double scrollOffsetY = 0.0;
     double mouseX        = 0.0;
     double mouseY        = 0.0;
+    double dragStartX    = 0.0;
+    double dragStartY    = 0.0;
 
-    std::vector<PageTextBlocks> pageTextBlocks = {};
+    pdf::PageImage *selectedImage = nullptr;
+
+    std::vector<PageTextBlocks> pageTextBlocks          = {};
     std::vector<std::vector<pdf::PageImage>> pageImages = {};
 
-    void mouse_moved(double x, double y);
+    void on_mouse_moved(double x, double y);
+    void on_mouse_drag_begin(double x, double y);
+    void on_mouse_drag_update(double x, double y);
+    void on_mouse_drag_end(double x, double y);
+
     void render_pages(const Cairo::RefPtr<Cairo::Context> &cr);
     void render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
     void render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
+
+    pdf::PageImage *get_image_at_position(double x, double y);
 };

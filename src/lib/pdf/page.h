@@ -64,6 +64,7 @@ struct TextBlock {
     Operator *op      = nullptr;
     ContentStream *cs = nullptr;
 
+    /// moves the text block on the page by the specified offset
     void move(Document &document, double xOffset, double yOffset) const;
 };
 
@@ -87,8 +88,15 @@ struct PageImage {
     double yOffset      = 0.0;
     XObjectImage *image = nullptr;
 
-    PageImage(std::string _name, double _xOffset, double _yOffset, XObjectImage *_image)
-        : name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image) {}
+    Operator *op      = nullptr;
+    ContentStream *cs = nullptr;
+
+    PageImage(std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
+              ContentStream *_cs)
+        : name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
+
+    /// Moves the image on the page by the specified offset
+    void move(Document &document, double xOffset, double yOffset) const;
 };
 
 struct Page {
