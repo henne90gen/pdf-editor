@@ -12,6 +12,8 @@ class EditorWindow : public Gtk::ApplicationWindow {
     [[maybe_unused]] EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
                                   const std::string &filePath);
 
+    void save();
+
   private:
     pdf::Document document;
 };

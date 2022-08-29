@@ -284,7 +284,7 @@ Result read_trailers(Document &document, char *crossRefStartPtr, Trailer *curren
     ignoreNewLines(currentReadPtr);
 
     size_t lengthOfTrailerDict = 1;
-    view = std::string_view(currentReadPtr + lengthOfTrailerDict, 9);
+    view                       = std::string_view(currentReadPtr + lengthOfTrailerDict, 9);
     while (view != "startxref") {
         lengthOfTrailerDict++;
         view = std::string_view(currentReadPtr + lengthOfTrailerDict, 9);
@@ -502,6 +502,7 @@ Result Document::read_from_file(const std::string &filePath, Document &document,
         return Result::error("Failed to open pdf file for reading: '{}'", filePath);
     }
 
+    document.file.path             = filePath;
     document.file.sizeInBytes = is.tellg();
     document.allocator.init(document.file.sizeInBytes);
     document.file.data = document.allocator.allocate_chunk(document.file.sizeInBytes);

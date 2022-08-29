@@ -12,6 +12,20 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
         return;
     }
     set_title(filePath);
+    set_show_menubar(true);
 
     Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
+}
+
+void EditorWindow::save() {
+    if (document.file.path.empty()) {
+        spdlog::info("No file path available for current document");
+        return;
+    }
+
+    spdlog::info("Saving {}", document.file.path);
+    auto result = document.write_to_file(document.file.path + "_copy.pdf");
+    if (result.has_error()) {
+        spdlog::warn("Failed to save document: {}", result.message());
+    }
 }

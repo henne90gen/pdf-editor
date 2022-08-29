@@ -179,7 +179,7 @@ Result write_to_stream(Document &document, std::ostream &s) {
     write_objects(document, s, byteOffsets);
     write_trailer(document, s, byteOffsets);
 
-    return Result::bool_(s.bad(), "Failed to write data to file");
+    return Result::from_bool(s.bad(), "Failed to write data to file");
 }
 
 Result Document::write_to_file(const std::string &filePath) {

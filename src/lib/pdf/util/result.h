@@ -20,7 +20,7 @@ class Result {
     static Result ok() { return {false, ""}; }
 
     template <typename... Args> //
-    static Result bool_(bool hasError, fmt::format_string<Args...> fmt, Args &&...args) {
+    static Result from_bool(bool hasError, fmt::format_string<Args...> fmt, Args &&...args) {
         return {hasError, fmt::format(fmt, std::forward<Args>(args)...)};
     }
 
@@ -43,13 +43,13 @@ template <typename T> class ValueResult {
 
     // TODO add in-place construction similar to emplace_back
     static ValueResult ok(T v) { return {v, false, ""}; }
-    static ValueResult of(Result r) { return {{}, r.has_error(), r.message()}; }
+    static ValueResult of(const Result& r) { return {{}, r.has_error(), r.message()}; }
 
     [[nodiscard]] T &value() { return _value; }
     [[nodiscard]] T &value() const { return _value; }
     [[nodiscard]] bool has_error() const { return hasError; }
     [[nodiscard]] std::string message() const { return errorMessage; }
-    [[nodiscard]] Result drop_value() const { return Result::bool_(hasError, "{}", errorMessage); }
+    [[nodiscard]] Result drop_value() const { return Result::from_bool(hasError, "{}", errorMessage); }
 
   private:
     T _value;

@@ -14,4 +14,7 @@ class EditorApplication : public PdfApplication {
 
   protected:
     EditorApplication();
+
+  private:
+    void on_save(const Glib::VariantBase &);
 };

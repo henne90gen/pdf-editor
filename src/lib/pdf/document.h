@@ -79,6 +79,7 @@ struct DocumentFileMetadata {
 };
 
 struct DocumentFile {
+    std::string path;
     char *data                    = nullptr;
     size_t sizeInBytes            = 0;
     int64_t lastCrossRefStart     = {};
