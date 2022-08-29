@@ -239,7 +239,7 @@ void Page::for_each_image(const std::function<ForEachResult(PageImage)> &func) {
     finder.traverse();
 }
 
-void PageImage::move(Document &document, double xOffset, double yOffset) const {
+void PageImage::move(Document &document, double offsetX, double offsetY) const {
     std::stringstream ss;
 
     // write everything up to the operator we want to wrap
@@ -250,9 +250,9 @@ void PageImage::move(Document &document, double xOffset, double yOffset) const {
     if (op->content[0] != ' ') {
         ss << " ";
     }
-    ss << xOffset;
+    ss << offsetX;
     ss << " ";
-    ss << -yOffset;
+    ss << -offsetY;
     ss << " Td ";
 
     // write operator
@@ -260,18 +260,21 @@ void PageImage::move(Document &document, double xOffset, double yOffset) const {
 
     // wrap operator with negative offset
     ss << " ";
-    ss << -xOffset;
+    ss << -offsetX;
     ss << " ";
-    ss << yOffset;
+    ss << offsetY;
     ss << " Td";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
     cs->encode(document.arena, ss.str());
+
+    document.document_changed_signal.emit();
+
     spdlog::info("Moved image '{}' by x={} and y={}", name, xOffset, yOffset);
 }
 
-void TextBlock::move(Document &document, double xOffset, double yOffset) const {
+void TextBlock::move(Document &document, double offsetX, double offsetY) const {
     // BT 56.8 724.1 Td /F1 12 Tf            [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ              ET Q Q
     // BT 56.8 724.1 Td /F1 12 Tf _x_ _y_ Td [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ -_x_ -_y_ Td ET Q Q
     std::stringstream ss;
@@ -284,9 +287,9 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) const {
     if (op->content[0] != ' ') {
         ss << " ";
     }
-    ss << xOffset;
+    ss << offsetX;
     ss << " ";
-    ss << -yOffset;
+    ss << -offsetY;
     ss << " Td ";
 
     // write operator
@@ -294,15 +297,18 @@ void TextBlock::move(Document &document, double xOffset, double yOffset) const {
 
     // wrap operator with negative offset
     ss << " ";
-    ss << -xOffset;
+    ss << -offsetX;
     ss << " ";
-    ss << yOffset;
+    ss << offsetY;
     ss << " Td";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
     cs->encode(document.arena, ss.str());
-    spdlog::info("Moved text block '{}' by x={} and y={}", text, xOffset, yOffset);
+
+    document.document_changed_signal.emit();
+
+    spdlog::info("Moved text block '{}' by x={} and y={}", text, offsetX, offsetY);
 }
 
 } // namespace pdf

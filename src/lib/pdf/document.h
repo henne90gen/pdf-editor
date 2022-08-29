@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <sigc++/sigc++.h>
 #include <unordered_set>
 
 #include "pdf/font.h"
@@ -106,6 +107,8 @@ struct Document : public ReferenceResolver {
     Arena arena                                               = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
+
+    sigc::signal<void()> document_changed_signal;
 
     ~Document();
 

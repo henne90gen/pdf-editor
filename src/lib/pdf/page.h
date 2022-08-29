@@ -65,7 +65,7 @@ struct TextBlock {
     ContentStream *cs = nullptr;
 
     /// moves the text block on the page by the specified offset
-    void move(Document &document, double xOffset, double yOffset) const;
+    void move(Document &document, double offsetX, double offsetY) const;
 };
 
 struct XObjectImage : public Stream {
@@ -96,7 +96,7 @@ struct PageImage {
         : name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
 
     /// Moves the image on the page by the specified offset
-    void move(Document &document, double xOffset, double yOffset) const;
+    void move(Document &document, double offsetX, double offsetY) const;
 };
 
 struct Page {

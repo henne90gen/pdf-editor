@@ -16,4 +16,6 @@ class EditorWindow : public Gtk::ApplicationWindow {
 
   private:
     pdf::Document document;
+
+    void on_document_change();
 };

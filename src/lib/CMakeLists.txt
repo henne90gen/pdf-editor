@@ -1,5 +1,6 @@
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Cairo REQUIRED cairomm-1.16)
+pkg_check_modules(sigc REQUIRED sigc++-3.0)
 
 function(target_link_cairo target)
     target_link_libraries(${target} PUBLIC ${Cairo_LIBRARIES})
@@ -7,6 +8,14 @@ function(target_link_cairo target)
     target_compile_options(${target} PUBLIC ${Cairo_CFLAGS_OTHER})
     target_link_directories(${target} PUBLIC ${Cairo_LIBRARY_DIRS})
     target_include_directories(${target} PUBLIC ${Cairo_INCLUDE_DIRS})
+endfunction()
+
+function(target_link_sigc target)
+    target_link_libraries(${target} PUBLIC ${sigc_LIBRARIES})
+    target_link_options(${target} PUBLIC ${sigc_LDFLAGS_OTHER})
+    target_compile_options(${target} PUBLIC ${sigc_CFLAGS_OTHER})
+    target_link_directories(${target} PUBLIC ${sigc_LIBRARY_DIRS})
+    target_include_directories(${target} PUBLIC ${sigc_INCLUDE_DIRS})
 endfunction()
 
 add_library(pdf
@@ -32,6 +41,7 @@ target_include_directories(pdf PUBLIC
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(pdf PUBLIC $<BUILD_INTERFACE:zlibstatic> $<BUILD_INTERFACE:spdlog::spdlog> freetype)
 target_link_cairo(pdf)
+target_link_sigc(pdf)
 
 install(TARGETS pdf
         EXPORT pdf
