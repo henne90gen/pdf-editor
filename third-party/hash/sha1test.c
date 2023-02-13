@@ -36,7 +36,7 @@ char *resultarray[4]    = {"A9 99 3E 36 47 06 81 6A BA 3E 25 71 78 50 C2 6C 9C D
                            "34 AA 97 3C D4 C4 DA A4 F6 1E EB 2B DB AD 27 31 65 34 01 6F",
                            "DE A3 56 A2 CD DD 90 C7 A7 EC ED C5 EB B5 63 93 4F 46 04 52"};
 
-int main() {
+int main(void) {
     SHA1Context sha;
     int i, j, err;
     uint8_t Message_Digest[20];

@@ -261,10 +261,7 @@ static void MD5Transform(UINT4 state[4], unsigned char block[64]) {
 /* Encodes input (UINT4) into output (unsigned char). Assumes len is
   a multiple of 4.
  */
-static void Encode(output, input, len) unsigned char *output;
-UINT4 *input;
-unsigned int len;
-{
+static void Encode(unsigned char *output, UINT4 *input, unsigned int len) {
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4) {
@@ -278,10 +275,7 @@ unsigned int len;
 /* Decodes input (unsigned char) into output (UINT4). Assumes len is
   a multiple of 4.
  */
-static void Decode(output, input, len) UINT4 *output;
-unsigned char *input;
-unsigned int len;
-{
+static void Decode(UINT4 *output, unsigned char *input, unsigned int len) {
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
@@ -292,10 +286,7 @@ unsigned int len;
 /* Note: Replace "for loop" with standard memcpy if possible.
  */
 
-static void MD5_memcpy(output, input, len) POINTER output;
-POINTER input;
-unsigned int len;
-{
+static void MD5_memcpy(POINTER output, POINTER input, unsigned int len) {
     unsigned int i;
 
     for (i = 0; i < len; i++)

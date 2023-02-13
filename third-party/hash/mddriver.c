@@ -42,10 +42,7 @@ Arguments (may be any combination):
   filename - digests file
   (none)   - digests standard input
  */
-int main(argc, argv)
-int argc;
-char *argv[];
-{
+int main(int argc, char *argv[]) {
     int i;
 
     if (argc > 1)
@@ -66,8 +63,7 @@ char *argv[];
 
 /* Digests a string and prints the result.
  */
-static void MDString(string) char *string;
-{
+static void MDString(char *string) {
     MD5_CTX context;
     unsigned char digest[16];
     unsigned int len = strlen(string);
@@ -84,7 +80,7 @@ static void MDString(string) char *string;
 /* Measures the time to digest TEST_BLOCK_COUNT TEST_BLOCK_LEN-byte
   blocks.
  */
-static void MDTimeTrial() {
+static void MDTimeTrial(void) {
     MD5_CTX context;
     time_t endTime, startTime;
     unsigned char block[TEST_BLOCK_LEN], digest[16];
@@ -116,7 +112,7 @@ static void MDTimeTrial() {
 
 /* Digests a reference suite of strings and prints the results.
  */
-static void MDTestSuite() {
+static void MDTestSuite(void) {
     printf("MD5 test suite:\n");
 
     MDString("");
@@ -130,8 +126,7 @@ static void MDTestSuite() {
 
 /* Digests a file and prints the result.
  */
-static void MDFile(filename) char *filename;
-{
+static void MDFile(char *filename) {
     FILE *file;
     MD5_CTX context;
     int len;
@@ -156,7 +151,7 @@ static void MDFile(filename) char *filename;
 
 /* Digests the standard input and prints the result.
  */
-static void MDFilter() {
+static void MDFilter(void) {
     MD5_CTX context;
     int len;
     unsigned char buffer[16], digest[16];
