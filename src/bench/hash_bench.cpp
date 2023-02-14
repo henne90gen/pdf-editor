@@ -1,9 +1,10 @@
 #include <benchmark/benchmark.h>
 
 #include <fstream>
-#include <hash/md5.h>
-#include <hash/sha1.h>
 #include <iostream>
+
+#include <pdf/hash/md5.h>
+#include <pdf/hash/sha1.h>
 
 typedef unsigned long int UINT4;
 struct MD5_CTX {
@@ -62,7 +63,7 @@ BENCHMARK(BM_MD5_Reference_abc);
 static void BM_MD5_abc(benchmark::State &state) {
     std::string testString = "abc";
     for (auto _ : state) {
-        auto hash = hash::md5_checksum(testString);
+        auto hash = pdf::hash::md5_checksum(testString);
         benchmark::DoNotOptimize(hash);
     }
 }
@@ -84,7 +85,7 @@ BENCHMARK(BM_MD5_Reference_File);
 static void BM_MD5_File(benchmark::State &state) {
     auto file = read_file("../../../test-files/image-1.pdf");
     for (auto _ : state) {
-        auto hash = hash::md5_checksum(file.first, file.second);
+        auto hash = pdf::hash::md5_checksum(file.first, file.second);
         benchmark::DoNotOptimize(hash);
     }
 }
@@ -106,7 +107,7 @@ BENCHMARK(BM_SHA1_Reference_abc);
 static void BM_SHA1_abc(benchmark::State &state) {
     std::string testString = "abc";
     for (auto _ : state) {
-        auto hash = hash::sha1_checksum(testString);
+        auto hash = pdf::hash::sha1_checksum(testString);
         benchmark::DoNotOptimize(hash);
     }
 }
@@ -128,7 +129,7 @@ BENCHMARK(BM_SHA1_Reference_File);
 static void BM_SHA1_File(benchmark::State &state) {
     auto file = read_file("../../../test-files/image-1.pdf");
     for (auto _ : state) {
-        auto hash = hash::sha1_checksum(file.first, file.second);
+        auto hash = pdf::hash::sha1_checksum(file.first, file.second);
         benchmark::DoNotOptimize(hash);
     }
 }

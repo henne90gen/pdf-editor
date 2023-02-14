@@ -2,7 +2,7 @@
 
 #include "hex_string.h"
 
-namespace hash {
+namespace pdf::hash {
 
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
@@ -120,4 +120,4 @@ SHA1Hash sha1_checksum(const uint8_t *bytes, uint64_t sizeInBytes) {
     return H;
 }
 
-} // namespace hash
+} // namespace pdf::hash

@@ -6,7 +6,7 @@
 #include "md5.h"
 #include "sha1.h"
 
-namespace hash {
+namespace pdf::hash {
 
 std::string to_hex_string(const MD5Hash &checksum);
 std::string to_hex_string(const SHA1Hash &checksum);
@@ -19,4 +19,4 @@ inline uint64_t calculate_padded_size(uint64_t sizeInBytes) {
     return sizeInBytes + 56 - (sizeInBytes % 64);
 }
 
-} // namespace hash
+} // namespace pdf::hash

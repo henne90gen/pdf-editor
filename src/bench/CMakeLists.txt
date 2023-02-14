@@ -8,6 +8,6 @@ target_link_libraries(writer_bench benchmark::benchmark pdf)
 add_executable(hash_bench hash_bench.cpp)
 target_link_libraries(hash_bench
         benchmark::benchmark
-        hash
+        pdf
         md5_reference
         sha1_reference)

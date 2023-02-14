@@ -1,6 +1,6 @@
 #include "hex_string.h"
 
-namespace hash {
+namespace pdf::hash {
 
 std::string to_hex_string(const MD5Hash &hash) {
     std::string result = "00000000000000000000000000000000";
@@ -46,4 +46,4 @@ std::string to_hex_string(const SHA1Hash &hash) {
     return result;
 }
 
-} // namespace hash
+} // namespace pdf::hash

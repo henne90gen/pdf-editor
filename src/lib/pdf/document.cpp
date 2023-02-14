@@ -6,9 +6,8 @@
 #include <sstream>
 #include <zlib.h>
 
-#include <hash/md5.h>
-#include <hash/hex_string.h>
-
+#include "pdf/hash/hex_string.h"
+#include "pdf/hash/md5.h"
 #include "pdf/operator_parser.h"
 #include "pdf/page.h"
 

@@ -1,12 +1,3 @@
-
-add_library(hash
-        hash/md5.cpp
-        hash/sha1.cpp
-        hash/hex_string.cpp)
-target_include_directories(hash PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Cairo REQUIRED cairomm-1.16)
 
@@ -32,14 +23,17 @@ add_library(pdf
         pdf/image.cpp
         pdf/renderer.cpp
         pdf/operator_traverser.cpp
-        pdf/memory/allocator.cpp)
+        pdf/memory/allocator.cpp
+        pdf/hash/hex_string.cpp
+        pdf/hash/md5.cpp
+        pdf/hash/sha1.cpp)
 target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(pdf PUBLIC $<BUILD_INTERFACE:zlibstatic> $<BUILD_INTERFACE:spdlog::spdlog> freetype hash)
+target_link_libraries(pdf PUBLIC $<BUILD_INTERFACE:zlibstatic> $<BUILD_INTERFACE:spdlog::spdlog> freetype)
 target_link_cairo(pdf)
 
-install(TARGETS pdf hash
+install(TARGETS pdf
         EXPORT pdf
         ARCHIVE
         COMPONENT libraries)

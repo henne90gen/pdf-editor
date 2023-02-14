@@ -4,7 +4,7 @@
 
 #include "hex_string.h"
 
-namespace hash {
+namespace pdf::hash {
 
 static inline uint32_t F(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Y) | (~X & Z); }
 static inline uint32_t G(uint32_t X, uint32_t Y, uint32_t Z) { return (X & Z) | (Y & ~Z); }
@@ -274,4 +274,4 @@ MD5Hash md5_checksum(const uint8_t *bytes, uint64_t sizeInBytes) {
     return output;
 }
 
-} // namespace hash
+} // namespace pdf::hash
