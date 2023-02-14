@@ -181,7 +181,7 @@ void DebugWindow::update_details_label(pdf::Object *object) {
 void DebugWindow::document_changed(const Glib::RefPtr<Gio::File> &file, const Glib::RefPtr<Gio::File> &otherFile,
                                    Gio::FileMonitor::Event event) {
     spdlog::trace("DebugWindow::document_changed(file={}, otherFile={}, event={})", file->get_path(),
-                  otherFile->get_path(), event);
+                  otherFile->get_path(), (int)event);
     if (event != Gio::FileMonitor::Event::CHANGES_DONE_HINT) {
         return;
     }

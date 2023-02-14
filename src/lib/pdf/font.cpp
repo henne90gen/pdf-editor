@@ -26,7 +26,7 @@ std::optional<FontDescriptor *> Font::font_descriptor(Document &document) {
     if (!objectOpt.has_value()) {
         spdlog::warn("Failed to find FontDescriptor in dictionary:");
         for (auto &itr : values) {
-            spdlog::warn("    key={}, value={}", itr.first, itr.second->type);
+            spdlog::warn("    key={}, value={}", itr.first, (int)itr.second->type);
         }
         return nullptr;
     }

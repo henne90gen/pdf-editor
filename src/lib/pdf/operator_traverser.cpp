@@ -47,7 +47,7 @@ void OperatorTraverser::apply_operator(Operator *op) {
         on_do(op);
     } else {
         // TODO unknown operator
-        spdlog::trace("OperatorTraverser::apply_operator() - unknown operator {}", op->type);
+        spdlog::trace("OperatorTraverser::apply_operator() - unknown operator {}", (int)op->type);
     }
 }
 
