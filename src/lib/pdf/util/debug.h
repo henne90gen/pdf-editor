@@ -1,4 +1,3 @@
-#include "spdlog/fmt/bundled/core.h"
 #include <string>
 #include <utility>
 

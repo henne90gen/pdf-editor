@@ -2,7 +2,7 @@
 add_library(hash
         hash/md5.cpp
         hash/sha1.cpp
-        hash/util.cpp)
+        hash/hex_string.cpp)
 target_include_directories(hash PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
@@ -32,7 +32,7 @@ add_library(pdf
         pdf/image.cpp
         pdf/renderer.cpp
         pdf/operator_traverser.cpp
-        pdf/util/allocator.cpp)
+        pdf/memory/allocator.cpp)
 target_include_directories(pdf PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)

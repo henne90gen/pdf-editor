@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "operator_parser.h"
+#include "pdf/operator_parser.h"
 
 namespace pdf {
 

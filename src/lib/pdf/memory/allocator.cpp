@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "pdf/objects.h"
-#include "util.h"
+#include "pdf/util/debug.h"
 
 namespace pdf {
 

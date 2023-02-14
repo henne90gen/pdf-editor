@@ -3,7 +3,7 @@
 #include <cstring>
 #include <spdlog/spdlog.h>
 
-#include "parser.h"
+#include "pdf/parser.h"
 
 namespace pdf {
 

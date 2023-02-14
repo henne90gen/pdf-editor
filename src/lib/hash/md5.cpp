@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "util.h"
+#include "hex_string.h"
 
 namespace hash {
 

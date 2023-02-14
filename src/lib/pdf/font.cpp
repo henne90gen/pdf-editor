@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "document.h"
-#include "objects.h"
+#include "pdf/document.h"
+#include "pdf/objects.h"
 
 namespace pdf {
 

@@ -2,14 +2,15 @@
 
 #include <bitset>
 #include <fstream>
-#include <hash/md5.h>
-#include <hash/util.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <zlib.h>
 
-#include "operator_parser.h"
-#include "page.h"
+#include <hash/md5.h>
+#include <hash/hex_string.h>
+
+#include "pdf/operator_parser.h"
+#include "pdf/page.h"
 
 namespace pdf {
 

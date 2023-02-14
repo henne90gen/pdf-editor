@@ -4,8 +4,8 @@
 #include <functional>
 #include <vector>
 
-#include "result.h"
-#include "util.h"
+#include "pdf/util/debug.h"
+#include "pdf/util/result.h"
 
 namespace pdf {
 

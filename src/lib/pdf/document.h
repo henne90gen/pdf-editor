@@ -1,13 +1,13 @@
 #pragma once
 
-#include "font.h"
-#include "image.h"
-#include "objects.h"
-#include "parser.h"
-#include "util/allocator.h"
-
 #include <functional>
 #include <unordered_set>
+
+#include "pdf/font.h"
+#include "pdf/image.h"
+#include "pdf/objects.h"
+#include "pdf/parser.h"
+#include "pdf/memory/allocator.h"
 
 namespace pdf {
 

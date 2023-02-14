@@ -1,6 +1,6 @@
 #include "sha1.h"
 
-#include "util.h"
+#include "hex_string.h"
 
 namespace hash {
 

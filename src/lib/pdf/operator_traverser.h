@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "font.h"
-#include "page.h"
+#include "pdf/font.h"
+#include "pdf/page.h"
 
 namespace pdf {
 

@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "objects.h"
-#include "util/allocator.h"
+#include "pdf/objects.h"
+#include "pdf/memory/allocator.h"
 
 namespace pdf {
 

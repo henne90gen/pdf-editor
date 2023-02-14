@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <hash/sha1.h>
-#include <hash/util.h>
+#include <hash/hex_string.h>
 
 TEST(SHA1_checksum, a) {
     // GIVEN

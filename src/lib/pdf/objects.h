@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include "util/allocator.h"
-#include "util/util.h"
+#include "pdf/memory/allocator.h"
+#include "pdf/util/debug.h"
 
 namespace pdf {
 

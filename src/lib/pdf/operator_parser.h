@@ -4,9 +4,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lexer.h"
-#include "objects.h"
-#include "util/allocator.h"
+#include "pdf/lexer.h"
+#include "pdf/objects.h"
+#include "pdf/memory/allocator.h"
 
 namespace pdf {
 

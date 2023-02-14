@@ -2,7 +2,7 @@
 
 #include <cairomm/cairomm.h>
 
-#include "operator_traverser.h"
+#include "pdf/operator_traverser.h"
 
 namespace pdf {
 

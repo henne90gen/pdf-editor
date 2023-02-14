@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 #include <string>
 
 namespace pdf {
@@ -43,7 +43,7 @@ template <typename T> class ValueResult {
 
     // TODO add in-place construction similar to emplace_back
     static ValueResult ok(T v) { return {v, false, ""}; }
-    static ValueResult of(const Result& r) { return {{}, r.has_error(), r.message()}; }
+    static ValueResult of(const Result &r) { return {{}, r.has_error(), r.message()}; }
 
     [[nodiscard]] T &value() { return _value; }
     [[nodiscard]] T &value() const { return _value; }
@@ -59,4 +59,5 @@ template <typename T> class ValueResult {
     ValueResult(T v, bool _hasError, std::string _errorMessage)
         : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
 };
-} // namespace util
+
+} // namespace pdf

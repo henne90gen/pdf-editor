@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <zlib.h>
 
-#include "document.h"
+#include "pdf/document.h"
 
 namespace pdf {
 

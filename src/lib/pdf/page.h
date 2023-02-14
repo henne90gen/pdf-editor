@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "document.h"
-#include "objects.h"
-#include "operator_parser.h"
-#include "util/util.h"
+#include "pdf/document.h"
+#include "pdf/objects.h"
+#include "pdf/operator_parser.h"
+#include "pdf/util/debug.h"
 
 namespace pdf {
 

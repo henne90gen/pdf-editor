@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include "lexer.h"
-#include "objects.h"
-#include "util/allocator.h"
-#include "util/util.h"
+#include "pdf/lexer.h"
+#include "pdf/memory/allocator.h"
+#include "pdf/objects.h"
+#include "pdf/util/debug.h"
 
 namespace pdf {
 

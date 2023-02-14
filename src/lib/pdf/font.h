@@ -3,8 +3,8 @@
 #include <cairomm/cairomm.h>
 #include <freetype/freetype.h>
 
-#include "cmap.h"
-#include "rectangle.h"
+#include "pdf/cmap.h"
+#include "pdf/rectangle.h"
 
 namespace pdf {
 
