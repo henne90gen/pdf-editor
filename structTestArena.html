@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: pdf::Allocation Struct Reference</title>
+<title>PDF Editor: TestArena Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -60,37 +60,33 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1Allocation.html">Allocation</a></li>  </ul>
-</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="structpdf_1_1Allocation-members.html">List of all members</a>  </div>
+<a href="structTestArena-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">pdf::Allocation Struct Reference</div>  </div>
+<div class="title">TestArena Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ad316a359cca9faa78ce92c570d61b468"><td class="memItemLeft" align="right" valign="top"><a id="ad316a359cca9faa78ce92c570d61b468"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>bufferStart</b> = nullptr</td></tr>
-<tr class="separator:ad316a359cca9faa78ce92c570d61b468"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d00470cb0c088dfdb8caf7ddd1c44ee"><td class="memItemLeft" align="right" valign="top"><a id="a4d00470cb0c088dfdb8caf7ddd1c44ee"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>bufferPosition</b> = nullptr</td></tr>
-<tr class="separator:a4d00470cb0c088dfdb8caf7ddd1c44ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5ca1e0e47babc51b20d91defe1d9adc"><td class="memItemLeft" align="right" valign="top"><a id="af5ca1e0e47babc51b20d91defe1d9adc"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>sizeInBytes</b> = 0</td></tr>
-<tr class="separator:af5ca1e0e47babc51b20d91defe1d9adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa11ecbf5f6fcad5c6287a13202217c64"><td class="memItemLeft" align="right" valign="top"><a id="aa11ecbf5f6fcad5c6287a13202217c64"></a>
-<a class="el" href="structpdf_1_1Allocation.html">Allocation</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>previousAllocation</b> = nullptr</td></tr>
-<tr class="separator:aa11ecbf5f6fcad5c6287a13202217c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a093a2d58c410a513f8419c84b43a7254"><td class="memItemLeft" align="right" valign="top"><a id="a093a2d58c410a513f8419c84b43a7254"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><b>bufferStart</b> = nullptr</td></tr>
+<tr class="separator:a093a2d58c410a513f8419c84b43a7254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a486c2a859a3a3c9ef749454138af5c72"><td class="memItemLeft" align="right" valign="top"><a id="a486c2a859a3a3c9ef749454138af5c72"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><b>bufferPosition</b> = nullptr</td></tr>
+<tr class="separator:a486c2a859a3a3c9ef749454138af5c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc7f4a5856fb2db0ed2949752ed1e538"><td class="memItemLeft" align="right" valign="top"><a id="afc7f4a5856fb2db0ed2949752ed1e538"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>virtualSizeInBytes</b> = 0</td></tr>
+<tr class="separator:afc7f4a5856fb2db0ed2949752ed1e538"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1f945b0093e06a94e8d0d7a0afff69f"><td class="memItemLeft" align="right" valign="top"><a id="aa1f945b0093e06a94e8d0d7a0afff69f"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>reservedSizeInBytes</b> = 0</td></tr>
+<tr class="separator:aa1f945b0093e06a94e8d0d7a0afff69f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/lib/pdf/memory/<a class="el" href="allocator_8h_source.html">allocator.h</a></li>
+<li>src/test/allocator_test.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

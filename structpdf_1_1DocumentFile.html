@@ -77,17 +77,17 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a600755d8ce752885a1b7dd1a32aa5c8c"><td class="memItemLeft" align="right" valign="top"><a id="a600755d8ce752885a1b7dd1a32aa5c8c"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1DocumentFile.html#a600755d8ce752885a1b7dd1a32aa5c8c">end_ptr</a> () const</td></tr>
-<tr class="memdesc:a600755d8ce752885a1b7dd1a32aa5c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Points to the byte right after the end of the data buffer. <br /></td></tr>
-<tr class="separator:a600755d8ce752885a1b7dd1a32aa5c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af338ed13a884e9f818890b88fd9a5523"><td class="memItemLeft" align="right" valign="top"><a id="af338ed13a884e9f818890b88fd9a5523"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1DocumentFile.html#af338ed13a884e9f818890b88fd9a5523">is_out_of_range</a> (const char *ptr) const</td></tr>
-<tr class="memdesc:af338ed13a884e9f818890b88fd9a5523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given pointer is outside of the range of the data buffer. <br /></td></tr>
-<tr class="separator:af338ed13a884e9f818890b88fd9a5523"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3808ac3113bf1102d70a8ef94ef4f52f"><td class="memItemLeft" align="right" valign="top"><a id="a3808ac3113bf1102d70a8ef94ef4f52f"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_out_of_range</b> (const char *ptr, size_t size) const</td></tr>
-<tr class="separator:a3808ac3113bf1102d70a8ef94ef4f52f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa59ba774abf6f87983ddf8cfeed82d33"><td class="memItemLeft" align="right" valign="top"><a id="aa59ba774abf6f87983ddf8cfeed82d33"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1DocumentFile.html#aa59ba774abf6f87983ddf8cfeed82d33">end_ptr</a> () const</td></tr>
+<tr class="memdesc:aa59ba774abf6f87983ddf8cfeed82d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Points to the byte right after the end of the data buffer. <br /></td></tr>
+<tr class="separator:aa59ba774abf6f87983ddf8cfeed82d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f69ddf1d4a8444e41230eab84f81782"><td class="memItemLeft" align="right" valign="top"><a id="a9f69ddf1d4a8444e41230eab84f81782"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1DocumentFile.html#a9f69ddf1d4a8444e41230eab84f81782">is_out_of_range</a> (const uint8_t *ptr) const</td></tr>
+<tr class="memdesc:a9f69ddf1d4a8444e41230eab84f81782"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the given pointer is outside of the range of the data buffer. <br /></td></tr>
+<tr class="separator:a9f69ddf1d4a8444e41230eab84f81782"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10ad25b2533bc7f859714e9b25a129a1"><td class="memItemLeft" align="right" valign="top"><a id="a10ad25b2533bc7f859714e9b25a129a1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_out_of_range</b> (const uint8_t *ptr, size_t size) const</td></tr>
+<tr class="separator:a10ad25b2533bc7f859714e9b25a129a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a337cdee55d0e10163cb3c796b33738fe"><td class="memItemLeft" align="right" valign="top"><a id="a337cdee55d0e10163cb3c796b33738fe"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_out_of_range</b> (std::string_view sv) const</td></tr>
 <tr class="separator:a337cdee55d0e10163cb3c796b33738fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,9 +97,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a040d7a1d8f53f0ff767bd2e877afffd9"><td class="memItemLeft" align="right" valign="top"><a id="a040d7a1d8f53f0ff767bd2e877afffd9"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>path</b></td></tr>
 <tr class="separator:a040d7a1d8f53f0ff767bd2e877afffd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af53aec77079566283c715d5d5cd3fc37"><td class="memItemLeft" align="right" valign="top"><a id="af53aec77079566283c715d5d5cd3fc37"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> = nullptr</td></tr>
-<tr class="separator:af53aec77079566283c715d5d5cd3fc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66024eba06aeaa8e205942403f2f6ec4"><td class="memItemLeft" align="right" valign="top"><a id="a66024eba06aeaa8e205942403f2f6ec4"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> = nullptr</td></tr>
+<tr class="separator:a66024eba06aeaa8e205942403f2f6ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a484acf622dcb8a133ee52a9a669c1308"><td class="memItemLeft" align="right" valign="top"><a id="a484acf622dcb8a133ee52a9a669c1308"></a>
 size_t&#160;</td><td class="memItemRight" valign="bottom"><b>sizeInBytes</b> = 0</td></tr>
 <tr class="separator:a484acf622dcb8a133ee52a9a669c1308"><td class="memSeparator" colspan="2">&#160;</td></tr>

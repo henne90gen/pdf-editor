@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['bmpfileheader_148',['BmpFileHeader',['../structpdf_1_1BmpFileHeader.html',1,'pdf']]],
-  ['bmpinfoheader_149',['BmpInfoHeader',['../structpdf_1_1BmpInfoHeader.html',1,'pdf']]],
-  ['boolean_150',['Boolean',['../structpdf_1_1Boolean.html',1,'pdf']]]
+  ['bmpfileheader_149',['BmpFileHeader',['../structpdf_1_1BmpFileHeader.html',1,'pdf']]],
+  ['bmpinfoheader_150',['BmpInfoHeader',['../structpdf_1_1BmpInfoHeader.html',1,'pdf']]],
+  ['boolean_151',['Boolean',['../structpdf_1_1Boolean.html',1,'pdf']]]
 ];
