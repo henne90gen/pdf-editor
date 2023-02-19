@@ -58,7 +58,7 @@ class ContentArea : public ScrolledZoomedContent {
     void update_hovered_byte(double x, double y);
 
     int find_byte(double x, double y) const;
-    void highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t length, double r,
+    void highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const uint8_t *startPtr, size_t length, double r,
                          double g, double b) const;
     static void highlight_byte(const Cairo::RefPtr<Cairo::Context> &cr, int byte, double r, double g, double b);
 };

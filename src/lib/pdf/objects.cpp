@@ -100,12 +100,12 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::decode(Allocator &allocator) {
+std::string_view Stream::decode(Arena &arena) {
     if (decodedStream != nullptr) {
-        return {decodedStream, decodedStreamSize};
+        return {(char *)decodedStream, decodedStreamSize};
     }
 
-    char *output      = const_cast<char *>(streamData.data());
+    auto *output      = (uint8_t *)const_cast<char *>(streamData.data());
     size_t outputSize = streamData.length();
 
     auto fs = filters();
@@ -118,13 +118,12 @@ std::string_view Stream::decode(Allocator &allocator) {
             // FIXME implement handling of "DecodeParms" from stream dictionary
             //  Example values: Predictor=12, Columns=4
 
-            char *input      = output;
+            auto *input      = output;
             size_t inputSize = outputSize;
 
-            outputSize = inputSize;
-            output = (char *)malloc(outputSize);
-            std::vector<const char *> outputs = {};
-            outputs.push_back(output);
+            Arena tempArena         = {};
+            output                  = tempArena.push(outputSize);
+            const auto *firstOutput = output;
 
             z_stream infstream;
             infstream.zalloc    = Z_NULL;
@@ -143,21 +142,17 @@ std::string_view Stream::decode(Allocator &allocator) {
                     break;
                 }
 
-                output = (char *)malloc(outputSize);
+                output              = tempArena.push(outputSize);
                 infstream.avail_out = (uInt)outputSize;
                 infstream.next_out  = (Bytef *)output;
-                outputs.push_back(output);
             }
 
             inflateEnd(&infstream);
 
             // copy the result into a buffer that fits exactly
-            char *tmp = allocator.allocate_chunk(infstream.total_out);
-            for (size_t i = 0; i < outputs.size(); i++) {
-                const char *ptr = outputs[i];
-                memcpy(tmp + i * outputSize, ptr, outputSize);
-                free((void *)ptr);
-            }
+            auto *tmp = arena.push(infstream.total_out);
+            // NOTE the arena allocator allocates contiguous memory, which is why this works
+            memcpy(tmp, firstOutput, infstream.total_out);
 
             output = tmp;
 
@@ -172,7 +167,7 @@ std::string_view Stream::decode(Allocator &allocator) {
     decodedStream     = output;
     decodedStreamSize = outputSize;
 
-    return {output, outputSize};
+    return {(char *)output, outputSize};
 }
 
 void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
@@ -209,20 +204,20 @@ void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, 
     }
 }
 
-void Stream::encode(Allocator &allocator, const std::string &data) {
+void Stream::encode(Arena &arena, const std::string &data) {
     const char *encodedData = nullptr;
     size_t encodedDataSize  = 0;
     deflate_buffer(data.data(), data.size(), encodedData, encodedDataSize);
 
-    auto newStreamData = allocator.allocate_chunk(encodedDataSize);
+    auto newStreamData = arena.push(encodedDataSize);
     memcpy(newStreamData, encodedData, encodedDataSize);
     free((void *)encodedData);
 
-    streamData                   = std::string_view(newStreamData, encodedDataSize);
-    dictionary->values["Length"] = allocator.allocate<Integer>(encodedDataSize);
+    streamData                   = std::string_view((char *)newStreamData, encodedDataSize);
+    dictionary->values["Length"] = arena.push<Integer>(encodedDataSize);
 }
 
-Stream *Stream::create_from_unencoded_data(Allocator &allocator,
+Stream *Stream::create_from_unencoded_data(Arena &arena,
                                            const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                            std::string_view unencodedData) {
     const char *encodedData = nullptr;
@@ -233,16 +228,16 @@ Stream *Stream::create_from_unencoded_data(Allocator &allocator,
     for (const auto &entry : additionalDictionaryEntries) {
         dict[entry.first] = entry.second;
     }
-    dict["Length"] = allocator.allocate<Integer>(encodedDataSize);
-    dict["Filter"] = allocator.allocate<Name>("FlateDecode");
+    dict["Length"] = arena.push<Integer>(encodedDataSize);
+    dict["Filter"] = arena.push<Name>("FlateDecode");
 
     // TODO this might be inefficient: maybe place the stream data after the stream object into the allocator
-    auto streamData = allocator.allocate_chunk(encodedDataSize);
+    auto streamData = arena.push(encodedDataSize);
     std::memcpy(streamData, encodedData, encodedDataSize);
     std::free((void *)encodedData);
 
-    auto dictionary = Dictionary::create(allocator, dict);
-    return allocator.allocate<Stream>(dictionary, std::string_view(streamData, encodedDataSize));
+    auto dictionary = arena.push<Dictionary>(dict);
+    return arena.push<Stream>(dictionary, std::string_view((char *)streamData, encodedDataSize));
 }
 
 std::string HexadecimalString::to_string() const {

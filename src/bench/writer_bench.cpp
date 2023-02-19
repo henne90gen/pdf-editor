@@ -6,9 +6,9 @@ static void BM_Blank(benchmark::State &state) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
     for (auto _ : state) {
-        char *buffer = nullptr;
-        size_t size  = 0;
-        auto result  = document.write_to_memory(buffer, size);
+        uint8_t *buffer = nullptr;
+        size_t size     = 0;
+        auto result     = document.write_to_memory(buffer, size);
         benchmark::DoNotOptimize(result);
     }
 }
@@ -18,9 +18,9 @@ static void BM_HelloWorld(benchmark::State &state) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
     for (auto _ : state) {
-        char *buffer = nullptr;
-        size_t size  = 0;
-        auto result  = document.write_to_memory(buffer, size);
+        uint8_t *buffer = nullptr;
+        size_t size     = 0;
+        auto result     = document.write_to_memory(buffer, size);
         benchmark::DoNotOptimize(result);
     }
 }

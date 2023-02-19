@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "pdf/lexer.h"
-#include "pdf/memory/allocator.h"
+#include "pdf/memory/arena_allocator.h"
 #include "pdf/objects.h"
 #include "pdf/util/debug.h"
 
@@ -24,14 +24,14 @@ struct NoopReferenceResolver : public ReferenceResolver {
 
 struct Parser {
     Lexer &lexer;
-    Allocator &allocator;
+    Arena &arena;
     ReferenceResolver *referenceResolver;
 
     std::vector<Token> tokens = {};
     size_t currentTokenIdx    = 0;
 
-    explicit Parser(Lexer &_lexer, Allocator &_allocator);
-    explicit Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver);
+    explicit Parser(Lexer &_lexer, Arena &_arena);
+    explicit Parser(Lexer &_lexer, Arena &_arena, ReferenceResolver *_referenceResolver);
 
     Object *parse();
 

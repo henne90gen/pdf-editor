@@ -4,7 +4,7 @@
 
 #include "pdf/lexer.h"
 #include "pdf/objects.h"
-#include "pdf/memory/allocator.h"
+#include "pdf/memory/arena_allocator.h"
 
 namespace pdf {
 
@@ -19,11 +19,11 @@ struct CMap {
 
 struct CMapParser {
     Lexer &lexer;
-    Allocator &allocator;
+    Arena &arena;
     size_t currentTokenIdx    = 0;
     std::vector<Token> tokens = {};
 
-    explicit CMapParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
+    explicit CMapParser(Lexer &_lexer, Arena &_arena) : lexer(_lexer), arena(_arena) {}
 
     /// Attempts to parse a CMap from the given lexer
     CMap *parse(); // TODO maybe return by value instead of a pointer
@@ -39,7 +39,7 @@ struct CMapParser {
 };
 
 struct CMapStream : public Stream {
-    std::optional<CMap *> read_cmap(Allocator &allocator);
+    std::optional<CMap *> read_cmap(Arena &arena);
 };
 
 } // namespace pdf

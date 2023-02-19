@@ -191,7 +191,7 @@ Result Document::write_to_file(const std::string &filePath) {
     return write_to_stream(*this, os);
 }
 
-Result Document::write_to_memory(char *&buffer, size_t &size) {
+Result Document::write_to_memory(uint8_t *&buffer, size_t &size) {
     std::stringstream ss;
     auto error = write_to_stream(*this, ss);
     if (error.has_error()) {
@@ -200,7 +200,7 @@ Result Document::write_to_memory(char *&buffer, size_t &size) {
 
     auto result = ss.str();
     size        = result.size();
-    buffer      = (char *)malloc(size);
+    buffer      = (uint8_t *)malloc(size);
     memcpy(buffer, result.data(), size);
     return Result::ok();
 }

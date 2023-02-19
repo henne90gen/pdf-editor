@@ -20,10 +20,9 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::Parser(lexer, allocator);
-    auto result = parser.parse();
+    auto arena        = pdf::Arena();
+    auto parser       = pdf::Parser(lexer, arena);
+    auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
     func(result->as<T>());
@@ -34,10 +33,9 @@ void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceR
                                        std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::Parser(lexer, allocator, referenceResolver);
-    auto result = parser.parse();
+    auto arena        = pdf::Arena();
+    auto parser       = pdf::Parser(lexer, arena, referenceResolver);
+    auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
     func(result->as<T>());
@@ -225,9 +223,8 @@ TEST(Parser, CatalogDict) {
 TEST(Parser, MultipleObjects) {
     auto textProvider = pdf::StringTextProvider("5\n 6 7");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::Parser(lexer, allocator);
+    auto arena        = pdf::Arena();
+    auto parser       = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -258,10 +255,9 @@ TEST(Parser, IndirectObject1) {
           "Builder 1.0 \"/>\r    <rdf:Description xmlns:pdfaid=\"http://www.aiim.org/pdfa/ns/id/\" rdf:about=\"\" "
           "pdfaid:part=\"2\" pdfaid:conformance=\"B\"/>\r  </rdf:RDF>\r</x:xmpmeta>\r<?xpacket "
           "end='w'?>\rendstream\nendobj");
-    auto lexer     = pdf::TextLexer(textProvider);
-    auto allocator = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::Parser(lexer, allocator);
+    auto lexer  = pdf::TextLexer(textProvider);
+    auto arena  = pdf::Arena();
+    auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);

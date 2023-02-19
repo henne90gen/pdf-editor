@@ -38,8 +38,8 @@ TEST(Text, Move) {
         textBlocks[0].move(document, 10, 500);
     }
 
-    char *buffer = nullptr;
-    size_t size  = 0;
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
 
     pdf::Document newDocument;

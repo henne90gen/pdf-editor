@@ -24,6 +24,7 @@ add_library(pdf
         pdf/renderer.cpp
         pdf/operator_traverser.cpp
         pdf/memory/allocator.cpp
+        pdf/memory/arena_allocator.cpp
         pdf/hash/hex_string.cpp
         pdf/hash/md5.cpp
         pdf/hash/sha1.cpp)

@@ -5,9 +5,9 @@
 
 #include "pdf/font.h"
 #include "pdf/image.h"
+#include "pdf/memory/arena_allocator.h"
 #include "pdf/objects.h"
 #include "pdf/parser.h"
-#include "pdf/memory/allocator.h"
 
 namespace pdf {
 
@@ -80,18 +80,21 @@ struct DocumentFileMetadata {
 
 struct DocumentFile {
     std::string path;
-    char *data                    = nullptr;
+    uint8_t *data                 = nullptr;
     size_t sizeInBytes            = 0;
     int64_t lastCrossRefStart     = {};
     Trailer trailer               = {};
     DocumentFileMetadata metadata = {};
 
     /// Points to the byte right after the end of the data buffer
-    char *end_ptr() const { return data + sizeInBytes; }
+    uint8_t *end_ptr() const { return data + sizeInBytes; }
     /// Returns true if the given pointer is outside of the range of the data buffer
-    bool is_out_of_range(const char *ptr) const { return ptr < data || ptr >= end_ptr(); }
-    bool is_out_of_range(const char *ptr, size_t size) const { return ptr < data || ptr + size >= end_ptr(); }
-    bool is_out_of_range(std::string_view sv) const { return sv.data() < data || sv.data() + sv.size() >= end_ptr(); }
+    bool is_out_of_range(const uint8_t *ptr) const { return ptr < data || ptr >= end_ptr(); }
+    bool is_out_of_range(const uint8_t *ptr, size_t size) const { return ptr < data || ptr + size >= end_ptr(); }
+    bool is_out_of_range(std::string_view sv) const {
+        return reinterpret_cast<const uint8_t *>(sv.data()) < data ||
+               reinterpret_cast<const uint8_t *>(sv.data()) + sv.size() >= end_ptr();
+    }
 };
 
 struct ReadMetadata {
@@ -100,7 +103,7 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    Allocator allocator                                       = {};
+    Arena arena                                               = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -157,11 +160,12 @@ struct Document : public ReferenceResolver {
     /// Writes the PDF-document to the given filePath
     [[nodiscard]] Result write_to_file(const std::string &filePath);
     /// Writes the PDF-document to a newly allocated buffer
-    [[nodiscard]] Result write_to_memory(char *&buffer, size_t &size);
+    /// TODO think about who owns the memory
+    [[nodiscard]] Result write_to_memory(uint8_t *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath
     static Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
     /// Reads the PDF-document from the given buffer
-    static Result read_from_memory(char *buffer, size_t size, Document &document, bool loadAllObjects = true);
+    static Result read_from_memory(const uint8_t *buffer, size_t size, Document &document, bool loadAllObjects = true);
 
     /// Deletes the page with the given page number
     Result delete_page(size_t pageNum);

@@ -9,7 +9,7 @@ void OperatorTraverser::traverse() {
     ASSERT(!streams.empty());
     for (auto s : streams) {
         currentContentStream = s;
-        s->for_each_operator(page.document.allocator, [this](Operator *op) {
+        s->for_each_operator(page.document.arena, [this](Operator *op) {
             apply_operator(op);
             return ForEachResult::CONTINUE;
         });

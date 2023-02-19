@@ -130,12 +130,13 @@ std::string format_bytes(size_t bytes) {
 }
 
 void DebugWindow::update_memory_usage_label() {
-    auto totalBytesUsed      = format_bytes(document.allocator.total_bytes_used());
-    auto totalBytesAllocated = format_bytes(document.allocator.total_bytes_allocated());
-    auto numAllocations      = std::to_string(document.allocator.num_allocations());
-    auto text = totalBytesUsed + " bytes used / " + totalBytesAllocated + " bytes allocated (" + numAllocations +
-                " allocations)";
-    memoryUsageLabel->set_text(text);
+    // TODO update this to show stats of the new arena allocator
+    // auto totalBytesUsed      = format_bytes(document.arena.total_bytes_used());
+    // auto totalBytesAllocated = format_bytes(document.arena.total_bytes_allocated());
+    // auto numAllocations      = std::to_string(document.arena.num_allocations());
+    // auto text = totalBytesUsed + " bytes used / " + totalBytesAllocated + " bytes allocated (" + numAllocations +
+    //             " allocations)";
+    // memoryUsageLabel->set_text(text);
 }
 
 void DebugWindow::update_details_label(pdf::Object *object) {
@@ -168,7 +169,7 @@ void DebugWindow::update_details_label(pdf::Object *object) {
         break;
     case pdf::Object::Type::STREAM: {
         auto stream = object->as<pdf::Stream>();
-        auto str    = std::string(stream->decode(document.allocator));
+        auto str    = std::string(stream->decode(document.arena));
         detailsLabel->set_text(str);
     } break;
     case pdf::Object::Type::NULL_OBJECT:

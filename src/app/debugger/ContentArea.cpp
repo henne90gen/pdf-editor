@@ -46,7 +46,7 @@ void ContentArea::highlight_trailer(const Cairo::RefPtr<Cairo::Context> &cr) con
     }
 
     for (const auto &entry : document.file.metadata.trailers) {
-        highlight_range(cr, entry.second.data(), entry.second.size(), 0, 0, 1);
+        highlight_range(cr, (uint8_t *)entry.second.data(), entry.second.size(), 0, 0, 1);
     }
 }
 
@@ -65,7 +65,7 @@ void ContentArea::highlight_objects(const Cairo::RefPtr<Cairo::Context> &cr) con
         double r = dist(engine);
         double g = dist(engine);
         double b = dist(engine);
-        highlight_range(cr, entry.second.data.data(), entry.second.data.size(), r, g, b);
+        highlight_range(cr, (uint8_t *)entry.second.data.data(), entry.second.data.size(), r, g, b);
     }
 }
 
@@ -100,7 +100,7 @@ void ContentArea::draw_text(const Cairo::RefPtr<Cairo::Context> &cr) const {
     }
 }
 
-void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const char *startPtr, size_t lengthIn,
+void ContentArea::highlight_range(const Cairo::RefPtr<Cairo::Context> &cr, const uint8_t *startPtr, size_t lengthIn,
                                   double r, double g, double b) const {
     cr->set_source_rgb(r, g, b);
 

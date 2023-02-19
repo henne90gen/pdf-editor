@@ -8,11 +8,11 @@ namespace pdf {
 
 NoopReferenceResolver GlobalNoopReferenceResolver = {};
 
-Parser::Parser(Lexer &_lexer, Allocator &_allocator)
-    : lexer(_lexer), allocator(_allocator), referenceResolver(&GlobalNoopReferenceResolver) {}
+Parser::Parser(Lexer &_lexer, Arena &_arena)
+    : lexer(_lexer), arena(_arena), referenceResolver(&GlobalNoopReferenceResolver) {}
 
-Parser::Parser(Lexer &_lexer, Allocator &_allocator, ReferenceResolver *_referenceResolver)
-    : lexer(_lexer), allocator(_allocator), referenceResolver(_referenceResolver) {}
+Parser::Parser(Lexer &_lexer, Arena &_arena, ReferenceResolver *_referenceResolver)
+    : lexer(_lexer), arena(_arena), referenceResolver(_referenceResolver) {}
 
 bool Parser::ensure_tokens_have_been_lexed() {
     if (currentTokenIdx < tokens.size()) {
@@ -56,7 +56,7 @@ Boolean *Parser::parse_boolean() {
         // TODO add logging
         return nullptr;
     }
-    return allocator.allocate<Boolean>(value);
+    return arena.push<Boolean>(value);
 }
 
 Integer *Parser::parse_integer() {
@@ -69,7 +69,7 @@ Integer *Parser::parse_integer() {
         // TODO is this conversion to a string really necessary?
         int64_t value = std::stoll(std::string(content));
         currentTokenIdx++;
-        return allocator.allocate<Integer>(value);
+        return arena.push<Integer>(value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -88,7 +88,7 @@ Real *Parser::parse_real() {
         // TODO is this conversion to a string really necessary?
         double value = std::stod(std::string(content));
         currentTokenIdx++;
-        return allocator.allocate<Real>(value);
+        return arena.push<Real>(value);
     } catch (std::invalid_argument &) {
         // TODO add logging
     } catch (std::out_of_range &) {
@@ -103,7 +103,7 @@ Null *Parser::parse_null_object() {
     }
 
     currentTokenIdx++;
-    return allocator.allocate<Null>();
+    return arena.push<Null>();
 }
 
 LiteralString *Parser::parse_literal_string() {
@@ -113,7 +113,7 @@ LiteralString *Parser::parse_literal_string() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<LiteralString>(std::string(content.substr(1, content.size() - 2)));
+    return arena.push<LiteralString>(std::string(content.substr(1, content.size() - 2)));
 }
 
 HexadecimalString *Parser::parse_hexadecimal_string() {
@@ -123,7 +123,7 @@ HexadecimalString *Parser::parse_hexadecimal_string() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<HexadecimalString>(std::string(content.substr(1, content.size() - 2)));
+    return arena.push<HexadecimalString>(std::string(content.substr(1, content.size() - 2)));
 }
 
 Name *Parser::parse_name() {
@@ -133,7 +133,7 @@ Name *Parser::parse_name() {
 
     auto content = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    return allocator.allocate<Name>(std::string(content.substr(1)));
+    return arena.push<Name>(std::string(content.substr(1)));
 }
 
 Array *Parser::parse_array() {
@@ -166,7 +166,7 @@ Array *Parser::parse_array() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent.data(), dataLength);
-    return allocator.allocate<Array>(objects);
+    return arena.push<Array>(objects);
 }
 
 void Parser::ignore_new_line_tokens() {
@@ -205,7 +205,7 @@ Dictionary *Parser::parse_dictionary() {
     }
 
     currentTokenIdx++;
-    return allocator.allocate<Dictionary>(std::move(objects));
+    return arena.push<Dictionary>(std::move(objects));
 }
 
 IndirectReference *Parser::parse_indirect_reference() {
@@ -222,7 +222,7 @@ IndirectReference *Parser::parse_indirect_reference() {
         const size_t pos2              = content.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(content.substr(pos1 + 1, pos2)));
         currentTokenIdx++;
-        return allocator.allocate<IndirectReference>(objectNumber, generationNumber);
+        return arena.push<IndirectReference>(objectNumber, generationNumber);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -267,7 +267,7 @@ IndirectObject *Parser::parse_indirect_object() {
         auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
         auto dataLength = tokenDiff + lastTokenContent.size();
         auto data       = std::string_view(objectStartContent.data(), dataLength);
-        return allocator.allocate<IndirectObject>(objectNumber, generationNumber, object);
+        return arena.push<IndirectObject>(objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
         // TODO add logging
     } catch (std::invalid_argument &err) {
@@ -347,7 +347,7 @@ Object *Parser::parse_stream_or_dictionary() {
     auto tokenDiff  = lastTokenContent.data() - objectStartContent;
     auto dataLength = tokenDiff + lastTokenContent.size();
     auto data       = std::string_view(objectStartContent, dataLength);
-    return allocator.allocate<Stream>(dictionary, streamData);
+    return arena.push<Stream>(dictionary, streamData);
 }
 
 Object *Parser::parse() {

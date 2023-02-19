@@ -166,7 +166,7 @@ Operator *OperatorParser::create_operator_TJ(Operator *result) {
     const auto last  = first + objectCount + 1;
     const auto ts    = std::vector<Token>(first, last);
     auto l           = TokenLexer(ts);
-    auto p           = Parser(l, allocator);
+    auto p           = Parser(l, arena);
     auto arr         = p.parse()->as<Array>();
 
     ASSERT(arr != nullptr);
@@ -202,7 +202,7 @@ Operator *OperatorParser::create_operator_Tm(Operator *result) {
 }
 
 Operator *OperatorParser::create_operator_Tj(Operator *result) {
-    result->data.Tj_ShowTextString.string = allocator.allocate<LiteralString>(operand<std::string>(0));
+    result->data.Tj_ShowTextString.string = arena.push<LiteralString>(operand<std::string>(0));
     return result;
 }
 
@@ -295,7 +295,7 @@ Operator *OperatorParser::create_operator_gs(Operator *result) {
 
 Operator *OperatorParser::create_operator_Do(Operator *result) {
     auto name                         = operand<std::string>(0);
-    result->data.Do_PaintXObject.name = allocator.allocate<Name>(name);
+    result->data.Do_PaintXObject.name = arena.push<Name>(name);
     return result;
 }
 
@@ -490,7 +490,7 @@ Operator *OperatorParser::create_operator_EMC(Operator *result) {
 }
 
 Operator *OperatorParser::create_operator(Operator::Type type, std::string_view content) {
-    auto result = allocator.allocate<Operator>(type, content);
+    auto result = arena.push<Operator>(type, content);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
         type == Operator::Type::W_ModifyClippingPathUsingNonZeroWindingNumberRule ||
         type == Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule ||

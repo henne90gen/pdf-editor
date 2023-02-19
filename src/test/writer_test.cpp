@@ -33,8 +33,8 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
 
-    char *buffer = nullptr;
-    size_t size  = 0;
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
@@ -52,8 +52,8 @@ TEST(Writer, Embed) {
 
     ASSERT_FALSE(document.write_to_file("test.pdf").has_error());
 
-    char *buffer = nullptr;
-    size_t size  = 0;
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
@@ -76,9 +76,9 @@ TEST(Writer, Embed) {
 TEST(Writer, Header) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
-    char *buffer = nullptr;
-    size_t size  = 0;
-    auto error   = document.write_to_memory(buffer, size);
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
+    auto error      = document.write_to_memory(buffer, size);
     ASSERT_FALSE(error.has_error());
     // %PDF-1.6\n%äüöß\n
     ASSERT_BUFFER_CONTAINS_AT(buffer, 0, "%PDF-1.6\n%\xC3\xA4\xC3\xBC\xC3\xB6\xC3\x9F\n");
@@ -87,9 +87,9 @@ TEST(Writer, Header) {
 TEST(Writer, Objects) {
     pdf::Document document;
     pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
-    char *buffer = nullptr;
-    size_t size  = 0;
-    auto error   = document.write_to_memory(buffer, size);
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
+    auto error      = document.write_to_memory(buffer, size);
     ASSERT_FALSE(error.has_error());
     ASSERT_BUFFER_CONTAINS_AT(buffer, 19, "8 0 obj");
 }

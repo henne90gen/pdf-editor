@@ -18,9 +18,8 @@ void assertNextOp(pdf::OperatorParser &parser, pdf::Operator::Type type) {
 TEST(OperationParser, Simple) {
     auto textProvider = pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nQ ");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::OperatorParser(lexer, allocator);
+    auto arena        = pdf::Arena();
+    auto parser       = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState);
@@ -39,10 +38,9 @@ TEST(OperationParser, HelloWorld) {
     auto textProvider =
           pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nq 0 0 0 rg\nBT\n56.8 724.1 Td /F1 12 "
                                   "Tf[<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ\nET\nQ\nQ ");
-    auto lexer     = pdf::TextLexer(textProvider);
-    auto allocator = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::OperatorParser(lexer, allocator);
+    auto lexer  = pdf::TextLexer(textProvider);
+    auto arena  = pdf::Arena();
+    auto parser = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState);
@@ -98,15 +96,15 @@ TEST(OperationParser, HelloWorld) {
 TEST(OperationParser, Content) {
     auto textProvider = pdf::StringTextProvider("0.1 w\nq 0 0.028 611.971 791.971 re\nW* n\nQ ");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto allocator    = pdf::Allocator();
-    allocator.init(1000);
-    auto parser = pdf::OperatorParser(lexer, allocator);
+    auto arena        = pdf::Arena();
+    auto parser       = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth, [](auto op) { ASSERT_EQ(op->content, "0.1 w"); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState, [](auto op) { ASSERT_EQ(op->content, "q"); });
-    assertNextOp(parser, pdf::Operator::Type::re_AppendRectangle, [](auto op) {
-        ASSERT_EQ(op->content, "0 0.028 611.971 791.971 re");
-    });
-    assertNextOp(parser, pdf::Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule, [](auto op) { ASSERT_EQ(op->content, "W*"); });
-    assertNextOp(parser, pdf::Operator::Type::n_EndPathWithoutFillingOrStroking, [](auto op) { ASSERT_EQ(op->content, "n"); });
+    assertNextOp(parser, pdf::Operator::Type::re_AppendRectangle,
+                 [](auto op) { ASSERT_EQ(op->content, "0 0.028 611.971 791.971 re"); });
+    assertNextOp(parser, pdf::Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule,
+                 [](auto op) { ASSERT_EQ(op->content, "W*"); });
+    assertNextOp(parser, pdf::Operator::Type::n_EndPathWithoutFillingOrStroking,
+                 [](auto op) { ASSERT_EQ(op->content, "n"); });
     assertNextOp(parser, pdf::Operator::Type::Q_PopGraphicsState, [](auto op) { ASSERT_EQ(op->content, "Q"); });
 }

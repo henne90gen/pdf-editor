@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include "pdf/memory/allocator.h"
+#include "pdf/memory/arena_allocator.h"
 #include "pdf/util/debug.h"
 
 namespace pdf {
@@ -39,7 +39,6 @@ struct Object {
     Type type;
 
     explicit Object(Type _type) : type(_type) {}
-    virtual ~Object() = default;
 
     static Type staticType() { return Type::OBJECT; }
     template <typename T> T *as() {
@@ -112,9 +111,6 @@ struct Dictionary : public Object {
     static Type staticType() { return Type::DICTIONARY; }
     explicit Dictionary(std::unordered_map<std::string, Object *> &map)
         : Object(staticType()), values(std::move(map)) {}
-    static Dictionary *create(Allocator &allocator, std::unordered_map<std::string, Object *> &dict) {
-        return allocator.allocate<Dictionary>(dict);
-    }
 
     template <typename T> std::optional<T *> find(const std::string &key) {
         auto itr = values.find(key);
@@ -156,20 +152,20 @@ struct Stream : public Object {
     Dictionary *dictionary = nullptr;
     std::string_view streamData;
 
-    const char *decodedStream = nullptr;
-    size_t decodedStreamSize  = 0;
+    const uint8_t *decodedStream = nullptr;
+    size_t decodedStreamSize     = 0;
 
     static Type staticType() { return Type::STREAM; }
     explicit Stream(Dictionary *_dictionary, std::string_view encodedData)
         : Object(staticType()), dictionary(_dictionary), streamData(encodedData) {}
 
     static Stream *
-    create_from_unencoded_data(Allocator &allocator,
+    create_from_unencoded_data(Arena &arena,
                                const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                std::string_view unencodedData);
 
-    [[nodiscard]] std::string_view decode(Allocator &allocator);
-    void encode(Allocator &allocator, const std::string &data);
+    [[nodiscard]] std::string_view decode(Arena &arena);
+    void encode(Arena &arena, const std::string &data);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

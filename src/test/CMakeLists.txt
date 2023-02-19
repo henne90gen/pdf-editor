@@ -21,6 +21,7 @@ function(create_test test_name)
     gtest_discover_tests(${test_name})
 endfunction()
 
+create_test(allocator_test)
 create_test(cmap_parser_test)
 create_test(image_test)
 create_test(lexer_test)

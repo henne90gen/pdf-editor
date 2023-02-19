@@ -6,7 +6,7 @@
 TEST(Reader, Blank) {
     pdf::Document document;
     auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
-    ASSERT_FALSE(result.has_error());
+    ASSERT_FALSE(result.has_error()) << result.message();
 
     std::vector<pdf::IndirectObject *> objects = document.objects();
     ASSERT_EQ(objects.size(), 8);
@@ -23,7 +23,7 @@ TEST(Reader, Blank) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.allocator);
+    auto str    = stream->decode(document.arena);
     ASSERT_EQ(str.size(), 42);
 }
 
@@ -45,7 +45,7 @@ TEST(Reader, HelloWorldGeneral) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.allocator);
+    auto str    = stream->decode(document.arena);
     ASSERT_EQ(str.size(), 139);
 }
 
@@ -136,6 +136,6 @@ TEST(Reader, ObjectStream) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.allocator);
+    auto str    = stream->decode(document.arena);
     ASSERT_EQ(str.size(), 117);
 }

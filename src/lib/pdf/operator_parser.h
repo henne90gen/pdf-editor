@@ -6,7 +6,7 @@
 
 #include "pdf/lexer.h"
 #include "pdf/objects.h"
-#include "pdf/memory/allocator.h"
+#include "pdf/memory/arena_allocator.h"
 
 namespace pdf {
 
@@ -164,12 +164,12 @@ std::ostream &operator<<(std::ostream &os, Operator::Type &type);
 
 struct OperatorParser {
     Lexer &lexer;
-    Allocator &allocator;
+    Arena &arena;
     std::vector<Token> tokens   = {};
     size_t currentTokenIdx      = 0;
     const char *lastOperatorEnd = nullptr;
 
-    explicit OperatorParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
+    explicit OperatorParser(Lexer &_lexer, Arena &_arena) : lexer(_lexer), arena(_arena) {}
 
     Operator *get_operator();
 

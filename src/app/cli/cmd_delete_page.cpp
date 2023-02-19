@@ -19,15 +19,15 @@ int cmd_delete_page(const DeleteArgs &args) {
         return 1;
     }
 
-    char *buffer;
-    size_t size;
-    result = document.write_to_memory(buffer, size);
+    uint8_t *buffer = nullptr;
+    size_t size     = 0;
+    result          = document.write_to_memory(buffer, size);
     if (result.has_error()) {
         spdlog::error("Failed to save PDF document: {}", result.message());
         return 1;
     }
 
-    auto sv = std::string_view(buffer, size);
+    auto sv = std::string_view((char *)buffer, size);
     std::cout << sv;
     free(buffer);
 

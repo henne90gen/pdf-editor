@@ -8,11 +8,6 @@
 namespace pdf {
 
 Allocator::~Allocator() {
-    for (auto object : objects) {
-        object->~Object();
-    }
-    spdlog::trace("Freed {} objects", objects.size());
-
     size_t allocationsFreed = 0;
     size_t bytesFreed       = 0;
 
