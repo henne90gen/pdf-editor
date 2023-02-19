@@ -8,7 +8,13 @@ namespace pdf {
 
 Arena::Arena() {
     constexpr size_t GB = 1024 * 1024 * 1024;
-    virtualSizeInBytes  = 64 * GB;
+    init(64 * GB);
+}
+
+Arena::Arena(const size_t maximumSizeInBytes) { init(maximumSizeInBytes); }
+
+void Arena::init(size_t maximumSizeInBytes) {
+    virtualSizeInBytes  = maximumSizeInBytes;
     bufferStart         = (uint8_t *)mmap(nullptr, virtualSizeInBytes, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     bufferPosition      = bufferStart;
     reservedSizeInBytes = 0;

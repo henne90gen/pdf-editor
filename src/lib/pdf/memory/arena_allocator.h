@@ -9,12 +9,13 @@ namespace pdf {
 
 struct Arena {
     Arena();
+    explicit Arena(size_t maximumSizeInBytes);
     ~Arena();
 
     /// push a new allocation onto the stack
-    uint8_t *push(const size_t allocationSizeInBytes);
+    uint8_t *push(size_t allocationSizeInBytes);
     /// pop an allocation from the stack
-    void pop(const size_t allocationSizeInBytes);
+    void pop(size_t allocationSizeInBytes);
 
     /// allocates a new object and calls its constructor with the provided arguments
     template <typename T, typename... Args> T *push(Args &&...args) {
@@ -28,6 +29,8 @@ struct Arena {
     uint8_t *bufferPosition    = nullptr;
     size_t virtualSizeInBytes  = 0;
     size_t reservedSizeInBytes = 0;
+
+    void init(size_t maximumSizeInBytes);
 };
 
 } // namespace pdf
