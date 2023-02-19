@@ -1,9 +1,5 @@
 #include "arena_allocator.h"
 
-#include <sys/mman.h>
-
-#include "pdf/util/debug.h"
-
 namespace pdf {
 
 Arena::Arena() {
@@ -11,7 +7,12 @@ Arena::Arena() {
     init(64 * GB);
 }
 
-Arena::Arena(const size_t maximumSizeInBytes) { init(maximumSizeInBytes); }
+Arena::Arena(const size_t maximumSizeInBytes, const size_t pageSize) {
+    this->pageSize = pageSize;
+    init(maximumSizeInBytes);
+}
+
+Arena::~Arena() { munmap(bufferStart, virtualSizeInBytes); }
 
 void Arena::init(size_t maximumSizeInBytes) {
     virtualSizeInBytes  = maximumSizeInBytes;
@@ -20,14 +21,13 @@ void Arena::init(size_t maximumSizeInBytes) {
     reservedSizeInBytes = 0;
 }
 
-Arena::~Arena() { munmap(bufferStart, virtualSizeInBytes); }
-
-uint8_t *Arena::push(const size_t allocationSizeInBytes) {
+uint8_t *Arena::push(size_t allocationSizeInBytes) {
     ASSERT(bufferStart != nullptr);
 
     if (bufferStart + reservedSizeInBytes < bufferPosition + allocationSizeInBytes) {
-        const auto pageCount          = (allocationSizeInBytes / PAGE_SIZE) + 1;
-        const auto allocationIncrease = PAGE_SIZE * pageCount;
+        const auto pageCount          = (allocationSizeInBytes / pageSize) + 1;
+        const auto allocationIncrease = pageSize * pageCount;
+        ASSERT(allocationIncrease + reservedSizeInBytes <= virtualSizeInBytes);
         const auto err = mprotect(bufferStart + reservedSizeInBytes, allocationIncrease, PROT_READ | PROT_WRITE);
         if (err != 0) {
             // TODO handle error
@@ -42,9 +42,8 @@ uint8_t *Arena::push(const size_t allocationSizeInBytes) {
     return result;
 }
 
-void Arena::pop(const size_t allocationSizeInBytes) {
+void Arena::pop(size_t allocationSizeInBytes) {
     ASSERT(bufferStart != nullptr);
-
     bufferPosition -= allocationSizeInBytes;
 }
 

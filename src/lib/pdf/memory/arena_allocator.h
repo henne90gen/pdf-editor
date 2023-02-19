@@ -2,14 +2,17 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <sys/mman.h>
 
-const int PAGE_SIZE = 1024 * 1024; // 1 MB
+#include "pdf/util/debug.h"
 
 namespace pdf {
 
+const size_t ARENA_PAGE_SIZE = 1024 * 1024; // 1 MB
+
 struct Arena {
     Arena();
-    explicit Arena(size_t maximumSizeInBytes);
+    explicit Arena(size_t maximumSizeInBytes, size_t pageSize = ARENA_PAGE_SIZE);
     ~Arena();
 
     /// push a new allocation onto the stack
@@ -24,11 +27,18 @@ struct Arena {
         return new (buf) T(args...);
     }
 
+    /// pops the allocation for an object from the stack
+    template <typename T> void pop() {
+        auto s = sizeof(T);
+        pop(s);
+    }
+
   private:
     uint8_t *bufferStart       = nullptr;
     uint8_t *bufferPosition    = nullptr;
     size_t virtualSizeInBytes  = 0;
     size_t reservedSizeInBytes = 0;
+    size_t pageSize            = ARENA_PAGE_SIZE;
 
     void init(size_t maximumSizeInBytes);
 };

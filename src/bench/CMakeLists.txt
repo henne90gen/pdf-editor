@@ -11,3 +11,6 @@ target_link_libraries(hash_bench
         pdf
         md5_reference
         sha1_reference)
+
+add_executable(allocator_bench allocator_bench.cpp)
+target_link_libraries(allocator_bench benchmark::benchmark pdf)
