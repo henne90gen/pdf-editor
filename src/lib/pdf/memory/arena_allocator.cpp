@@ -47,4 +47,18 @@ void Arena::pop(size_t allocationSizeInBytes) {
     bufferPosition -= allocationSizeInBytes;
 }
 
+void Arena::pop_all() {
+    bufferPosition = bufferStart;
+}
+
+void TemporaryArena::start_using() {
+    ASSERT(!isInUse);
+    isInUse = true;
+}
+
+void TemporaryArena::stop_using() {
+    isInUse = false;
+    arena.pop_all();
+}
+
 } // namespace pdf

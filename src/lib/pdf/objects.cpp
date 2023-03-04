@@ -121,6 +121,7 @@ std::string_view Stream::decode(Arena &arena) {
             auto *input      = output;
             size_t inputSize = outputSize;
 
+            // TODO don't allocate a new arena here, instead use an existing one.
             Arena tempArena         = {};
             output                  = tempArena.push(outputSize);
             const auto *firstOutput = output;

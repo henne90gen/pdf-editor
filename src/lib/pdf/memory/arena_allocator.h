@@ -15,19 +15,21 @@ struct Arena {
     explicit Arena(size_t maximumSizeInBytes, size_t pageSize = ARENA_PAGE_SIZE);
     ~Arena();
 
-    /// push a new allocation onto the stack
+    /// push a new allocation into the arena
     uint8_t *push(size_t allocationSizeInBytes);
-    /// pop an allocation from the stack
+    /// pop an allocation from the arena
     void pop(size_t allocationSizeInBytes);
+    /// pops all allocations from the arena
+    void pop_all();
 
-    /// allocates a new object and calls its constructor with the provided arguments
+    /// allocates a new object in the arena and calls its constructor with the provided arguments
     template <typename T, typename... Args> T *push(Args &&...args) {
         auto s   = sizeof(T);
         auto buf = push(s);
         return new (buf) T(args...);
     }
 
-    /// pops the allocation for an object from the stack
+    /// pops the allocation for an object from the arena
     template <typename T> void pop() {
         auto s = sizeof(T);
         pop(s);
@@ -41,6 +43,14 @@ struct Arena {
     size_t pageSize            = ARENA_PAGE_SIZE;
 
     void init(size_t maximumSizeInBytes);
+};
+
+struct TemporaryArena {
+    Arena arena  = {};
+    bool isInUse = false;
+
+    void start_using();
+    void stop_using();
 };
 
 } // namespace pdf

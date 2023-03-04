@@ -13,8 +13,9 @@ static void BM_ArenaCreate(benchmark::State &state) {
 BENCHMARK(BM_ArenaCreate)->Range(2, 1024);
 
 static void BM_ArenaAllocate(benchmark::State &state) {
-    size_t pageSize           = 1024 * 1024 * 1024;
-    size_t maximumSizeInBytes = 1024L * 1024L * 1024L * 1024L;
+    size_t MB                 = 1024 * 1024;                   // 1 MB
+    size_t pageSize           = 5 * MB;                        // 5 MB
+    size_t maximumSizeInBytes = 1024L * 1024L * 1024L * 1024L; // 1 TB
     auto arena                = pdf::Arena(maximumSizeInBytes, pageSize);
     for (auto _ : state) {
         const auto buf = arena.push(state.range(0));
