@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: Member List</title>
+<title>PDF Editor: pdf::TemporaryArena Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,26 +62,42 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1Arena.html">Arena</a></li>  </ul>
+<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structpdf_1_1TemporaryArena-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">pdf::Arena Member List</div>  </div>
+<div class="title">pdf::TemporaryArena Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>This is the complete list of members for <a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a>, including all inherited members.</p>
-<table class="directory">
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>Arena</b>() (defined in <a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a>)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>Arena</b>(size_t maximumSizeInBytes, size_t pageSize=ARENA_PAGE_SIZE) (defined in <a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a>)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"><span class="mlabel">explicit</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structpdf_1_1Arena.html#aba8ccd9513aff4fbaa3d50f52d61a2b7">pop</a>(size_t allocationSizeInBytes)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="structpdf_1_1Arena.html#a1eb64f5fe6af2c8bd9dc8c9a5888e21d">pop</a>()</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structpdf_1_1Arena.html#a528b2c800b5007a6017d98f9f3d1fadb">pop_all</a>()</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd">push</a>(size_t allocationSizeInBytes)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structpdf_1_1Arena.html#a009c18304dfd0a68648af76140d14722">push</a>(Args &amp;&amp;...args)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>~Arena</b>() (defined in <a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a>)</td><td class="entry"><a class="el" href="structpdf_1_1Arena.html">pdf::Arena</a></td><td class="entry"></td></tr>
-</table></div><!-- contents -->
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a7aed0e4578e4c08493216ea305a1d54d"><td class="memItemLeft" align="right" valign="top"><a id="a7aed0e4578e4c08493216ea305a1d54d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>start_using</b> ()</td></tr>
+<tr class="separator:a7aed0e4578e4c08493216ea305a1d54d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33dc7c147332486c9851c54d437e89b9"><td class="memItemLeft" align="right" valign="top"><a id="a33dc7c147332486c9851c54d437e89b9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>stop_using</b> ()</td></tr>
+<tr class="separator:a33dc7c147332486c9851c54d437e89b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a91b87b63d69558925385778f73cc556a"><td class="memItemLeft" align="right" valign="top"><a id="a91b87b63d69558925385778f73cc556a"></a>
+<a class="el" href="structpdf_1_1Arena.html">Arena</a>&#160;</td><td class="memItemRight" valign="bottom"><b>arena</b> = {}</td></tr>
+<tr class="separator:a91b87b63d69558925385778f73cc556a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbbbdf3cc617142e1e300564a9441e99"><td class="memItemLeft" align="right" valign="top"><a id="afbbbdf3cc617142e1e300564a9441e99"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isInUse</b> = false</td></tr>
+<tr class="separator:afbbbdf3cc617142e1e300564a9441e99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<hr/>The documentation for this struct was generated from the following files:<ul>
+<li>src/lib/pdf/memory/<a class="el" href="arena__allocator_8h_source.html">arena_allocator.h</a></li>
+<li>src/lib/pdf/memory/arena_allocator.cpp</li>
+</ul>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1

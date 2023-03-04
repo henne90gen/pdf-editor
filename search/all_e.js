@@ -14,5 +14,6 @@ var searchData=
   ['pdfwindow_99',['PdfWindow',['../classPdfWindow.html',1,'']]],
   ['pixeloffset_100',['pixelOffset',['../structpdf_1_1BmpFileHeader.html#ac3dd5e73b188ea4b5e2eec8924c00b35',1,'pdf::BmpFileHeader']]],
   ['pop_101',['pop',['../structpdf_1_1Arena.html#aba8ccd9513aff4fbaa3d50f52d61a2b7',1,'pdf::Arena::pop(size_t allocationSizeInBytes)'],['../structpdf_1_1Arena.html#a1eb64f5fe6af2c8bd9dc8c9a5888e21d',1,'pdf::Arena::pop()']]],
-  ['push_102',['push',['../structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd',1,'pdf::Arena::push(size_t allocationSizeInBytes)'],['../structpdf_1_1Arena.html#a009c18304dfd0a68648af76140d14722',1,'pdf::Arena::push(Args &amp;&amp;...args)']]]
+  ['pop_5fall_102',['pop_all',['../structpdf_1_1Arena.html#a528b2c800b5007a6017d98f9f3d1fadb',1,'pdf::Arena']]],
+  ['push_103',['push',['../structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd',1,'pdf::Arena::push(size_t allocationSizeInBytes)'],['../structpdf_1_1Arena.html#a009c18304dfd0a68648af76140d14722',1,'pdf::Arena::push(Args &amp;&amp;...args)']]]
 ];

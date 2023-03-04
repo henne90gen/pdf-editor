@@ -81,21 +81,25 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a445509bef4ccaa45a011326403681181"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7516974d6a444739ca809001229364bd"><td class="memItemLeft" align="right" valign="top"><a id="a7516974d6a444739ca809001229364bd"></a>
 uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd">push</a> (size_t allocationSizeInBytes)</td></tr>
-<tr class="memdesc:a7516974d6a444739ca809001229364bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">push a new allocation onto the stack <br /></td></tr>
+<tr class="memdesc:a7516974d6a444739ca809001229364bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">push a new allocation into the arena <br /></td></tr>
 <tr class="separator:a7516974d6a444739ca809001229364bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba8ccd9513aff4fbaa3d50f52d61a2b7"><td class="memItemLeft" align="right" valign="top"><a id="aba8ccd9513aff4fbaa3d50f52d61a2b7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Arena.html#aba8ccd9513aff4fbaa3d50f52d61a2b7">pop</a> (size_t allocationSizeInBytes)</td></tr>
-<tr class="memdesc:aba8ccd9513aff4fbaa3d50f52d61a2b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">pop an allocation from the stack <br /></td></tr>
+<tr class="memdesc:aba8ccd9513aff4fbaa3d50f52d61a2b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">pop an allocation from the arena <br /></td></tr>
 <tr class="separator:aba8ccd9513aff4fbaa3d50f52d61a2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a528b2c800b5007a6017d98f9f3d1fadb"><td class="memItemLeft" align="right" valign="top"><a id="a528b2c800b5007a6017d98f9f3d1fadb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Arena.html#a528b2c800b5007a6017d98f9f3d1fadb">pop_all</a> ()</td></tr>
+<tr class="memdesc:a528b2c800b5007a6017d98f9f3d1fadb"><td class="mdescLeft">&#160;</td><td class="mdescRight">pops all allocations from the arena <br /></td></tr>
+<tr class="separator:a528b2c800b5007a6017d98f9f3d1fadb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a009c18304dfd0a68648af76140d14722"><td class="memTemplParams" colspan="2"><a id="a009c18304dfd0a68648af76140d14722"></a>
 template&lt;typename T , typename... Args&gt; </td></tr>
 <tr class="memitem:a009c18304dfd0a68648af76140d14722"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structpdf_1_1Arena.html#a009c18304dfd0a68648af76140d14722">push</a> (Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:a009c18304dfd0a68648af76140d14722"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates a new object and calls its constructor with the provided arguments <br /></td></tr>
+<tr class="memdesc:a009c18304dfd0a68648af76140d14722"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates a new object in the arena and calls its constructor with the provided arguments <br /></td></tr>
 <tr class="separator:a009c18304dfd0a68648af76140d14722"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><td class="memTemplParams" colspan="2"><a id="a1eb64f5fe6af2c8bd9dc8c9a5888e21d"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structpdf_1_1Arena.html#a1eb64f5fe6af2c8bd9dc8c9a5888e21d">pop</a> ()</td></tr>
-<tr class="memdesc:a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><td class="mdescLeft">&#160;</td><td class="mdescRight">pops the allocation for an object from the stack <br /></td></tr>
+<tr class="memdesc:a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><td class="mdescLeft">&#160;</td><td class="mdescRight">pops the allocation for an object from the arena <br /></td></tr>
 <tr class="separator:a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following files:<ul>
