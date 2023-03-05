@@ -10,11 +10,13 @@ int cmd_embed(EmbedArgs &args) {
         return 1;
     }
 
-    pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.files[args.files.size() - 1]), document).has_error()) {
+    auto documentResult = pdf::Document::read_from_file(std::string(args.files[args.files.size() - 1]));
+    if (documentResult.has_error()) {
+        spdlog::error(documentResult.message());
         return 1;
     }
 
+    auto document = documentResult.value();
     for (size_t i = 0; i < args.files.size() - 1; i++) {
         document.embed_file(std::string(args.files[i]));
     }

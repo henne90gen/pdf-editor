@@ -70,7 +70,7 @@ std::optional<CMap *> Font::cmap(Document &document) {
         return {};
     }
 
-    return cmapStreamOpt.value()->read_cmap(document.arena);
+    return cmapStreamOpt.value()->read_cmap(document.allocator);
 }
 
 FT_Face Font::load_font_face(Document &document) {
@@ -91,7 +91,7 @@ FT_Face Font::load_font_face(Document &document) {
     }
 
     FT_Face face;
-    auto view    = fontFile->decode(document.arena);
+    auto view    = fontFile->decode(document.allocator);
     auto basePtr = view.data();
     auto size    = (int64_t)view.length();
     error        = FT_New_Memory_Face(library, reinterpret_cast<const FT_Byte *>(basePtr), size, faceIndex, &face);

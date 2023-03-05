@@ -51,9 +51,9 @@ TEST(Image, ExtractImage1) {
     auto readFileName  = "../../../test-files/image-1.pdf";
     auto writeFileName = "image-1.bmp";
 
-    pdf::Document document;
-    auto result = pdf::Document::read_from_file(readFileName, document, false);
+    auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
+    auto document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 100, 100, 8);
         return pdf::ForEachResult::CONTINUE;
@@ -64,9 +64,9 @@ TEST(Image, ExtractImage2) {
     auto readFileName  = "../../../test-files/image-2.pdf";
     auto writeFileName = "image-2.bmp";
 
-    pdf::Document document;
-    auto result = pdf::Document::read_from_file(readFileName, document, false);
+    auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
+    auto document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 4, 4, 8);
         return pdf::ForEachResult::CONTINUE;
@@ -77,9 +77,9 @@ TEST(Image, ExtractImage3) {
     auto readFileName  = "../../../test-files/image-3.pdf";
     auto writeFileName = "image-3.bmp";
 
-    pdf::Document document;
-    auto result = pdf::Document::read_from_file(readFileName, document, false);
+    auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
+    auto document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 2, 2, 8);
         return pdf::ForEachResult::CONTINUE;

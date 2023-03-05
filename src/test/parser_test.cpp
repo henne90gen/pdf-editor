@@ -18,11 +18,14 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
 };
 
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
+    auto arenaResult  = pdf::Arena::create();
+    ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
+
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto arena        = pdf::Arena();
-    auto parser       = pdf::Parser(lexer, arena);
-    auto result       = parser.parse();
+    auto arena  = arenaResult.value();
+    auto parser = pdf::Parser(lexer, arena);
+    auto result = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
     func(result->as<T>());

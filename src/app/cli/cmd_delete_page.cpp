@@ -6,14 +6,14 @@ struct DeleteArgs {
 };
 
 int cmd_delete_page(const DeleteArgs &args) {
-    pdf::Document document;
-    auto result = pdf::Document::read_from_file(std::string(args.source), document);
-    if (result.has_error()) {
-        spdlog::error("Failed to load PDF document: {}", result.message());
+    auto documentResult = pdf::Document::read_from_file(std::string(args.source));
+    if (documentResult.has_error()) {
+        spdlog::error("Failed to load PDF document: {}", documentResult.message());
         return 1;
     }
 
-    result = document.delete_page(args.pageNum);
+    auto document = documentResult.value();
+    auto result   = document.delete_page(args.pageNum);
     if (result.has_error()) {
         spdlog::error("Failed to delete page {}: {}", args.pageNum, result.message());
         return 1;

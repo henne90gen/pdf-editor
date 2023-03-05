@@ -4,14 +4,19 @@
 #include <cstdint>
 
 #include "pdf/util/debug.h"
+#include "pdf/util/result.h"
 
 namespace pdf {
 
 const size_t ARENA_PAGE_SIZE = 1024 * 1024; // 1 MB
 
+typedef ValueResult<uint8_t *> PtrResult;
+
 struct Arena {
-    Arena();
-    explicit Arena(size_t maximumSizeInBytes, size_t pageSize = ARENA_PAGE_SIZE);
+    static ValueResult<Arena> create();
+    static ValueResult<Arena> create(size_t maximumSizeInBytes, size_t pageSize = ARENA_PAGE_SIZE);
+
+    Arena() = default;
     ~Arena();
 
     /// push a new allocation into the arena
@@ -41,15 +46,36 @@ struct Arena {
     size_t reservedSizeInBytes = 0;
     size_t pageSize            = ARENA_PAGE_SIZE;
 
-    void init(size_t maximumSizeInBytes);
+    explicit Arena(uint8_t *_buffer, size_t _maximumSizeInBytes, size_t _pageSize = ARENA_PAGE_SIZE);
 };
 
 struct TemporaryArena {
-    Arena arena  = {};
-    bool isInUse = false;
+    TemporaryArena(Arena &_arena) : arena(_arena) {}
+    ~TemporaryArena() { arena.pop_all(); }
 
-    void start_using();
-    void stop_using();
+    /// push a new allocation into the arena
+    uint8_t *push(size_t allocationSizeInBytes);
+
+    /// allocates a new object in the arena and calls its constructor with the provided arguments
+    template <typename T, typename... Args> T *push(Args &&...args) {
+        auto s   = sizeof(T);
+        auto buf = push(s);
+        return new (buf) T(args...);
+    }
+
+  private:
+    Arena arena;
+};
+
+struct Allocator {
+    static ValueResult<Allocator> create();
+
+    Arena &arena() { return internalArena; }
+    TemporaryArena get_temp() { return {temporaryArena}; }
+
+  private:
+    Arena internalArena;
+    Arena temporaryArena;
 };
 
 } // namespace pdf

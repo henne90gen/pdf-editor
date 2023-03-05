@@ -7,17 +7,21 @@
 #include "test_util.h"
 
 TEST(Writer, DeletePageInvalidPageNum) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+
+    auto document = result.value();
     ASSERT_TRUE(document.delete_page(0).has_error());
     ASSERT_TRUE(document.delete_page(-1).has_error());
     ASSERT_TRUE(document.delete_page(3).has_error());
 }
 
 TEST(Writer, DeletePageFirst) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
-    auto result = document.delete_page(1);
+    auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
+
+    auto document = documentResult.value();
+    auto result   = document.delete_page(1);
     ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
     std::string filePath = "delete-page-first.pdf";
@@ -27,9 +31,11 @@ TEST(Writer, DeletePageFirst) {
 }
 
 TEST(Writer, DISABLED_DeletePageSecond) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/two-pages.pdf", document);
-    auto result = document.delete_page(2);
+    auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
+
+    auto document = documentResult.value();
+    auto result   = document.delete_page(2);
     ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
 
@@ -39,15 +45,19 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    pdf::Document testDoc;
-    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, testDoc).has_error());
+    auto testDocResult = pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(testDocResult.has_error()) << testDocResult.message();
+
+    auto testDoc = testDocResult.value();
     ASSERT_EQ(testDoc.page_count(), 1);
     free(buffer);
 }
 
 TEST(Writer, Embed) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+    auto document = result.value();
+
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
 
     ASSERT_FALSE(document.write_to_file("test.pdf").has_error());
@@ -65,8 +75,9 @@ TEST(Writer, Embed) {
         ASSERT_EQ(7350, params->must_find<pdf::Integer>("Size")->value);
     };
 
-    pdf::Document doc;
-    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, doc).has_error());
+    result = pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(result.has_error()) << result.message();
+    auto doc = result.value();
     doc.for_each_embedded_file([&assertFunc](pdf::EmbeddedFile *embeddedFile) {
         assertFunc(embeddedFile);
         return pdf::ForEachResult::CONTINUE;
@@ -74,8 +85,10 @@ TEST(Writer, Embed) {
 }
 
 TEST(Writer, Header) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+
+    auto document   = result.value();
     uint8_t *buffer = nullptr;
     size_t size     = 0;
     auto error      = document.write_to_memory(buffer, size);
@@ -85,8 +98,9 @@ TEST(Writer, Header) {
 }
 
 TEST(Writer, Objects) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+    auto document   = result.value();
     uint8_t *buffer = nullptr;
     size_t size     = 0;
     auto error      = document.write_to_memory(buffer, size);
@@ -129,11 +143,12 @@ TEST(SplitByLines, EndsWithNewline) {
 }
 
 void write_pdf(const std::string &name) {
-    pdf::Document document;
     std::string testFilePath = "../../../test-files/" + name;
-    pdf::Document::read_from_file(testFilePath, document);
+    auto result              = pdf::Document::read_from_file(testFilePath);
+    ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto anError = document.write_to_file(name);
+    auto document = result.value();
+    auto anError  = document.write_to_file(name);
     ASSERT_FALSE(anError.has_error());
 
 #if _WIN32

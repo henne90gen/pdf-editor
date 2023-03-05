@@ -104,8 +104,7 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    Arena arena                                               = {};
-    TemporaryArena temporaryArena                             = {};
+    Allocator allocator = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
@@ -167,9 +166,9 @@ struct Document : public ReferenceResolver {
     /// TODO think about who owns the memory
     [[nodiscard]] Result write_to_memory(uint8_t *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath
-    static Result read_from_file(const std::string &filePath, Document &document, bool loadAllObjects = true);
+    static ValueResult<Document> read_from_file(const std::string &filePath, bool loadAllObjects = true);
     /// Reads the PDF-document from the given buffer
-    static Result read_from_memory(const uint8_t *buffer, size_t size, Document &document, bool loadAllObjects = true);
+    static ValueResult<Document> read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects = true);
 
     /// Deletes the page with the given page number
     Result delete_page(size_t pageNum);

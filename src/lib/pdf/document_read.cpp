@@ -498,12 +498,19 @@ Result read_data(Document &document, bool loadAllObjects) {
     return load_all_objects(document, &document.file.trailer);
 }
 
-Result Document::read_from_file(const std::string &filePath, Document &document, bool loadAllObjects) {
-    auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
-    if (!is.is_open()) {
-        return Result::error("Failed to open pdf file for reading: '{}'", filePath);
+ValueResult<Document> Document::read_from_file(const std::string &filePath, bool loadAllObjects) {
+    auto arenaResult = Arena::create();
+    if (arenaResult.has_error()) {
+        return ValueResult<Document>::error("failed to create memory arena: {}", arenaResult.message());
     }
 
+    auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
+    if (!is.is_open()) {
+        return ValueResult<Document>::error("failed to open pdf file for reading: '{}'", filePath);
+    }
+
+    Document document         = {};
+    document.arena            = arenaResult.value();
     document.file.path        = filePath;
     document.file.sizeInBytes = is.tellg();
     document.file.data        = document.arena.push(document.file.sizeInBytes);
@@ -512,16 +519,31 @@ Result Document::read_from_file(const std::string &filePath, Document &document,
     is.read((char *)document.file.data, static_cast<std::streamsize>(document.file.sizeInBytes));
     is.close();
 
-    return read_data(document, loadAllObjects);
+    const auto readResult = read_data(document, loadAllObjects);
+    if (readResult.has_error()) {
+        return ValueResult<Document>::error("failed to read document: {}", readResult.message());
+    }
+    return ValueResult<Document>::ok(document);
 }
 
-Result Document::read_from_memory(const uint8_t *buffer, size_t size, Document &document, bool loadAllObjects) {
+ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects) {
+    auto arenaResult = Arena::create();
+    if (arenaResult.has_error()) {
+        return ValueResult<Document>::error("failed to create memory arena: {}", arenaResult.message());
+    }
+
+    Document document         = {};
+    document.arena            = arenaResult.value();
     document.file.data        = document.arena.push(size);
     document.file.sizeInBytes = size;
 
     memcpy(document.file.data, buffer, size);
 
-    return read_data(document, loadAllObjects);
+    const auto readResult = read_data(document, loadAllObjects);
+    if (readResult.has_error()) {
+        return ValueResult<Document>::error("failed to read document: {}", readResult.message());
+    }
+    return ValueResult<Document>::ok(document);
 }
 
 } // namespace pdf

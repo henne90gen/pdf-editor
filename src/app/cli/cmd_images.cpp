@@ -5,12 +5,13 @@ struct ImagesArgs {
 };
 
 int cmd_images(const ImagesArgs &args) {
-    pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.source), document).has_error()) {
+    auto result = pdf::Document::read_from_file(std::string(args.source));
+    if (result.has_error()) {
         return 1;
     }
 
-    int count = 0;
+    auto document = result.value();
+    int count     = 0;
     document.for_each_image([&count](pdf::Image &img) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);
 

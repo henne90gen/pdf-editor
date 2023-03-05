@@ -5,13 +5,13 @@ struct InfoArgs {
 };
 
 int cmd_info(const InfoArgs &args) {
-    pdf::Document document;
-    const auto result = pdf::Document::read_from_file(std::string(args.source), document);
+    auto result = pdf::Document::read_from_file(std::string(args.source));
     if (result.has_error()) {
         spdlog::error(result.message());
         return 1;
     }
 
+    auto document              = result.value();
     size_t pageCount           = document.page_count();
     size_t lineCount           = document.line_count();
     size_t wordCount           = document.word_count();

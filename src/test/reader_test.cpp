@@ -4,11 +4,11 @@
 #include <pdf/page.h>
 
 TEST(Reader, Blank) {
-    pdf::Document document;
-    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
-    std::vector<pdf::IndirectObject *> objects = document.objects();
+    auto document = result.value();
+    auto objects  = document.objects();
     ASSERT_EQ(objects.size(), 8);
 
     auto root = document.catalog();
@@ -28,9 +28,11 @@ TEST(Reader, Blank) {
 }
 
 TEST(Reader, HelloWorldGeneral) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.objects();
+    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+
+    auto document = result.value();
+    auto objects  = document.objects();
     ASSERT_EQ(objects.size(), 13);
 
     auto root = document.catalog();
@@ -50,10 +52,11 @@ TEST(Reader, HelloWorldGeneral) {
 }
 
 TEST(Reader, HelloWorldFont) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto pages = document.pages();
+    auto document = result.value();
+    auto pages    = document.pages();
     ASSERT_EQ(pages.size(), 1);
     auto page = pages[0];
 
@@ -86,10 +89,11 @@ TEST(Reader, HelloWorldFont) {
 }
 
 TEST(Reader, HelloWorldCmap) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto pages = document.pages();
+    auto document = result.value();
+    auto pages    = document.pages();
     ASSERT_EQ(pages.size(), 1);
     auto page = pages[0];
 
@@ -119,9 +123,11 @@ TEST(Reader, FontFlags) {
 }
 
 TEST(Reader, ObjectStream) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/object-stream.pdf", document);
-    std::vector<pdf::IndirectObject *> objects = document.objects();
+    auto result = pdf::Document::read_from_file("../../../test-files/object-stream.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+
+    auto document = result.value();
+    auto objects  = document.objects();
     ASSERT_EQ(objects.size(), 16);
 
     auto root = document.catalog();

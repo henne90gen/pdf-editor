@@ -3,8 +3,8 @@
 #include <pdf/document.h>
 
 static void BM_Blank(benchmark::State &state) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/blank.pdf", document);
+    auto documentResult = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    auto document       = documentResult.value();
     for (auto _ : state) {
         uint8_t *buffer = nullptr;
         size_t size     = 0;
@@ -15,8 +15,8 @@ static void BM_Blank(benchmark::State &state) {
 BENCHMARK(BM_Blank);
 
 static void BM_HelloWorld(benchmark::State &state) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/hello-world.pdf", document);
+    auto documentResult = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto document       = documentResult.value();
     for (auto _ : state) {
         uint8_t *buffer = nullptr;
         size_t size     = 0;

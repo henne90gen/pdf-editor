@@ -6,11 +6,13 @@
 
 EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
     : Gtk::ApplicationWindow(obj) {
-    const auto result = pdf::Document::read_from_file(filePath, document);
+    auto result = pdf::Document::read_from_file(filePath);
     if (result.has_error()) {
         spdlog::error(result.message());
         return;
     }
+    document = result.value();
+
     set_title(filePath);
     set_show_menubar(true);
 

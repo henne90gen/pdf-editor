@@ -14,8 +14,11 @@ struct TestArena {
 TEST(Arena, can_handle_small_allocation) {
     ASSERT_EQ(sizeof(TestArena), sizeof(pdf::Arena));
 
-    pdf::Arena arena = {};
-    const auto buf   = arena.push(5);
+    auto result = pdf::Arena::create();
+    ASSERT_FALSE(result.has_error());
+
+    auto arena     = result.value();
+    const auto buf = arena.push(5);
     ASSERT_TRUE(nullptr != buf);
     buf[0] = 0;
     buf[1] = 0;
@@ -29,14 +32,17 @@ TEST(Arena, can_handle_small_allocation) {
     ASSERT_EQ(testArena->bufferStart + 5, testArena->bufferPosition);
     constexpr size_t MB = 1024 * 1024;
     constexpr size_t GB = 1024 * MB;
-    ASSERT_EQ(64 * GB, testArena->virtualSizeInBytes);
+    ASSERT_EQ(128 * GB, testArena->virtualSizeInBytes);
     ASSERT_EQ(1 * MB, testArena->reservedSizeInBytes);
 }
 
 TEST(Arena, can_handle_growing_allocation) {
     ASSERT_EQ(sizeof(TestArena), sizeof(pdf::Arena));
 
-    pdf::Arena arena = {};
+    auto result = pdf::Arena::create();
+    ASSERT_FALSE(result.has_error());
+
+    auto arena     = result.value();
     const auto buf1  = arena.push(pdf::ARENA_PAGE_SIZE);
     ASSERT_TRUE(nullptr != buf1);
 
@@ -52,6 +58,6 @@ TEST(Arena, can_handle_growing_allocation) {
     ASSERT_EQ(testArena->bufferStart + pdf::ARENA_PAGE_SIZE + 1, testArena->bufferPosition);
     constexpr size_t MB = 1024 * 1024;
     constexpr size_t GB = 1024 * MB;
-    ASSERT_EQ(64 * GB, testArena->virtualSizeInBytes);
+    ASSERT_EQ(128 * GB, testArena->virtualSizeInBytes);
     ASSERT_EQ(2 * MB, testArena->reservedSizeInBytes);
 }

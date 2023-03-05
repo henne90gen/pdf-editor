@@ -6,11 +6,13 @@ struct TextArgs {
 };
 
 int cmd_text(const TextArgs &args) {
-    pdf::Document document;
-    if (pdf::Document::read_from_file(std::string(args.source), document).has_error()) {
+    auto result = pdf::Document::read_from_file(std::string(args.source));
+    if (result.has_error()) {
+        spdlog::error(result.message());
         return 1;
     }
 
+    auto document = result.value();
     document.for_each_page([](pdf::Page *page) {
         auto textBlocks = page->text_blocks();
         for (auto &textBlock : textBlocks) {

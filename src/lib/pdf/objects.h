@@ -160,11 +160,11 @@ struct Stream : public Object {
         : Object(staticType()), dictionary(_dictionary), streamData(encodedData) {}
 
     static Stream *
-    create_from_unencoded_data(Arena &arena,
+    create_from_unencoded_data(Allocator &allocator,
                                const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                std::string_view unencodedData);
 
-    [[nodiscard]] std::string_view decode(Arena &arena);
+    [[nodiscard]] std::string_view decode(Allocator &allocator);
     void encode(Arena &arena, const std::string &data);
     [[nodiscard]] std::vector<std::string> filters() const;
 };

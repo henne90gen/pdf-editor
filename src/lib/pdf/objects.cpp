@@ -100,7 +100,7 @@ std::vector<std::string> Stream::filters() const {
     return result;
 }
 
-std::string_view Stream::decode(Arena &arena) {
+std::string_view Stream::decode(Allocator &allocator) {
     if (decodedStream != nullptr) {
         return {(char *)decodedStream, decodedStreamSize};
     }
@@ -121,8 +121,7 @@ std::string_view Stream::decode(Arena &arena) {
             auto *input      = output;
             size_t inputSize = outputSize;
 
-            // TODO don't allocate a new arena here, instead use an existing one.
-            Arena tempArena         = {};
+            auto tempArena          = allocator.get_temp();
             output                  = tempArena.push(outputSize);
             const auto *firstOutput = output;
 
@@ -151,7 +150,7 @@ std::string_view Stream::decode(Arena &arena) {
             inflateEnd(&infstream);
 
             // copy the result into a buffer that fits exactly
-            auto *tmp = arena.push(infstream.total_out);
+            auto *tmp = allocator.arena().push(infstream.total_out);
             // NOTE the arena allocator allocates contiguous memory, which is why this works
             memcpy(tmp, firstOutput, infstream.total_out);
 
@@ -218,7 +217,7 @@ void Stream::encode(Arena &arena, const std::string &data) {
     dictionary->values["Length"] = arena.push<Integer>(encodedDataSize);
 }
 
-Stream *Stream::create_from_unencoded_data(Arena &arena,
+Stream *Stream::create_from_unencoded_data(Allocator &allocator,
                                            const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                            std::string_view unencodedData) {
     const char *encodedData = nullptr;
@@ -229,6 +228,8 @@ Stream *Stream::create_from_unencoded_data(Arena &arena,
     for (const auto &entry : additionalDictionaryEntries) {
         dict[entry.first] = entry.second;
     }
+
+    auto &arena    = allocator.arena();
     dict["Length"] = arena.push<Integer>(encodedDataSize);
     dict["Filter"] = arena.push<Name>("FlateDecode");
 

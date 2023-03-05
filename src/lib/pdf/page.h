@@ -51,7 +51,7 @@ struct Resources : public Dictionary {
 };
 
 struct ContentStream : public Stream {
-    void for_each_operator(Arena &arena, const std::function<ForEachResult(Operator *)> &func);
+    void for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func);
 };
 
 struct TextBlock {

@@ -41,10 +41,10 @@ std::vector<ContentStream *> Page::content_streams() {
     return result;
 }
 
-void ContentStream::for_each_operator(Arena &arena, const std::function<ForEachResult(Operator *)> &func) {
-    auto textProvider   = StringTextProvider(decode(arena));
+void ContentStream::for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func) {
+    auto textProvider   = StringTextProvider(decode(allocator));
     auto lexer          = TextLexer(textProvider);
-    auto operatorParser = OperatorParser(lexer, arena);
+    auto operatorParser = OperatorParser(lexer, allocator);
     Operator *op        = operatorParser.get_operator();
     while (op != nullptr) {
         ForEachResult result = func(op);

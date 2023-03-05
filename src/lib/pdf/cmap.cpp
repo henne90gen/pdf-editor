@@ -271,14 +271,14 @@ CMap *CMapParser::parse() {
         }
     }
 
-    return arena.push<CMap>(charmap);
+    return allocator.arena().push<CMap>(charmap);
 }
 
-std::optional<CMap *> CMapStream::read_cmap(Arena &arena) {
-    auto data         = decode(arena);
+std::optional<CMap *> CMapStream::read_cmap(Allocator &allocator) {
+    auto data         = decode(allocator);
     auto textProvider = StringTextProvider(data);
     auto lexer        = TextLexer(textProvider);
-    auto parser       = CMapParser(lexer, arena);
+    auto parser       = CMapParser(lexer, allocator);
 
     auto result = parser.parse();
     if (result == nullptr) {
