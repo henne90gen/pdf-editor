@@ -1,5 +1,15 @@
 #include "arena_allocator.h"
 
+#if WIN32
+#define ReserveAddressRange(sizeInBytes) 0;
+#define ReleaseAddressRange(buffer, sizeInBytes) void()
+#else
+#include <sys/mman.h>
+#define ReserveAddressRange(sizeInBytes)                                                                               \
+    (uint8_t *)mmap(nullptr, sizeInBytes, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)
+#define ReleaseAddressRange(buffer, sizeInBytes) munmap(buffer, sizeInBytes)
+#endif
+
 namespace pdf {
 
 Arena::Arena() {
@@ -12,11 +22,11 @@ Arena::Arena(const size_t maximumSizeInBytes, const size_t pageSize) {
     init(maximumSizeInBytes);
 }
 
-Arena::~Arena() { munmap(bufferStart, virtualSizeInBytes); }
+Arena::~Arena() { ReleaseAddressRange(bufferStart, virtualSizeInBytes); }
 
 void Arena::init(size_t maximumSizeInBytes) {
     virtualSizeInBytes  = maximumSizeInBytes;
-    bufferStart         = (uint8_t *)mmap(nullptr, virtualSizeInBytes, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    bufferStart         = ReserveAddressRange(virtualSizeInBytes);
     bufferPosition      = bufferStart;
     reservedSizeInBytes = 0;
 }
@@ -47,9 +57,7 @@ void Arena::pop(size_t allocationSizeInBytes) {
     bufferPosition -= allocationSizeInBytes;
 }
 
-void Arena::pop_all() {
-    bufferPosition = bufferStart;
-}
+void Arena::pop_all() { bufferPosition = bufferStart; }
 
 void TemporaryArena::start_using() {
     ASSERT(!isInUse);

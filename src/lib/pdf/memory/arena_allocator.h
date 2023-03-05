@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <sys/mman.h>
 
 #include "pdf/util/debug.h"
 

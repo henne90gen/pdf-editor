@@ -14,7 +14,7 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
     set_title(filePath);
     set_show_menubar(true);
 
-    document.document_changed_signal.connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
+    document.documentChangedSignal.connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
 
     Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
 }

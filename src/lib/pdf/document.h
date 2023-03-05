@@ -105,10 +105,11 @@ struct ReadMetadata {
 
 struct Document : public ReferenceResolver {
     Arena arena                                               = {};
+    TemporaryArena temporaryArena                             = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
-    sigc::signal<void()> document_changed_signal;
+    sigc::signal<void()> documentChangedSignal;
 
     ~Document();
 
