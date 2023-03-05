@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: pdf::TemporaryArena Struct Reference</title>
+<title>PDF Editor: pdf::Allocator Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,32 +62,33 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a></li>  </ul>
+<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1Allocator.html">Allocator</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="structpdf_1_1TemporaryArena-members.html">List of all members</a>  </div>
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="structpdf_1_1Allocator-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">pdf::TemporaryArena Struct Reference</div>  </div>
+<div class="title">pdf::Allocator Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a348ce8f29d54756500b8169dac5ae389"><td class="memItemLeft" align="right" valign="top"><a id="a348ce8f29d54756500b8169dac5ae389"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TemporaryArena</b> (<a class="el" href="structpdf_1_1Arena.html">Arena</a> &amp;_arena)</td></tr>
-<tr class="separator:a348ce8f29d54756500b8169dac5ae389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48c08735e79b58af95ea8d6d023fd3cc"><td class="memItemLeft" align="right" valign="top"><a id="a48c08735e79b58af95ea8d6d023fd3cc"></a>
-uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1TemporaryArena.html#a48c08735e79b58af95ea8d6d023fd3cc">push</a> (size_t allocationSizeInBytes)</td></tr>
-<tr class="memdesc:a48c08735e79b58af95ea8d6d023fd3cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">push a new allocation into the arena <br /></td></tr>
-<tr class="separator:a48c08735e79b58af95ea8d6d023fd3cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad24ed8a015c293a74ccd7c9d7371e469"><td class="memTemplParams" colspan="2"><a id="ad24ed8a015c293a74ccd7c9d7371e469"></a>
-template&lt;typename T , typename... Args&gt; </td></tr>
-<tr class="memitem:ad24ed8a015c293a74ccd7c9d7371e469"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structpdf_1_1TemporaryArena.html#ad24ed8a015c293a74ccd7c9d7371e469">push</a> (Args &amp;&amp;...args)</td></tr>
-<tr class="memdesc:ad24ed8a015c293a74ccd7c9d7371e469"><td class="mdescLeft">&#160;</td><td class="mdescRight">allocates a new object in the arena and calls its constructor with the provided arguments <br /></td></tr>
-<tr class="separator:ad24ed8a015c293a74ccd7c9d7371e469"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab52367ffa5988881d3fa1a4eedfb7289"><td class="memItemLeft" align="right" valign="top"><a id="ab52367ffa5988881d3fa1a4eedfb7289"></a>
+<a class="el" href="structpdf_1_1Arena.html">Arena</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>arena</b> ()</td></tr>
+<tr class="separator:ab52367ffa5988881d3fa1a4eedfb7289"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17bc67dcad331420735408bd904677c2"><td class="memItemLeft" align="right" valign="top"><a id="a17bc67dcad331420735408bd904677c2"></a>
+<a class="el" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_temp</b> ()</td></tr>
+<tr class="separator:a17bc67dcad331420735408bd904677c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aec91733f044617c00cc6c1f40f53054c"><td class="memItemLeft" align="right" valign="top"><a id="aec91733f044617c00cc6c1f40f53054c"></a>
+static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a class="el" href="structpdf_1_1Allocator.html">Allocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> ()</td></tr>
+<tr class="separator:aec91733f044617c00cc6c1f40f53054c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/lib/pdf/memory/<a class="el" href="arena__allocator_8h_source.html">arena_allocator.h</a></li>

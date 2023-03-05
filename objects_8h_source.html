@@ -231,11 +231,11 @@ $(function() {
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        : <a class="code" href="structpdf_1_1Object.html">Object</a>(staticType()), dictionary(_dictionary), streamData(encodedData) {}</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">static</span> <a class="code" href="structpdf_1_1Stream.html">Stream</a> *</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    create_from_unencoded_data(<a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;arena,</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    create_from_unencoded_data(<a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator,</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;                               <span class="keyword">const</span> std::unordered_map&lt;std::string, Object *&gt; &amp;additionalDictionaryEntries,</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;                               std::string_view unencodedData);</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    [[nodiscard]] std::string_view decode(<a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;arena);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    [[nodiscard]] std::string_view decode(<a class="code" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator);</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordtype">void</span> encode(<a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;arena, <span class="keyword">const</span> std::string &amp;data);</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    [[nodiscard]] std::vector&lt;std::string&gt; filters() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;};</div>
@@ -260,14 +260,15 @@ $(function() {
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;std::ostream &amp;operator&lt;&lt;(std::ostream &amp;os, Object::Type &amp;type);</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;} <span class="comment">// namespace pdf</span></div>
-<div class="ttc" id="astructpdf_1_1Arena_html"><div class="ttname"><a href="structpdf_1_1Arena.html">pdf::Arena</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:12</div></div>
+<div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:70</div></div>
+<div class="ttc" id="astructpdf_1_1Arena_html"><div class="ttname"><a href="structpdf_1_1Arena.html">pdf::Arena</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:15</div></div>
 <div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:99</div></div>
 <div class="ttc" id="astructpdf_1_1Boolean_html"><div class="ttname"><a href="structpdf_1_1Boolean.html">pdf::Boolean</a></div><div class="ttdef"><b>Definition:</b> objects.h:52</div></div>
 <div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:108</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:106</div></div>
 <div class="ttc" id="astructpdf_1_1EmbeddedFile_html"><div class="ttname"><a href="structpdf_1_1EmbeddedFile.html">pdf::EmbeddedFile</a></div><div class="ttdef"><b>Definition:</b> objects.h:172</div></div>
 <div class="ttc" id="astructpdf_1_1HexadecimalString_html"><div class="ttname"><a href="structpdf_1_1HexadecimalString.html">pdf::HexadecimalString</a></div><div class="ttdef"><b>Definition:</b> objects.h:82</div></div>
-<div class="ttc" id="astructpdf_1_1HexadecimalString_html_a34ef88b85985fd2528d7fd7690461bc2"><div class="ttname"><a href="structpdf_1_1HexadecimalString.html#a34ef88b85985fd2528d7fd7690461bc2">pdf::HexadecimalString::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">decodes the hexadecimal string</div><div class="ttdef"><b>Definition:</b> objects.cpp:244</div></div>
+<div class="ttc" id="astructpdf_1_1HexadecimalString_html_a34ef88b85985fd2528d7fd7690461bc2"><div class="ttname"><a href="structpdf_1_1HexadecimalString.html#a34ef88b85985fd2528d7fd7690461bc2">pdf::HexadecimalString::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">decodes the hexadecimal string</div><div class="ttdef"><b>Definition:</b> objects.cpp:245</div></div>
 <div class="ttc" id="astructpdf_1_1IndirectObject_html"><div class="ttname"><a href="structpdf_1_1IndirectObject.html">pdf::IndirectObject</a></div><div class="ttdef"><b>Definition:</b> objects.h:141</div></div>
 <div class="ttc" id="astructpdf_1_1IndirectReference_html"><div class="ttname"><a href="structpdf_1_1IndirectReference.html">pdf::IndirectReference</a></div><div class="ttdef"><b>Definition:</b> objects.h:132</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:59</div></div>
