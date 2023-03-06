@@ -37,13 +37,13 @@ ValueResult<Dictionary *> parse_dict(Arena &arena, uint8_t *start, size_t length
 }
 
 // TODO replace "start + length" with a string_view
-ValueResult<IndirectObject *> parse_stream(Arena &arena, uint8_t *start, size_t length) {
+ValueResult<IndirectObject *> parse_stream(Allocator &allocator, uint8_t *start, size_t length) {
     ASSERT(start != nullptr);
     ASSERT(length > 0);
     auto input  = std::string_view((char *)start, length);
     auto text   = StringTextProvider(input);
     auto lexer  = TextLexer(text);
-    auto parser = Parser(lexer, arena);
+    auto parser = Parser(lexer, allocator.arena());
     auto result = parser.parse();
 
     // TODO make error messages more descriptive
@@ -68,7 +68,7 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
     auto sizeField2 = W->values[2]->as<Integer>()->value;
-    auto content    = stream->decode(document.arena);
+    auto content    = stream->decode(document.allocator);
 
     // verify that the content of the stream matches the size in the dictionary
     size_t countInDict        = stream->dictionary->must_find<Integer>("Size")->value - 1;
@@ -154,7 +154,7 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
         return Result::ok();
     }
 
-    currentTrailer->prev = document.arena.push<Trailer>();
+    currentTrailer->prev = document.allocator.arena().push<Trailer>();
     return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
@@ -175,7 +175,7 @@ Result read_trailers(Document &document, uint8_t *crossRefStartPtr, Trailer *cur
         }
 
         size_t lengthOfStream = startxrefPtr - startOfStream;
-        auto result           = parse_stream(document.arena, startOfStream, lengthOfStream);
+        auto result           = parse_stream(document.allocator, startOfStream, lengthOfStream);
         if (result.has_error()) {
             return result.drop_value();
         }
@@ -297,7 +297,7 @@ Result read_trailers(Document &document, uint8_t *crossRefStartPtr, Trailer *cur
 
     document.file.metadata.trailers[currentTrailer] =
           std::string_view((char *)crossRefStartPtr, (currentReadPtr - crossRefStartPtr) + lengthOfTrailerDict);
-    auto result = parse_dict(document.arena, currentReadPtr, lengthOfTrailerDict);
+    auto result = parse_dict(document.allocator.arena(), currentReadPtr, lengthOfTrailerDict);
     if (result.has_error()) {
         return result.drop_value();
     }
@@ -308,7 +308,7 @@ Result read_trailers(Document &document, uint8_t *crossRefStartPtr, Trailer *cur
         return Result::ok();
     }
 
-    currentTrailer->prev = document.arena.push<Trailer>();
+    currentTrailer->prev = document.allocator.arena().push<Trailer>();
     return read_trailers(document, document.file.data + opt.value()->value, currentTrailer->prev);
 }
 
@@ -342,7 +342,7 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
         auto input  = std::string_view((char *)start, length);
         auto text   = StringTextProvider(input);
         auto lexer  = TextLexer(text);
-        auto parser = Parser(lexer, document.arena, &document);
+        auto parser = Parser(lexer, document.allocator.arena(), &document);
         auto object = parser.parse();
         if (object == nullptr) {
             // TODO make this error more descriptive
@@ -361,10 +361,10 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
         auto stream = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->must_find<Name>("Type")->value == "ObjStm");
 
-        auto content      = stream->decode(document.arena);
+        auto content      = stream->decode(document.allocator);
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
-        auto parser       = Parser(lexer, document.arena, &document);
+        auto parser       = Parser(lexer, document.allocator.arena(), &document);
         int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
 
         auto objectNumbers = std::vector<int64_t>(N);
@@ -381,8 +381,8 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
             objs[i]  = obj;
         }
 
-        auto object = document.arena.push<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
-                                                          objs[entry.compressed.indexInStream]);
+        auto object = document.allocator.arena().push<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
+                                                                      objs[entry.compressed.indexInStream]);
         // TODO the content does not refer to the original PDF document, but instead to a decoded stream
         return LoadObjectResult::ok({object, content});
     }
@@ -499,9 +499,9 @@ Result read_data(Document &document, bool loadAllObjects) {
 }
 
 ValueResult<Document> Document::read_from_file(const std::string &filePath, bool loadAllObjects) {
-    auto arenaResult = Arena::create();
-    if (arenaResult.has_error()) {
-        return ValueResult<Document>::error("failed to create memory arena: {}", arenaResult.message());
+    auto allocatorResult = Allocator::create();
+    if (allocatorResult.has_error()) {
+        return ValueResult<Document>::error("failed to create memory arena: {}", allocatorResult.message());
     }
 
     auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
@@ -510,10 +510,10 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
     }
 
     Document document         = {};
-    document.arena            = arenaResult.value();
+    document.allocator        = allocatorResult.value();
     document.file.path        = filePath;
     document.file.sizeInBytes = is.tellg();
-    document.file.data        = document.arena.push(document.file.sizeInBytes);
+    document.file.data        = document.allocator.arena().push(document.file.sizeInBytes);
 
     is.seekg(0);
     is.read((char *)document.file.data, static_cast<std::streamsize>(document.file.sizeInBytes));
@@ -527,14 +527,14 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
 }
 
 ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects) {
-    auto arenaResult = Arena::create();
-    if (arenaResult.has_error()) {
-        return ValueResult<Document>::error("failed to create memory arena: {}", arenaResult.message());
+    auto allocatorResult = Allocator::create();
+    if (allocatorResult.has_error()) {
+        return ValueResult<Document>::error("failed to create memory arena: {}", allocatorResult.message());
     }
 
     Document document         = {};
-    document.arena            = arenaResult.value();
-    document.file.data        = document.arena.push(size);
+    document.allocator        = allocatorResult.value();
+    document.file.data        = document.allocator.arena().push(size);
     document.file.sizeInBytes = size;
 
     memcpy(document.file.data, buffer, size);

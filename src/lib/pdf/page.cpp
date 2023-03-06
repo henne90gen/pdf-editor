@@ -44,7 +44,7 @@ std::vector<ContentStream *> Page::content_streams() {
 void ContentStream::for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func) {
     auto textProvider   = StringTextProvider(decode(allocator));
     auto lexer          = TextLexer(textProvider);
-    auto operatorParser = OperatorParser(lexer, allocator);
+    auto operatorParser = OperatorParser(lexer, allocator.arena());
     Operator *op        = operatorParser.get_operator();
     while (op != nullptr) {
         ForEachResult result = func(op);
@@ -164,7 +164,7 @@ size_t Page::character_count() {
     auto contentStreams = content_streams();
     CMap *cmap          = nullptr;
     for (auto contentStream : contentStreams) {
-        contentStream->for_each_operator(document.arena, [&result, this, &cmap](Operator *op) {
+        contentStream->for_each_operator(document.allocator, [&result, this, &cmap](Operator *op) {
             if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
                 result += count_TJ_characters(cmap, op);
             } else if (op->type == Operator::Type::Tj_ShowTextString) {
@@ -243,7 +243,7 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
     std::stringstream ss;
 
     // write everything up to the operator we want to wrap
-    auto decoded = cs->decode(document.arena);
+    auto decoded = cs->decode(document.allocator);
     ss << decoded.substr(0, op->content.data() - decoded.data());
 
     // wrap operator with offset
@@ -267,7 +267,7 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-    cs->encode(document.arena, ss.str());
+    cs->encode(document.allocator.arena(), ss.str());
 
     document.documentChangedSignal.emit();
 
@@ -280,7 +280,7 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
     std::stringstream ss;
 
     // write everything up to the operator we want to wrap
-    auto decoded = cs->decode(document.arena);
+    auto decoded = cs->decode(document.allocator);
     ss << decoded.substr(0, op->content.data() - decoded.data());
 
     // wrap operator with offset
@@ -304,7 +304,7 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-    cs->encode(document.arena, ss.str());
+    cs->encode(document.allocator.arena(), ss.str());
 
     document.documentChangedSignal.emit();
 

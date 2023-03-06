@@ -171,7 +171,8 @@ std::string_view Stream::decode(Allocator &allocator) {
 }
 
 void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
-    // TODO check that deflate_buffer actually works, deflateEnd returns a Z_DATA_ERROR
+    // TODO rewrite this to use the temp allocator instead
+    // TODO check that deflate_buffer actually works, sometimes deflateEnd returns a Z_DATA_ERROR
     destSize = srcSize * 2;
     destData = (char *)std::malloc(destSize);
 

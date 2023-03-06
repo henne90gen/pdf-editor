@@ -122,13 +122,13 @@ Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uin
     return Result::ok();
 }
 
-Result Image::write_bmp(const std::string &fileName) const {
-    auto pixels = stream->decode(arena);
+Result Image::write_bmp(Allocator &allocator, const std::string &fileName) const {
+    auto pixels = stream->decode(allocator);
     return ::pdf::write_bmp(fileName, static_cast<int32_t>(width), static_cast<int32_t>(height), bitsPerComponent,
                             pixels);
 }
 
-ValueResult<Image *> Image::read_bmp(Arena &arena, const std::string &fileName) {
+ValueResult<Image *> Image::read_bmp(Allocator &allocator, const std::string &fileName) {
     std::ifstream file(fileName, std::ios::in | std::ios::binary);
     if (file.fail() || !file.is_open()) {
         return ValueResult<Image *>::error("Failed to open image file: {}", fileName);
@@ -148,13 +148,13 @@ ValueResult<Image *> Image::read_bmp(Arena &arena, const std::string &fileName) 
 
     // TODO flip BGR to RGB and remove padding
 
-    auto image              = arena.push<Image>(arena);
+    auto image              = allocator.arena().push<Image>();
     image->width            = infoHeader.width;
     image->height           = infoHeader.height;
     image->bitsPerComponent = infoHeader.bitsPerPixel / 3;
 
     auto imageDict = std::unordered_map<std::string, Object *>();
-    image->stream  = Stream::create_from_unencoded_data(arena, imageDict,
+    image->stream  = Stream::create_from_unencoded_data(allocator, imageDict,
                                                         std::string_view(reinterpret_cast<char *>(pixels), pixelSize));
 
     return ValueResult<Image *>::ok(image);
