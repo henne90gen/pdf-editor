@@ -12,11 +12,11 @@ int cmd_images(const ImagesArgs &args) {
 
     auto document = result.value();
     int count     = 0;
-    document.for_each_image([&count](pdf::Image &img) {
+    document.for_each_image([&count, &document](pdf::Image &img) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);
 
         const auto &fileName = std::to_string(count) + ".bmp";
-        if (img.write_bmp(fileName).has_error()) {
+        if (img.write_bmp(document.allocator, fileName).has_error()) {
             spdlog::warn("Failed to write image file '{}'", fileName);
             return pdf::ForEachResult::CONTINUE;
         }

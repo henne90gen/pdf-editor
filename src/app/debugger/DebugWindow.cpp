@@ -171,7 +171,7 @@ void DebugWindow::update_details_label(pdf::Object *object) {
         break;
     case pdf::Object::Type::STREAM: {
         auto stream = object->as<pdf::Stream>();
-        auto str    = std::string(stream->decode(document.arena));
+        auto str    = std::string(stream->decode(document.allocator));
         detailsLabel->set_text(str);
     } break;
     case pdf::Object::Type::NULL_OBJECT:

@@ -122,7 +122,7 @@ std::string_view Stream::decode(Allocator &allocator) {
             size_t inputSize = outputSize;
 
             auto tempArena          = allocator.get_temp();
-            output                  = tempArena.push(outputSize);
+            output                  = tempArena.arena().push(outputSize);
             const auto *firstOutput = output;
 
             z_stream infstream;
@@ -142,7 +142,7 @@ std::string_view Stream::decode(Allocator &allocator) {
                     break;
                 }
 
-                output              = tempArena.push(outputSize);
+                output              = tempArena.arena().push(outputSize);
                 infstream.avail_out = (uInt)outputSize;
                 infstream.next_out  = (Bytef *)output;
             }

@@ -65,7 +65,7 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
         auto input  = std::string_view(start, length);
         auto text   = StringTextProvider(input);
         auto lexer  = TextLexer(text);
-        auto parser = Parser(lexer, arena, this);
+        auto parser = Parser(lexer, allocator.arena(), this);
         auto result = parser.parse();
         if (result == nullptr || !result->is<IndirectObject>()) {
             return {nullptr, {}};
@@ -76,10 +76,10 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
         auto stream       = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->must_find<Name>("Type")->value == "ObjStm");
 
-        auto content      = stream->decode(arena);
+        auto content      = stream->decode(allocator);
         auto textProvider = StringTextProvider(content);
         auto lexer        = TextLexer(textProvider);
-        auto parser       = Parser(lexer, arena, this);
+        auto parser       = Parser(lexer, allocator.arena(), this);
         int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
 
         // TODO cache objectNumbers and corresponding objects
@@ -97,8 +97,8 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
             objs[i]  = obj;
         }
 
-        auto object = arena.push<IndirectObject>(objectNumbers[entry->compressed.indexInStream], 0,
-                                                 objs[entry->compressed.indexInStream]);
+        auto object = allocator.arena().push<IndirectObject>(objectNumbers[entry->compressed.indexInStream], 0,
+                                                             objs[entry->compressed.indexInStream]);
         // TODO the content does not refer to the original PDF document, but instead to a decoded stream
         return {object, content};
     }
@@ -180,7 +180,7 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
     // TODO cache page objects (otherwise they are re-created each time the pages are iterated)
 
     if (pageTreeRoot->is_page()) {
-        func(arena.push<Page>(*this, pageTreeRoot));
+        func(allocator.arena().push<Page>(*this, pageTreeRoot));
         return;
     }
 
@@ -192,7 +192,7 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
             if (resolvedKid->is_page()) {
-                Page *page           = arena.push<Page>(*this, resolvedKid);
+                Page *page           = allocator.arena().push<Page>(*this, resolvedKid);
                 ForEachResult result = func(page);
                 if (result == ForEachResult::BREAK) {
                     return;
@@ -327,7 +327,7 @@ size_t Document::character_count() {
 }
 
 void Document::for_each_image(const std::function<ForEachResult(Image &)> &func) {
-    for_each_object([this, &func](IndirectObject *obj) {
+    for_each_object([&func](IndirectObject *obj) {
         if (!obj->object->is<Stream>()) {
             return ForEachResult::CONTINUE;
         }
@@ -358,7 +358,7 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
             return ForEachResult::CONTINUE;
         }
 
-        auto image             = Image(arena);
+        auto image             = Image();
         image.width            = widthOpt.value()->value;
         image.height           = heightOpt.value()->value;
         image.bitsPerComponent = bitsPerComponentOpt.value()->value;
@@ -367,7 +367,7 @@ void Document::for_each_image(const std::function<ForEachResult(Image &)> &func)
     });
 }
 
-ValueResult<Stream *> create_embedded_file_stream(Arena &arena, const std::string &filePath) {
+ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const std::string &filePath) {
     auto is = std::ifstream();
     is.open(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
 
@@ -386,24 +386,24 @@ ValueResult<Stream *> create_embedded_file_stream(Arena &arena, const std::strin
     auto checksum    = hash::md5_checksum(reinterpret_cast<const uint8_t *>(fileData), fileSize);
     auto checksumStr = hash::to_hex_string(checksum);
     std::unordered_map<std::string, Object *> params = {
-          {"Size", arena.push<Integer>(fileSize)},
+          {"Size", allocator.arena().push<Integer>(fileSize)},
           // TODO add CreationDate
           // TODO add ModDate
-          {"CheckSum", arena.push<LiteralString>(checksumStr)},
+          {"CheckSum", allocator.arena().push<LiteralString>(checksumStr)},
     };
     std::unordered_map<std::string, Object *> dict = {
-          {"Type", arena.push<Name>("EmbeddedFile")},
+          {"Type", allocator.arena().push<Name>("EmbeddedFile")},
           // {"SubType", MIME type}, // TODO parse MIME type and add as SubType
-          {"Params", arena.push<Dictionary>(params)},
+          {"Params", allocator.arena().push<Dictionary>(params)},
     };
 
-    auto result = Stream::create_from_unencoded_data(arena, dict, std::string_view(fileData, fileSize));
+    auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view(fileData, fileSize));
     free(fileData);
     return ValueResult<Stream *>::ok(result);
 }
 
 Result Document::embed_file(const std::string &filePath) {
-    auto result = create_embedded_file_stream(arena, filePath);
+    auto result = create_embedded_file_stream(allocator, filePath);
     if (result.has_error()) {
         return result.drop_value();
     }
@@ -415,7 +415,7 @@ Result Document::embed_file(const std::string &filePath) {
 
 int64_t Document::add_object(Object *object) {
     auto objectNumber        = next_object_number();
-    objectList[objectNumber] = arena.push<IndirectObject>(objectNumber, 0, object);
+    objectList[objectNumber] = allocator.arena().push<IndirectObject>(objectNumber, 0, object);
     return objectNumber;
 }
 

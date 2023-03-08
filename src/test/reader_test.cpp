@@ -23,7 +23,7 @@ TEST(Reader, Blank) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.arena);
+    auto str    = stream->decode(document.allocator);
     ASSERT_EQ(str.size(), 42);
 }
 
@@ -47,7 +47,7 @@ TEST(Reader, HelloWorldGeneral) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.arena);
+    auto str    = stream->decode(document.allocator);
     ASSERT_EQ(str.size(), 139);
 }
 
@@ -142,6 +142,6 @@ TEST(Reader, ObjectStream) {
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
     auto stream = contents->as<pdf::Stream>();
-    auto str    = stream->decode(document.arena);
+    auto str    = stream->decode(document.allocator);
     ASSERT_EQ(str.size(), 117);
 }

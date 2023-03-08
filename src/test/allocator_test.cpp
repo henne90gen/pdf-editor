@@ -15,7 +15,7 @@ TEST(Arena, can_handle_small_allocation) {
     ASSERT_EQ(sizeof(TestArena), sizeof(pdf::Arena));
 
     auto result = pdf::Arena::create();
-    ASSERT_FALSE(result.has_error());
+    ASSERT_FALSE(result.has_error()) << result.message();
 
     auto arena     = result.value();
     const auto buf = arena.push(5);
@@ -40,10 +40,10 @@ TEST(Arena, can_handle_growing_allocation) {
     ASSERT_EQ(sizeof(TestArena), sizeof(pdf::Arena));
 
     auto result = pdf::Arena::create();
-    ASSERT_FALSE(result.has_error());
+    ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto arena     = result.value();
-    const auto buf1  = arena.push(pdf::ARENA_PAGE_SIZE);
+    auto arena      = result.value();
+    const auto buf1 = arena.push(pdf::ARENA_PAGE_SIZE);
     ASSERT_TRUE(nullptr != buf1);
 
     const auto buf2 = arena.push(1);

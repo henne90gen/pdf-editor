@@ -36,11 +36,15 @@ void assertFilesAreIdentical(const std::string &f1, const std::string &f2) {
 
 void assertImageCanBeExtracted(pdf::Image &image, const std::string &readFileName, const std::string &writeFileName,
                                int32_t width, int32_t height, uint16_t bitsPerComponent) {
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error()) << allocatorResult.message();
+    auto allocator = allocatorResult.value();
+
     ASSERT_EQ(width, image.width);
     ASSERT_EQ(height, image.height);
     ASSERT_EQ(bitsPerComponent, image.bitsPerComponent);
 
-    auto writeResult = image.write_bmp(writeFileName);
+    auto writeResult = image.write_bmp(allocator, writeFileName);
     ASSERT_FALSE(writeResult.has_error());
 
     auto finalFileName = readFileName.substr(0, readFileName.size() - 4) + ".bmp";

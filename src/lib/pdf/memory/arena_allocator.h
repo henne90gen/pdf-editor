@@ -50,32 +50,29 @@ struct Arena {
 };
 
 struct TemporaryArena {
-    TemporaryArena(Arena &_arena) : arena(_arena) {}
-    ~TemporaryArena() { arena.pop_all(); }
+    explicit TemporaryArena(Arena &_arena) : internalArena(_arena) {}
+    ~TemporaryArena() { internalArena.pop_all(); }
 
-    /// push a new allocation into the arena
-    uint8_t *push(size_t allocationSizeInBytes);
-
-    /// allocates a new object in the arena and calls its constructor with the provided arguments
-    template <typename T, typename... Args> T *push(Args &&...args) {
-        auto s   = sizeof(T);
-        auto buf = push(s);
-        return new (buf) T(args...);
-    }
+    Arena &arena() { return internalArena; }
 
   private:
-    Arena arena;
+    Arena &internalArena;
 };
 
 struct Allocator {
     static ValueResult<Allocator> create();
 
+    Allocator() = default;
+
     Arena &arena() { return internalArena; }
-    TemporaryArena get_temp() { return {temporaryArena}; }
+    TemporaryArena get_temp() { return TemporaryArena(temporaryArena); }
 
   private:
     Arena internalArena;
     Arena temporaryArena;
+
+    explicit Allocator(const Arena &_internalArena, const Arena &_temporaryArena)
+        : internalArena(_internalArena), temporaryArena(_temporaryArena) {}
 };
 
 } // namespace pdf

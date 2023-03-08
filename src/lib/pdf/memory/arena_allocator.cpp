@@ -37,6 +37,19 @@ Result ReserveMemory(uint8_t *buffer, size_t sizeInBytes) {
     const auto err = mprotect(buffer, sizeInBytes, PROT_READ | PROT_WRITE);
     if (err != 0) {
         // TODO create more concrete error message
+        /*
+         EACCES
+            The memory cannot be given the specified access. This can happen, for example, if you mmap(2) a file to which you have read-only access, then ask mprotect() to mark it PROT_WRITE.
+
+        EINVAL
+            addr is not a valid pointer, or not a multiple of the system page size.
+
+        ENOMEM
+            Internal kernel structures could not be allocated.
+
+        ENOMEM
+            Addresses in the range [addr, addr+len-1] are invalid for the address space of the process, or specify one or more pages that are not mapped. (Before kernel 2.4.19, the error EFAULT was incorrectly produced for these cases.)
+         */
         return Result::error("failed to reserve memory of size {}", sizeInBytes);
     }
     return Result::ok();
@@ -94,5 +107,21 @@ void Arena::pop(size_t allocationSizeInBytes) {
 }
 
 void Arena::pop_all() { bufferPosition = bufferStart; }
+
+ValueResult<Allocator> Allocator::create() {
+    auto internalArenaResult  = Arena::create();
+    if (internalArenaResult.has_error()) {
+        return ValueResult<Allocator>::of(internalArenaResult.drop_value());
+    }
+
+    auto temporaryArenaResult = Arena::create();
+    if (temporaryArenaResult.has_error()) {
+        return ValueResult<Allocator>::of(temporaryArenaResult.drop_value());
+    }
+
+    auto internalArena        = internalArenaResult.value();
+    auto temporaryArena       = temporaryArenaResult.value();
+    return ValueResult<Allocator>::ok(Allocator(internalArena, temporaryArena));
+}
 
 } // namespace pdf
