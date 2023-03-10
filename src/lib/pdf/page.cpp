@@ -198,10 +198,10 @@ std::vector<PageImage> Page::images() {
 }
 
 struct ImageFinder : public OperatorTraverser {
-    const std::function<ForEachResult(PageImage)> &func;
+    const std::function<ForEachResult(PageImage &)> &func;
     std::vector<PageImage> result = {};
 
-    explicit ImageFinder(Page &page, const std::function<ForEachResult(PageImage)> &_func)
+    explicit ImageFinder(Page &page, const std::function<ForEachResult(PageImage &)> &_func)
         : OperatorTraverser(page), func(_func) {}
 
     void on_do(Operator *op) override {
@@ -234,7 +234,7 @@ struct ImageFinder : public OperatorTraverser {
     }
 };
 
-void Page::for_each_image(const std::function<ForEachResult(PageImage)> &func) {
+void Page::for_each_image(const std::function<ForEachResult(PageImage &)> &func) {
     auto finder = ImageFinder(*this, func);
     finder.traverse();
 }
@@ -271,7 +271,7 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
 
     document.documentChangedSignal.emit();
 
-    spdlog::info("Moved image '{}' by x={} and y={}", name, xOffset, yOffset);
+    spdlog::info("Moved image '{}' by x={} and y={}", name, offsetX, offsetY);
 }
 
 void TextBlock::move(Document &document, double offsetX, double offsetY) const {

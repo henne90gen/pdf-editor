@@ -120,7 +120,7 @@ struct Page {
     std::vector<ContentStream *> content_streams();
     std::vector<TextBlock> text_blocks();
     std::vector<PageImage> images();
-    void for_each_image(const std::function<ForEachResult(PageImage)> &func);
+    void for_each_image(const std::function<ForEachResult(PageImage&)> &func);
 
     int64_t rotate();
     double width();

@@ -486,7 +486,6 @@ Result read_data(Document &document, bool loadAllObjects) {
         return Result::error("Invalid cross reference start");
     }
 
-    auto trailersMetadata = std::vector<std::string_view>();
     auto result           = read_trailers(document, crossRefStartPtr, &document.file.trailer);
     if (result.has_error()) {
         return result;

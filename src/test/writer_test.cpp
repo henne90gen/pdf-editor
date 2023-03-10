@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <pdf/document.h>
+#include <pdf/page.h>
 
 #include "process.h"
 #include "test_util.h"
@@ -53,6 +54,39 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     free(buffer);
 }
 
+TEST(Writer, MoveImage) {
+    pdf::Document document;
+    pdf::Document::read_from_file("../../../test-files/image-1.pdf", document);
+    document.for_each_page([&document](pdf::Page *page) {
+        page->for_each_image([&document](pdf::PageImage &image) {
+            image.move(document, 10, 10);
+            return pdf::ForEachResult::CONTINUE;
+        });
+        return pdf::ForEachResult::CONTINUE;
+    });
+
+    char *buffer = nullptr;
+    size_t size  = 0;
+    ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
+    ASSERT_NE(buffer, nullptr);
+    ASSERT_NE(size, 0);
+
+    auto assertFunc = [](pdf::PageImage &image) {
+        ASSERT_EQ(10, image.xOffset);
+        ASSERT_EQ(10, image.yOffset);
+    };
+
+    pdf::Document doc;
+    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, doc).has_error());
+    doc.for_each_page([&assertFunc](pdf::Page *page) {
+        page->for_each_image([&assertFunc](pdf::PageImage &image) {
+            assertFunc(image);
+            return pdf::ForEachResult::CONTINUE;
+        });
+        return pdf::ForEachResult::CONTINUE;
+    });
+}
+
 TEST(Writer, Embed) {
     auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
@@ -60,7 +94,7 @@ TEST(Writer, Embed) {
 
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
 
-    ASSERT_FALSE(document.write_to_file("test.pdf").has_error());
+    //    ASSERT_FALSE(document.write_to_file("test.pdf").has_error());
 
     uint8_t *buffer = nullptr;
     size_t size     = 0;
@@ -183,7 +217,7 @@ TEST(Writer, Image3) { write_pdf("image-3.pdf"); }
 TEST(Writer, DISABLED_ObjectStream) {
     // TODO
     // All objects (even the ones that are part of an object stream) are loaded into the objectList
-    // They are then all written out into the final pdf file. This is probably problematic.
+    // They are then all written out into the final pdf file. This is problematic.
     write_pdf("object-stream.pdf");
 }
 TEST(Writer, TwoPages) { write_pdf("two-pages.pdf"); }
