@@ -46,7 +46,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (MSVC)
     add_compile_options(/W4 /WX)
 else ()
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-overlength-strings)
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-overlength-strings -Wno-deprecated-declarations)
 endif ()
 
 # Source Code

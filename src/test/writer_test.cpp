@@ -55,8 +55,9 @@ TEST(Writer, DISABLED_DeletePageSecond) {
 }
 
 TEST(Writer, MoveImage) {
-    pdf::Document document;
-    pdf::Document::read_from_file("../../../test-files/image-1.pdf", document);
+    auto result = pdf::Document::read_from_file("../../../test-files/image-1.pdf");
+    ASSERT_FALSE(result.has_error()) << result.message();
+    auto document = result.value();
     document.for_each_page([&document](pdf::Page *page) {
         page->for_each_image([&document](pdf::PageImage &image) {
             image.move(document, 10, 10);
@@ -65,7 +66,7 @@ TEST(Writer, MoveImage) {
         return pdf::ForEachResult::CONTINUE;
     });
 
-    char *buffer = nullptr;
+    uint8_t *buffer = nullptr;
     size_t size  = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
@@ -76,8 +77,9 @@ TEST(Writer, MoveImage) {
         ASSERT_EQ(10, image.yOffset);
     };
 
-    pdf::Document doc;
-    ASSERT_FALSE(pdf::Document::read_from_memory(buffer, size, doc).has_error());
+    result=pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(result.has_error());
+    auto doc = result.value();
     doc.for_each_page([&assertFunc](pdf::Page *page) {
         page->for_each_image([&assertFunc](pdf::PageImage &image) {
             assertFunc(image);
