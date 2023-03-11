@@ -486,7 +486,7 @@ Result read_data(Document &document, bool loadAllObjects) {
         return Result::error("Invalid cross reference start");
     }
 
-    auto result           = read_trailers(document, crossRefStartPtr, &document.file.trailer);
+    auto result = read_trailers(document, crossRefStartPtr, &document.file.trailer);
     if (result.has_error()) {
         return result;
     }
@@ -532,7 +532,7 @@ ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t s
     }
 
     Document document         = {};
-    document.allocator        = allocatorResult.value();
+    document.allocator        = std::move(allocatorResult.value());
     document.file.data        = document.allocator.arena().push(size);
     document.file.sizeInBytes = size;
 

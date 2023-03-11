@@ -17,6 +17,7 @@ void OperatorTraverser::traverse() {
 }
 
 void OperatorTraverser::apply_operator(Operator *op) {
+    spdlog::trace("{}", operatorTypeToString(op->type));
     if (op->type == Operator::Type::w_SetLineWidth) {
         state().lineWidth = op->data.w_SetLineWidth.lineWidth;
     } else if (op->type == Operator::Type::q_PushGraphicsState) {
@@ -91,7 +92,7 @@ void OperatorTraverser::beginText() {
     state().textState.textObjectParams.value().textLineMatrix.translate(0, page.height());
 }
 
-void OperatorTraverser::pushGraphicsState() { stateStack.emplace_back(); }
+void OperatorTraverser::pushGraphicsState() { stateStack.push_back(state()); }
 
 void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
 
@@ -99,6 +100,8 @@ void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp = Cairo::identity_matrix();
     // TODO this '-' seems wrong (how can we flip the coordinate space on the y axis?)
     tmp.translate(op->data.Td_MoveStartOfNextLine.x, -op->data.Td_MoveStartOfNextLine.y);
+
+    ASSERT(state().textState.textObjectParams.has_value());
 
     auto currentLineMatrix = state().textState.textObjectParams.value().textLineMatrix;
     auto newLineMatrix     = tmp * currentLineMatrix;

@@ -61,3 +61,20 @@ TEST(Arena, can_handle_growing_allocation) {
     ASSERT_EQ(128 * GB, testArena->virtualSizeInBytes);
     ASSERT_EQ(2 * MB, testArena->reservedSizeInBytes);
 }
+
+namespace pdf {
+pdf::PtrResult ReserveAddressRange(size_t sizeInBytes);
+pdf::Result ReleaseAddressRange(uint8_t *buffer, size_t sizeInBytes);
+pdf::Result ReserveMemory(uint8_t *buffer, size_t sizeInBytes);
+} // namespace pdf
+
+TEST(MemoryApi, ReserveMemory) {
+    const size_t GB                = 1024 * 1024 * 1024;
+    const auto reservedSizeInBytes = 128 * GB;
+    auto result                    = pdf::ReserveAddressRange(reservedSizeInBytes);
+    ASSERT_FALSE(result.has_error()) << result.message();
+    const auto ptr                  = result.value();
+    const auto allocatedSizeInBytes = pdf::ARENA_PAGE_SIZE;
+    const auto reserveResult        = pdf::ReserveMemory(ptr, allocatedSizeInBytes);
+    ASSERT_FALSE(reserveResult.has_error()) << reserveResult.message();
+}

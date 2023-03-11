@@ -41,9 +41,12 @@ template <typename T> class ValueResult {
         return {{}, true, fmt::format(fmt, std::forward<Args>(args)...)};
     }
 
-    // TODO add in-place construction similar to emplace_back
-    static ValueResult ok(T v) { return {v, false, ""}; }
-    static ValueResult of(const Result &r) { return {{}, r.has_error(), r.message()}; }
+    template <typename... Args> //
+    static ValueResult<T> ok(Args &&...args) {
+        return {T(std::forward<Args>(args)...), false, ""};
+    }
+    static ValueResult<T> ok(T v) { return {v, false, ""}; }
+    static ValueResult<T> of(const Result &r) { return {{}, r.has_error(), r.message()}; }
 
     [[nodiscard]] T &value() { return _value; }
     [[nodiscard]] T &value() const { return _value; }
@@ -51,11 +54,14 @@ template <typename T> class ValueResult {
     [[nodiscard]] std::string message() const { return errorMessage; }
     [[nodiscard]] Result drop_value() const { return Result::from_bool(hasError, "{}", errorMessage); }
 
+    ~ValueResult() = default;
+
   private:
     T _value;
     bool hasError = false;
     std::string errorMessage;
 
+    ValueResult() = default;
     ValueResult(T v, bool _hasError, std::string _errorMessage)
         : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
 };

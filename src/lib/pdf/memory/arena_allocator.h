@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 #include "pdf/util/debug.h"
 #include "pdf/util/result.h"
@@ -17,7 +18,7 @@ struct Arena {
     static ValueResult<Arena> create(size_t maximumSizeInBytes, size_t pageSize = ARENA_PAGE_SIZE);
 
     Arena() = default;
-    ~Arena();
+    explicit Arena(uint8_t *_buffer, size_t _maximumSizeInBytes, size_t _pageSize = ARENA_PAGE_SIZE);
 
     /// push a new allocation into the arena
     uint8_t *push(size_t allocationSizeInBytes);
@@ -39,14 +40,15 @@ struct Arena {
         pop(s);
     }
 
+    /// releases the underlying memory
+    void destroy();
+
   private:
     uint8_t *bufferStart       = nullptr;
     uint8_t *bufferPosition    = nullptr;
     size_t virtualSizeInBytes  = 0;
     size_t reservedSizeInBytes = 0;
     size_t pageSize            = ARENA_PAGE_SIZE;
-
-    explicit Arena(uint8_t *_buffer, size_t _maximumSizeInBytes, size_t _pageSize = ARENA_PAGE_SIZE);
 };
 
 struct TemporaryArena {
@@ -71,7 +73,7 @@ struct Allocator {
     Arena internalArena;
     Arena temporaryArena;
 
-    explicit Allocator(const Arena &_internalArena, const Arena &_temporaryArena)
+    explicit Allocator(Arena _internalArena, Arena _temporaryArena)
         : internalArena(_internalArena), temporaryArena(_temporaryArena) {}
 };
 

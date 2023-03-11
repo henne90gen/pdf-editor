@@ -54,31 +54,31 @@ Operator::Type stringToOperatorType(const std::string_view &t) {
 }
 
 std::ostream &operator<<(std::ostream &os, Operator::Type &type) {
-#define __BYTECODE_OP(Name, Description)                                                                               \
+#define CASE(Name, Description)                                                                                        \
     case Operator::Type::Name##_##Description:                                                                         \
         os.write("Operator::Type::" #Name "_" #Description, strlen("Operator::Type::" #Name "_" #Description));        \
         break;
 
     switch (type) {
-        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+        ENUMERATE_OPERATION_TYPES(CASE)
     default:
         ASSERT(false);
     }
-#undef __BYTECODE_OP
+#undef CASE
     return os;
 }
 
 std::string operatorTypeToString(Operator::Type &type) {
-#define __BYTECODE_OP(Name, Description)                                                                               \
+#define CASE(Name, Description)                                                                                        \
     case Operator::Type::Name##_##Description:                                                                         \
         return "Operator::Type::" #Name "_" #Description;
 
     switch (type) {
-        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+        ENUMERATE_OPERATION_TYPES(CASE)
     default:
         ASSERT(false);
     }
-#undef __BYTECODE_OP
+#undef CASE
 }
 
 Operator *OperatorParser::get_operator() {
@@ -208,7 +208,7 @@ Operator *OperatorParser::create_operator_Tj(Operator *result) {
 
 Operator *OperatorParser::create_operator_cm(Operator *result) {
     for (int i = 0; i < 6; i++) {
-        result->data.cm_ModifyCurrentTransformationMatrix.matrix[i] = operand<double>(6 - 1);
+        result->data.cm_ModifyCurrentTransformationMatrix.matrix[i] = operand<double>(5 - i);
     }
     return result;
 }
@@ -500,17 +500,17 @@ Operator *OperatorParser::create_operator(Operator::Type type, std::string_view 
         return result;
     }
 
-#define __BYTECODE_OP(Name, Description)                                                                               \
+#define CASE(Name, Description)                                                                                        \
     case Operator::Type::Name##_##Description:                                                                         \
         return create_operator_##Name(result);
 
     switch (type) {
-        ENUMERATE_OPERATION_TYPES(__BYTECODE_OP)
+        ENUMERATE_OPERATION_TYPES(CASE)
     default:
         spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));
         ASSERT(false);
     }
-#undef __BYTECODE_OP
+#undef CASE
 
     return result;
 }

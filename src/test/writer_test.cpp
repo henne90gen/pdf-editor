@@ -67,7 +67,7 @@ TEST(Writer, MoveImage) {
     });
 
     uint8_t *buffer = nullptr;
-    size_t size  = 0;
+    size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
@@ -77,9 +77,9 @@ TEST(Writer, MoveImage) {
         ASSERT_EQ(10, image.yOffset);
     };
 
-    result=pdf::Document::read_from_memory(buffer, size);
-    ASSERT_FALSE(result.has_error());
-    auto doc = result.value();
+    auto docResult = pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(docResult.has_error());
+    auto doc = docResult.value();
     doc.for_each_page([&assertFunc](pdf::Page *page) {
         page->for_each_image([&assertFunc](pdf::PageImage &image) {
             assertFunc(image);

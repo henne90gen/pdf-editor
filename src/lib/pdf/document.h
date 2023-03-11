@@ -104,7 +104,7 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    Allocator allocator = {};
+    Allocator allocator                                       = {};
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 

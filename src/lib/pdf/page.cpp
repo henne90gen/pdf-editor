@@ -190,7 +190,7 @@ size_t Page::character_count() {
 
 std::vector<PageImage> Page::images() {
     auto result = std::vector<PageImage>();
-    for_each_image([&result](PageImage image) {
+    for_each_image([&result](PageImage &image) {
         result.push_back(image);
         return ForEachResult::CONTINUE;
     });
@@ -250,20 +250,21 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
     if (op->content[0] != ' ') {
         ss << " ";
     }
-    ss << offsetX;
+    ss << "1 0 0 1 ";
+    ss << offsetX - this->xOffset;
     ss << " ";
-    ss << -offsetY;
-    ss << " Td ";
+    ss << offsetY - this->yOffset;
+    ss << " cm ";
 
     // write operator
     ss << op->content;
 
     // wrap operator with negative offset
+    ss << " 1 0 0 1 ";
+    ss << -offsetX - this->xOffset;
     ss << " ";
-    ss << -offsetX;
-    ss << " ";
-    ss << offsetY;
-    ss << " Td";
+    ss << -offsetY - this->yOffset;
+    ss << " cm";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 

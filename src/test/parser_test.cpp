@@ -18,14 +18,14 @@ class TestReferenceResolver : public pdf::ReferenceResolver {
 };
 
 template <typename T> void assertParses(const std::string &input, std::function<void(T *)> func) {
-    auto arenaResult  = pdf::Arena::create();
+    auto arenaResult = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
 
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto arena  = arenaResult.value();
-    auto parser = pdf::Parser(lexer, arena);
-    auto result = parser.parse();
+    auto arena        = arenaResult.value();
+    auto parser       = pdf::Parser(lexer, arena);
+    auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
     func(result->as<T>());
@@ -36,9 +36,11 @@ void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceR
                                        std::function<void(T *)> func) {
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto arena        = pdf::Arena();
-    auto parser       = pdf::Parser(lexer, arena, referenceResolver);
-    auto result       = parser.parse();
+    auto arenaResult  = pdf::Arena::create();
+    ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
+    auto arena  = arenaResult.value();
+    auto parser = pdf::Parser(lexer, arena, referenceResolver);
+    auto result = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, T::staticType());
     func(result->as<T>());
@@ -203,9 +205,6 @@ TEST(Parser, StreamIndirectLength) {
         ASSERT_EQ(result->streamData.length(), 10);
         ASSERT_EQ(result->streamData, "some bytes");
     });
-    for (auto ref : refs) {
-        delete ref;
-    }
 }
 
 TEST(Parser, Null) {
@@ -226,8 +225,10 @@ TEST(Parser, CatalogDict) {
 TEST(Parser, MultipleObjects) {
     auto textProvider = pdf::StringTextProvider("5\n 6 7");
     auto lexer        = pdf::TextLexer(textProvider);
-    auto arena        = pdf::Arena();
-    auto parser       = pdf::Parser(lexer, arena);
+    auto arenaResult  = pdf::Arena::create();
+    ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
+    auto arena  = arenaResult.value();
+    auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -258,8 +259,10 @@ TEST(Parser, IndirectObject1) {
           "Builder 1.0 \"/>\r    <rdf:Description xmlns:pdfaid=\"http://www.aiim.org/pdfa/ns/id/\" rdf:about=\"\" "
           "pdfaid:part=\"2\" pdfaid:conformance=\"B\"/>\r  </rdf:RDF>\r</x:xmpmeta>\r<?xpacket "
           "end='w'?>\rendstream\nendobj");
-    auto lexer  = pdf::TextLexer(textProvider);
-    auto arena  = pdf::Arena();
+    auto lexer       = pdf::TextLexer(textProvider);
+    auto arenaResult = pdf::Arena::create();
+    ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
+    auto arena  = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
