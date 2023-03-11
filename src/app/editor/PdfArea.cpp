@@ -70,6 +70,8 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 }
 
 void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
+    cr->save();
+
     cr->set_source_rgba(0, 0, 1, 0.1);
 
     for (const auto &pageTextBlock : pageTextBlocks) {
@@ -100,9 +102,13 @@ void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
         }
     }
     cr->fill();
+
+    cr->restore();
 }
 
 void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
+    cr->save();
+
     for (const auto &images : pageImages) {
         for (const auto &image : images) {
             cr->rectangle(                                   //
@@ -119,6 +125,8 @@ void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
             cr->fill();
         }
     }
+
+    cr->restore();
 }
 
 void PdfArea::set_offsets(const double x, const double y) {
