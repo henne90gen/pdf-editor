@@ -19,7 +19,7 @@ Available Commands:
 
 ### Unix
 
-- install gtkmm4
+- install gtk4 and gtkmm4
 - run cmake
     - `mkdir build && cd build`
     - `cmake .. -G Ninja`
@@ -47,6 +47,11 @@ Available Commands:
 | PDF/UA       |             | https://www.pdfa.org/resource/pdfua-reference-suite/                                                                          |
 | PDF/A        | Many files  | https://www.pdfa.org/resource/verapdf-test-suite/ https://github.com/veraPDF/veraPDF-corpus                                   |
 |              |             | https://github.com/bfosupport/pdfa-testsuite                                                                                  |
+
+## Fuzzing
+
+Running existing fuzzing test cases: `cmake --build . --target test_fuzzer`
+Running fuzzer: `cmake --build . --target fuzzer && ./src/test/fuzzer ../fuzzing-corpus`
 
 ## Ideas
 
