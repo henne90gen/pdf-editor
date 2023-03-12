@@ -103,50 +103,57 @@ $(function() {
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        : pageOffset(_pageOffset), textBlocks(std::move(_textBlocks)) {}</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classPdfArea.html">   34</a></span>&#160;<span class="keyword">class </span><a class="code" href="classPdfArea.html">PdfArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">double</span> _zoom = 1.0;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    [[maybe_unused]] <a class="code" href="classPdfArea.html">PdfArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp; <span class="comment">/*builder*/</span>,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                             <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="structPageImages.html">   34</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structPageImages.html">PageImages</a> {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="structpdf_1_1Page.html">pdf::Page</a> *page;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    std::vector&lt;pdf::PageImage&gt; images = {};</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classPdfArea.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classPdfArea.html">PdfArea</a> : <span class="keyword">public</span> <a class="code" href="classScrolledZoomedContent.html">ScrolledZoomedContent</a> {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">double</span> _zoom = 1.0;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    [[maybe_unused]] <a class="code" href="classPdfArea.html">PdfArea</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp; <span class="comment">/*builder*/</span>,</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                             <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;_document);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">void</span> set_offsets(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">void</span> update_zoom(<span class="keywordtype">double</span> z) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">double</span> zoom()<span class="keyword"> override </span>{ <span class="keywordflow">return</span> _zoom; }</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">double</span> scrollOffsetX = 0.0;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">double</span> scrollOffsetY = 0.0;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">double</span> mouseX        = 0.0;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">double</span> mouseY        = 0.0;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordtype">double</span> dragStartX    = 0.0;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">double</span> dragStartY    = 0.0;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="structpdf_1_1PageImage.html">pdf::PageImage</a> *selectedImage = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    std::vector&lt;PageTextBlocks&gt; pageTextBlocks          = {};</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    std::vector&lt;std::vector&lt;pdf::PageImage&gt;&gt; pageImages = {};</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> on_draw(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">double</span> scrollOffsetX = 0.0;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">double</span> scrollOffsetY = 0.0;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">double</span> mouseX        = 0.0;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">double</span> mouseY        = 0.0;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">double</span> dragStartX    = 0.0;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">double</span> dragStartY    = 0.0;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> on_mouse_moved(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_begin(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_update(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_end(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="structpdf_1_1PageImage.html">pdf::PageImage</a> *selectedImage = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    std::vector&lt;PageTextBlocks&gt; pageTextBlocks = {};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    std::vector&lt;PageImages&gt; pageImages         = {};</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">void</span> render_pages(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">void</span> render_text_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">void</span> render_image_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="structpdf_1_1PageImage.html">pdf::PageImage</a> *get_image_at_position(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
-<div class="ttc" id="aclassPdfArea_html"><div class="ttname"><a href="classPdfArea.html">PdfArea</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:34</div></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">void</span> on_mouse_moved(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_begin(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_update(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_end(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">void</span> render_pages(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">void</span> render_text_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">void</span> render_image_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="code" href="structpdf_1_1PageImage.html">pdf::PageImage</a> *get_image_at_position(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;};</div>
+<div class="ttc" id="aclassPdfArea_html"><div class="ttname"><a href="classPdfArea.html">PdfArea</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:39</div></div>
 <div class="ttc" id="aclassScrolledZoomedContent_html"><div class="ttname"><a href="classScrolledZoomedContent.html">ScrolledZoomedContent</a></div><div class="ttdef"><b>Definition:</b> ScrolledZoomedWindow.h:8</div></div>
+<div class="ttc" id="astructPageImages_html"><div class="ttname"><a href="structPageImages.html">PageImages</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:34</div></div>
 <div class="ttc" id="astructPageTextBlocks_html"><div class="ttname"><a href="structPageTextBlocks.html">PageTextBlocks</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:26</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:106</div></div>
 <div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> page.h:85</div></div>
+<div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:104</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

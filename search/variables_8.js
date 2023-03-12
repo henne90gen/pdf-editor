@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['size_297',['size',['../structpdf_1_1BmpInfoHeader.html#aeeb443371d469f5589b57b511ccb4b0e',1,'pdf::BmpInfoHeader']]]
+  ['size_299',['size',['../structpdf_1_1BmpInfoHeader.html#aeeb443371d469f5589b57b511ccb4b0e',1,'pdf::BmpInfoHeader']]]
 ];
