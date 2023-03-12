@@ -177,7 +177,7 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
         return;
     }
 
-    // TODO cache page objects (otherwise they are re-created each time the pages are iterated)
+    // FIXME cache page objects (otherwise they are re-created each time the pages are iterated)
 
     if (pageTreeRoot->is_page()) {
         func(allocator.arena().push<Page>(*this, pageTreeRoot));

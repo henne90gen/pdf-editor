@@ -37,15 +37,15 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
             spdlog::info("Found Image {} at position {},{} with size {}x{}", img.name, img.xOffset, img.yOffset,
                          img.image->width(), img.image->height());
         }
-        pageImages.push_back(images);
+        pageImages.push_back({page, images});
 
         pageOffset += page->height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
     });
 }
 
-void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height) {
-    spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
+void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int /*width*/, int /*height*/) {
+    //    spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
 
     cr->translate(-scrollOffsetX, -scrollOffsetY);
     cr->scale(_zoom, _zoom);
@@ -60,10 +60,20 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 
     auto pages = document.pages();
     for (auto page : pages) {
+        cr->save();
+
+        // move (0,0) from the top-left to the bottom-left corner of the page and make positive y-axis extend vertically
+        // upward
+        auto pageHeight = page->height();
+        auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
+        cr->transform(matrix);
+
         pdf::Renderer renderer(*page, cr);
         renderer.render();
 
-        cr->translate(0, page->height() + PAGE_PADDING);
+        cr->restore();
+
+        cr->translate(0, pageHeight + PAGE_PADDING);
     }
 
     cr->restore();
@@ -110,7 +120,13 @@ void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->save();
 
     for (const auto &images : pageImages) {
-        for (const auto &image : images) {
+        cr->save();
+
+        auto pageHeight = images.page->height();
+        auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
+        cr->transform(matrix);
+
+        for (const auto &image : images.images) {
             cr->rectangle(                                   //
                   image.xOffset,                             //
                   image.yOffset,                             //
@@ -124,6 +140,8 @@ void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
             }
             cr->fill();
         }
+
+        cr->restore();
     }
 
     cr->restore();
@@ -154,13 +172,16 @@ void PdfArea::on_mouse_moved(double x, double y) {
 
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {
     for (auto &images : pageImages) {
-        for (auto &image : images) {
-            if (x < image.xOffset || //
-                x > image.xOffset + static_cast<double>(image.image->width())) {
+        const auto pageX = x;
+        const auto pageY = images.page->height() - y;
+
+        for (auto &image : images.images) {
+            if (pageX < image.xOffset || //
+                pageX > image.xOffset + static_cast<double>(image.image->width())) {
                 continue;
             }
-            if (y < image.yOffset || //
-                y > image.yOffset + static_cast<double>(image.image->height())) {
+            if (pageY < image.yOffset || //
+                pageY > image.yOffset + static_cast<double>(image.image->height())) {
                 continue;
             }
 
@@ -184,14 +205,18 @@ void PdfArea::on_mouse_drag_update(double x, double y) {
     if (selectedImage == nullptr) {
         return;
     }
+
     selectedImage->xOffset = dragStartX + x;
-    selectedImage->yOffset = dragStartY + y;
+    selectedImage->yOffset = dragStartY - y;
+
     queue_draw();
 }
 
 void PdfArea::on_mouse_drag_end(double x, double y) {
     if (selectedImage != nullptr) {
-        selectedImage->move(document, x, y);
+        const auto pageX = x;
+        const auto pageY = -y;
+        selectedImage->move(document, pageX, pageY);
     }
     dragStartX = 0.0;
     dragStartY = 0.0;

@@ -83,6 +83,8 @@ struct XObjectImage : public Stream {
 };
 
 struct PageImage {
+    Page &page;
+
     std::string name;
     double xOffset      = 0.0;
     double yOffset      = 0.0;
@@ -91,9 +93,9 @@ struct PageImage {
     Operator *op      = nullptr;
     ContentStream *cs = nullptr;
 
-    PageImage(std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
+    PageImage(Page &_page, std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
               ContentStream *_cs)
-        : name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
+        : page(_page), name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
 
     /// Moves the image on the page by the specified offset
     void move(Document &document, double offsetX, double offsetY) const;
@@ -120,7 +122,7 @@ struct Page {
     std::vector<ContentStream *> content_streams();
     std::vector<TextBlock> text_blocks();
     std::vector<PageImage> images();
-    void for_each_image(const std::function<ForEachResult(PageImage&)> &func);
+    void for_each_image(const std::function<ForEachResult(PageImage &)> &func);
 
     int64_t rotate();
     double width();

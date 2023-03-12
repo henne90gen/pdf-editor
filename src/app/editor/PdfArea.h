@@ -31,6 +31,11 @@ struct PageTextBlocks {
         : pageOffset(_pageOffset), textBlocks(std::move(_textBlocks)) {}
 };
 
+struct PageImages {
+    pdf::Page *page;
+    std::vector<pdf::PageImage> images = {};
+};
+
 class PdfArea : public ScrolledZoomedContent {
   public:
     double _zoom = 1.0;
@@ -56,8 +61,8 @@ class PdfArea : public ScrolledZoomedContent {
 
     pdf::PageImage *selectedImage = nullptr;
 
-    std::vector<PageTextBlocks> pageTextBlocks          = {};
-    std::vector<std::vector<pdf::PageImage>> pageImages = {};
+    std::vector<PageTextBlocks> pageTextBlocks = {};
+    std::vector<PageImages> pageImages         = {};
 
     void on_mouse_moved(double x, double y);
     void on_mouse_drag_begin(double x, double y);

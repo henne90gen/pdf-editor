@@ -229,7 +229,7 @@ struct ImageFinder : public OperatorTraverser {
         double xOffset = 0.0;
         double yOffset = 0.0;
         state().currentTransformationMatrix.transform_point(xOffset, yOffset);
-        auto pageImage = PageImage(xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, currentContentStream);
+        auto pageImage = PageImage(page, xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, currentContentStream);
         func(pageImage);
     }
 };
