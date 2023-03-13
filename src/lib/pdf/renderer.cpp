@@ -63,4 +63,27 @@ void Renderer::on_show_text(Operator *op) {
     cr->show_glyphs(glyphs);
 }
 
+void Renderer::on_do(Operator *op) {
+    auto pageImageResult = pdf::PageImage::create(page, state(), op, currentContentStream);
+    if (pageImageResult.has_error()) {
+        return;
+    }
+
+    auto pageImage           = pageImageResult.value();
+    auto image               = pageImage.image;
+    auto pixels              = image->decode(page.document.allocator);
+    auto width               = image->width();
+    auto height              = image->height();
+    auto bitsPerComponentOpt = image->bits_per_component();
+    if (!bitsPerComponentOpt.has_value()) {
+        return;
+    }
+
+    auto stride  = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
+    auto surface = Cairo::ImageSurface::create((unsigned char *)pixels.data(), Cairo::ImageSurface::Format::RGB24,
+                                               width, height, stride);
+    cr->set_source(surface, pageImage.xOffset, pageImage.yOffset);
+    cr->paint();
+}
+
 } // namespace pdf

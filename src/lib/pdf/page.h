@@ -82,8 +82,9 @@ struct XObjectImage : public Stream {
     }
 };
 
+struct GraphicsState; // forward declaration to avoid circular includes
 struct PageImage {
-    Page &page;
+    Page *page = nullptr;
 
     std::string name;
     double xOffset      = 0.0;
@@ -93,12 +94,15 @@ struct PageImage {
     Operator *op      = nullptr;
     ContentStream *cs = nullptr;
 
-    PageImage(Page &_page, std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
+    PageImage() = default;
+    PageImage(Page *_page, std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
               ContentStream *_cs)
         : page(_page), name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
 
     /// Moves the image on the page by the specified offset
     void move(Document &document, double offsetX, double offsetY) const;
+
+    static ValueResult<PageImage> create(Page &page, GraphicsState &state, Operator *op, ContentStream *cs);
 };
 
 struct Page {

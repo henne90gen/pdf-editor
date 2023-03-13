@@ -205,31 +205,13 @@ struct ImageFinder : public OperatorTraverser {
         : OperatorTraverser(page), func(_func) {}
 
     void on_do(Operator *op) override {
-        const auto &xObjectName = op->data.Do_PaintXObject.name->value;
-
-        const auto xObjectMapOpt = page.resources()->x_objects(page.document);
-        if (!xObjectMapOpt.has_value()) {
+        auto pageImageResult = PageImage::create(page, state(), op, currentContentStream);
+        if (pageImageResult.has_error()) {
             return;
         }
 
-        const auto &xObjectMap   = xObjectMapOpt.value();
-        const auto &xObjectKey   = xObjectName.substr(1, xObjectName.size() - 1);
-        const auto xObjectRefOpt = xObjectMap->find<IndirectReference>(xObjectKey);
-        const auto xObjectOpt    = page.document.get<Stream>(xObjectRefOpt);
-        if (!xObjectOpt.has_value()) {
-            return;
-        }
-
-        const auto xObject = xObjectOpt.value();
-        const auto subtype = xObject->dictionary->must_find<Name>("Subtype");
-        if (subtype->value != "Image") {
-            return;
-        }
-
-        double xOffset = 0.0;
-        double yOffset = 0.0;
-        state().currentTransformationMatrix.transform_point(xOffset, yOffset);
-        auto pageImage = PageImage(page, xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, currentContentStream);
+        auto pageImage = pageImageResult.value();
+        result.push_back(pageImage);
         func(pageImage);
     }
 };
@@ -310,6 +292,35 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
     document.documentChangedSignal.emit();
 
     spdlog::info("Moved text block '{}' by x={} and y={}", text, offsetX, offsetY);
+}
+
+ValueResult<PageImage> PageImage::create(Page &page, GraphicsState &state, Operator *op, ContentStream *cs) {
+    const auto &xObjectName = op->data.Do_PaintXObject.name->value;
+
+    const auto xObjectMapOpt = page.resources()->x_objects(page.document);
+    if (!xObjectMapOpt.has_value()) {
+        return ValueResult<PageImage>::error("asda");
+    }
+
+    const auto &xObjectMap   = xObjectMapOpt.value();
+    const auto &xObjectKey   = xObjectName.substr(1, xObjectName.size() - 1);
+    const auto xObjectRefOpt = xObjectMap->find<IndirectReference>(xObjectKey);
+    const auto xObjectOpt    = page.document.get<Stream>(xObjectRefOpt);
+    if (!xObjectOpt.has_value()) {
+        return ValueResult<PageImage>::error("Failed to find XObject with XObjectKey={}", xObjectKey);
+    }
+
+    const auto xObject = xObjectOpt.value();
+    const auto subtype = xObject->dictionary->must_find<Name>("Subtype");
+    if (subtype->value != "Image") {
+        return ValueResult<PageImage>::error("XObject is not an image");
+    }
+
+    double xOffset = 0.0;
+    double yOffset = 0.0;
+    state.currentTransformationMatrix.transform_point(xOffset, yOffset);
+    auto pageImage = PageImage(&page, xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, cs);
+    return ValueResult<PageImage>::ok(pageImage);
 }
 
 } // namespace pdf

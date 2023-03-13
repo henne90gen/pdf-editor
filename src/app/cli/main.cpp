@@ -11,7 +11,7 @@
 
 void help() {
     spdlog::error("Usage:");
-    spdlog::error("    pdf-app [COMMAND] [FILE_PATH]");
+    spdlog::error("    pdf-cli [COMMAND] [FILE_PATH]");
     spdlog::error("");
 }
 
