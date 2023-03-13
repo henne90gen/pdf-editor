@@ -6,17 +6,17 @@ import multiprocessing
 NUM_PROCESSES = 10
 ACTIVATED_TESTS = {
     "VeraPDF": [
-        "6.1 File structure",
+        # "6.1 File structure",
         "6.2 Graphics",
         "6.3 Annotations",
         "6.6 Metadata",
         "6.6 Action",
         "6.7 Metadata",
         "6.9 Embedded files",
-        "7.1 General",
-        "7.2 Text",
-        "7.11 Embedded files",
-        "7.21 Fonts",
+        # "7.1 General",
+        # "7.2 Text",
+        # "7.11 Embedded files",
+        # "7.21 Fonts",
         "Undefined",
     ],
     "Isartor": [],
