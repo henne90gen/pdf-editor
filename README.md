@@ -50,8 +50,13 @@ Available Commands:
 
 ## Fuzzing
 
+IMPORTANT: Make sure to compile `fuzzer` with `CMAKE_BUILD_TYPE=Debug` mode!
+
 Running existing fuzzing test cases: `cmake --build . --target test_fuzzer`
 Running fuzzer: `cmake --build . --target fuzzer && ./src/test/fuzzer ../fuzzing-corpus`
+
+`./src/test/fuzzer -rss_limit_mb=8192 -max_len=1000000 ../fuzzing-corpus`
+`./src/test/fuzzer -rss_limit_mb=8192 -max_len=1000000 -merge=1 ../new-fuzzing-corpus ../fuzzing-corpus`
 
 ## Ideas
 

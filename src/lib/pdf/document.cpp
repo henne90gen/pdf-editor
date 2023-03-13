@@ -117,7 +117,18 @@ IndirectObject *Document::get_object(int64_t objectNumber) {
     return object.first;
 }
 
-IndirectObject *Document::resolve(const IndirectReference *ref) { return get_object(ref->objectNumber); }
+IndirectObject *Document::resolve(const IndirectReference *ref) {
+    if (currentResolutionObjectNumber == ref->objectNumber) {
+        return nullptr;
+    }
+
+    // TODO this is not enough to protect against stack overflows
+    currentResolutionObjectNumber = ref->objectNumber;
+    auto result                   = get_object(ref->objectNumber);
+    currentResolutionObjectNumber = 0;
+
+    return result;
+}
 
 std::vector<IndirectObject *> Document::objects() {
     std::vector<IndirectObject *> result = {};

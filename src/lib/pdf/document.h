@@ -170,21 +170,25 @@ struct Document : public ReferenceResolver {
     /// Reads the PDF-document from the given buffer
     static ValueResult<Document> read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects = true);
 
-    /// Deletes the page with the given page number
+    // Deletes the page with the given page number
     Result delete_page(size_t pageNum);
-    /// Insert another document into this one so that the first page of the inserted document has the given page number
+    // Insert another document into this one so that the first page of the inserted document has the given page number
     [[maybe_unused]] bool insert_document(Document &otherDocument, size_t atPageNum);
-    /// Inserts a file into the pdf document
+    // Inserts a file into the pdf document
     Result embed_file(const std::string &filePath);
 
     int64_t next_object_number() const;
     int64_t add_object(Object *object);
 
-    /// Finds the IndirectObject that wraps the given Object
+    // Finds the IndirectObject that wraps the given Object
     IndirectObject *find_existing_object(Object *object);
 
+    // releases all memory that was allocated by this document instance
+    void destroy() { allocator.destroy(); }
+
   private:
-    DocumentCatalog *rootCache = nullptr;
+    DocumentCatalog *rootCache            = nullptr;
+    int64_t currentResolutionObjectNumber = 0;
 
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);

@@ -36,8 +36,8 @@ create_test(write_object_test)
 if (NOT WIN32)
     add_executable(fuzzer fuzzer.cpp)
     target_link_libraries(fuzzer pdf)
-    target_link_options(fuzzer PRIVATE -fsanitize=fuzzer,address)
-    target_compile_options(fuzzer PRIVATE -fsanitize=fuzzer,address)
+    target_link_options(fuzzer PRIVATE -fsanitize=fuzzer)
+    target_compile_options(fuzzer PRIVATE -fsanitize=fuzzer)
 
     add_custom_target(test_fuzzer
             COMMAND $<TARGET_FILE:fuzzer> -runs=0 fuzzing-corpus

@@ -24,47 +24,48 @@ Result ReserveMemory(uint8_t *buffer, size_t sizeInBytes) {
 #else
 #include <sys/mman.h>
 PtrResult ReserveAddressRange(size_t sizeInBytes) {
-    // TODO check for error on mmap
     const auto ptr = (uint8_t *)mmap(nullptr, sizeInBytes, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr != MAP_FAILED) {
         return PtrResult::ok(ptr);
     }
 
-    /*
-EACCES
-    A file descriptor refers to a non-regular file. Or MAP_PRIVATE was requested, but fd is not open for reading. Or
-    MAP_SHARED was requested and PROT_WRITE is set, but fd is not open in read/write (O_RDWR) mode. Or PROT_WRITE is
-    set, but the file is append-only. EAGAIN The file has been locked, or too much memory has been locked (see
-    setrlimit(2)).
-
-EBADF
-    fd is not a valid file descriptor (and MAP_ANONYMOUS was not set).
-
-EINVAL
-    We don't like addr, length, or offset (e.g., they are too large, or not aligned on a page boundary).
-
-EINVAL
-    (since Linux 2.6.12) length was 0.
-
-EINVAL
-    flags contained neither MAP_PRIVATE or MAP_SHARED, or contained both of these values.
-
-ENFILE
-    The system limit on the total number of open files has been reached.
-
-ENODEV
-    The underlying file system of the specified file does not support memory mapping.
-
-ENOMEM
-    No memory is available, or the process's maximum number of mappings would have been exceeded.
-
-EPERM
-    The prot argument asks for PROT_EXEC but the mapped area belongs to a file on a file system that was mounted
-    no-exec. ETXTBSY MAP_DENYWRITE was set but the object specified by fd is open for writing. EOVERFLOW On 32-bit
-    architecture together with the large file extension (i.e., using 64-bit off_t): the number of pages used for length
-    plus number of pages used for offset would overflow unsigned long (32 bits).
-     */
-    return PtrResult::error("failed to reserve memory");
+    switch (errno) {
+    case EACCES:
+        // A file descriptor refers to a non-regular file. Or MAP_PRIVATE was requested, but fd is not open for reading.
+        // Or MAP_SHARED was requested and PROT_WRITE is set, but fd is not open in read/write (O_RDWR) mode. Or
+        // PROT_WRITE is set, but the file is append-only. EAGAIN The file has been locked, or too much memory has been
+        // locked (see setrlimit(2)).
+        return PtrResult::error("EACCES: invalid access parameters");
+    case EBADF:
+        // fd is not a valid file descriptor (and MAP_ANONYMOUS was not set).
+        return PtrResult ::error("EBADF: fd is not a valid file descriptor (and MAP_ANONYMOUS was not set).");
+    case EINVAL:
+        // We don't like addr, length, or offset (e.g., they are too large, or not aligned on a page boundary).
+        // or
+        // (since Linux 2.6.12) length was 0.
+        // or
+        // flags contained neither MAP_PRIVATE or MAP_SHARED, or contained both of these values.
+        return PtrResult ::error("EINVAL: invalid parameter supplied");
+    case ENFILE:
+        // The system limit on the total number of open files has been reached.
+        return PtrResult ::error("ENFILE: The system limit on the total number of open files has been reached.");
+    case ENODEV:
+        // The underlying file system of the specified file does not support memory mapping.
+        return PtrResult ::error(
+              "ENODEV: The underlying file system of the specified file does not support memory mapping.");
+    case ENOMEM:
+        // No memory is available, or the process's maximum number of mappings would have been exceeded.
+        return PtrResult ::error(
+              "ENOMEM: No memory is available, or the process's maximum number of mappings would have been exceeded.");
+    case EPERM:
+        // The prot argument asks for PROT_EXEC but the mapped area belongs to a file on a file system that was mounted
+        // no-exec. ETXTBSY MAP_DENYWRITE was set but the object specified by fd is open for writing. EOVERFLOW On
+        // 32-bit architecture together with the large file extension (i.e., using 64-bit off_t): the number of pages
+        // used for length plus number of pages used for offset would overflow unsigned long (32 bits).
+        return PtrResult ::error("EPERM: invalid permissions");
+    default:
+        return PtrResult::error("failed to reserve memory: {}", errno);
+    }
 };
 
 Result ReleaseAddressRange(uint8_t *buffer, size_t sizeInBytes) {
@@ -79,28 +80,20 @@ Result ReserveMemory(uint8_t *buffer, size_t sizeInBytes) {
         return Result::ok();
     }
 
-    /*
-     EACCES
-        The memory cannot be given the specified access. This can happen, for example, if you mmap(2) a file to
-    which you have read-only access, then ask mprotect() to mark it PROT_WRITE.
-
-    EINVAL
-        addr is not a valid pointer, or not a multiple of the system page size.
-
-    ENOMEM
-        Internal kernel structures could not be allocated.
-
-    ENOMEM
-        Addresses in the range [addr, addr+len-1] are invalid for the address space of the process, or specify one
-    or more pages that are not mapped. (Before kernel 2.4.19, the error EFAULT was incorrectly produced for these
-    cases.)
-     */
     switch (errno) {
     case EACCES:
+        // The memory cannot be given the specified access. This can happen, for example, if you mmap(2) a file to which
+        // you have read-only access, then ask mprotect() to mark it PROT_WRITE.
         return Result::error("EACCES");
     case EINVAL:
+        // addr is not a valid pointer, or not a multiple of the system page size.
         return Result::error("EINVAL: addr is not a valid pointer, or not a multiple of the system page size.");
     case ENOMEM:
+        // Internal kernel structures could not be allocated.
+        // or
+        // Addresses in the range [addr, addr+len-1] are invalid for the address space of the process, or specify one or
+        // more pages that are not mapped. (Before kernel 2.4.19, the error EFAULT was incorrectly produced for these
+        // cases.)
         return Result::error("ENOMEM: Internal kernel structures could not be allocated.");
     }
 
@@ -174,6 +167,11 @@ ValueResult<Allocator> Allocator::create() {
     auto internalArena  = internalArenaResult.value();
     auto temporaryArena = temporaryArenaResult.value();
     return ValueResult<Allocator>::ok(Allocator(internalArena, temporaryArena));
+}
+
+void Allocator::destroy() {
+    internalArena.destroy();
+    temporaryArena.destroy();
 }
 
 } // namespace pdf

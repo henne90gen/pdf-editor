@@ -94,6 +94,14 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
         currentTrailer->crossReferenceTable.objectCount       = static_cast<int64_t>(countInDict);
     }
 
+    if (currentTrailer->crossReferenceTable.objectCount < 0) {
+        return Result::error("Object count in cross reference table cannot be negative");
+    }
+    if (currentTrailer->crossReferenceTable.objectCount > 1000000) {
+        return Result::error("Too many objects in cross reference table: {}",
+                             currentTrailer->crossReferenceTable.objectCount);
+    }
+
     for (auto contentPtr = content.data(); contentPtr < content.data() + content.size();
          contentPtr += sizeField0 + sizeField1 + sizeField2) {
         uint64_t type = 0;
@@ -221,6 +229,9 @@ Result read_trailers(Document &document, uint8_t *crossRefStartPtr, Trailer *cur
                              err.what());
     }
 
+    if (currentTrailer->crossReferenceTable.objectCount < 0) {
+        return Result::error("Object count in cross reference table cannot be negative");
+    }
     if (currentTrailer->crossReferenceTable.objectCount > 1000000) {
         return Result::error("Too many objects in cross reference table: {}",
                              currentTrailer->crossReferenceTable.objectCount);
@@ -320,9 +331,13 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
     }
 
     if (entry.type == CrossReferenceEntryType::NORMAL) {
+        if (entry.normal.byteOffset > document.file.sizeInBytes) {
+            return LoadObjectResult ::error("Malformed cross reference table entry");
+        }
+
         auto *start   = document.file.data + entry.normal.byteOffset;
         auto *fileEnd = document.file.end_ptr();
-        if (start >= fileEnd) {
+        if (start + 6 >= fileEnd) {
             return LoadObjectResult::error("Malformed cross reference table entry");
         }
 
@@ -400,6 +415,7 @@ Result load_all_objects(Document &document, Trailer *trailer) {
     };
     auto compressedEntries = std::vector<NumberedCrossReferenceEntry>();
     auto &crt              = trailer->crossReferenceTable;
+
     for (uint64_t objectNumber = crt.firstObjectNumber;
          objectNumber < static_cast<uint64_t>(crt.firstObjectNumber + crt.objectCount); objectNumber++) {
         auto itr = document.objectList.find(objectNumber);
@@ -505,6 +521,7 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
 
     auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
     if (!is.is_open()) {
+        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to open pdf file for reading: '{}'", filePath);
     }
 
@@ -520,8 +537,10 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
 
     const auto readResult = read_data(document, loadAllObjects);
     if (readResult.has_error()) {
+        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to read document: {}", readResult.message());
     }
+
     return ValueResult<Document>::ok(document);
 }
 
@@ -532,7 +551,7 @@ ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t s
     }
 
     Document document         = {};
-    document.allocator        = std::move(allocatorResult.value());
+    document.allocator        = allocatorResult.value();
     document.file.data        = document.allocator.arena().push(size);
     document.file.sizeInBytes = size;
 
@@ -540,8 +559,10 @@ ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t s
 
     const auto readResult = read_data(document, loadAllObjects);
     if (readResult.has_error()) {
+        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to read document: {}", readResult.message());
     }
+
     return ValueResult<Document>::ok(document);
 }
 

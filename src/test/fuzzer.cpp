@@ -5,5 +5,10 @@
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     auto result = pdf::Document::read_from_memory(data, size);
-    return result.has_error();
+    if (result.has_error()) {
+        return 0;
+    }
+
+    result.value().destroy();
+    return 0;
 }
