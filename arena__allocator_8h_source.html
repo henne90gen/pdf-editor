@@ -134,24 +134,25 @@ $(function() {
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;arena() { <span class="keywordflow">return</span> internalArena; }</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a> get_temp() { <span class="keywordflow">return</span> <a class="code" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a>(temporaryArena); }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> internalArena;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> temporaryArena;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Allocator.html">Allocator</a>(<a class="code" href="structpdf_1_1Arena.html">Arena</a> _internalArena, <a class="code" href="structpdf_1_1Arena.html">Arena</a> _temporaryArena)</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        : internalArena(_internalArena), temporaryArena(_temporaryArena) {}</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;};</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;} <span class="comment">// namespace pdf</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">void</span> destroy();</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> internalArena;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> temporaryArena;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1Allocator.html">Allocator</a>(<a class="code" href="structpdf_1_1Arena.html">Arena</a> _internalArena, <a class="code" href="structpdf_1_1Arena.html">Arena</a> _temporaryArena)</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        : internalArena(_internalArena), temporaryArena(_temporaryArena) {}</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;};</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;} <span class="comment">// namespace pdf</span></div>
 <div class="ttc" id="aclasspdf_1_1ValueResult_html"><div class="ttname"><a href="classpdf_1_1ValueResult.html">pdf::ValueResult</a></div><div class="ttdef"><b>Definition:</b> result.h:37</div></div>
 <div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:64</div></div>
 <div class="ttc" id="astructpdf_1_1Arena_html"><div class="ttname"><a href="structpdf_1_1Arena.html">pdf::Arena</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:16</div></div>
 <div class="ttc" id="astructpdf_1_1Arena_html_a009c18304dfd0a68648af76140d14722"><div class="ttname"><a href="structpdf_1_1Arena.html#a009c18304dfd0a68648af76140d14722">pdf::Arena::push</a></div><div class="ttdeci">T * push(Args &amp;&amp;...args)</div><div class="ttdoc">allocates a new object in the arena and calls its constructor with the provided arguments</div><div class="ttdef"><b>Definition:</b> arena_allocator.h:31</div></div>
 <div class="ttc" id="astructpdf_1_1Arena_html_a1eb64f5fe6af2c8bd9dc8c9a5888e21d"><div class="ttname"><a href="structpdf_1_1Arena.html#a1eb64f5fe6af2c8bd9dc8c9a5888e21d">pdf::Arena::pop</a></div><div class="ttdeci">void pop()</div><div class="ttdoc">pops the allocation for an object from the arena</div><div class="ttdef"><b>Definition:</b> arena_allocator.h:38</div></div>
-<div class="ttc" id="astructpdf_1_1Arena_html_a2f29dd1ae24cf3216e4a33b9d969921a"><div class="ttname"><a href="structpdf_1_1Arena.html#a2f29dd1ae24cf3216e4a33b9d969921a">pdf::Arena::destroy</a></div><div class="ttdeci">void destroy()</div><div class="ttdoc">releases the underlying memory</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:132</div></div>
-<div class="ttc" id="astructpdf_1_1Arena_html_a528b2c800b5007a6017d98f9f3d1fadb"><div class="ttname"><a href="structpdf_1_1Arena.html#a528b2c800b5007a6017d98f9f3d1fadb">pdf::Arena::pop_all</a></div><div class="ttdeci">void pop_all()</div><div class="ttdoc">pops all allocations from the arena</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:161</div></div>
-<div class="ttc" id="astructpdf_1_1Arena_html_a7516974d6a444739ca809001229364bd"><div class="ttname"><a href="structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd">pdf::Arena::push</a></div><div class="ttdeci">uint8_t * push(size_t allocationSizeInBytes)</div><div class="ttdoc">push a new allocation into the arena</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:134</div></div>
+<div class="ttc" id="astructpdf_1_1Arena_html_a2f29dd1ae24cf3216e4a33b9d969921a"><div class="ttname"><a href="structpdf_1_1Arena.html#a2f29dd1ae24cf3216e4a33b9d969921a">pdf::Arena::destroy</a></div><div class="ttdeci">void destroy()</div><div class="ttdoc">releases the underlying memory</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:125</div></div>
+<div class="ttc" id="astructpdf_1_1Arena_html_a528b2c800b5007a6017d98f9f3d1fadb"><div class="ttname"><a href="structpdf_1_1Arena.html#a528b2c800b5007a6017d98f9f3d1fadb">pdf::Arena::pop_all</a></div><div class="ttdeci">void pop_all()</div><div class="ttdoc">pops all allocations from the arena</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:154</div></div>
+<div class="ttc" id="astructpdf_1_1Arena_html_a7516974d6a444739ca809001229364bd"><div class="ttname"><a href="structpdf_1_1Arena.html#a7516974d6a444739ca809001229364bd">pdf::Arena::push</a></div><div class="ttdeci">uint8_t * push(size_t allocationSizeInBytes)</div><div class="ttdoc">push a new allocation into the arena</div><div class="ttdef"><b>Definition:</b> arena_allocator.cpp:127</div></div>
 <div class="ttc" id="astructpdf_1_1TemporaryArena_html"><div class="ttname"><a href="structpdf_1_1TemporaryArena.html">pdf::TemporaryArena</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:54</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

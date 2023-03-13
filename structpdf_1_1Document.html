@@ -153,16 +153,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 <tr class="memitem:a411db343dabb04ae622057a4c02f847f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a411db343dabb04ae622057a4c02f847f">write_to_memory</a> (uint8_t *&amp;buffer, size_t &amp;size)</td></tr>
 <tr class="separator:a411db343dabb04ae622057a4c02f847f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61fc07704d72e9770567d23dbe31123b"><td class="memItemLeft" align="right" valign="top"><a id="a61fc07704d72e9770567d23dbe31123b"></a>
-<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a61fc07704d72e9770567d23dbe31123b">delete_page</a> (size_t pageNum)</td></tr>
-<tr class="memdesc:a61fc07704d72e9770567d23dbe31123b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the page with the given page number. <br /></td></tr>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><b>delete_page</b> (size_t pageNum)</td></tr>
 <tr class="separator:a61fc07704d72e9770567d23dbe31123b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2546bab5077d4dc0c58ee836d12aaac5"><td class="memItemLeft" align="right" valign="top"><a id="a2546bab5077d4dc0c58ee836d12aaac5"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a2546bab5077d4dc0c58ee836d12aaac5">insert_document</a> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;otherDocument, size_t atPageNum)</td></tr>
-<tr class="memdesc:a2546bab5077d4dc0c58ee836d12aaac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert another document into this one so that the first page of the inserted document has the given page number. <br /></td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>insert_document</b> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;otherDocument, size_t atPageNum)</td></tr>
 <tr class="separator:a2546bab5077d4dc0c58ee836d12aaac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b55ce463b50a5ae469ab97d34454767"><td class="memItemLeft" align="right" valign="top"><a id="a8b55ce463b50a5ae469ab97d34454767"></a>
-<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a8b55ce463b50a5ae469ab97d34454767">embed_file</a> (const std::string &amp;filePath)</td></tr>
-<tr class="memdesc:a8b55ce463b50a5ae469ab97d34454767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a file into the pdf document. <br /></td></tr>
+<a class="el" href="classpdf_1_1Result.html">Result</a>&#160;</td><td class="memItemRight" valign="bottom"><b>embed_file</b> (const std::string &amp;filePath)</td></tr>
 <tr class="separator:a8b55ce463b50a5ae469ab97d34454767"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89615b15e6213761f209c57adf080a7c"><td class="memItemLeft" align="right" valign="top"><a id="a89615b15e6213761f209c57adf080a7c"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>next_object_number</b> () const</td></tr>
@@ -171,9 +168,11 @@ int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>next_object_number
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>add_object</b> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
 <tr class="separator:ae31b235dace352dd93a598fffbabb1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6658320fa71220a37d408f03f033a870"><td class="memItemLeft" align="right" valign="top"><a id="a6658320fa71220a37d408f03f033a870"></a>
-<a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a6658320fa71220a37d408f03f033a870">find_existing_object</a> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
-<tr class="memdesc:a6658320fa71220a37d408f03f033a870"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> that wraps the given <a class="el" href="structpdf_1_1Object.html">Object</a>. <br /></td></tr>
+<a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>find_existing_object</b> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
 <tr class="separator:a6658320fa71220a37d408f03f033a870"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a722db7323ad835e6fd7412b40c9ffd7e"><td class="memItemLeft" align="right" valign="top"><a id="a722db7323ad835e6fd7412b40c9ffd7e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>destroy</b> ()</td></tr>
+<tr class="separator:a722db7323ad835e6fd7412b40c9ffd7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>

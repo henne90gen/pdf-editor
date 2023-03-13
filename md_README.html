@@ -131,7 +131,9 @@ Test Files</h1>
 </table>
 <h1><a class="anchor" id="autotoc_md7"></a>
 Fuzzing</h1>
+<p>IMPORTANT: Make sure to compile <code>fuzzer</code> with <code>CMAKE_BUILD_TYPE=Debug</code> mode!</p>
 <p>Running existing fuzzing test cases: <code>cmake --build . --target test_fuzzer</code> Running fuzzer: <code>cmake --build . --target fuzzer &amp;&amp; ./src/test/fuzzer ../fuzzing-corpus</code></p>
+<p><code>./src/test/fuzzer -rss_limit_mb=8192 -max_len=1000000 ../fuzzing-corpus</code> <code>./src/test/fuzzer -rss_limit_mb=8192 -max_len=1000000 -merge=1 ../new-fuzzing-corpus ../fuzzing-corpus</code></p>
 <h1><a class="anchor" id="autotoc_md8"></a>
 Ideas</h1>
 <ul>
