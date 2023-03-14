@@ -82,7 +82,8 @@ void Renderer::on_do(Operator *op) {
     auto stride         = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
     auto currentRowSize = static_cast<int32_t>((bitsPerComponentOpt.value()->value * 3 * width) / 32.0 * 4.0);
 
-    auto pBuf = reinterpret_cast<uint8_t *>(std::malloc(stride * height));
+    auto tempArena = page.document.allocator.get_temp();
+    auto pBuf      = tempArena.arena().push(stride * height);
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             auto pBufIndex      = (height - row - 1) * stride + col * 4;
@@ -99,7 +100,6 @@ void Renderer::on_do(Operator *op) {
     cr->paint();
 
     surface->finish();
-    free(pBuf);
 }
 
 } // namespace pdf
