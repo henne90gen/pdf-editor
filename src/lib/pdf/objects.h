@@ -165,7 +165,7 @@ struct Stream : public Object {
                                std::string_view unencodedData);
 
     [[nodiscard]] std::string_view decode(Allocator &allocator);
-    void encode(Arena &arena, const std::string &data);
+    void encode(Allocator &allocator, const std::string &data);
     [[nodiscard]] std::vector<std::string> filters() const;
 };
 

@@ -17,7 +17,7 @@ void OperatorTraverser::traverse() {
 }
 
 void OperatorTraverser::apply_operator(Operator *op) {
-    //    spdlog::trace("{}", operatorTypeToString(op->type));
+    spdlog::info("{}", operatorTypeToString(op->type));
     if (op->type == Operator::Type::w_SetLineWidth) {
         state().lineWidth = op->data.w_SetLineWidth.lineWidth;
     } else if (op->type == Operator::Type::q_PushGraphicsState) {

@@ -391,8 +391,9 @@ ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const st
     is.seekg(0);
     spdlog::info("Embedding {} bytes of file '{}'", fileSize, filePath);
 
-    char *fileData = (char *)malloc(fileSize);
-    is.read(fileData, static_cast<std::streamsize>(fileSize));
+    auto tempArena = allocator.temporary();
+    auto fileData  = tempArena.arena().push(fileSize);
+    is.read((char *)fileData, static_cast<std::streamsize>(fileSize));
 
     auto checksum    = hash::md5_checksum(reinterpret_cast<const uint8_t *>(fileData), fileSize);
     auto checksumStr = hash::to_hex_string(checksum);
@@ -408,8 +409,7 @@ ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const st
           {"Params", allocator.arena().push<Dictionary>(params)},
     };
 
-    auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view(fileData, fileSize));
-    free(fileData);
+    auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view((char *)fileData, fileSize));
     return ValueResult<Stream *>::ok(result);
 }
 

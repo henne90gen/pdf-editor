@@ -67,7 +67,7 @@ struct Allocator {
     Allocator() = default;
 
     Arena &arena() { return internalArena; }
-    TemporaryArena get_temp() { return TemporaryArena(temporaryArena); }
+    TemporaryArena temporary() { return TemporaryArena(temporaryArena); }
     void destroy();
 
   private:

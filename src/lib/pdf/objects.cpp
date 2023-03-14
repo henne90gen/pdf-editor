@@ -121,7 +121,7 @@ std::string_view Stream::decode(Allocator &allocator) {
             auto *input      = output;
             size_t inputSize = outputSize;
 
-            auto tempArena          = allocator.get_temp();
+            auto tempArena          = allocator.temporary();
             output                  = tempArena.arena().push(outputSize);
             const auto *firstOutput = output;
 
@@ -170,11 +170,10 @@ std::string_view Stream::decode(Allocator &allocator) {
     return {(char *)output, outputSize};
 }
 
-void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, size_t &destSize) {
-    // TODO rewrite this to use the temp allocator instead
-    // TODO check that deflate_buffer actually works, sometimes deflateEnd returns a Z_DATA_ERROR
-    destSize = srcSize * 2;
-    destData = (char *)std::malloc(destSize);
+std::string_view deflate_buffer(Allocator &allocator, const uint8_t *srcData, size_t srcSize) {
+    auto tempArena = allocator.temporary();
+    auto tempSize  = srcSize * 2;
+    auto tempData  = tempArena.arena().push(tempSize);
 
     z_stream stream  = {};
     stream.zalloc    = Z_NULL;
@@ -182,48 +181,42 @@ void deflate_buffer(const char *srcData, size_t srcSize, const char *&destData, 
     stream.opaque    = Z_NULL;
     stream.avail_in  = (uInt)srcSize;     // size of input
     stream.next_in   = (Bytef *)srcData;  // input char array
-    stream.avail_out = (uInt)destSize;    // size of output
-    stream.next_out  = (Bytef *)destData; // output char array
+    stream.avail_out = (uInt)tempSize;    // size of output
+    stream.next_out  = (Bytef *)tempData; // output char array
 
     auto ret = deflateInit(&stream, Z_BEST_COMPRESSION);
     if (ret != Z_OK) {
         // TODO error handling
-        return;
+        return {};
     }
 
-    ret = deflate(&stream, Z_FULL_FLUSH);
-    if (ret != Z_OK) {
+    ret = deflate(&stream, Z_FINISH);
+    if (ret != Z_STREAM_END) {
         // TODO error handling
-        return;
+        return {};
     }
 
-    ret      = deflateEnd(&stream);
-    destSize = stream.total_out;
+    ret = deflateEnd(&stream);
     if (ret != Z_OK) {
         // TODO error handling
-        return;
+        return {};
     }
+
+    auto resultSize = stream.total_out;
+    auto resultData = allocator.arena().push(resultSize);
+    std::memcpy(resultData, tempData, resultSize);
+    return {(char *)resultData, resultSize};
 }
 
-void Stream::encode(Arena &arena, const std::string &data) {
-    const char *encodedData = nullptr;
-    size_t encodedDataSize  = 0;
-    deflate_buffer(data.data(), data.size(), encodedData, encodedDataSize);
-
-    auto newStreamData = arena.push(encodedDataSize);
-    memcpy(newStreamData, encodedData, encodedDataSize);
-    free((void *)encodedData);
-
-    streamData                   = std::string_view((char *)newStreamData, encodedDataSize);
-    dictionary->values["Length"] = arena.push<Integer>(encodedDataSize);
+void Stream::encode(Allocator &allocator, const std::string &data) {
+    streamData                   = deflate_buffer(allocator, (uint8_t *)data.data(), data.size());
+    dictionary->values["Length"] = allocator.arena().push<Integer>(streamData.size());
 }
 
 Stream *Stream::create_from_unencoded_data(Allocator &allocator,
                                            const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
                                            std::string_view unencodedData) {
-    const char *encodedData = nullptr;
-    size_t encodedDataSize  = 0;
-    deflate_buffer(unencodedData.data(), unencodedData.size(), encodedData, encodedDataSize);
+    auto streamData = deflate_buffer(allocator, (uint8_t *)unencodedData.data(), unencodedData.size());
 
     std::unordered_map<std::string, Object *> dict = {};
     for (const auto &entry : additionalDictionaryEntries) {
@@ -231,16 +224,11 @@ Stream *Stream::create_from_unencoded_data(Allocator &allocator,
     }
 
     auto &arena    = allocator.arena();
-    dict["Length"] = arena.push<Integer>(encodedDataSize);
+    dict["Length"] = arena.push<Integer>(streamData.size());
     dict["Filter"] = arena.push<Name>("FlateDecode");
 
-    // TODO this might be inefficient: maybe place the stream data after the stream object into the allocator
-    auto streamData = arena.push(encodedDataSize);
-    std::memcpy(streamData, encodedData, encodedDataSize);
-    std::free((void *)encodedData);
-
     auto dictionary = arena.push<Dictionary>(dict);
-    return arena.push<Stream>(dictionary, std::string_view((char *)streamData, encodedDataSize));
+    return arena.push<Stream>(dictionary, streamData);
 }
 
 std::string HexadecimalString::to_string() const {

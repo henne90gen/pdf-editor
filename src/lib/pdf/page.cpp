@@ -250,7 +250,7 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-    cs->encode(document.allocator.arena(), ss.str());
+    cs->encode(document.allocator, ss.str());
 
     document.documentChangedSignal.emit();
 
@@ -283,11 +283,11 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
     ss << -offsetX;
     ss << " ";
     ss << offsetY;
-    ss << " Td";
+    ss << " Td ";
 
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
-    cs->encode(document.allocator.arena(), ss.str());
+    cs->encode(document.allocator, ss.str());
 
     document.documentChangedSignal.emit();
 

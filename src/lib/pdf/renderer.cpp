@@ -82,7 +82,7 @@ void Renderer::on_do(Operator *op) {
     auto stride         = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
     auto currentRowSize = static_cast<int32_t>((bitsPerComponentOpt.value()->value * 3 * width) / 32.0 * 4.0);
 
-    auto tempArena = page.document.allocator.get_temp();
+    auto tempArena = page.document.allocator.temporary();
     auto pBuf      = tempArena.arena().push(stride * height);
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
