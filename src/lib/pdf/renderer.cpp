@@ -79,11 +79,27 @@ void Renderer::on_do(Operator *op) {
         return;
     }
 
-    auto stride  = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
-    auto surface = Cairo::ImageSurface::create((unsigned char *)pixels.data(), Cairo::ImageSurface::Format::RGB24,
-                                               width, height, stride);
+    auto stride         = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
+    auto currentRowSize = static_cast<int32_t>((bitsPerComponentOpt.value()->value * 3 * width) / 32.0 * 4.0);
+
+    auto pBuf = reinterpret_cast<uint8_t *>(std::malloc(stride * height));
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            auto pBufIndex      = (height - row - 1) * stride + col * 4;
+            auto pixelsIndex    = static_cast<int32_t>(row * currentRowSize + col * 3);
+            pBuf[pBufIndex + 0] = pixels[pixelsIndex + 2];
+            pBuf[pBufIndex + 1] = pixels[pixelsIndex + 1];
+            pBuf[pBufIndex + 2] = pixels[pixelsIndex + 0];
+            pBuf[pBufIndex + 3] = 0;
+        }
+    }
+
+    auto surface = Cairo::ImageSurface::create(pBuf, Cairo::ImageSurface::Format::RGB24, width, height, stride);
     cr->set_source(surface, pageImage.xOffset, pageImage.yOffset);
     cr->paint();
+
+    surface->finish();
+    free(pBuf);
 }
 
 } // namespace pdf
