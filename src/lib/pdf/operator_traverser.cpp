@@ -87,9 +87,6 @@ void OperatorTraverser::beginText() {
     // only one BT ... ET can be open at a time
     ASSERT(!state().textState.textObjectParams.has_value());
     state().textState.textObjectParams = std::optional(TextObjectState());
-
-    // TODO this seems wrong (how can we flip the coordinate space on the y axis?)
-    state().textState.textObjectParams.value().textLineMatrix.translate(0, page.height());
 }
 
 void OperatorTraverser::pushGraphicsState() { stateStack.push_back(state()); }
@@ -97,9 +94,10 @@ void OperatorTraverser::pushGraphicsState() { stateStack.push_back(state()); }
 void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
 
 void OperatorTraverser::moveStartOfNextLine(Operator *op) {
-    auto tmp = Cairo::identity_matrix();
-    // TODO this '-' seems wrong (how can we flip the coordinate space on the y axis?)
-    tmp.translate(op->data.Td_MoveStartOfNextLine.x, -op->data.Td_MoveStartOfNextLine.y);
+    auto tmp             = Cairo::identity_matrix();
+    auto startOfNextLine = op->data.Td_MoveStartOfNextLine;
+    spdlog::info("MoveStartOfNextLine: {} | {}", startOfNextLine.x, startOfNextLine.y);
+    tmp.translate(startOfNextLine.x, startOfNextLine.y);
 
     ASSERT(state().textState.textObjectParams.has_value());
 
@@ -138,10 +136,9 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
 Cairo::Matrix OperatorTraverser::font_matrix() const {
     const auto &textState = state().textState;
     auto textRenderMatrix = Cairo::identity_matrix();
-    textRenderMatrix.scale(textState.textFontSize, textState.textFontSize);
+    textRenderMatrix.scale(textState.textFontSize, -textState.textFontSize);
     textRenderMatrix.translate(0, textState.textRiseUnscaled);
-
-    return textRenderMatrix * textState.textObjectParams.value().textMatrix;
+    return textRenderMatrix;
 }
 
 } // namespace pdf

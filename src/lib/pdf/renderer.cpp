@@ -60,7 +60,10 @@ void Renderer::on_show_text(Operator *op) {
         }
     }
 
+    cr->save();
+    cr->transform(textState.textObjectParams.value().textMatrix);
     cr->show_glyphs(glyphs);
+    cr->restore();
 }
 
 void Renderer::on_do(Operator *op) {
