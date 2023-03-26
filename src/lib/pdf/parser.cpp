@@ -257,11 +257,7 @@ IndirectObject *Parser::parse_indirect_object() {
         const size_t pos2              = objectStartContent.find(' ', pos1);
         const int64_t generationNumber = std::stoll(std::string(objectStartContent.substr(pos1 + 1, pos2)));
 
-        auto lastTokenContent = tokens[currentTokenIdx].content;
         currentTokenIdx++;
-        auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
-        auto dataLength = tokenDiff + lastTokenContent.size();
-        auto data       = std::string_view(objectStartContent.data(), dataLength);
         return arena.push<IndirectObject>(objectNumber, generationNumber, object);
     } catch (std::out_of_range &err) {
         // TODO add logging
@@ -276,7 +272,6 @@ Object *Parser::parse_stream_or_dictionary() {
         return nullptr;
     }
 
-    auto objectStartContent = tokens[currentTokenIdx].content.data();
     auto beforeTokenIdx     = currentTokenIdx;
     auto dictionary         = parse_dictionary();
     if (dictionary == nullptr) {
@@ -337,11 +332,7 @@ Object *Parser::parse_stream_or_dictionary() {
         return nullptr;
     }
 
-    auto lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    auto tokenDiff  = lastTokenContent.data() - objectStartContent;
-    auto dataLength = tokenDiff + lastTokenContent.size();
-    auto data       = std::string_view(objectStartContent, dataLength);
     return arena.push<Stream>(dictionary, streamData);
 }
 
