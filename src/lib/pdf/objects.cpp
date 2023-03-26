@@ -286,6 +286,7 @@ std::string Object::type_string() const {
         ENUMERATE_OBJECT_TYPES(DECLARE_CASE)
 #undef DECLARE_CASE
     }
+    return "unknown";
 }
 
 } // namespace pdf
