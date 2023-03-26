@@ -10,18 +10,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # TODO Building has to be done inside a docker image, because gtk-4 is only available in Ubuntu 21.04 and later
-      - name: Build and Test
-        run: docker build . -t build-image
+      - run: mkdir build
+      - run: docker build . -t build-image
 
-      - name: Retrieve Build Artifact
+      - name: Build
         run: |
-          id=$(docker create build-image)
-          docker cp $id:/app/build/pdf-editor-0.0.1-Linux.zip pdf-editor-0.0.1-Linux.zip
-          docker rm -v $id
+          docker run -v $(pwd):/app build-image cmake .. -G Ninja -D  CMAKE_BUILD_TYPE=Release
+          docker run -v $(pwd):/app build-image cmake --build .
+
+      - name: Test
+        run: |
+          docker run -v $(pwd):/app build-image ctest --output-no-failure
+          docker run -v $(pwd):/app build-image cmake --build . --target test_fuzzer
+          docker run -v $(pwd):/app build-image cmake --build . --target test_suite_verapdf
+          docker run -v $(pwd):/app build-image cmake --build . --target test_suite_isartor
+          docker run -v $(pwd):/app build-image cmake --build . --target test_suite_bfosupport
+
+      - name: Package
+        run: |
+          docker run -v $(pwd):/app build-image cpack -G ZIP
 
       # TODO prevent double zipping (maybe unpack before archiving?)
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          path: pdf-editor-0.0.1-Linux.zip
+          path: build/pdf-editor-0.0.1-Linux.zip

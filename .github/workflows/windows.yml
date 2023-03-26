@@ -18,19 +18,26 @@ jobs:
           update: true
           install: git mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-toolchain mingw-w64-x86_64-gtkmm4 mingw-w64-x86_64-clang
 
-      - name: Build and Test
-        # TODO enable tests on windows:
-        #  ctest --output-on-failure
-        #  cmake --build . --target test_files
-        #  cmake --build . --target test_suite_verapdf
-        #  cmake --build . --target test_suite_isartor
-        #  cmake --build . --target test_suite_bfosupport
+      - run: mkdir build
+
+      - name: Build
+        working-directory: build
         run: |
-          mkdir build
-          cd build
           cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++
           cmake --build .
-          cmake --build . --target package
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure
+      # TODO enable all tests on windows:
+      #  cmake --build . --target test_files
+      #  cmake --build . --target test_suite_verapdf
+      #  cmake --build . --target test_suite_isartor
+      #  cmake --build . --target test_suite_bfosupport
+
+      - name: Package
+        working-directory: build
+        run: cmake --build . --target package
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
