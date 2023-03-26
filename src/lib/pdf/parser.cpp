@@ -141,7 +141,6 @@ Array *Parser::parse_array() {
         return nullptr;
     }
 
-    auto objectStartContent = tokens[currentTokenIdx].content;
     auto beforeTokenIdx     = currentTokenIdx;
     currentTokenIdx++;
 
@@ -161,11 +160,7 @@ Array *Parser::parse_array() {
         objects.push_back(object);
     }
 
-    auto lastTokenContent = tokens[currentTokenIdx].content;
     currentTokenIdx++;
-    auto tokenDiff  = lastTokenContent.data() - objectStartContent.data();
-    auto dataLength = tokenDiff + lastTokenContent.size();
-    auto data       = std::string_view(objectStartContent.data(), dataLength);
     return arena.push<Array>(objects);
 }
 
