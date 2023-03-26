@@ -14,7 +14,7 @@ jobs:
 
       - name: Build
         run: |
-          docker run -v $(pwd):/app build-image cmake .. -G Ninja -D  CMAKE_BUILD_TYPE=Release
+          docker run -v $(pwd):/app build-image cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=/usr/bin/clang -D CMAKE_CXX_COMPILER=/usr/bin/clang++
           docker run -v $(pwd):/app build-image cmake --build .
 
       - name: Test
