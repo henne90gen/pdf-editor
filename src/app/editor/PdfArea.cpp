@@ -94,11 +94,18 @@ void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
                    static_cast<float>(textBlock.height)},               //
             };
 
+            spdlog::info("       Rect: {} | {} | {} | {}", r.origin.x, r.origin.y, r.size.width, r.size.height);
+
             graphene_rect_t scaledRect = {};
             graphene_rect_scale(&r, static_cast<float>(_zoom), static_cast<float>(_zoom), &scaledRect);
             graphene_rect_offset(&scaledRect, static_cast<float>(-scrollOffsetX), static_cast<float>(verticalOffset));
 
+            spdlog::info("Scaled Rect: {} | {} | {} | {}", scaledRect.origin.x, scaledRect.origin.y,
+                         scaledRect.size.width, scaledRect.size.height);
+
             graphene_point_t p = {static_cast<float>(mouseX), static_cast<float>(mouseY)};
+
+            spdlog::info("Mouse: {} | {}", p.x, p.y);
             if (!graphene_rect_contains_point(&scaledRect, &p)) {
                 continue;
             }

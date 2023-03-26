@@ -101,7 +101,8 @@ struct TextBlockFinder : public OperatorTraverser {
 
         double x = 0.0;
         double y = 0.0;
-        fontMatrix.transform_point(x, y);
+        const auto &textState = state().textState;
+        textState.textObjectParams->textLineMatrix.transform_point(x, y);
 
         Cairo::TextExtents extents = {};
         cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), static_cast<int>(glyphs.size()), &extents);
