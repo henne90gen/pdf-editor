@@ -1,10 +1,9 @@
-name: Build and Test on Windows
+name: Windows
 
 on: push
 
 jobs:
   build:
-    name: "Build and Test on Windows"
     runs-on: windows-latest
     defaults:
       run:

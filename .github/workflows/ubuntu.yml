@@ -1,10 +1,9 @@
-name: Build and Test on Ubuntu
+name: Ubuntu
 
 on: push
 
 jobs:
   build:
-    name: "Build and Test on Ubuntu"
     runs-on: ubuntu-latest
 
     steps:
