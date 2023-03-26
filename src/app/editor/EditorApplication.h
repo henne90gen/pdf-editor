@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gtkmm/application.h>
+#include <gtkmm/filechoosernative.h>
 
 #include <PdfApplication.h>
 
@@ -16,5 +17,10 @@ class EditorApplication : public PdfApplication {
     EditorApplication();
 
   private:
-    void on_save(const Glib::VariantBase &);
+    Glib::RefPtr<Gtk::FileChooserNative> dialog;
+
+    void on_open_file_dialog();
+    void on_open_file_dialog_response(int response);
+    void on_save();
+    void on_open_file(const Glib::VariantBase &);
 };

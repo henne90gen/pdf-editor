@@ -17,7 +17,7 @@ void OperatorTraverser::traverse() {
 }
 
 void OperatorTraverser::apply_operator(Operator *op) {
-    spdlog::info("{}", operatorTypeToString(op->type));
+//    spdlog::info("{}", operatorTypeToString(op->type));
     if (op->type == Operator::Type::w_SetLineWidth) {
         state().lineWidth = op->data.w_SetLineWidth.lineWidth;
     } else if (op->type == Operator::Type::q_PushGraphicsState) {
@@ -96,7 +96,6 @@ void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
 void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp             = Cairo::identity_matrix();
     auto startOfNextLine = op->data.Td_MoveStartOfNextLine;
-    spdlog::info("MoveStartOfNextLine: {} | {}", startOfNextLine.x, startOfNextLine.y);
     tmp.translate(startOfNextLine.x, startOfNextLine.y);
 
     ASSERT(state().textState.textObjectParams.has_value());

@@ -18,4 +18,7 @@ class EditorWindow : public Gtk::ApplicationWindow {
     pdf::Document document;
 
     void on_document_change();
+    Gdk::DragAction on_dnd_enter(double x, double y);
+    Gdk::DragAction on_dnd_motion(double x, double y);
+    bool on_dnd_drop(const Glib::ValueBase &value, double x, double y);
 };
