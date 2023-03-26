@@ -4,6 +4,7 @@ on: push
 
 jobs:
   build:
+    name: Windows
     runs-on: windows-latest
     defaults:
       run:
