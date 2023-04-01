@@ -226,14 +226,17 @@ void Page::for_each_image(const std::function<ForEachResult(PageImage &)> &func)
 void PageImage::move(Document &document, double offsetX, double offsetY) const {
     std::stringstream ss;
 
-    // write everything up to the operator we want to wrap
     auto decoded            = cs->decode(document.allocator);
     auto bytesUntilOperator = op->content.data() - decoded.data();
+
+    // write everything up to the operator we want to wrap
     ss << decoded.substr(0, bytesUntilOperator);
 
     if (op->content[0] != ' ') {
         ss << " ";
     }
+
+    // TODO operator stream, if we applied such a move operation previously and just edit that one instead
 
     // save state
     ss << "q ";
