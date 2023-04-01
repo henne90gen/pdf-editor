@@ -7,9 +7,9 @@ void OperatorTraverser::traverse() {
 
     auto streams = page.content_streams();
     ASSERT(!streams.empty());
-    for (auto s : streams) {
-        currentContentStream = s;
-        s->for_each_operator(page.document.allocator, [this](Operator *op) {
+    for (auto stream : streams) {
+        currentContentStream = stream;
+        stream->for_each_operator(page.document.allocator, [this](Operator *op) {
             apply_operator(op);
             return ForEachResult::CONTINUE;
         });

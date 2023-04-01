@@ -167,7 +167,7 @@ std::string_view Stream::decode(Allocator &allocator) {
     decodedStream     = output;
     decodedStreamSize = outputSize;
 
-    return {(char *)output, outputSize};
+    return {(char *)decodedStream, decodedStreamSize};
 }
 
 std::string_view deflate_buffer(Allocator &allocator, const uint8_t *srcData, size_t srcSize) {
@@ -209,6 +209,7 @@ std::string_view deflate_buffer(Allocator &allocator, const uint8_t *srcData, si
 }
 
 void Stream::encode(Allocator &allocator, const std::string &data) {
+    decodedStream                = nullptr;
     streamData                   = deflate_buffer(allocator, (uint8_t *)data.data(), data.size());
     dictionary->values["Length"] = allocator.arena().push<Integer>(streamData.size());
 }

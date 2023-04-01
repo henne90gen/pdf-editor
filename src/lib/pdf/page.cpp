@@ -42,7 +42,8 @@ std::vector<ContentStream *> Page::content_streams() {
 }
 
 void ContentStream::for_each_operator(Allocator &allocator, const std::function<ForEachResult(Operator *)> &func) {
-    auto textProvider   = StringTextProvider(decode(allocator));
+    auto decoded        = decode(allocator);
+    auto textProvider   = StringTextProvider(decoded);
     auto lexer          = TextLexer(textProvider);
     auto operatorParser = OperatorParser(lexer, allocator.arena());
     Operator *op        = operatorParser.get_operator();
@@ -99,8 +100,8 @@ struct TextBlockFinder : public OperatorTraverser {
             }
         }
 
-        double x = 0.0;
-        double y = 0.0;
+        double x              = 0.0;
+        double y              = 0.0;
         const auto &textState = state().textState;
         textState.textObjectParams->textLineMatrix.transform_point(x, y);
 
@@ -226,30 +227,31 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
     std::stringstream ss;
 
     // write everything up to the operator we want to wrap
-    auto decoded = cs->decode(document.allocator);
-    ss << decoded.substr(0, op->content.data() - decoded.data());
+    auto decoded            = cs->decode(document.allocator);
+    auto bytesUntilOperator = op->content.data() - decoded.data();
+    ss << decoded.substr(0, bytesUntilOperator);
 
-    // wrap operator with offset
     if (op->content[0] != ' ') {
         ss << " ";
     }
+
+    // save state
+    ss << "q ";
+
+    // apply offset
     ss << "1 0 0 1 ";
-    ss << offsetX - this->xOffset;
+    ss << offsetX;
     ss << " ";
-    ss << offsetY - this->yOffset;
+    ss << offsetY;
     ss << " cm ";
 
     // write operator
     ss << op->content;
 
-    // wrap operator with negative offset
-    ss << " 1 0 0 1 ";
-    ss << -offsetX - this->xOffset;
-    ss << " ";
-    ss << -offsetY - this->yOffset;
-    ss << " cm";
+    // restore state
+    ss << " Q";
 
-    ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
+    ss << decoded.substr(bytesUntilOperator + op->content.size());
 
     cs->encode(document.allocator, ss.str());
 

@@ -66,6 +66,8 @@ class PdfArea : public ScrolledZoomedContent {
     std::vector<PageTextBlocks> pageTextBlocks = {};
     std::vector<PageImages> pageImages         = {};
 
+    void init_document_data();
+
     void on_mouse_moved(double x, double y);
     void on_mouse_drag_begin(double x, double y);
     void on_mouse_drag_update(double x, double y);

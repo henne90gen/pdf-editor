@@ -1,6 +1,5 @@
 #include "PdfArea.h"
 
-#include <gtkmm/checkbutton.h>
 #include <gtkmm/eventcontrollermotion.h>
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/gesturedrag.h>
@@ -20,6 +19,15 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
     auto motionCtrl = Gtk::EventControllerMotion::create();
     motionCtrl->signal_motion().connect(sigc::mem_fun(*this, &PdfArea::on_mouse_moved));
     add_controller(motionCtrl);
+
+    documentChangedSignal.connect(sigc::mem_fun(*this, &PdfArea::init_document_data));
+
+    init_document_data();
+}
+
+void PdfArea::init_document_data() {
+    pageTextBlocks.clear();
+    pageImages.clear();
 
     int i             = 0;
     double pageOffset = 0.0;
@@ -62,8 +70,8 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
     for (auto page : pages) {
         cr->save();
 
-        // move (0,0) from the top-left to the bottom-left corner of the page and make positive y-axis extend vertically
-        // upward
+        // move (0,0) from the top-left to the bottom-left corner of the page
+        // and make positive y-axis extend vertically upward
         auto pageHeight = page->height();
         auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
         cr->transform(matrix);
@@ -134,17 +142,17 @@ void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
         cr->transform(matrix);
 
         for (const auto &image : images.images) {
+            if (&image != selectedImage) {
+                continue;
+            }
+
             cr->rectangle(                                   //
                   image.xOffset,                             //
                   image.yOffset,                             //
                   static_cast<double>(image.image->width()), //
                   static_cast<double>(image.image->height()) //
             );
-            if (&image == selectedImage) {
-                cr->set_source_rgba(0, 1, 1, 1);
-            } else {
-                cr->set_source_rgba(0, 0, 1, 0.1);
-            }
+            cr->set_source_rgba(0, 1, 1, 0.1);
             cr->fill();
         }
 
@@ -174,7 +182,7 @@ void PdfArea::update_zoom(double z) {
 void PdfArea::on_mouse_moved(double x, double y) {
     mouseX = x;
     mouseY = y;
-    queue_draw();
+//    queue_draw();
 }
 
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {
@@ -205,6 +213,7 @@ void PdfArea::on_mouse_drag_begin(double x, double y) {
         dragStartX = image->xOffset;
         dragStartY = image->yOffset;
     }
+
     selectedImage = image;
 }
 
@@ -226,7 +235,9 @@ void PdfArea::on_mouse_drag_end(double x, double y) {
         selectedImage->move(document, pageX, pageY);
         documentChangedSignal.emit();
     }
+
     dragStartX = 0.0;
     dragStartY = 0.0;
+
     queue_draw();
 }

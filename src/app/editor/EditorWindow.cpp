@@ -28,16 +28,26 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
 }
 
 void EditorWindow::save() {
-    if (document.file.path.empty()) {
+    auto path = document.file.path;
+    if (path.empty()) {
         spdlog::info("No file path available for current document");
         return;
     }
 
-    spdlog::info("Saving {}", document.file.path);
-    auto result = document.write_to_file(document.file.path + "_copy.pdf");
+    auto extension = path.substr(path.size() - 4);
+    if (extension == ".pdf") {
+        path = path.substr(0, path.size() - 4);
+    }
+    path = path + "_copy.pdf";
+
+    spdlog::info("Saving {}", path);
+    auto result = document.write_to_file(path);
     if (result.has_error()) {
         spdlog::warn("Failed to save document: {}", result.message());
+        return;
     }
+
+    set_title(path);
 }
 
 void EditorWindow::on_document_change() { set_title("* " + document.file.path); }
