@@ -155,7 +155,9 @@ void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint6
     auto startXref = s.tellp();
     if (document.file.trailer.dict != nullptr) {
         s << "xref\n";
-        s << 0 << " " << byteOffsets.size() << "\n";
+
+        auto xrefEntryCount = byteOffsets.size() + 1;
+        s << 0 << " " << xrefEntryCount << "\n";
 
         s << "0000000000 65535 f \n";
         for (size_t i = 0; i < byteOffsets.size(); i++) {
