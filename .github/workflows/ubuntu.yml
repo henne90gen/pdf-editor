@@ -20,7 +20,7 @@ jobs:
 
       - name: Test
         run: |
-          docker run -v $(pwd):/app build-image ctest --output-no-failure
+          docker run -v $(pwd):/app build-image ctest --output-on-failure
           docker run -v $(pwd):/app build-image cmake --build . --target test_fuzzer
           docker run -v $(pwd):/app build-image cmake --build . --target test_suite_verapdf
           docker run -v $(pwd):/app build-image cmake --build . --target test_suite_isartor
