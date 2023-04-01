@@ -26,10 +26,11 @@ jobs:
           cmake .. -G Ninja -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++
           cmake --build .
 
-      - name: Test
-        working-directory: build
-        run: |
-          ctest --output-on-failure
+# TODO download xpdf cli tools and install them to C:/Program Files/Xpdf
+#      - name: Test
+#        working-directory: build
+#        run: |
+#          ctest --output-on-failure
 #          cmake --build . --target test_suite_verapdf
 #          cmake --build . --target test_suite_isartor
 #          cmake --build . --target test_suite_bfosupport
