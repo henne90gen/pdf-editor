@@ -60,7 +60,7 @@ ValueResult<Execution> execute(const std::string &command, const std::vector<std
         return ValueResult<Execution>::error("failed to create pipe for stderr");
     }
     if (!SetHandleInformation(stderrRead, HANDLE_FLAG_INHERIT, 0)) {
-        return ValueResult<Execution>::error("failed to configure pipe for stdout");
+        return ValueResult<Execution>::error("failed to configure pipe for stderr");
     }
 
     // additional information
