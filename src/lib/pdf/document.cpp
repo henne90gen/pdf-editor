@@ -432,19 +432,6 @@ int64_t Document::add_object(Object *object) {
 
 int64_t Document::next_object_number() const { return objectList.size(); }
 
-// void create_stream(int64_t objectNumber, const std::string &content, std::stringstream &ss) {
-//     const char *encodedData = nullptr;
-//     size_t encodedDataSize  = 0;
-//     deflate_buffer(content.data(), content.size(), encodedData, encodedDataSize);
-//
-//     ss << objectNumber << " 0 obj <<\n";
-//     ss << "/Length " << encodedDataSize << "\n";
-//     ss << "/Filter /FlateDecode\n";
-//     ss << ">> stream\n";
-//     ss << std::string_view(encodedData, encodedDataSize);
-//     ss << "endstream endobj\n";
-// }
-
 IndirectObject *Document::find_existing_object(Object *object) {
     for (auto &entry : objectList) {
         if (entry.second->object == object) {

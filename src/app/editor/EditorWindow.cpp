@@ -17,9 +17,8 @@ EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder>
     set_title(filePath);
     set_show_menubar(true);
 
-    document.documentChangedSignal.connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
-
-    Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
+    auto pdfWindow = Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
+    pdfWindow->document_changed_signal().connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
 
     auto dropTarget = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
     dropTarget->signal_enter().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_enter), false);

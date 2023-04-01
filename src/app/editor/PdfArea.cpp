@@ -224,6 +224,7 @@ void PdfArea::on_mouse_drag_end(double x, double y) {
         const auto pageX = x;
         const auto pageY = -y;
         selectedImage->move(document, pageX, pageY);
+        documentChangedSignal.emit();
     }
     dragStartX = 0.0;
     dragStartY = 0.0;

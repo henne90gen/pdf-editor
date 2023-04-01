@@ -49,6 +49,8 @@ class PdfArea : public ScrolledZoomedContent {
 
     void on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int width, int height);
 
+    sigc::signal<void()> documentChangedSignal;
+
   private:
     pdf::Document &document;
 

@@ -13,6 +13,8 @@ class PdfWindow : public ScrolledZoomedWindow {
   public:
     [[maybe_unused]] PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document);
 
+    sigc::signal<void()> document_changed_signal() { return pdfArea->documentChangedSignal; }
+
   protected:
     std::pair<double, double> calculate_content_size() override;
     ScrolledZoomedContent &content() override;

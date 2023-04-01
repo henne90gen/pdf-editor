@@ -108,8 +108,6 @@ struct Document : public ReferenceResolver {
     DocumentFile file                                         = {};
     std::unordered_map<uint64_t, IndirectObject *> objectList = {};
 
-    sigc::signal<void()> documentChangedSignal;
-
     ~Document();
 
     template <typename T> T *get(Object *object) {

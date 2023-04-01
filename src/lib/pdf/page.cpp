@@ -253,8 +253,6 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
 
     cs->encode(document.allocator, ss.str());
 
-    document.documentChangedSignal.emit();
-
     spdlog::info("Moved image '{}' by x={} and y={}", name, offsetX, offsetY);
 }
 
@@ -289,8 +287,6 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
     ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
 
     cs->encode(document.allocator, ss.str());
-
-    document.documentChangedSignal.emit();
 
     spdlog::info("Moved text block '{}' by x={} and y={}", text, offsetX, offsetY);
 }
