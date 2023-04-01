@@ -185,7 +185,7 @@ void write_pdf(const std::string &name) {
 
     auto document = result.value();
     auto anError  = document.write_to_file(name);
-    ASSERT_FALSE(anError.has_error());
+    ASSERT_FALSE(anError.has_error()) << anError.message();
 
 #if _WIN32
     const char *command = "C:/Program Files/Xpdf/bin64/pdfinfo.exe";
@@ -193,10 +193,10 @@ void write_pdf(const std::string &name) {
     const char *command = "/usr/bin/pdfinfo";
 #endif
     auto expectedResult = pdf::execute(command, {testFilePath});
-    ASSERT_FALSE(expectedResult.has_error());
+    ASSERT_FALSE(expectedResult.has_error()) << expectedResult.message();
 
     auto actualResult = pdf::execute(command, {name});
-    ASSERT_FALSE(actualResult.has_error());
+    ASSERT_FALSE(actualResult.has_error()) << actualResult.message();
     ASSERT_EQ(expectedResult.value().status, actualResult.value().status);
     ASSERT_EQ(expectedResult.value().error, actualResult.value().error);
 

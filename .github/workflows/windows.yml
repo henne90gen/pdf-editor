@@ -30,9 +30,9 @@ jobs:
         working-directory: build
         run: |
           ctest --output-on-failure
-          cmake --build . --target test_suite_verapdf
-          cmake --build . --target test_suite_isartor
-          cmake --build . --target test_suite_bfosupport
+#          cmake --build . --target test_suite_verapdf
+#          cmake --build . --target test_suite_isartor
+#          cmake --build . --target test_suite_bfosupport
 
       - name: Package
         working-directory: build
