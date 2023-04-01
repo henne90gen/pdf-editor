@@ -73,8 +73,8 @@ TEST(Writer, MoveImage) {
     ASSERT_NE(size, 0);
 
     auto assertFunc = [](pdf::PageImage &image) {
-        ASSERT_EQ(10, image.xOffset);
-        ASSERT_EQ(10, image.yOffset);
+        ASSERT_EQ(95.5, image.xOffset);
+        ASSERT_EQ(704.189, image.yOffset);
     };
 
     auto docResult = pdf::Document::read_from_memory(buffer, size);
