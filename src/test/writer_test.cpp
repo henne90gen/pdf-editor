@@ -105,8 +105,8 @@ TEST(Writer, Embed) {
     ASSERT_NE(size, 0);
 
     auto assertFunc = [](pdf::EmbeddedFile *embeddedFile) {
-        ASSERT_EQ("EmbeddedFile", embeddedFile->dictionary->must_find<pdf::Name>("Type)")->value);
-        ASSERT_EQ(6650, embeddedFile->dictionary->must_find<pdf::Integer>("Length)")->value);
+        ASSERT_EQ("EmbeddedFile", embeddedFile->dictionary->must_find<pdf::Name>("Type")->value);
+        ASSERT_EQ(6650, embeddedFile->dictionary->must_find<pdf::Integer>("Length")->value);
         auto params = embeddedFile->dictionary->must_find<pdf::Dictionary>("Params");
         ASSERT_EQ(7350, params->must_find<pdf::Integer>("Size")->value);
     };
