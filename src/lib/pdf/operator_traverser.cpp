@@ -18,37 +18,52 @@ void OperatorTraverser::traverse() {
 
 void OperatorTraverser::apply_operator(Operator *op) {
 //    spdlog::info("{}", operatorTypeToString(op->type));
-    if (op->type == Operator::Type::w_SetLineWidth) {
+    switch (op->type) {
+    case Operator::Type::w_SetLineWidth:
         state().lineWidth = op->data.w_SetLineWidth.lineWidth;
-    } else if (op->type == Operator::Type::q_PushGraphicsState) {
+        break;
+    case Operator::Type::q_PushGraphicsState:
         pushGraphicsState();
-    } else if (op->type == Operator::Type::Q_PopGraphicsState) {
+        break;
+    case Operator::Type::Q_PopGraphicsState:
         popGraphicsState();
-    } else if (op->type == Operator::Type::re_AppendRectangle) {
+        break;
+    case Operator::Type::re_AppendRectangle:
         appendRectangle();
-    } else if (op->type == Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule) {
+        break;
+    case Operator::Type::Wx_ModifyClippingPathUsingEvenOddRule:
         modifyClippingPathUsingEvenOddRule();
-    } else if (op->type == Operator::Type::n_EndPathWithoutFillingOrStroking) {
+        break;
+    case Operator::Type::n_EndPathWithoutFillingOrStroking:
         endPathWithoutFillingOrStroking();
-    } else if (op->type == Operator::Type::rg_SetNonStrokingColorRGB) {
+        break;
+    case Operator::Type::rg_SetNonStrokingColorRGB:
         setNonStrokingColor(op);
-    } else if (op->type == Operator::Type::cm_ModifyCurrentTransformationMatrix) {
+        break;
+    case Operator::Type::cm_ModifyCurrentTransformationMatrix:
         modifyCurrentTransformationMatrix(op);
-    } else if (op->type == Operator::Type::BT_BeginText) {
+        break;
+    case Operator::Type::BT_BeginText:
         beginText();
-    } else if (op->type == Operator::Type::ET_EndText) {
+        break;
+    case Operator::Type::ET_EndText:
         endText();
-    } else if (op->type == Operator::Type::Td_MoveStartOfNextLine) {
+        break;
+    case Operator::Type::Td_MoveStartOfNextLine:
         moveStartOfNextLine(op);
-    } else if (op->type == Operator::Type::Tf_SetTextFontAndSize) {
+        break;
+    case Operator::Type::Tf_SetTextFontAndSize:
         setTextFontAndSize(op);
-    } else if (op->type == Operator::Type::TJ_ShowOneOrMoreTextStrings) {
+        break;
+    case Operator::Type::TJ_ShowOneOrMoreTextStrings:
         on_show_text(op);
-    } else if (op->type == Operator::Type::Do_PaintXObject) {
+        break;
+    case Operator::Type::Do_PaintXObject:
         on_do(op);
-    } else {
+        break;
+    default:
         // TODO unknown operator
-        spdlog::trace("OperatorTraverser::apply_operator() - unknown operator {}", (int)op->type);
+        spdlog::warn("OperatorTraverser::apply_operator() - unknown operator {}", operatorTypeToString(op->type));
     }
 }
 

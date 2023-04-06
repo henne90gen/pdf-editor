@@ -50,7 +50,7 @@ void EditorApplication::on_open_file(const Glib::VariantBase &parameter) {
     }
 
     auto path = Glib::VariantBase::cast_dynamic<Glib::Variant<Glib::ustring>>(parameter);
-    auto pathString = locale_from_utf8(path.get());
+    auto pathString = Glib::locale_from_utf8(path.get());
     open_window(pathString);
 }
 
