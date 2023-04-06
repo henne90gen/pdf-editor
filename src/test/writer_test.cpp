@@ -3,9 +3,17 @@
 #include <iostream>
 #include <pdf/document.h>
 #include <pdf/page.h>
+#include <sstream>
 
 #include "process.h"
 #include "test_util.h"
+
+TEST(Writer, bla) {
+    auto s = std::stringstream();
+    uint32_t i  = 1230;
+    s << i;
+    ASSERT_EQ("1230", s.str());
+}
 
 TEST(Writer, DeletePageInvalidPageNum) {
     auto result = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");

@@ -171,7 +171,13 @@ void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint6
         write_indirect_object(s, document.file.trailer.streamObject);
     }
 
-    s << "\nstartxref\n" << startXref << "\n%%EOF\n";
+    s << "\nstartxref\n";
+
+    // NOTE writing the number directly to the stream (s << startXref) fails if the ostream is backed by a file for some
+    // reason (it writes 1,000 instead of 1000)
+    s << std::to_string(startXref);
+
+    s << "\n%%EOF\n";
 }
 
 Result write_to_stream(Document &document, std::ostream &s) {
