@@ -33,11 +33,12 @@ TEST(Lexer, Integer) {
 }
 
 TEST(Lexer, Real) {
-    auto textProvider = pdf::StringTextProvider("1.3 -4.2 +3.5");
+    auto textProvider = pdf::StringTextProvider("1.3 -4.2 +3.5 .5");
     auto lexer        = pdf::TextLexer(textProvider);
     assertNextToken(lexer, pdf::Token::Type::REAL, "1.3");
     assertNextToken(lexer, pdf::Token::Type::REAL, "-4.2");
     assertNextToken(lexer, pdf::Token::Type::REAL, "+3.5");
+    assertNextToken(lexer, pdf::Token::Type::REAL, ".5");
     assertNoMoreTokens(lexer);
 }
 

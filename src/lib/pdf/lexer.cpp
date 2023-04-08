@@ -62,10 +62,12 @@ std::optional<Token> matchInt(const std::string_view &word) {
 
 std::optional<Token> matchFloatOrInt(const std::string_view &word) {
     auto result = matchInt(word);
-    if (!result.has_value()) {
-        return {};
+    size_t idx  = 0;
+
+    if (result.has_value()) {
+        idx = result.value().content.length();
     }
-    auto idx = result.value().content.length();
+
     if (idx >= word.length() || word[idx] != '.') {
         return result;
     }
