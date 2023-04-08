@@ -17,6 +17,7 @@
 #include <spdlog/spdlog.h>
 
 #include <pdf/document.h>
+#include <pdf/operator_traverser.h>
 #include <pdf/page.h>
 
 #include <ScrolledZoomedWindow.h>

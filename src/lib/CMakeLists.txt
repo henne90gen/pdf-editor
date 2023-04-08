@@ -30,7 +30,6 @@ add_library(pdf
         pdf/cmap.cpp
         pdf/operator_parser.cpp
         pdf/image.cpp
-        pdf/renderer.cpp
         pdf/operator_traverser.cpp
         pdf/memory/arena_allocator.cpp
         pdf/hash/hex_string.cpp

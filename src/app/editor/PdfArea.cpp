@@ -4,8 +4,6 @@
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/gesturedrag.h>
 
-#include <pdf/renderer.h>
-
 PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*builder*/, pdf::Document &_document)
     : ScrolledZoomedContent(obj), document(_document) {
     set_draw_func(sigc::mem_fun(*this, &PdfArea::on_draw));
@@ -29,23 +27,27 @@ void PdfArea::init_document_data() {
     pageTextBlocks.clear();
     pageImages.clear();
 
+    return;
+
     int i             = 0;
     double pageOffset = 0.0;
-    document.for_each_page([this, &i, &pageOffset](pdf::Page *page) {
+    document.for_each_page([&i, &pageOffset](pdf::Page *page) {
         spdlog::info("Page {} with offset {}", i++, pageOffset);
 
-        pageTextBlocks.emplace_back(pageOffset, page->text_blocks());
-        for (const auto &textBlock : pageTextBlocks.back().textBlocks) {
-            spdlog::info("Found TextBlock at position {},{} with size {}x{}", textBlock.x, textBlock.y, textBlock.width,
-                         textBlock.height);
-        }
+        // pageTextBlocks.emplace_back(pageOffset, page->text_blocks());
+        // for (const auto &textBlock : pageTextBlocks.back().textBlocks) {
+        //     spdlog::info("Found TextBlock at position {},{} with size {}x{}", textBlock.x, textBlock.y,
+        //     textBlock.width,
+        //                  textBlock.height);
+        // }
 
-        const auto &images = page->images();
-        for (const auto &img : images) {
-            spdlog::info("Found Image {} at position {},{} with size {}x{}", img.name, img.xOffset, img.yOffset,
-                         img.image->width(), img.image->height());
-        }
-        pageImages.push_back({page, images});
+        // const auto &images = page->images();
+        // for (const auto &img : images) {
+        //     spdlog::info("Found Image {} at position {},{} with size {}x{}", img.name, img.xOffset,
+        //     img.yOffset,
+        //                  img.image->width(), img.image->height());
+        // }
+        // pageImages.push_back({page, images});
 
         pageOffset += page->height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
@@ -53,7 +55,7 @@ void PdfArea::init_document_data() {
 }
 
 void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int /*width*/, int /*height*/) {
-    //    spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
+    // spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
 
     cr->translate(-scrollOffsetX, -scrollOffsetY);
     cr->scale(_zoom, _zoom);
@@ -70,17 +72,12 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
     for (auto page : pages) {
         cr->save();
 
-        // move (0,0) from the top-left to the bottom-left corner of the page
-        // and make positive y-axis extend vertically upward
-        auto pageHeight = page->height();
-        auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
-        cr->transform(matrix);
-
-        pdf::Renderer renderer(*page, cr);
-        renderer.render();
+        pdf::OperatorTraverser traverser(*page, cr);
+        traverser.traverse();
 
         cr->restore();
 
+        auto pageHeight = page->height();
         cr->translate(0, pageHeight + PAGE_PADDING);
     }
 
@@ -182,7 +179,7 @@ void PdfArea::update_zoom(double z) {
 void PdfArea::on_mouse_moved(double x, double y) {
     mouseX = x;
     mouseY = y;
-//    queue_draw();
+    //    queue_draw();
 }
 
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {

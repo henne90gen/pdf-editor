@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <pdf/document.h>
-#include <pdf/renderer.h>
 
 #if 0
 TEST(Renderer, Blank) {

@@ -56,74 +56,6 @@ void ContentStream::for_each_operator(Allocator &allocator, const std::function<
     }
 }
 
-struct TextBlockFinder : public OperatorTraverser {
-    std::vector<TextBlock> result = {};
-
-    explicit TextBlockFinder(Page &page) : OperatorTraverser(page) {}
-
-    std::vector<TextBlock> find() {
-        traverse();
-        return result;
-    }
-
-    void on_show_text(Operator *op) override {
-        TextFont &textFont = state().textState.textFont;
-        auto cmapOpt       = textFont.font->cmap(page.document);
-
-        auto face       = textFont.cairoFace;
-        auto fontMatrix = font_matrix();
-        auto ctm        = stateStack.back().currentTransformationMatrix;
-        auto scaledFont = Cairo::ScaledFont::create(face, fontMatrix, ctm);
-
-        auto glyphs    = std::vector<Cairo::Glyph>();
-        double offsetX = 0.0;
-        std::string text;
-        for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
-            if (value->is<HexadecimalString>()) {
-                if (cmapOpt.has_value()) {
-                    text += cmapOpt.value()->map_char_codes(value->as<HexadecimalString>());
-                }
-                auto str = value->as<HexadecimalString>()->to_string();
-                for (char c : str) {
-                    auto i             = static_cast<uint8_t>(c);
-                    Cairo::Glyph glyph = {.index = i, .x = offsetX, .y = 0.0};
-                    glyphs.push_back(glyph);
-
-                    Cairo::TextExtents extents;
-                    cairo_scaled_font_glyph_extents(scaledFont->cobj(), &glyph, 1, &extents);
-                    offsetX += static_cast<double>(extents.x_advance);
-                }
-            } else if (value->is<LiteralString>()) {
-                text += value->as<LiteralString>()->value;
-            } else if (value->is<Integer>()) {
-                offsetX -= static_cast<double>(value->as<Integer>()->value) / 1000.0;
-            }
-        }
-
-        double x              = 0.0;
-        double y              = 0.0;
-        const auto &textState = state().textState;
-        textState.textObjectParams->textLineMatrix.transform_point(x, y);
-
-        Cairo::TextExtents extents = {};
-        cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), static_cast<int>(glyphs.size()), &extents);
-        result.push_back({
-              .text   = text,
-              .x      = x,
-              .y      = y,
-              .width  = extents.width,
-              .height = extents.height,
-              .op     = op,
-              .cs     = currentContentStream,
-        });
-    }
-};
-
-std::vector<TextBlock> Page::text_blocks() {
-    auto finder = TextBlockFinder(*this);
-    return finder.find();
-}
-
 size_t count_TJ_characters(CMap *cmap, Operator *op) {
     // TODO skip whitespace characters
     size_t result = 0;
@@ -190,37 +122,27 @@ size_t Page::character_count() {
     return result;
 }
 
-std::vector<PageImage> Page::images() {
-    auto result = std::vector<PageImage>();
-    for_each_image([&result](PageImage &image) {
-        result.push_back(image);
-        return ForEachResult::CONTINUE;
-    });
-    return result;
+std::vector<TextBlock> Page::text_blocks() {
+    // TODO cache the results of this
+    auto traverser = OperatorTraverser(*this);
+    traverser.traverse();
+    return traverser.textBlocks;
 }
 
-struct ImageFinder : public OperatorTraverser {
-    const std::function<ForEachResult(PageImage &)> &func;
-    std::vector<PageImage> result = {};
-
-    explicit ImageFinder(Page &page, const std::function<ForEachResult(PageImage &)> &_func)
-        : OperatorTraverser(page), func(_func) {}
-
-    void on_do(Operator *op) override {
-        auto pageImageResult = PageImage::create(page, state(), op, currentContentStream);
-        if (pageImageResult.has_error()) {
-            return;
-        }
-
-        auto pageImage = pageImageResult.value();
-        result.push_back(pageImage);
-        func(pageImage);
-    }
-};
+std::vector<PageImage> Page::images() {
+    // TODO cache the results of this
+    auto traverser = OperatorTraverser(*this);
+    traverser.traverse();
+    return traverser.images;
+}
 
 void Page::for_each_image(const std::function<ForEachResult(PageImage &)> &func) {
-    auto finder = ImageFinder(*this, func);
-    finder.traverse();
+    auto images = this->images();
+    for (auto &image : images) {
+        if (func(image) == ForEachResult::BREAK) {
+            break;
+        }
+    }
 }
 
 void PageImage::move(Document &document, double offsetX, double offsetY) const {

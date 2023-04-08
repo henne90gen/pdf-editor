@@ -90,10 +90,24 @@ struct GraphicsState {
 
 struct OperatorTraverser {
     Page &page;
+    Cairo::RefPtr<Cairo::Context> cr;
     ContentStream *currentContentStream   = nullptr;
     std::vector<GraphicsState> stateStack = {};
 
-    explicit OperatorTraverser(Page &_page) : page(_page) { stateStack.emplace_back(); }
+    std::vector<TextBlock> textBlocks = {};
+    std::vector<PageImage> images     = {};
+
+    explicit OperatorTraverser(Page &_page, const Cairo::RefPtr<Cairo::Context> &_cr) : page(_page), cr(_cr) {
+        stateStack.emplace_back();
+    }
+
+    explicit OperatorTraverser(Page &_page) : page(_page) {
+        // initialize the Cairo context with a dummy surface
+        auto surface = Cairo::RecordingSurface::create();
+        cr           = Cairo::Context::create(surface);
+
+        stateStack.emplace_back();
+    }
 
     void traverse();
 
@@ -103,9 +117,6 @@ struct OperatorTraverser {
 
     GraphicsState &state() { return stateStack.back(); }
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
-
-    virtual void on_show_text(Operator *) {}
-    virtual void on_do(Operator *) {}
 
   private:
     void apply_operator(Operator *op);
@@ -121,6 +132,8 @@ struct OperatorTraverser {
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;
+    void showText(Operator *);
+    void onDo(Operator *);
 };
 
 } // namespace pdf
