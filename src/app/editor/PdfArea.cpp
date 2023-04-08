@@ -49,7 +49,7 @@ void PdfArea::init_document_data() {
         // }
         // pageImages.push_back({page, images});
 
-        pageOffset += page->height() + PAGE_PADDING;
+        pageOffset += page->attr_height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
     });
 }
@@ -77,7 +77,7 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 
         cr->restore();
 
-        auto pageHeight = page->height();
+        auto pageHeight = page->attr_height();
         cr->translate(0, pageHeight + PAGE_PADDING);
     }
 
@@ -134,7 +134,7 @@ void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
     for (const auto &images : pageImages) {
         cr->save();
 
-        auto pageHeight = images.page->height();
+        auto pageHeight = images.page->attr_height();
         auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
         cr->transform(matrix);
 
@@ -185,7 +185,7 @@ void PdfArea::on_mouse_moved(double x, double y) {
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {
     for (auto &images : pageImages) {
         const auto pageX = x;
-        const auto pageY = images.page->height() - y;
+        const auto pageY = images.page->attr_height() - y;
 
         for (auto &image : images.images) {
             if (pageX < image.xOffset || //

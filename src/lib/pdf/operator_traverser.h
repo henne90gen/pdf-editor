@@ -3,9 +3,12 @@
 #include <vector>
 
 #include "pdf/font.h"
-#include "pdf/page.h"
 
 namespace pdf {
+
+struct Page;
+struct ContentStream;
+struct Operator;
 
 struct Color {
     double r = 0.0;
@@ -88,9 +91,63 @@ struct GraphicsState {
     double miterLimit = 10.0;
 };
 
+struct TextBlock {
+    Page *page = nullptr;
+
+    std::string text;
+    double x      = 0.0;
+    double y      = 0.0;
+    double width  = 0.0;
+    double height = 0.0;
+
+    Operator *op      = nullptr;
+    ContentStream *cs = nullptr;
+
+    /// moves the text block on the page by the specified offset
+    void move(Document &document, double offsetX, double offsetY) const;
+};
+
+struct XObjectImage : public Stream {
+    int64_t width() { return dictionary->must_find<Integer>("Width")->value; }
+    int64_t height() { return dictionary->must_find<Integer>("Height")->value; }
+    std::optional<Object *> color_space() { return dictionary->find<Object>("ColorSpace"); }
+    std::optional<Integer *> bits_per_component() { return dictionary->find<Integer>("BitsPerComponent"); }
+    bool image_mask() {
+        const auto opt = dictionary->find<Boolean>("ImageMask");
+        if (!opt.has_value()) {
+            return false;
+        }
+        return opt.value()->value;
+    }
+};
+
+struct PageImage {
+    Page *page = nullptr;
+
+    std::string name;
+    double xOffset      = 0.0;
+    double yOffset      = 0.0;
+    XObjectImage *image = nullptr;
+
+    Operator *op      = nullptr;
+    ContentStream *cs = nullptr;
+
+    PageImage() = default;
+    PageImage(Page *_page, std::string _name, double _xOffset, double _yOffset, XObjectImage *_image, Operator *_op,
+              ContentStream *_cs)
+        : page(_page), name(std::move(_name)), xOffset(_xOffset), yOffset(_yOffset), image(_image), op(_op), cs(_cs) {}
+
+    /// Moves the image on the page by the specified offset
+    void move(Document &document, double offsetX, double offsetY) const;
+
+    static ValueResult<PageImage> create(Page &page, GraphicsState &state, Operator *op, ContentStream *cs);
+};
+
 struct OperatorTraverser {
     Page &page;
     Cairo::RefPtr<Cairo::Context> cr;
+    bool dirty = true;
+
     ContentStream *currentContentStream   = nullptr;
     std::vector<GraphicsState> stateStack = {};
 

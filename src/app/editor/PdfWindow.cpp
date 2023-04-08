@@ -13,12 +13,12 @@ std::pair<double, double> PdfWindow::calculate_content_size() {
     double width  = 0;
     double height = PAGE_PADDING;
     document.for_each_page([&width, &height](pdf::Page *page) {
-        double currentWidth = page->width();
+        double currentWidth = page->attr_width();
         if (currentWidth > width) {
             width = currentWidth;
         }
-        // TODO maybe add some padding between the pages
-        height += page->height() + PAGE_PADDING;
+
+        height += page->attr_height() + PAGE_PADDING;
         return pdf::ForEachResult::CONTINUE;
     });
 

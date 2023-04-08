@@ -1,17 +1,26 @@
 #include "operator_traverser.h"
 
+#include "pdf/page.h"
+
 namespace pdf {
 
 void OperatorTraverser::traverse() {
+    if (!dirty) {
+        return;
+    }
+
+    images.clear();
+    textBlocks.clear();
+
     cr->save();
 
     // move (0,0) from the top-left to the bottom-left corner of the page
     // and make positive y-axis extend vertically upward
-    auto pageHeight = page.height();
+    auto pageHeight = page.attr_height();
     auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
     cr->transform(matrix);
 
-    auto cropBox = page.crop_box();
+    auto cropBox = page.attr_crop_box();
     cr->set_source_rgb(1, 1, 1);
     cr->rectangle(0, 0, cropBox->width(), cropBox->height());
     cr->fill();
@@ -27,6 +36,8 @@ void OperatorTraverser::traverse() {
     }
 
     cr->restore();
+
+    dirty = false;
 }
 
 void OperatorTraverser::apply_operator(Operator *op) {
@@ -138,7 +149,7 @@ void OperatorTraverser::moveStartOfNextLine(Operator *op) {
 void OperatorTraverser::setTextFontAndSize(Operator *op) {
     state().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
-    auto fontMapOpt = page.resources()->fonts(page.document);
+    auto fontMapOpt = page.attr_resources()->fonts(page.document);
     if (!fontMapOpt.has_value()) {
         // TODO add logging
         return;
@@ -252,6 +263,7 @@ void OperatorTraverser::showText(Operator *op) {
     Cairo::TextExtents extents = {};
     cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), static_cast<int>(glyphs.size()), &extents);
     textBlocks.push_back({
+          .page   = &page,
           .text   = text,
           .x      = x,
           .y      = y,

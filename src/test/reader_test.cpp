@@ -18,7 +18,7 @@ TEST(Reader, Blank) {
     ASSERT_EQ(pages.size(), 1);
 
     auto page        = pages[0];
-    auto contentsOpt = page->contents();
+    auto contentsOpt = page->attr_contents();
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
@@ -42,7 +42,7 @@ TEST(Reader, HelloWorldGeneral) {
     ASSERT_EQ(pages.size(), 1);
 
     auto page        = pages[0];
-    auto contentsOpt = page->contents();
+    auto contentsOpt = page->attr_contents();
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());
@@ -60,7 +60,7 @@ TEST(Reader, HelloWorldFont) {
     ASSERT_EQ(pages.size(), 1);
     auto page = pages[0];
 
-    auto fontMapOpt = page->resources()->fonts(page->document);
+    auto fontMapOpt = page->attr_resources()->fonts(page->document);
     ASSERT_TRUE(fontMapOpt.has_value());
     auto fontMap = fontMapOpt.value();
     ASSERT_NE(fontMap, nullptr);
@@ -97,7 +97,7 @@ TEST(Reader, HelloWorldCmap) {
     ASSERT_EQ(pages.size(), 1);
     auto page = pages[0];
 
-    auto fontMapOpt = page->resources()->fonts(page->document);
+    auto fontMapOpt = page->attr_resources()->fonts(page->document);
     ASSERT_TRUE(fontMapOpt.has_value());
     auto fontMap = fontMapOpt.value();
     ASSERT_NE(fontMap, nullptr);
@@ -137,7 +137,7 @@ TEST(Reader, ObjectStream) {
     ASSERT_EQ(pages.size(), 1);
 
     auto page        = pages[0];
-    auto contentsOpt = page->contents();
+    auto contentsOpt = page->attr_contents();
     ASSERT_TRUE(contentsOpt.has_value());
     auto contents = contentsOpt.value();
     ASSERT_TRUE(contents->is<pdf::Stream>());

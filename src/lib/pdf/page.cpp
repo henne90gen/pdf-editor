@@ -3,9 +3,10 @@
 #include <sstream>
 
 #include "pdf/operator_parser.h"
-#include "pdf/operator_traverser.h"
 
 namespace pdf {
+
+Page::Page(Document &_document, PageTreeNode *_node) : document(_document), node(_node) {}
 
 int64_t Page::rotate() {
     const std::optional<Integer *> &rot = node->attribute<Integer>(document, "Rotate", true);
@@ -15,12 +16,12 @@ int64_t Page::rotate() {
     return rot.value()->value;
 }
 
-double Page::width() { return crop_box()->width(); }
+double Page::attr_width() { return attr_crop_box()->width(); }
 
-double Page::height() { return crop_box()->height(); }
+double Page::attr_height() { return attr_crop_box()->height(); }
 
 std::vector<ContentStream *> Page::content_streams() {
-    auto contentsOpt = contents();
+    auto contentsOpt = attr_contents();
     if (!contentsOpt.has_value()) {
         return {};
     }
@@ -77,7 +78,7 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
 size_t count_Tj_characters(Operator *op) { return op->data.Tj_ShowTextString.string->value.size(); }
 
 std::optional<Font *> Page::get_font(const Tf_SetTextFontSize &data) {
-    auto fontMapOpt = resources()->fonts(document);
+    auto fontMapOpt = attr_resources()->fonts(document);
     if (!fontMapOpt.has_value()) {
         // TODO add logging
         return {};
@@ -123,15 +124,11 @@ size_t Page::character_count() {
 }
 
 std::vector<TextBlock> Page::text_blocks() {
-    // TODO cache the results of this
-    auto traverser = OperatorTraverser(*this);
     traverser.traverse();
     return traverser.textBlocks;
 }
 
 std::vector<PageImage> Page::images() {
-    // TODO cache the results of this
-    auto traverser = OperatorTraverser(*this);
     traverser.traverse();
     return traverser.images;
 }
@@ -180,6 +177,8 @@ void PageImage::move(Document &document, double offsetX, double offsetY) const {
 
     cs->encode(document.allocator, ss.str());
 
+    page->traverser.dirty = true;
+
     spdlog::info("Moved image '{}' by x={} and y={}", name, offsetX, offsetY);
 }
 
@@ -215,15 +214,17 @@ void TextBlock::move(Document &document, double offsetX, double offsetY) const {
 
     cs->encode(document.allocator, ss.str());
 
+    page->traverser.dirty = true;
+
     spdlog::info("Moved text block '{}' by x={} and y={}", text, offsetX, offsetY);
 }
 
 ValueResult<PageImage> PageImage::create(Page &page, GraphicsState &state, Operator *op, ContentStream *cs) {
     const auto &xObjectName = op->data.Do_PaintXObject.name->value;
 
-    const auto xObjectMapOpt = page.resources()->x_objects(page.document);
+    const auto xObjectMapOpt = page.attr_resources()->x_objects(page.document);
     if (!xObjectMapOpt.has_value()) {
-        return ValueResult<PageImage>::error("asda");
+        return ValueResult<PageImage>::error("failed to get XObject map");
     }
 
     const auto &xObjectMap   = xObjectMapOpt.value();
@@ -231,7 +232,7 @@ ValueResult<PageImage> PageImage::create(Page &page, GraphicsState &state, Opera
     const auto xObjectRefOpt = xObjectMap->find<IndirectReference>(xObjectKey);
     const auto xObjectOpt    = page.document.get<Stream>(xObjectRefOpt);
     if (!xObjectOpt.has_value()) {
-        return ValueResult<PageImage>::error("Failed to find XObject with XObjectKey={}", xObjectKey);
+        return ValueResult<PageImage>::error("failed to find XObject with XObjectKey={}", xObjectKey);
     }
 
     const auto xObject = xObjectOpt.value();
