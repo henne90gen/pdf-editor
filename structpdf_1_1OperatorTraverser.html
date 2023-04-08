@@ -75,20 +75,12 @@ $(function() {
 <div class="title">pdf::OperatorTraverser Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Inheritance diagram for pdf::OperatorTraverser:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="structpdf_1_1OperatorTraverser.png" usemap="#pdf::OperatorTraverser_map" alt=""/>
-  <map id="pdf::OperatorTraverser_map" name="pdf::OperatorTraverser_map">
-<area href="structpdf_1_1ImageFinder.html" alt="pdf::ImageFinder" shape="rect" coords="0,56,143,80"/>
-<area href="structpdf_1_1Renderer.html" alt="pdf::Renderer" shape="rect" coords="153,56,296,80"/>
-<area href="structpdf_1_1TextBlockFinder.html" alt="pdf::TextBlockFinder" shape="rect" coords="306,56,449,80"/>
-  </map>
-</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a3488ba38daaa0ff9daa15d0f74931575"><td class="memItemLeft" align="right" valign="top"><a id="a3488ba38daaa0ff9daa15d0f74931575"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>OperatorTraverser</b> (<a class="el" href="structpdf_1_1Page.html">Page</a> &amp;_page, const Cairo::RefPtr&lt; Cairo::Context &gt; &amp;_cr)</td></tr>
+<tr class="separator:a3488ba38daaa0ff9daa15d0f74931575"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38fb11e2c660d60c1d3a71b93142360f"><td class="memItemLeft" align="right" valign="top"><a id="a38fb11e2c660d60c1d3a71b93142360f"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>OperatorTraverser</b> (<a class="el" href="structpdf_1_1Page.html">Page</a> &amp;_page)</td></tr>
 <tr class="separator:a38fb11e2c660d60c1d3a71b93142360f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -101,31 +93,33 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a0864512f4ac2e46b181c8e22eb3700f6"><td class="memItemLeft" align="right" valign="top"><a id="a0864512f4ac2e46b181c8e22eb3700f6"></a>
 <a class="el" href="structpdf_1_1Page.html">Page</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>page</b></td></tr>
 <tr class="separator:a0864512f4ac2e46b181c8e22eb3700f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf3a1b4729130254b4607fad94032428"><td class="memItemLeft" align="right" valign="top"><a id="adf3a1b4729130254b4607fad94032428"></a>
+Cairo::RefPtr&lt; Cairo::Context &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>cr</b></td></tr>
+<tr class="separator:adf3a1b4729130254b4607fad94032428"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4449bebbbe8b9fbd7c92763fb920f61"><td class="memItemLeft" align="right" valign="top"><a id="aa4449bebbbe8b9fbd7c92763fb920f61"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>dirty</b> = true</td></tr>
+<tr class="separator:aa4449bebbbe8b9fbd7c92763fb920f61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6264237635217fc73c9f10215f4a9d2"><td class="memItemLeft" align="right" valign="top"><a id="af6264237635217fc73c9f10215f4a9d2"></a>
 <a class="el" href="structpdf_1_1ContentStream.html">ContentStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>currentContentStream</b> = nullptr</td></tr>
 <tr class="separator:af6264237635217fc73c9f10215f4a9d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d4731bd09acb960425abcc90f625797"><td class="memItemLeft" align="right" valign="top"><a id="a5d4731bd09acb960425abcc90f625797"></a>
 std::vector&lt; <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>stateStack</b> = {}</td></tr>
 <tr class="separator:a5d4731bd09acb960425abcc90f625797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af58a707967437f40b6544a7d0625ce62"><td class="memItemLeft" align="right" valign="top"><a id="af58a707967437f40b6544a7d0625ce62"></a>
+std::vector&lt; <a class="el" href="structpdf_1_1TextBlock.html">TextBlock</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>textBlocks</b> = {}</td></tr>
+<tr class="separator:af58a707967437f40b6544a7d0625ce62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24cf87ae869be116d56b68b1fc1ab3cf"><td class="memItemLeft" align="right" valign="top"><a id="a24cf87ae869be116d56b68b1fc1ab3cf"></a>
+std::vector&lt; <a class="el" href="structpdf_1_1PageImage.html">PageImage</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>images</b> = {}</td></tr>
+<tr class="separator:a24cf87ae869be116d56b68b1fc1ab3cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a36f461e3fe6ed3a5dd82c02c0e3c6b25"><td class="memItemLeft" align="right" valign="top"><a id="a36f461e3fe6ed3a5dd82c02c0e3c6b25"></a>
-Cairo::Matrix&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1OperatorTraverser.html#a36f461e3fe6ed3a5dd82c02c0e3c6b25">font_matrix</a> () const</td></tr>
-<tr class="memdesc:a36f461e3fe6ed3a5dd82c02c0e3c6b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">calculates the current font matrix <br /></td></tr>
-<tr class="separator:a36f461e3fe6ed3a5dd82c02c0e3c6b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e13cd27ba496a956d09b1480afc923d"><td class="memItemLeft" align="right" valign="top"><a id="a5e13cd27ba496a956d09b1480afc923d"></a>
 <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>state</b> ()</td></tr>
 <tr class="separator:a5e13cd27ba496a956d09b1480afc923d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6975cbcaff63759da50c2e53dd28c833"><td class="memItemLeft" align="right" valign="top"><a id="a6975cbcaff63759da50c2e53dd28c833"></a>
 const <a class="el" href="structpdf_1_1GraphicsState.html">GraphicsState</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>state</b> () const</td></tr>
 <tr class="separator:a6975cbcaff63759da50c2e53dd28c833"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89b8fcd88450e9cb2dfe33a976751972"><td class="memItemLeft" align="right" valign="top"><a id="a89b8fcd88450e9cb2dfe33a976751972"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>on_show_text</b> (<a class="el" href="structpdf_1_1Operator.html">Operator</a> *)</td></tr>
-<tr class="separator:a89b8fcd88450e9cb2dfe33a976751972"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a670f825e0b69ddd1bb5abb6d97ee5dc8"><td class="memItemLeft" align="right" valign="top"><a id="a670f825e0b69ddd1bb5abb6d97ee5dc8"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>on_do</b> (<a class="el" href="structpdf_1_1Operator.html">Operator</a> *)</td></tr>
-<tr class="separator:a670f825e0b69ddd1bb5abb6d97ee5dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/lib/pdf/<a class="el" href="operator__traverser_8h_source.html">operator_traverser.h</a></li>
