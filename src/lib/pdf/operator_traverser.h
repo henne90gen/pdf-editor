@@ -58,7 +58,6 @@ struct TextFont {
     FontType type;
     Font *font;
     FT_Face ftFace;
-    Cairo::RefPtr<Cairo::FontFace> cairoFace;
 };
 
 struct TextState {
@@ -76,19 +75,14 @@ struct TextState {
 };
 
 struct GraphicsState {
-    // default is a matrix that converts default user coordinates to device coordinates (TODO whatever that means)
-    Cairo::Matrix currentTransformationMatrix = Cairo::identity_matrix(); // aka CTM
+    // Current transformation matrix
+    Cairo::Matrix ctm = Cairo::identity_matrix();
 
-    double colorSpace      = {};
+    double colorSpace      = 0.0;
     Color strokingColor    = {};
     Color nonStrokingColor = {};
 
     TextState textState = {};
-
-    double lineWidth  = 1.0;
-    int64_t lineCap   = 0;
-    int64_t lineJoin  = 0;
-    double miterLimit = 10.0;
 };
 
 struct TextBlock {
@@ -140,7 +134,7 @@ struct PageImage {
     /// Moves the image on the page by the specified offset
     void move(Document &document, double offsetX, double offsetY) const;
 
-    static ValueResult<PageImage> create(Page &page, GraphicsState &state, Operator *op, ContentStream *cs);
+    static ValueResult<PageImage> create(Page &page, const Cairo::Matrix &ctm, Operator *op, ContentStream *cs);
 };
 
 struct OperatorTraverser {
@@ -169,9 +163,6 @@ struct OperatorTraverser {
     void traverse();
 
   protected:
-    /// calculates the current font matrix
-    [[nodiscard]] Cairo::Matrix font_matrix() const;
-
     GraphicsState &state() { return stateStack.back(); }
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
 

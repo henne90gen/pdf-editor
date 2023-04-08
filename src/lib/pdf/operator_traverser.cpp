@@ -14,6 +14,8 @@ void OperatorTraverser::traverse() {
 
     cr->save();
 
+    cr->set_miter_limit(10.0);
+
     // move (0,0) from the top-left to the bottom-left corner of the page
     // and make positive y-axis extend vertically upward
     auto pageHeight = page.attr_height();
@@ -44,7 +46,7 @@ void OperatorTraverser::apply_operator(Operator *op) {
     //    spdlog::info("{}", operatorTypeToString(op->type));
     switch (op->type) {
     case Operator::Type::w_SetLineWidth:
-        state().lineWidth = op->data.w_SetLineWidth.lineWidth;
+        cr->set_line_width(op->data.w_SetLineWidth.lineWidth);
         break;
     case Operator::Type::q_PushGraphicsState:
         pushGraphicsState();
@@ -92,15 +94,17 @@ void OperatorTraverser::apply_operator(Operator *op) {
 }
 
 void OperatorTraverser::modifyCurrentTransformationMatrix(Operator *op) {
-    const auto &m1 = op->data.cm_ModifyCurrentTransformationMatrix.matrix;
-    auto matrix    = Cairo::Matrix(m1[0], m1[1], m1[2], m1[3], m1[4], m1[5]);
-    state().currentTransformationMatrix.multiply(state().currentTransformationMatrix, matrix);
+    const auto &m = op->data.cm_ModifyCurrentTransformationMatrix.matrix;
+    auto matrix   = Cairo::Matrix(1, m[1], m[2], 1, m[4], m[5]);
+    state().ctm.multiply(state().ctm, matrix);
 }
 
-void OperatorTraverser::appendRectangle() const { // TODO append rectangle to the current path
+void OperatorTraverser::appendRectangle() const {
+    // TODO append rectangle to the current path
 }
 
-void OperatorTraverser::modifyClippingPathUsingEvenOddRule() const { // TODO clipping path modification
+void OperatorTraverser::modifyClippingPathUsingEvenOddRule() const {
+    // TODO clipping path modification
 }
 
 void OperatorTraverser::endPathWithoutFillingOrStroking() const {
@@ -109,7 +113,7 @@ void OperatorTraverser::endPathWithoutFillingOrStroking() const {
 }
 
 void OperatorTraverser::setNonStrokingColor(Operator *op) {
-    state().nonStrokingColor = Color::rgb(      //
+    cr->set_source_rgb(                         //
           op->data.rg_SetNonStrokingColorRGB.r, //
           op->data.rg_SetNonStrokingColorRGB.g, //
           op->data.rg_SetNonStrokingColorRGB.b  //
@@ -128,9 +132,15 @@ void OperatorTraverser::beginText() {
     state().textState.textObjectParams = std::optional(TextObjectState());
 }
 
-void OperatorTraverser::pushGraphicsState() { stateStack.push_back(state()); }
+void OperatorTraverser::pushGraphicsState() {
+    cr->save();
+    stateStack.push_back(state());
+}
 
-void OperatorTraverser::popGraphicsState() { stateStack.pop_back(); }
+void OperatorTraverser::popGraphicsState() {
+    cr->restore();
+    stateStack.pop_back();
+}
 
 void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     auto tmp             = Cairo::identity_matrix();
@@ -147,7 +157,13 @@ void OperatorTraverser::moveStartOfNextLine(Operator *op) {
 }
 
 void OperatorTraverser::setTextFontAndSize(Operator *op) {
-    state().textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
+    auto &textState        = state().textState;
+    textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
+
+    auto textRenderMatrix = Cairo::identity_matrix();
+    textRenderMatrix.scale(textState.textFontSize, -textState.textFontSize);
+    textRenderMatrix.translate(0, textState.textRiseUnscaled);
+    cr->set_font_matrix(textRenderMatrix);
 
     auto fontMapOpt = page.attr_resources()->fonts(page.document);
     if (!fontMapOpt.has_value()) {
@@ -166,23 +182,13 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
     auto fontFace                   = font->load_font_face(page.document);
     state().textState.textFont.font = font;
     if (fontFace != nullptr) {
-        state().textState.textFont.ftFace    = fontFace;
-        state().textState.textFont.cairoFace = Cairo::FtFontFace::create(fontFace, 0);
+        state().textState.textFont.ftFace = fontFace;
+        cr->set_font_face(Cairo::FtFontFace::create(fontFace, 0));
     }
-}
-
-Cairo::Matrix OperatorTraverser::font_matrix() const {
-    const auto &textState = state().textState;
-    auto textRenderMatrix = Cairo::identity_matrix();
-    textRenderMatrix.scale(textState.textFontSize, -textState.textFontSize);
-    textRenderMatrix.translate(0, textState.textRiseUnscaled);
-    return textRenderMatrix;
 }
 
 void OperatorTraverser::showText(Operator *op) {
     const auto &textState = state().textState;
-    cr->set_font_matrix(font_matrix());
-    cr->set_font_face(textState.textFont.cairoFace);
     cr->set_source_rgb(0.0, 0.0, 0.0);
 
     auto scaledFont = cr->get_scaled_font();
@@ -228,10 +234,9 @@ void OperatorTraverser::showText(Operator *op) {
 
     glyphs.clear();
 
-    TextFont &textFont = state().textState.textFont;
-    auto cmapOpt       = textFont.font->cmap(page.document);
+    const TextFont &textFont = state().textState.textFont;
+    auto cmapOpt             = textFont.font->cmap(page.document);
 
-    auto face      = textFont.cairoFace;
     double offsetX = 0.0;
     std::string text;
     for (auto value : op->data.TJ_ShowOneOrMoreTextStrings.objects->values) {
@@ -275,7 +280,7 @@ void OperatorTraverser::showText(Operator *op) {
 }
 
 void OperatorTraverser::onDo(Operator *op) {
-    auto pageImageResult = pdf::PageImage::create(page, state(), op, currentContentStream);
+    auto pageImageResult = pdf::PageImage::create(page, state().ctm, op, currentContentStream);
     if (pageImageResult.has_error()) {
         return;
     }
@@ -313,6 +318,112 @@ void OperatorTraverser::onDo(Operator *op) {
     cr->paint();
 
     surface->finish();
+}
+
+ValueResult<PageImage> PageImage::create(Page &page, const Cairo::Matrix &ctm, Operator *op, ContentStream *cs) {
+    const auto &xObjectName = op->data.Do_PaintXObject.name->value;
+
+    const auto xObjectMapOpt = page.attr_resources()->x_objects(page.document);
+    if (!xObjectMapOpt.has_value()) {
+        return ValueResult<PageImage>::error("failed to get XObject map");
+    }
+
+    const auto &xObjectMap   = xObjectMapOpt.value();
+    const auto &xObjectKey   = xObjectName.substr(1, xObjectName.size() - 1);
+    const auto xObjectRefOpt = xObjectMap->find<IndirectReference>(xObjectKey);
+    const auto xObjectOpt    = page.document.get<Stream>(xObjectRefOpt);
+    if (!xObjectOpt.has_value()) {
+        return ValueResult<PageImage>::error("failed to find XObject with XObjectKey={}", xObjectKey);
+    }
+
+    const auto xObject = xObjectOpt.value();
+    const auto subtype = xObject->dictionary->must_find<Name>("Subtype");
+    if (subtype->value != "Image") {
+        return ValueResult<PageImage>::error("XObject is not an image");
+    }
+
+    double xOffset = 0.0;
+    double yOffset = 0.0;
+    ctm.transform_point(xOffset, yOffset);
+    auto pageImage = PageImage(&page, xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, cs);
+    return ValueResult<PageImage>::ok(pageImage);
+}
+
+void PageImage::move(Document &document, double offsetX, double offsetY) const {
+    std::stringstream ss;
+
+    auto decoded            = cs->decode(document.allocator);
+    auto bytesUntilOperator = op->content.data() - decoded.data();
+
+    // write everything up to the operator we want to wrap
+    ss << decoded.substr(0, bytesUntilOperator);
+
+    if (op->content[0] != ' ') {
+        ss << " ";
+    }
+
+    // TODO operator stream, if we applied such a move operation previously and just edit that one instead
+
+    // save state
+    ss << "q ";
+
+    // apply offset
+    ss << "1 0 0 1 ";
+    ss << offsetX;
+    ss << " ";
+    ss << offsetY;
+    ss << " cm ";
+
+    // write operator
+    ss << op->content;
+
+    // restore state
+    ss << " Q";
+
+    ss << decoded.substr(bytesUntilOperator + op->content.size());
+
+    cs->encode(document.allocator, ss.str());
+
+    page->traverser.dirty = true;
+
+    spdlog::info("Moved image '{}' by x={} and y={}", name, offsetX, offsetY);
+}
+
+void TextBlock::move(Document &document, double offsetX, double offsetY) const {
+    // BT 56.8 724.1 Td /F1 12 Tf            [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ              ET Q Q
+    // BT 56.8 724.1 Td /F1 12 Tf _x_ _y_ Td [<01>-2<02>1<03>2<03>2<0405>17<06>76<040708>]TJ -_x_ -_y_ Td ET Q Q
+    std::stringstream ss;
+
+    // write everything up to the operator we want to wrap
+    auto decoded = cs->decode(document.allocator);
+    ss << decoded.substr(0, op->content.data() - decoded.data());
+
+    // wrap operator with offset
+    if (op->content[0] != ' ') {
+        ss << " ";
+    }
+    ss << offsetX;
+    ss << " ";
+    ss << -offsetY;
+    ss << " Td ";
+
+    // write operator
+    ss << op->content;
+
+    // wrap operator with negative offset
+    ss << " ";
+    ss << -offsetX;
+    ss << " ";
+    ss << offsetY;
+    ss << " Td ";
+
+    ss << decoded.substr(op->content.data() - decoded.data() + op->content.size());
+
+    cs->encode(document.allocator, ss.str());
+
+    page->traverser.dirty = true;
+
+    spdlog::info("Moved text block '{}' by x={} and y={}", text, offsetX, offsetY);
 }
 
 } // namespace pdf
