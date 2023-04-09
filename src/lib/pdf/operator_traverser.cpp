@@ -4,7 +4,7 @@
 
 namespace pdf {
 
-void OperatorTraverser::traverse() {
+void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &cr) {
     if (!dirty) {
         return;
     }
@@ -29,10 +29,11 @@ void OperatorTraverser::traverse() {
 
     auto streams = page.content_streams();
     ASSERT(!streams.empty());
+
     for (auto stream : streams) {
         currentContentStream = stream;
-        stream->for_each_operator(page.document.allocator, [this](Operator *op) {
-            apply_operator(op);
+        stream->for_each_operator(page.document.allocator, [this, &cr](Operator *op) {
+            apply_operator(cr, op);
             return ForEachResult::CONTINUE;
         });
     }
@@ -42,17 +43,17 @@ void OperatorTraverser::traverse() {
     dirty = false;
 }
 
-void OperatorTraverser::apply_operator(Operator *op) {
+void OperatorTraverser::apply_operator(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     //    spdlog::info("{}", operatorTypeToString(op->type));
     switch (op->type) {
     case Operator::Type::w_SetLineWidth:
         cr->set_line_width(op->data.w_SetLineWidth.lineWidth);
         break;
     case Operator::Type::q_PushGraphicsState:
-        pushGraphicsState();
+        pushGraphicsState(cr);
         break;
     case Operator::Type::Q_PopGraphicsState:
-        popGraphicsState();
+        popGraphicsState(cr);
         break;
     case Operator::Type::re_AppendRectangle:
         appendRectangle();
@@ -64,7 +65,7 @@ void OperatorTraverser::apply_operator(Operator *op) {
         endPathWithoutFillingOrStroking();
         break;
     case Operator::Type::rg_SetNonStrokingColorRGB:
-        setNonStrokingColor(op);
+        setNonStrokingColor(cr, op);
         break;
     case Operator::Type::cm_ModifyCurrentTransformationMatrix:
         modifyCurrentTransformationMatrix(op);
@@ -79,17 +80,18 @@ void OperatorTraverser::apply_operator(Operator *op) {
         moveStartOfNextLine(op);
         break;
     case Operator::Type::Tf_SetTextFontAndSize:
-        setTextFontAndSize(op);
+        setTextFontAndSize(cr, op);
         break;
     case Operator::Type::TJ_ShowOneOrMoreTextStrings:
-        showText(op);
+        showText(cr, op);
         break;
     case Operator::Type::Do_PaintXObject:
-        onDo(op);
+        onDo(cr, op);
         break;
     default:
         // TODO unknown operator
-        spdlog::warn("OperatorTraverser::apply_operator() - unknown operator {}", operatorTypeToString(op->type));
+        // spdlog::warn("OperatorTraverser::apply_operator() - unknown operator {}", operatorTypeToString(op->type));
+        break;
     }
 }
 
@@ -112,7 +114,7 @@ void OperatorTraverser::endPathWithoutFillingOrStroking() const {
     //  it does however set the clipping path, if a clipping path operator was used before it
 }
 
-void OperatorTraverser::setNonStrokingColor(Operator *op) {
+void OperatorTraverser::setNonStrokingColor(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     cr->set_source_rgb(                         //
           op->data.rg_SetNonStrokingColorRGB.r, //
           op->data.rg_SetNonStrokingColorRGB.g, //
@@ -132,12 +134,12 @@ void OperatorTraverser::beginText() {
     state().textState.textObjectParams = std::optional(TextObjectState());
 }
 
-void OperatorTraverser::pushGraphicsState() {
+void OperatorTraverser::pushGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->save();
     stateStack.push_back(state());
 }
 
-void OperatorTraverser::popGraphicsState() {
+void OperatorTraverser::popGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->restore();
     stateStack.pop_back();
 }
@@ -156,7 +158,7 @@ void OperatorTraverser::moveStartOfNextLine(Operator *op) {
     state().textState.textObjectParams.value().textMatrix     = newLineMatrix;
 }
 
-void OperatorTraverser::setTextFontAndSize(Operator *op) {
+void OperatorTraverser::setTextFontAndSize(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     auto &textState        = state().textState;
     textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
@@ -187,7 +189,7 @@ void OperatorTraverser::setTextFontAndSize(Operator *op) {
     }
 }
 
-void OperatorTraverser::showText(Operator *op) {
+void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     const auto &textState = state().textState;
     cr->set_source_rgb(0.0, 0.0, 0.0);
 
@@ -218,6 +220,7 @@ void OperatorTraverser::showText(Operator *op) {
             scaledFont->text_to_glyphs(xOffset, 0.0, utf8, newGlyphs, clusters, flags);
             for (auto &g : newGlyphs) {
                 glyphs.push_back(g);
+
                 Cairo::TextExtents extents;
                 cairo_scaled_font_glyph_extents(scaledFont->cobj(), &g, 1, &extents);
                 xOffset += static_cast<double>(extents.x_advance);
@@ -279,7 +282,7 @@ void OperatorTraverser::showText(Operator *op) {
     });
 }
 
-void OperatorTraverser::onDo(Operator *op) {
+void OperatorTraverser::onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
     auto pageImageResult = pdf::PageImage::create(page, state().ctm, op, currentContentStream);
     if (pageImageResult.has_error()) {
         return;

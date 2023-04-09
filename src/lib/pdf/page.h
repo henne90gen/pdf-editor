@@ -68,10 +68,18 @@ struct Page {
     Rectangle *attr_media_box() { return node->attribute<Rectangle>(document, "MediaBox", true).value(); }
 
     // TODO make value_or more efficient (currently mediaBox is fetched even if it is not being used)
-    Rectangle *attr_crop_box() { return node->attribute<Rectangle>(document, "CropBox", true).value_or(attr_media_box()); }
-    Rectangle *attr_bleed_box() { return node->attribute<Rectangle>(document, "BleedBox", true).value_or(attr_media_box()); }
-    Rectangle *attr_trim_box() { return node->attribute<Rectangle>(document, "TrimBox", true).value_or(attr_media_box()); }
-    Rectangle *attr_art_box() { return node->attribute<Rectangle>(document, "ArtBox", true).value_or(attr_media_box()); }
+    Rectangle *attr_crop_box() {
+        return node->attribute<Rectangle>(document, "CropBox", true).value_or(attr_media_box());
+    }
+    Rectangle *attr_bleed_box() {
+        return node->attribute<Rectangle>(document, "BleedBox", true).value_or(attr_media_box());
+    }
+    Rectangle *attr_trim_box() {
+        return node->attribute<Rectangle>(document, "TrimBox", true).value_or(attr_media_box());
+    }
+    Rectangle *attr_art_box() {
+        return node->attribute<Rectangle>(document, "ArtBox", true).value_or(attr_media_box());
+    }
     std::optional<Dictionary *> attr_box_color_info() {
         return node->attribute<Dictionary>(document, "BoxColorInfo", false);
     }
@@ -86,6 +94,8 @@ struct Page {
     double attr_height();
     size_t character_count();
     std::optional<Font *> get_font(const Tf_SetTextFontSize &data);
+
+    void render(const Cairo::RefPtr<Cairo::Context> &cr);
 };
 
 } // namespace pdf

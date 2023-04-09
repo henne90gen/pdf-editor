@@ -8,10 +8,10 @@
 namespace pdf {
 
 template <> double OperatorParser::operand(int index) {
-    Token &token = tokens[currentTokenIdx - (2 + index)];
+    Token &token = tokens[currentTokenIdx - (1 + index)];
     if (token.type == Token::Type::NEW_LINE) {
         index++;
-        token = tokens[currentTokenIdx - (2 + index)];
+        token = tokens[currentTokenIdx - (1 + index)];
     }
     auto &content = token.content;
     // TODO is this conversion to a string really necessary?
@@ -20,18 +20,18 @@ template <> double OperatorParser::operand(int index) {
 }
 
 template <> int64_t OperatorParser::operand(int index) {
-    auto &content = tokens[currentTokenIdx - (2 + index)].content;
+    auto &content = tokens[currentTokenIdx - (1 + index)].content;
     // TODO is this conversion to a string really necessary?
     // TODO catch exception
     return std::stoll(std::string(content));
 }
 
 template <> std::string_view OperatorParser::operand(int index) {
-    return tokens[currentTokenIdx - (2 + index)].content;
+    return tokens[currentTokenIdx - (1 + index)].content;
 }
 
 template <> std::string OperatorParser::operand(int index) {
-    return std::string(tokens[currentTokenIdx - (2 + index)].content);
+    return std::string(tokens[currentTokenIdx - (1 + index)].content);
 }
 
 std::string replace(std::string str, const std::string &from, const std::string &to) {
@@ -108,8 +108,9 @@ Operator *OperatorParser::get_operator() {
                 lastOperatorEnd++;
             }
 
+            auto op = create_operator(stringToOperatorType(operatorContent), operatorContentWithParameters);
             currentTokenIdx++;
-            return create_operator(stringToOperatorType(operatorContent), operatorContentWithParameters);
+            return op;
         }
 
         if (tokens[currentTokenIdx].type == Token::Type::INVALID) {
@@ -136,10 +137,7 @@ Operator *OperatorParser::create_operator_w(Operator *result) {
 
 Operator *OperatorParser::create_operator_re(Operator *result) {
     for (int i = 0; i < 4; i++) {
-        auto &content = tokens[currentTokenIdx - 1 - (4 - i)].content;
-        // TODO is this conversion to a string really necessary?
-        // TODO catch exception
-        result->data.re_AppendRectangle.rect[i] = std::stod(std::string(content));
+        result->data.re_AppendRectangle.rect[i] = operand<double>(3 - i);
     }
     return result;
 }
@@ -159,11 +157,14 @@ Operator *OperatorParser::create_operator_TJ(Operator *result) {
             break;
         }
     }
-    ASSERT(arrayStartIndex != -1);
 
-    int objectCount  = currentTokenIdx - 2 - arrayStartIndex;
+    int arrayTokenCount = currentTokenIdx - arrayStartIndex;
+
+    ASSERT(arrayStartIndex >= 0);
+    ASSERT(arrayTokenCount >= 0);
+
     const auto first = tokens.begin() + arrayStartIndex;
-    const auto last  = first + objectCount + 1;
+    const auto last  = first + arrayTokenCount;
     const auto ts    = std::vector<Token>(first, last);
     auto l           = TokenLexer(ts);
     auto p           = Parser(l, arena);
@@ -489,6 +490,10 @@ Operator *OperatorParser::create_operator_EMC(Operator *result) {
     return result;
 }
 
+/**
+ * currentTokenIdx points to the OPERATOR token when entering this function.
+ * Any parameters are located before the OPERATOR token.
+ */
 Operator *OperatorParser::create_operator(Operator::Type type, std::string_view content) {
     auto result = arena.push<Operator>(type, content);
     if (type == Operator::Type::q_PushGraphicsState || type == Operator::Type::Q_PopGraphicsState ||
@@ -507,7 +512,7 @@ Operator *OperatorParser::create_operator(Operator::Type type, std::string_view 
     switch (type) {
         ENUMERATE_OPERATION_TYPES(CASE)
     default:
-        spdlog::error("Failed to parse command of type: {}", operatorTypeToString(type));
+        spdlog::error("Failed to parse operator of type: {}", operatorTypeToString(type));
         ASSERT(false);
     }
 #undef CASE

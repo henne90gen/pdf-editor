@@ -396,8 +396,11 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
             objs[i]  = obj;
         }
 
-        auto object = document.allocator.arena().push<IndirectObject>(objectNumbers[entry.compressed.indexInStream], 0,
-                                                                      objs[entry.compressed.indexInStream]);
+        auto object = document.allocator.arena().push<IndirectObject>( //
+              objectNumbers[entry.compressed.indexInStream],           //
+              0,                                                       //
+              objs[entry.compressed.indexInStream]                     //
+        );
         // TODO the content does not refer to the original PDF document, but instead to a decoded stream
         return LoadObjectResult::ok({object, content});
     }

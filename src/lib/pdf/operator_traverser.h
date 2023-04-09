@@ -139,7 +139,6 @@ struct PageImage {
 
 struct OperatorTraverser {
     Page &page;
-    Cairo::RefPtr<Cairo::Context> cr;
     bool dirty = true;
 
     ContentStream *currentContentStream   = nullptr;
@@ -148,40 +147,37 @@ struct OperatorTraverser {
     std::vector<TextBlock> textBlocks = {};
     std::vector<PageImage> images     = {};
 
-    explicit OperatorTraverser(Page &_page, const Cairo::RefPtr<Cairo::Context> &_cr) : page(_page), cr(_cr) {
-        stateStack.emplace_back();
-    }
+    explicit OperatorTraverser(Page &_page) : page(_page) { stateStack.emplace_back(); }
 
-    explicit OperatorTraverser(Page &_page) : page(_page) {
+    void traverse() {
         // initialize the Cairo context with a dummy surface
-        auto surface = Cairo::RecordingSurface::create();
-        cr           = Cairo::Context::create(surface);
-
-        stateStack.emplace_back();
+        const auto surface = Cairo::RecordingSurface::create();
+        const auto cr      = Cairo::Context::create(surface);
+        traverse(cr);
     }
 
-    void traverse();
+    void traverse(const Cairo::RefPtr<Cairo::Context> &cr);
 
   protected:
     GraphicsState &state() { return stateStack.back(); }
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
 
   private:
-    void apply_operator(Operator *op);
+    void apply_operator(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
 
-    void setNonStrokingColor(Operator *op);
+    void setNonStrokingColor(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
     void endText();
     void beginText();
-    void pushGraphicsState();
-    void popGraphicsState();
+    void pushGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr);
+    void popGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr);
     void moveStartOfNextLine(Operator *op);
-    void setTextFontAndSize(Operator *op);
+    void setTextFontAndSize(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
     void modifyCurrentTransformationMatrix(Operator *op);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;
-    void showText(Operator *);
-    void onDo(Operator *);
+    void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *);
+    void onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *);
 };
 
 } // namespace pdf

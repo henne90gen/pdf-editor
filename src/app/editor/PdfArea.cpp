@@ -18,9 +18,8 @@ PdfArea::PdfArea(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> & /*build
     motionCtrl->signal_motion().connect(sigc::mem_fun(*this, &PdfArea::on_mouse_moved));
     add_controller(motionCtrl);
 
-    documentChangedSignal.connect(sigc::mem_fun(*this, &PdfArea::init_document_data));
-
     init_document_data();
+    documentChangedSignal.connect(sigc::mem_fun(*this, &PdfArea::init_document_data));
 }
 
 void PdfArea::init_document_data() {
@@ -61,8 +60,9 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int /*width*/, in
     cr->scale(_zoom, _zoom);
 
     render_pages(cr);
-    render_text_highlight(cr);
-    render_image_highlight(cr);
+
+    // render_text_highlight(cr);
+    // render_image_highlight(cr);
 }
 
 void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
@@ -70,11 +70,9 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 
     auto pages = document.pages();
     for (auto page : pages) {
+        // TODO skip rendering pages which are not in the current view port
         cr->save();
-
-        pdf::OperatorTraverser traverser(*page, cr);
-        traverser.traverse();
-
+        page->render(cr);
         cr->restore();
 
         auto pageHeight = page->attr_height();
@@ -179,7 +177,7 @@ void PdfArea::update_zoom(double z) {
 void PdfArea::on_mouse_moved(double x, double y) {
     mouseX = x;
     mouseY = y;
-    //    queue_draw();
+//    queue_draw();
 }
 
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {

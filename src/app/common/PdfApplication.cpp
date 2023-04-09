@@ -3,7 +3,6 @@
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/builder.h>
-#include <iostream>
 #include <spdlog/spdlog.h>
 
 #include "OpenWindow.h"
