@@ -140,27 +140,37 @@ $(function() {
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_media_box() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;MediaBox&quot;</span>, <span class="keyword">true</span>).value(); }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="comment">// TODO make value_or more efficient (currently mediaBox is fetched even if it is not being used)</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_crop_box() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;CropBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box()); }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_bleed_box() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;BleedBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box()); }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_trim_box() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;TrimBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box()); }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_art_box() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;ArtBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box()); }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    std::optional&lt;Dictionary *&gt; attr_box_color_info() {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Dictionary.html">Dictionary</a>&gt;(document, <span class="stringliteral">&quot;BoxColorInfo&quot;</span>, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    std::optional&lt;Object *&gt; attr_contents() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Object.html">Object</a>&gt;(document, <span class="stringliteral">&quot;Contents&quot;</span>, <span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    std::vector&lt;ContentStream *&gt; content_streams();</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    std::vector&lt;TextBlock&gt; text_blocks();</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    std::vector&lt;PageImage&gt; images();</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">void</span> for_each_image(<span class="keyword">const</span> std::function&lt;ForEachResult(<a class="code" href="structpdf_1_1PageImage.html">PageImage</a> &amp;)&gt; &amp;func);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    int64_t rotate();</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordtype">double</span> attr_width();</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">double</span> attr_height();</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordtype">size_t</span> character_count();</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    std::optional&lt;Font *&gt; get_font(<span class="keyword">const</span> <a class="code" href="structpdf_1_1Tf__SetTextFontSize.html">Tf_SetTextFontSize</a> &amp;data);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;};</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;} <span class="comment">// namespace pdf</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_crop_box() {</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;CropBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box());</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_bleed_box() {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;BleedBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box());</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_trim_box() {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;TrimBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box());</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a> *attr_art_box() {</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Rectangle.html">Rectangle</a>&gt;(document, <span class="stringliteral">&quot;ArtBox&quot;</span>, <span class="keyword">true</span>).value_or(attr_media_box());</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    std::optional&lt;Dictionary *&gt; attr_box_color_info() {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Dictionary.html">Dictionary</a>&gt;(document, <span class="stringliteral">&quot;BoxColorInfo&quot;</span>, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    std::optional&lt;Object *&gt; attr_contents() { <span class="keywordflow">return</span> node-&gt;attribute&lt;<a class="code" href="structpdf_1_1Object.html">Object</a>&gt;(document, <span class="stringliteral">&quot;Contents&quot;</span>, <span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    std::vector&lt;ContentStream *&gt; content_streams();</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    std::vector&lt;TextBlock&gt; text_blocks();</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    std::vector&lt;PageImage&gt; images();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordtype">void</span> for_each_image(<span class="keyword">const</span> std::function&lt;ForEachResult(<a class="code" href="structpdf_1_1PageImage.html">PageImage</a> &amp;)&gt; &amp;func);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    int64_t rotate();</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">double</span> attr_width();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">double</span> attr_height();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">size_t</span> character_count();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    std::optional&lt;Font *&gt; get_font(<span class="keyword">const</span> <a class="code" href="structpdf_1_1Tf__SetTextFontSize.html">Tf_SetTextFontSize</a> &amp;data);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">void</span> render(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;} <span class="comment">// namespace pdf</span></div>
 <div class="ttc" id="astructpdf_1_1Allocator_html"><div class="ttname"><a href="structpdf_1_1Allocator.html">pdf::Allocator</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:64</div></div>
 <div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:99</div></div>
 <div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:56</div></div>
