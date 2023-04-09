@@ -68,15 +68,22 @@ void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int /*width*/, in
 void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
     cr->save();
 
-    auto pages = document.pages();
+    auto positionY     = 0.0;
+    auto pages         = document.pages();
+    auto screenEndPosY = scrollOffsetY + get_height();
     for (auto page : pages) {
-        // TODO skip rendering pages which are not in the current view port
-        cr->save();
-        page->render(cr);
-        cr->restore();
-
         auto pageHeight = page->attr_height();
-        cr->translate(0, pageHeight + PAGE_PADDING);
+
+        if ((scrollOffsetY >= positionY && scrollOffsetY <= positionY + pageHeight) ||
+            (screenEndPosY >= positionY && screenEndPosY <= positionY + pageHeight)) {
+            cr->save();
+            page->render(cr);
+            cr->restore();
+        }
+
+        auto dy = pageHeight + PAGE_PADDING;
+        positionY += dy;
+        cr->translate(0, dy);
     }
 
     cr->restore();
@@ -177,7 +184,7 @@ void PdfArea::update_zoom(double z) {
 void PdfArea::on_mouse_moved(double x, double y) {
     mouseX = x;
     mouseY = y;
-//    queue_draw();
+    //    queue_draw();
 }
 
 pdf::PageImage *PdfArea::get_image_at_position(double x, double y) {
