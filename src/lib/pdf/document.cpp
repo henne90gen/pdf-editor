@@ -191,14 +191,15 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
     // FIXME cache page objects (otherwise they are re-created each time the pages are iterated)
 
     if (pageTreeRoot->is_page()) {
-        func(allocator.arena().push<Page>(*this, pageTreeRoot));
+        auto page = allocator.arena().push<Page>(*this, pageTreeRoot);
+        func(page);
         return;
     }
 
     std::vector<PageTreeNode *> queue = {pageTreeRoot};
     while (!queue.empty()) {
-        PageTreeNode *current = queue.back();
-        queue.pop_back();
+        PageTreeNode *current = queue.front();
+        queue.erase(queue.begin());
 
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
