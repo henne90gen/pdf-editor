@@ -313,6 +313,8 @@ Result Document::delete_page(size_t pageNum) {
         return ForEachResult::BREAK;
     });
 
+    cachedPages.clear();
+
     // TODO clean up objects that are no longer required
 
     return Result::ok();
