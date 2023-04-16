@@ -4,10 +4,16 @@
 
 namespace pdf {
 
-void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &cr) {
+void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &crIn) {
     if (!dirty) {
+        // simply draw the recorded sequence again
+        crIn->set_source(recordingSurface, 0.0, 0.0);
+        crIn->paint();
         return;
     }
+
+    recordingSurface = Cairo::RecordingSurface::create();
+    auto cr          = Cairo::Context::create(recordingSurface);
 
     images.clear();
     textBlocks.clear();
@@ -39,6 +45,9 @@ void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &cr) {
     }
 
     cr->restore();
+
+    crIn->set_source(recordingSurface, 0.0, 0.0);
+    crIn->paint();
 
     dirty = false;
 }

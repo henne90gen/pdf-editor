@@ -181,6 +181,16 @@ PageTreeNode *PageTreeNode::parent(Document &document) {
 }
 
 void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
+    if (!cachedPages.empty()) {
+        for (auto page : cachedPages) {
+            ForEachResult result = func(page);
+            if (result == ForEachResult::BREAK) {
+                return;
+            }
+        }
+        return;
+    }
+
     auto c            = catalog();
     auto pageTreeRoot = c->page_tree_root(*this);
     if (pageTreeRoot == nullptr) {
@@ -188,10 +198,9 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
         return;
     }
 
-    // FIXME cache page objects (otherwise they are re-created each time the pages are iterated)
-
     if (pageTreeRoot->is_page()) {
         auto page = allocator.arena().push<Page>(*this, pageTreeRoot);
+        cachedPages.push_back(page);
         func(page);
         return;
     }
@@ -203,22 +212,25 @@ void Document::for_each_page(const std::function<ForEachResult(Page *)> &func) {
 
         for (auto kid : current->kids()->values) {
             auto resolvedKid = get<PageTreeNode>(kid);
-            if (resolvedKid->is_page()) {
-                Page *page           = allocator.arena().push<Page>(*this, resolvedKid);
-                ForEachResult result = func(page);
-                if (result == ForEachResult::BREAK) {
-                    return;
-                }
-            } else {
+            if (!resolvedKid->is_page()) {
                 queue.push_back(resolvedKid);
+                continue;
+            }
+
+            auto page = allocator.arena().push<Page>(*this, resolvedKid);
+            cachedPages.push_back(page);
+            ForEachResult result = func(page);
+            if (result == ForEachResult::BREAK) {
+                cachedPages.clear();
+                return;
             }
         }
     }
 }
 
 DocumentCatalog *Document::catalog() {
-    if (rootCache != nullptr) {
-        return rootCache;
+    if (cachedRoot != nullptr) {
+        return cachedRoot;
     }
 
     Object *obj;
@@ -229,8 +241,8 @@ DocumentCatalog *Document::catalog() {
     }
     ASSERT(obj != nullptr);
 
-    rootCache = get<DocumentCatalog>(obj);
-    return rootCache;
+    cachedRoot = get<DocumentCatalog>(obj);
+    return cachedRoot;
 }
 
 std::vector<Page *> Document::pages() {

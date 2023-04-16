@@ -140,6 +140,7 @@ struct PageImage {
 struct OperatorTraverser {
     Page &page;
     bool dirty = true;
+    Cairo::RefPtr<Cairo::Surface> recordingSurface;
 
     ContentStream *currentContentStream   = nullptr;
     std::vector<GraphicsState> stateStack = {};

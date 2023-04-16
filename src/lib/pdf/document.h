@@ -185,8 +185,9 @@ struct Document : public ReferenceResolver {
     void destroy() { allocator.destroy(); }
 
   private:
-    DocumentCatalog *rootCache            = nullptr;
     int64_t currentResolutionObjectNumber = 0;
+    DocumentCatalog *cachedRoot           = nullptr;
+    std::vector<Page *> cachedPages       = {};
 
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);
