@@ -154,8 +154,7 @@ std::string_view Stream::decode(Allocator &allocator) {
             // NOTE the arena allocator allocates contiguous memory, which is why this works
             memcpy(tmp, firstOutput, infstream.total_out);
 
-            output = tmp;
-
+            output     = tmp;
             outputSize = infstream.total_out;
         } else {
             // TODO handle more filters

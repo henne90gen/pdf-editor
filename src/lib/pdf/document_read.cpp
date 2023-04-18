@@ -63,8 +63,16 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
         return Result::error("Expected STREAM object but got {}", streamObject->object->type_string());
     }
 
-    auto stream     = streamObject->object->as<Stream>();
-    auto W          = stream->dictionary->must_find<Array>("W");
+    auto stream            = streamObject->object->as<Stream>();
+    std::string &typeValue = stream->dictionary->must_find<Name>("Type")->value;
+    if (typeValue != "XRef") {
+        return Result::error("Expected stream of type XRef but got {}", typeValue);
+    }
+
+    auto W = stream->dictionary->must_find<Array>("W");
+    if (W->values.size() != 3) {
+        spdlog::warn("Cross reference stream should have W with 3 entries, not {}", W->values.size());
+    }
     auto sizeField0 = W->values[0]->as<Integer>()->value;
     auto sizeField1 = W->values[1]->as<Integer>()->value;
     auto sizeField2 = W->values[2]->as<Integer>()->value;
@@ -88,6 +96,7 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
             currentTrailer->crossReferenceTable.objectCount = index->values[1]->as<Integer>()->value;
         } else {
             // TODO streams can define subsections of entries
+            spdlog::warn("Stream subsections are not implemented yet");
         }
     } else {
         currentTrailer->crossReferenceTable.firstObjectNumber = 0;
@@ -102,31 +111,29 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
                              currentTrailer->crossReferenceTable.objectCount);
     }
 
+    auto unknownEntryCount = 0;
     for (auto contentPtr = content.data(); contentPtr < content.data() + content.size();
          contentPtr += sizeField0 + sizeField1 + sizeField2) {
         uint64_t type = 0;
         if (sizeField0 == 0) {
             type = 1; // default value for type
-        }
-
-        for (int j = 0; j < sizeField0; j++) {
-            uint8_t c      = *(contentPtr + j);
-            uint64_t shift = (sizeField0 - (j + 1)) * 8;
-            type |= c << shift;
+        } else {
+            for (int j = 0; j < sizeField0; j++) {
+                uint8_t c = *(contentPtr + j);
+                type      = (type << 8) + c;
+            }
         }
 
         uint64_t field1 = 0;
         for (int j = 0; j < sizeField1; j++) {
-            uint8_t c      = *(contentPtr + j + sizeField0);
-            uint64_t shift = (sizeField1 - (j + 1)) * 8;
-            field1 |= c << shift;
+            uint8_t c = *(contentPtr + j + sizeField0);
+            field1    = (field1 << 8) + c;
         }
 
         uint64_t field2 = 0;
         for (int j = 0; j < sizeField2; j++) {
-            uint8_t c      = *(contentPtr + j + sizeField0 + sizeField1);
-            uint64_t shift = (sizeField2 - (j + 1)) * 8;
-            field2 |= c << shift;
+            uint8_t c = *(contentPtr + j + sizeField0 + sizeField1);
+            field2    = (field2 << 8) + c;
         }
 
         switch (type) {
@@ -152,10 +159,12 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
             currentTrailer->crossReferenceTable.entries.push_back(entry);
         } break;
         default:
-            spdlog::warn("Encountered unknown cross reference stream entry field type: {}", type);
+            spdlog::trace("Encountered unknown cross reference stream entry field type: {}", type);
+            unknownEntryCount++;
             break;
         }
     }
+    spdlog::warn("Encountered {} unknown cross reference stream entries", unknownEntryCount);
 
     auto opt = stream->dictionary->find<Integer>("Prev");
     if (!opt.has_value()) {
@@ -468,7 +477,8 @@ Result read_data(Document &document, bool loadAllObjects) {
     // parse eof
     size_t eofMarkerLength = 5;
     auto eofMarkerStart    = document.file.data + (document.file.sizeInBytes - eofMarkerLength);
-    if (document.file.data[document.file.sizeInBytes - 1] == '\n') {
+    if (document.file.data[document.file.sizeInBytes - 1] == '\n' ||
+        document.file.data[document.file.sizeInBytes - 1] == '\r') {
         eofMarkerStart--;
     }
     if (document.file.data[document.file.sizeInBytes - 2] == '\r') {
