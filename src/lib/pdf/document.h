@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <sigc++/sigc++.h>
 #include <unordered_set>
 
 #include "pdf/font.h"
