@@ -50,8 +50,9 @@ struct BmpInfoHeader {
 };
 #pragma pack(pop)
 
-Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uint32_t bitsPerComponent,
-                 std::string_view pixels) {
+Result Image::write_bmp(Allocator &allocator, const std::string &fileName) const {
+    auto pixels        = stream->decode(allocator);
+    auto tempAllocator = allocator.temporary();
 
     BmpInfoHeader infoHeader = {};
     infoHeader.width         = width;
@@ -79,7 +80,7 @@ Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uin
     auto pixelsSize     = static_cast<size_t>(paddedRowSize * height);
     ASSERT(pixels.size() == static_cast<size_t>(currentRowSize * height));
 
-    auto pBuf = reinterpret_cast<uint8_t *>(std::malloc(pixelsSize));
+    auto pBuf = tempAllocator.arena().push(pixelsSize);
     std::memset(pBuf, 0, pixelsSize);
 
     auto padding = paddedRowSize - currentRowSize;
@@ -117,15 +118,7 @@ Result write_bmp(const std::string &fileName, int32_t width, int32_t height, uin
         return Result::error("Failed to write to file '{}'", fileName);
     }
 
-    std::free(pBuf);
-
     return Result::ok();
-}
-
-Result Image::write_bmp(Allocator &allocator, const std::string &fileName) const {
-    auto pixels = stream->decode(allocator);
-    return ::pdf::write_bmp(fileName, static_cast<int32_t>(width), static_cast<int32_t>(height), bitsPerComponent,
-                            pixels);
 }
 
 ValueResult<Image *> Image::read_bmp(Allocator &allocator, const std::string &fileName) {
@@ -143,7 +136,7 @@ ValueResult<Image *> Image::read_bmp(Allocator &allocator, const std::string &fi
     file.read(reinterpret_cast<char *>(&infoHeader), infoHeaderSize);
 
     uint32_t pixelSize = fileHeader.fileSizeInBytes - fileHeader.pixelOffset;
-    auto pixels        = reinterpret_cast<uint8_t *>(std::malloc(pixelSize));
+    auto pixels        = allocator.arena().push(pixelSize);
     file.read(reinterpret_cast<char *>(pixels), pixelSize);
 
     // TODO flip BGR to RGB and remove padding
