@@ -141,7 +141,7 @@ Array *Parser::parse_array() {
         return nullptr;
     }
 
-    auto beforeTokenIdx     = currentTokenIdx;
+    auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
     std::vector<Object *> objects = {};
@@ -272,8 +272,8 @@ Object *Parser::parse_stream_or_dictionary() {
         return nullptr;
     }
 
-    auto beforeTokenIdx     = currentTokenIdx;
-    auto dictionary         = parse_dictionary();
+    auto beforeTokenIdx = currentTokenIdx;
+    auto dictionary     = parse_dictionary();
     if (dictionary == nullptr) {
         currentTokenIdx = beforeTokenIdx;
         return nullptr;
