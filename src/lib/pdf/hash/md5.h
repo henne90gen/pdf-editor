@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <string>
-
 namespace pdf::hash {
 
 // https://datatracker.ietf.org/doc/html/rfc1321
