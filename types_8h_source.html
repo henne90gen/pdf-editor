@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: pdf::TemporaryArena Struct Reference</title>
+<title>PDF Editor: src/lib/pdf/util/types.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,31 +62,30 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>pdf</b></li><li class="navelem"><a class="el" href="structpdf_1_1TemporaryArena.html">TemporaryArena</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_c85d3e3c5052e9ad9ce18c6863244a25.html">lib</a></li><li class="navelem"><a class="el" href="dir_9a4b695b9cfd6e8301fd48e438a3ddfb.html">pdf</a></li><li class="navelem"><a class="el" href="dir_ddadc2ea35f4d7063abbe86e375ac008.html">util</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="structpdf_1_1TemporaryArena-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">pdf::TemporaryArena Struct Reference</div>  </div>
+<div class="title">types.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a348ce8f29d54756500b8169dac5ae389"><td class="memItemLeft" align="right" valign="top"><a id="a348ce8f29d54756500b8169dac5ae389"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>TemporaryArena</b> (<a class="el" href="structpdf_1_1Arena.html">Arena</a> &amp;_arena)</td></tr>
-<tr class="separator:a348ce8f29d54756500b8169dac5ae389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a198689884ce31b29c217a288a12ce293"><td class="memItemLeft" align="right" valign="top"><a id="a198689884ce31b29c217a288a12ce293"></a>
-<a class="el" href="structpdf_1_1Arena.html">Arena</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>arena</b> ()</td></tr>
-<tr class="separator:a198689884ce31b29c217a288a12ce293"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/lib/pdf/memory/<a class="el" href="arena__allocator_8h_source.html">arena_allocator.h</a></li>
-</ul>
-</div><!-- contents -->
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;pdf/memory/stl_allocator.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span>pdf {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">using</span> Vector = std::vector&lt;T, StlAllocator&lt;T&gt;&gt;;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> K, <span class="keyword">typename</span> V&gt;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">using</span> UnorderedMap = std::unordered_map&lt;K, V, std::hash&lt;K&gt;, std::equal_to&lt;K&gt;, <a class="code" href="structStlAllocator.html">StlAllocator&lt;std::pair&lt;const K, V&gt;</a>&gt;&gt;;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;} <span class="comment">// namespace pdf</span></div>
+<div class="ttc" id="astructStlAllocator_html"><div class="ttname"><a href="structStlAllocator.html">StlAllocator</a></div><div class="ttdef"><b>Definition:</b> stl_allocator.h:11</div></div>
+</div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1

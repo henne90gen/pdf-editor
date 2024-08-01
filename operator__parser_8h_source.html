@@ -77,8 +77,8 @@ $(function() {
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;pdf/lexer.h&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;pdf/objects.h&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;pdf/memory/arena_allocator.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;pdf/memory/arena_allocator.h&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;pdf/objects.h&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">namespace </span>pdf {</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
@@ -237,11 +237,11 @@ $(function() {
 <div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="structpdf_1_1OperatorParser.html">  165</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpdf_1_1OperatorParser.html">OperatorParser</a> {</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;lexer;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;arena;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    std::vector&lt;Token&gt; tokens   = {};</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    Vector&lt;Token&gt; tokens;</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">size_t</span> currentTokenIdx      = 0;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *lastOperatorEnd = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1OperatorParser.html">OperatorParser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;_arena) : lexer(_lexer), arena(_arena) {}</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1OperatorParser.html">OperatorParser</a>(<a class="code" href="structpdf_1_1Lexer.html">Lexer</a> &amp;_lexer, <a class="code" href="structpdf_1_1Arena.html">Arena</a> &amp;_arena) : lexer(_lexer), arena(_arena), tokens(arena) {}</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="structpdf_1_1Operator.html">Operator</a> *get_operator();</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
@@ -257,10 +257,10 @@ $(function() {
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160; </div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;} <span class="comment">// namespace pdf</span></div>
 <div class="ttc" id="astructpdf_1_1Arena_html"><div class="ttname"><a href="structpdf_1_1Arena.html">pdf::Arena</a></div><div class="ttdef"><b>Definition:</b> arena_allocator.h:16</div></div>
-<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:99</div></div>
-<div class="ttc" id="astructpdf_1_1Lexer_html"><div class="ttname"><a href="structpdf_1_1Lexer.html">pdf::Lexer</a></div><div class="ttdef"><b>Definition:</b> lexer.h:91</div></div>
-<div class="ttc" id="astructpdf_1_1LiteralString_html"><div class="ttname"><a href="structpdf_1_1LiteralString.html">pdf::LiteralString</a></div><div class="ttdef"><b>Definition:</b> objects.h:75</div></div>
-<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:92</div></div>
+<div class="ttc" id="astructpdf_1_1Array_html"><div class="ttname"><a href="structpdf_1_1Array.html">pdf::Array</a></div><div class="ttdef"><b>Definition:</b> objects.h:100</div></div>
+<div class="ttc" id="astructpdf_1_1Lexer_html"><div class="ttname"><a href="structpdf_1_1Lexer.html">pdf::Lexer</a></div><div class="ttdef"><b>Definition:</b> lexer.h:93</div></div>
+<div class="ttc" id="astructpdf_1_1LiteralString_html"><div class="ttname"><a href="structpdf_1_1LiteralString.html">pdf::LiteralString</a></div><div class="ttdef"><b>Definition:</b> objects.h:76</div></div>
+<div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:93</div></div>
 <div class="ttc" id="astructpdf_1_1OperatorParser_html"><div class="ttname"><a href="structpdf_1_1OperatorParser.html">pdf::OperatorParser</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:165</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
 <div class="ttc" id="astructpdf_1_1Tf__SetTextFontSize_html"><div class="ttname"><a href="structpdf_1_1Tf__SetTextFontSize.html">pdf::Tf_SetTextFontSize</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:104</div></div>

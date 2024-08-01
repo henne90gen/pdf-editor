@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['is_5fout_5fof_5frange_252',['is_out_of_range',['../structpdf_1_1DocumentFile.html#a9f69ddf1d4a8444e41230eab84f81782',1,'pdf::DocumentFile']]]
+  ['line_5fcount_263',['line_count',['../structpdf_1_1Document.html#a3e324d5aba119a218d217397113f849b',1,'pdf::Document']]]
 ];

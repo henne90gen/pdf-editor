@@ -85,13 +85,13 @@ $(function() {
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;pdf/document.h&gt;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;ContentWindow.h&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;ObjectList.h&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;JumpToByteDialog.h&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;JumpToByteDialog.h&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;ObjectList.h&quot;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classDebugWindow.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="classDebugWindow.html">DebugWindow</a> : <span class="keyword">public</span> Gtk::ApplicationWindow {</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    [[maybe_unused]] <a class="code" href="classDebugWindow.html">DebugWindow</a>(BaseObjectType *obj, <span class="keyword">const</span> Glib::RefPtr&lt;Gtk::Builder&gt; &amp;builder,</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;                                 <span class="keyword">const</span> std::string &amp;filePath);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;                                 <a class="code" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document_);</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="keywordtype">void</span> update_selected_byte_label(<span class="keywordtype">int</span> b);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordtype">void</span> update_hovered_byte_label(<span class="keywordtype">int</span> b);</div>
@@ -117,16 +117,16 @@ $(function() {
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    Gtk::Button *parseDocumentButton   = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classContentArea.html">ContentArea</a> *contentArea           = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classObjectList.html">ObjectList</a> *documentTree         = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classObjectList.html">ObjectList</a> *documentTree           = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classJumpToByteDialog.html">JumpToByteDialog</a> *jumpToByteDialog = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
 <div class="ttc" id="aclassContentArea_html"><div class="ttname"><a href="classContentArea.html">ContentArea</a></div><div class="ttdef"><b>Definition:</b> ContentArea.h:13</div></div>
 <div class="ttc" id="aclassDebugWindow_html"><div class="ttname"><a href="classDebugWindow.html">DebugWindow</a></div><div class="ttdef"><b>Definition:</b> DebugWindow.h:19</div></div>
 <div class="ttc" id="aclassJumpToByteDialog_html"><div class="ttname"><a href="classJumpToByteDialog.html">JumpToByteDialog</a></div><div class="ttdef"><b>Definition:</b> JumpToByteDialog.h:7</div></div>
 <div class="ttc" id="aclassObjectList_html"><div class="ttname"><a href="classObjectList.html">ObjectList</a></div><div class="ttdef"><b>Definition:</b> ObjectList.h:23</div></div>
-<div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:105</div></div>
-<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:32</div></div>
-<div class="ttc" id="astructpdf_1_1ReadMetadata_html"><div class="ttname"><a href="structpdf_1_1ReadMetadata.html">pdf::ReadMetadata</a></div><div class="ttdef"><b>Definition:</b> document.h:100</div></div>
+<div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:117</div></div>
+<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
+<div class="ttc" id="astructpdf_1_1ReadMetadata_html"><div class="ttname"><a href="structpdf_1_1ReadMetadata.html">pdf::ReadMetadata</a></div><div class="ttdef"><b>Definition:</b> document.h:110</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

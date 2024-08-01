@@ -87,6 +87,12 @@ Inheritance diagram for pdf::Document:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a18fb36ae084ecc1894fd53d734079541"><td class="memItemLeft" align="right" valign="top"><a id="a18fb36ae084ecc1894fd53d734079541"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Document</b> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&amp;other)=default</td></tr>
+<tr class="separator:a18fb36ae084ecc1894fd53d734079541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c2df90dfbe5a8f313c8bd2cc2c7d126"><td class="memItemLeft" align="right" valign="top"><a id="a1c2df90dfbe5a8f313c8bd2cc2c7d126"></a>
+<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&amp;other)=default</td></tr>
+<tr class="separator:a1c2df90dfbe5a8f313c8bd2cc2c7d126"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3844b487b634cf5813ee8e23bea5ebf"><td class="memTemplParams" colspan="2"><a id="ad3844b487b634cf5813ee8e23bea5ebf"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ad3844b487b634cf5813ee8e23bea5ebf"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get</b> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
@@ -170,9 +176,6 @@ int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>add_object</b> (<a
 <tr class="memitem:a6658320fa71220a37d408f03f033a870"><td class="memItemLeft" align="right" valign="top"><a id="a6658320fa71220a37d408f03f033a870"></a>
 <a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>find_existing_object</b> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
 <tr class="separator:a6658320fa71220a37d408f03f033a870"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a722db7323ad835e6fd7412b40c9ffd7e"><td class="memItemLeft" align="right" valign="top"><a id="a722db7323ad835e6fd7412b40c9ffd7e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>destroy</b> ()</td></tr>
-<tr class="separator:a722db7323ad835e6fd7412b40c9ffd7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -188,14 +191,14 @@ static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a 
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memItemLeft" align="right" valign="top"><a id="aa4d2c121fdb6d73bbcb51f83bd1a2109"></a>
-<a class="el" href="structpdf_1_1Allocator.html">Allocator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b> = {}</td></tr>
+<a class="el" href="structpdf_1_1Allocator.html">Allocator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b></td></tr>
 <tr class="separator:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aab13479934667f8f4bb9632a4bf34e"><td class="memItemLeft" align="right" valign="top"><a id="a5aab13479934667f8f4bb9632a4bf34e"></a>
-<a class="el" href="structpdf_1_1DocumentFile.html">DocumentFile</a>&#160;</td><td class="memItemRight" valign="bottom"><b>file</b> = {}</td></tr>
+<a class="el" href="structpdf_1_1DocumentFile.html">DocumentFile</a>&#160;</td><td class="memItemRight" valign="bottom"><b>file</b></td></tr>
 <tr class="separator:a5aab13479934667f8f4bb9632a4bf34e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d10159cea1f9ed572d374030b8102aa"><td class="memItemLeft" align="right" valign="top"><a id="a2d10159cea1f9ed572d374030b8102aa"></a>
-std::unordered_map&lt; uint64_t, <a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>objectList</b> = {}</td></tr>
-<tr class="separator:a2d10159cea1f9ed572d374030b8102aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ef4f960008d400e0117da14827df5ab"><td class="memItemLeft" align="right" valign="top"><a id="a1ef4f960008d400e0117da14827df5ab"></a>
+UnorderedMap&lt; uint64_t, <a class="el" href="structpdf_1_1IndirectObject.html">IndirectObject</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>objectList</b></td></tr>
+<tr class="separator:a1ef4f960008d400e0117da14827df5ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a411db343dabb04ae622057a4c02f847f"></a>

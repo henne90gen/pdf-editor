@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['line_5fcount_253',['line_count',['../structpdf_1_1Document.html#a3e324d5aba119a218d217397113f849b',1,'pdf::Document']]]
+  ['move_264',['move',['../structpdf_1_1TextBlock.html#a0f82763e6aa874f1adcd826442d7c228',1,'pdf::TextBlock::move()'],['../structpdf_1_1PageImage.html#a26a3f7194e893f23f6551277bf06aea5',1,'pdf::PageImage::move()']]]
 ];

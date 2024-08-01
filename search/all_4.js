@@ -6,5 +6,7 @@ var searchData=
   ['embeddedfile_38',['EmbeddedFile',['../structpdf_1_1EmbeddedFile.html',1,'pdf']]],
   ['end_5fptr_39',['end_ptr',['../structpdf_1_1DocumentFile.html#aa59ba774abf6f87983ddf8cfeed82d33',1,'pdf::DocumentFile']]],
   ['execution_40',['Execution',['../structpdf_1_1Execution.html',1,'pdf']]],
-  ['extractargs_41',['ExtractArgs',['../structExtractArgs.html',1,'']]]
+  ['expected_41',['Expected',['../classExpected.html',1,'']]],
+  ['expected_3c_20void_2c_20e_20_3e_42',['Expected&lt; void, E &gt;',['../classExpected_3_01void_00_01E_01_4.html',1,'']]],
+  ['extractargs_43',['ExtractArgs',['../structExtractArgs.html',1,'']]]
 ];

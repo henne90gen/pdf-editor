@@ -212,13 +212,13 @@ $(function() {
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordtype">bool</span> dirty = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    Cairo::RefPtr&lt;Cairo::Surface&gt; recordingSurface;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="code" href="structpdf_1_1ContentStream.html">ContentStream</a> *currentContentStream   = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    std::vector&lt;GraphicsState&gt; stateStack = {};</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="code" href="structpdf_1_1ContentStream.html">ContentStream</a> *currentContentStream = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    Vector&lt;GraphicsState&gt; stateStack;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    std::vector&lt;TextBlock&gt; textBlocks = {};</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    std::vector&lt;PageImage&gt; images     = {};</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    Vector&lt;TextBlock&gt; textBlocks;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    Vector&lt;PageImage&gt; images;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1OperatorTraverser.html">OperatorTraverser</a>(<a class="code" href="structpdf_1_1Page.html">Page</a> &amp;_page) : page(_page) { stateStack.emplace_back(); }</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="structpdf_1_1OperatorTraverser.html">OperatorTraverser</a>(<a class="code" href="structpdf_1_1Page.html">Page</a> &amp;page);</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">void</span> traverse() {</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="comment">// initialize the Cairo context with a dummy surface</span></div>
@@ -253,22 +253,22 @@ $(function() {
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;} <span class="comment">// namespace pdf</span></div>
 <div class="ttc" id="aclasspdf_1_1ValueResult_html"><div class="ttname"><a href="classpdf_1_1ValueResult.html">pdf::ValueResult</a></div><div class="ttdef"><b>Definition:</b> result.h:37</div></div>
-<div class="ttc" id="astructpdf_1_1Boolean_html"><div class="ttname"><a href="structpdf_1_1Boolean.html">pdf::Boolean</a></div><div class="ttdef"><b>Definition:</b> objects.h:52</div></div>
+<div class="ttc" id="astructpdf_1_1Boolean_html"><div class="ttname"><a href="structpdf_1_1Boolean.html">pdf::Boolean</a></div><div class="ttdef"><b>Definition:</b> objects.h:53</div></div>
 <div class="ttc" id="astructpdf_1_1Color_html"><div class="ttname"><a href="structpdf_1_1Color.html">pdf::Color</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:13</div></div>
 <div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:56</div></div>
-<div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:105</div></div>
+<div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:117</div></div>
 <div class="ttc" id="astructpdf_1_1Font_html"><div class="ttname"><a href="structpdf_1_1Font.html">pdf::Font</a></div><div class="ttdef"><b>Definition:</b> font.h:54</div></div>
 <div class="ttc" id="astructpdf_1_1GraphicsState_html"><div class="ttname"><a href="structpdf_1_1GraphicsState.html">pdf::GraphicsState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:77</div></div>
-<div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:59</div></div>
-<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:32</div></div>
+<div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:60</div></div>
+<div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
 <div class="ttc" id="astructpdf_1_1OperatorTraverser_html"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:140</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
 <div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:118</div></div>
-<div class="ttc" id="astructpdf_1_1PageImage_html_a26a3f7194e893f23f6551277bf06aea5"><div class="ttname"><a href="structpdf_1_1PageImage.html#a26a3f7194e893f23f6551277bf06aea5">pdf::PageImage::move</a></div><div class="ttdeci">void move(Document &amp;document, double offsetX, double offsetY) const</div><div class="ttdoc">Moves the image on the page by the specified offset.</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:364</div></div>
+<div class="ttc" id="astructpdf_1_1PageImage_html_a26a3f7194e893f23f6551277bf06aea5"><div class="ttname"><a href="structpdf_1_1PageImage.html#a26a3f7194e893f23f6551277bf06aea5">pdf::PageImage::move</a></div><div class="ttdeci">void move(Document &amp;document, double offsetX, double offsetY) const</div><div class="ttdoc">Moves the image on the page by the specified offset.</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:370</div></div>
 <div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:60</div></div>
 <div class="ttc" id="astructpdf_1_1Stream_html"><div class="ttname"><a href="structpdf_1_1Stream.html">pdf::Stream</a></div><div class="ttdef"><b>Definition:</b> objects.h:151</div></div>
 <div class="ttc" id="astructpdf_1_1TextBlock_html"><div class="ttname"><a href="structpdf_1_1TextBlock.html">pdf::TextBlock</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:88</div></div>
-<div class="ttc" id="astructpdf_1_1TextBlock_html_a0f82763e6aa874f1adcd826442d7c228"><div class="ttname"><a href="structpdf_1_1TextBlock.html#a0f82763e6aa874f1adcd826442d7c228">pdf::TextBlock::move</a></div><div class="ttdeci">void move(Document &amp;document, double offsetX, double offsetY) const</div><div class="ttdoc">moves the text block on the page by the specified offset</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:404</div></div>
+<div class="ttc" id="astructpdf_1_1TextBlock_html_a0f82763e6aa874f1adcd826442d7c228"><div class="ttname"><a href="structpdf_1_1TextBlock.html#a0f82763e6aa874f1adcd826442d7c228">pdf::TextBlock::move</a></div><div class="ttdeci">void move(Document &amp;document, double offsetX, double offsetY) const</div><div class="ttdoc">moves the text block on the page by the specified offset</div><div class="ttdef"><b>Definition:</b> operator_traverser.cpp:410</div></div>
 <div class="ttc" id="astructpdf_1_1TextFont_html"><div class="ttname"><a href="structpdf_1_1TextFont.html">pdf::TextFont</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:57</div></div>
 <div class="ttc" id="astructpdf_1_1TextObjectState_html"><div class="ttname"><a href="structpdf_1_1TextObjectState.html">pdf::TextObjectState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:31</div></div>
 <div class="ttc" id="astructpdf_1_1TextState_html"><div class="ttname"><a href="structpdf_1_1TextState.html">pdf::TextState</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:63</div></div>

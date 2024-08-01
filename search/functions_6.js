@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['move_254',['move',['../structpdf_1_1TextBlock.html#a0f82763e6aa874f1adcd826442d7c228',1,'pdf::TextBlock::move()'],['../structpdf_1_1PageImage.html#a26a3f7194e893f23f6551277bf06aea5',1,'pdf::PageImage::move()']]]
+  ['object_5fcount_265',['object_count',['../structpdf_1_1Document.html#a28bfd341260ef11bae7c41b881d34fd1',1,'pdf::Document']]],
+  ['objects_266',['objects',['../structpdf_1_1Document.html#a1f9943e9c4e8b27613433369f44222d8',1,'pdf::Document']]]
 ];
