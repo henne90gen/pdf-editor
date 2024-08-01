@@ -124,12 +124,12 @@ size_t Page::character_count() {
     return result;
 }
 
-std::vector<TextBlock> Page::text_blocks() {
+Vector<TextBlock> Page::text_blocks() {
     traverser.traverse();
     return traverser.textBlocks;
 }
 
-std::vector<PageImage> Page::images() {
+Vector<PageImage> Page::images() {
     traverser.traverse();
     return traverser.images;
 }

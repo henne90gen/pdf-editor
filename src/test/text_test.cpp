@@ -4,10 +4,10 @@
 #include <pdf/page.h>
 
 TEST(Text, HelloWorldTextBlocks) {
-    auto documentResult = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
-    ASSERT_FALSE(documentResult.has_error());
+    auto document_result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(document_result_1.has_error());
 
-    auto document = documentResult.value();
+    auto &document = document_result_1.value();
     auto pages    = document.pages();
     ASSERT_EQ(pages.size(), 1);
 
@@ -23,10 +23,10 @@ TEST(Text, HelloWorldTextBlocks) {
 }
 
 TEST(Text, Move) {
-    auto documentResult = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
-    ASSERT_FALSE(documentResult.has_error());
+    auto document_result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(document_result_1.has_error());
 
-    auto document = documentResult.value();
+    auto &document = document_result_1.value();
     {
         auto pages = document.pages();
         ASSERT_EQ(pages.size(), 1);
@@ -42,10 +42,10 @@ TEST(Text, Move) {
     size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
 
-    documentResult = pdf::Document::read_from_memory(buffer, size);
-    ASSERT_FALSE(documentResult.has_error());
+    auto document_result_2 = pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(document_result_2.has_error());
 
-    auto newDocument = documentResult.value();
+    auto &newDocument = document_result_2.value();
     {
         auto pages = newDocument.pages();
         ASSERT_EQ(pages.size(), 1);

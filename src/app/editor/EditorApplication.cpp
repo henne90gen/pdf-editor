@@ -32,9 +32,17 @@ EditorApplication::EditorApplication() : PdfApplication("de.henne90gen.pdf.edito
 
 void EditorApplication::open_window(const std::string &filePath) {
     spdlog::info("Opening new window: {}", filePath);
+
+    auto result = pdf::Document::read_from_file(filePath, false);
+    if (result.has_error()) {
+        spdlog::error("{}", result.message());
+        return;
+    }
+
+    auto &document = result.value();
     try {
         auto builder = Gtk::Builder::create_from_resource("/com/github/henne90gen/pdf-editor/editor.ui");
-        auto window  = Gtk::Builder::get_widget_derived<EditorWindow>(builder, "EditorWindow", filePath);
+        auto window  = Gtk::Builder::get_widget_derived<EditorWindow>(builder, "EditorWindow", document);
         add_window(*window);
         window->present();
     } catch (Gtk::BuilderError &err) {

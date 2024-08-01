@@ -7,16 +7,9 @@
 #include <iomanip>
 #include <sstream>
 
-DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
-    : Gtk::ApplicationWindow(obj) {
-    auto result = pdf::Document::read_from_file(filePath, false);
-    if (result.has_error()) {
-        spdlog::error(result.message());
-        return;
-    }
-    document = result.value();
-
-    set_title(filePath);
+DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document_)
+    : Gtk::ApplicationWindow(obj), document(std::move(document_)), metadata(document.allocator) {
+    set_title(document.file.path);
 
     // apply css
     Glib::RefPtr<Gtk::CssProvider> cssProvider = Gtk::CssProvider::create();
@@ -44,7 +37,7 @@ DebugWindow::DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &
     jumpToByteButton->signal_clicked().connect(sigc::mem_fun(*this, &DebugWindow::open_jump_to_byte_dialog));
     documentTree->signal_object_selected().connect(sigc::mem_fun(*this, &DebugWindow::update_details_label));
 
-    auto gioFile = Gio::File::create_for_path(filePath);
+    auto gioFile = Gio::File::create_for_path(document.file.path);
     fileMonitor  = gioFile->monitor_file(Gio::FileMonitorFlags::NONE);
     fileMonitor->signal_changed().connect(sigc::mem_fun(*this, &DebugWindow::document_changed));
 
@@ -181,10 +174,10 @@ void DebugWindow::update_details_label(pdf::Object *object) {
     }
 }
 
-void DebugWindow::document_changed(const Glib::RefPtr<Gio::File> &file, const Glib::RefPtr<Gio::File> &otherFile,
+void DebugWindow::document_changed(const Glib::RefPtr<Gio::File> &file, const Glib::RefPtr<Gio::File> &other_file,
                                    Gio::FileMonitor::Event event) {
-    spdlog::trace("DebugWindow::document_changed(file={}, otherFile={}, event={})", file->get_path(),
-                  otherFile->get_path(), (int)event);
+    spdlog::trace("DebugWindow::document_changed(file={}, other_file={}, event={})", file->get_path(),
+                  other_file->get_path(), (int)event);
     if (event != Gio::FileMonitor::Event::CHANGES_DONE_HINT) {
         return;
     }

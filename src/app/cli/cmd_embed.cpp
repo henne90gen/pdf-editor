@@ -16,7 +16,7 @@ int cmd_embed(EmbedArgs &args) {
         return 1;
     }
 
-    auto document = documentResult.value();
+    auto &document = documentResult.value();
     for (size_t i = 0; i < args.files.size() - 1; i++) {
         document.embed_file(std::string(args.files[i]));
     }
@@ -24,5 +24,6 @@ int cmd_embed(EmbedArgs &args) {
     if (document.write_to_file("out.pdf").has_error()) {
         return 1;
     }
+
     return 0;
 }

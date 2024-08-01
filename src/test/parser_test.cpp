@@ -23,7 +23,7 @@ template <typename T> void assertParses(const std::string &input, std::function<
 
     auto textProvider = pdf::StringTextProvider(input);
     auto lexer        = pdf::TextLexer(textProvider);
-    auto arena        = arenaResult.value();
+    auto &arena       = arenaResult.value();
     auto parser       = pdf::Parser(lexer, arena);
     auto result       = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -38,7 +38,7 @@ void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceR
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena, referenceResolver);
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -227,7 +227,7 @@ TEST(Parser, MultipleObjects) {
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
@@ -262,7 +262,7 @@ TEST(Parser, IndirectObject1) {
     auto lexer       = pdf::TextLexer(textProvider);
     auto arenaResult = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();

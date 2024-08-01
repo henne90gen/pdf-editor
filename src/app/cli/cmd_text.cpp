@@ -12,7 +12,7 @@ int cmd_text(const TextArgs &args) {
         return 1;
     }
 
-    auto document = result.value();
+    auto &document = result.value();
     document.for_each_page([](pdf::Page *page) {
         auto textBlocks = page->text_blocks();
         for (auto &textBlock : textBlocks) {

@@ -142,13 +142,13 @@ struct OperatorTraverser {
     bool dirty = true;
     Cairo::RefPtr<Cairo::Surface> recordingSurface;
 
-    ContentStream *currentContentStream   = nullptr;
-    std::vector<GraphicsState> stateStack = {};
+    ContentStream *currentContentStream = nullptr;
+    Vector<GraphicsState> stateStack;
 
-    std::vector<TextBlock> textBlocks = {};
-    std::vector<PageImage> images     = {};
+    Vector<TextBlock> textBlocks;
+    Vector<PageImage> images;
 
-    explicit OperatorTraverser(Page &_page) : page(_page) { stateStack.emplace_back(); }
+    explicit OperatorTraverser(Page &page);
 
     void traverse() {
         // initialize the Cairo context with a dummy surface

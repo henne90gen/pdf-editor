@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <pdf/document.h>
+#include <pdf/util/types.h>
 
 namespace pdf {
 void write_object(std::ostream &s, Object *object);
@@ -79,8 +80,10 @@ TEST(Writer, write_name) {
 }
 
 TEST(Writer, write_array) {
+    auto allocator_result = pdf::Allocator::create();
+    auto &allocator = allocator_result.value();
     std::stringstream s;
-    auto vec = std::vector<pdf::Object *>();
+    auto vec = pdf::Vector<pdf::Object *>(allocator);
     vec.push_back(new pdf::Name("Hello"));
     vec.push_back(new pdf::Name("World"));
     pdf::write_array_object(s, new pdf::Array(vec));
@@ -89,10 +92,12 @@ TEST(Writer, write_array) {
 }
 
 TEST(Writer, write_dictionary) {
+    auto allocator_result = pdf::Allocator::create();
+    auto &allocator = allocator_result.value();
     std::stringstream s;
-    auto map              = std::unordered_map<std::string, pdf::Object *>();
-    map["Hello"]          = new pdf::Integer(123);
-    map["World"]          = new pdf::LiteralString("World");
+    auto map     = pdf::UnorderedMap<std::string, pdf::Object *>(allocator);
+    map["Hello"] = new pdf::Integer(123);
+    map["World"] = new pdf::LiteralString("World");
     pdf::write_dictionary_object(s, new pdf::Dictionary(map));
     const auto &str = s.str();
     ASSERT_EQ(str, "<</World (World) /Hello 123>>");
@@ -113,8 +118,9 @@ TEST(Writer, write_indirect_object) {
 }
 
 TEST(Writer, write_stream) {
+    auto& allocator = pdf::Allocator::create().value();
     std::stringstream s;
-    auto m    = std::unordered_map<std::string, pdf::Object *>();
+    auto m    = pdf::UnorderedMap<std::string, pdf::Object *>(allocator);
     m["Size"] = new pdf::Integer(123);
     auto dict = new pdf::Dictionary(m);
     pdf::write_stream_object(s, new pdf::Stream(dict, "abc123"));

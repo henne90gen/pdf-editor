@@ -20,7 +20,7 @@ TEST(OperationParser, Simple) {
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
@@ -43,7 +43,7 @@ TEST(OperationParser, HelloWorld) {
     auto lexer       = pdf::TextLexer(textProvider);
     auto arenaResult = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth,
                  [](auto op) { ASSERT_EQ(op->data.w_SetLineWidth.lineWidth, 0.1); });
@@ -102,7 +102,7 @@ TEST(OperationParser, Content) {
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto arena  = arenaResult.value();
+    auto &arena  = arenaResult.value();
     auto parser = pdf::OperatorParser(lexer, arena);
     assertNextOp(parser, pdf::Operator::Type::w_SetLineWidth, [](auto op) { ASSERT_EQ(op->content, "0.1 w"); });
     assertNextOp(parser, pdf::Operator::Type::q_PushGraphicsState, [](auto op) { ASSERT_EQ(op->content, "q"); });

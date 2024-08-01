@@ -140,7 +140,7 @@ void write_object(std::ostream &s, Object *object) {
     }
 }
 
-void write_objects(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
+void write_objects(Document &document, std::ostream &s, UnorderedMap<uint64_t, uint64_t> &byteOffsets) {
     for (auto &entry : document.objectList) {
         if (entry.second == nullptr) {
             continue;
@@ -151,7 +151,7 @@ void write_objects(Document &document, std::ostream &s, std::unordered_map<uint6
     }
 }
 
-void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint64_t, uint64_t> &byteOffsets) {
+void write_trailer(Document &document, std::ostream &s, UnorderedMap<uint64_t, uint64_t> &byteOffsets) {
     auto startXref = s.tellp();
     if (document.file.trailer.dict != nullptr) {
         s << "xref\n";
@@ -183,7 +183,8 @@ void write_trailer(Document &document, std::ostream &s, std::unordered_map<uint6
 Result write_to_stream(Document &document, std::ostream &s) {
     write_header(s);
 
-    std::unordered_map<uint64_t, uint64_t> byteOffsets = {};
+    auto temp  = document.allocator.temporary();
+    auto byteOffsets = UnorderedMap<uint64_t, uint64_t>(temp);
     write_objects(document, s, byteOffsets);
     write_trailer(document, s, byteOffsets);
 

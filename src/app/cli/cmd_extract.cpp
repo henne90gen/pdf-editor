@@ -8,7 +8,7 @@ int cmd_extract(ExtractArgs &args) {
         return 1;
     }
 
-    auto document = result.value();
+    auto &document = result.value();
 
     // TODO get the file name from the file specifications
 

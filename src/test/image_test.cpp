@@ -38,7 +38,7 @@ void assertImageCanBeExtracted(pdf::Image &image, const std::string &readFileNam
                                int32_t width, int32_t height, uint16_t bitsPerComponent) {
     auto allocatorResult = pdf::Allocator::create();
     ASSERT_FALSE(allocatorResult.has_error()) << allocatorResult.message();
-    auto allocator = allocatorResult.value();
+    auto &allocator = allocatorResult.value();
 
     ASSERT_EQ(width, image.width);
     ASSERT_EQ(height, image.height);
@@ -57,7 +57,7 @@ TEST(Image, ExtractImage1) {
 
     auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
-    auto document = result.value();
+    auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 100, 100, 8);
         return pdf::ForEachResult::CONTINUE;
@@ -70,7 +70,7 @@ TEST(Image, ExtractImage2) {
 
     auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
-    auto document = result.value();
+    auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 4, 4, 8);
         return pdf::ForEachResult::CONTINUE;
@@ -83,7 +83,7 @@ TEST(Image, ExtractImage3) {
 
     auto result = pdf::Document::read_from_file(readFileName, false);
     ASSERT_FALSE(result.has_error());
-    auto document = result.value();
+    auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
         assertImageCanBeExtracted(image, readFileName, writeFileName, 2, 2, 8);
         return pdf::ForEachResult::CONTINUE;

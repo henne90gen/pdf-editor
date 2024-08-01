@@ -5,13 +5,14 @@
 #include "pdf/lexer.h"
 #include "pdf/memory/arena_allocator.h"
 #include "pdf/objects.h"
+#include "pdf/util/types.h"
 
 namespace pdf {
 
 struct CMap {
-    std::unordered_map<uint8_t, std::string> charmap = {};
+    UnorderedMap<uint8_t, std::string> charmap;
 
-    explicit CMap(std::unordered_map<uint8_t, std::string> _charmap) : charmap(std::move(_charmap)) {}
+    explicit CMap(UnorderedMap<uint8_t, std::string> _charmap) : charmap(std::move(_charmap)) {}
 
     [[nodiscard]] std::optional<std::string> map_char_code(uint8_t code) const;
     [[nodiscard]] std::string map_char_codes(HexadecimalString *str) const;
@@ -20,10 +21,11 @@ struct CMap {
 struct CMapParser {
     Lexer &lexer;
     Allocator &allocator;
-    size_t currentTokenIdx    = 0;
-    std::vector<Token> tokens = {};
+    size_t currentTokenIdx = 0;
+    Vector<Token> tokens;
 
-    explicit CMapParser(Lexer &_lexer, Allocator &_allocator) : lexer(_lexer), allocator(_allocator) {}
+    explicit CMapParser(Lexer &_lexer, Allocator &_allocator)
+        : lexer(_lexer), allocator(_allocator), tokens(allocator) {}
 
     /// Attempts to parse a CMap from the given lexer
     CMap *parse(); // TODO maybe return by value instead of a pointer
@@ -34,8 +36,8 @@ struct CMapParser {
     [[nodiscard]] bool current_token_is(Token::Type type);
 
     void parse_code_space_range();
-    void parse_bf_char(std::unordered_map<uint8_t, std::string> &charmap);
-    void parse_bf_range(std::unordered_map<uint8_t, std::string> &charmap);
+    void parse_bf_char(UnorderedMap<uint8_t, std::string> &charmap);
+    void parse_bf_range(UnorderedMap<uint8_t, std::string> &charmap);
 };
 
 struct CMapStream : public Stream {

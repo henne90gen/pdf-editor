@@ -9,8 +9,8 @@
 #include "test_util.h"
 
 TEST(Writer, bla) {
-    auto s = std::stringstream();
-    uint32_t i  = 1230;
+    auto s     = std::stringstream();
+    uint32_t i = 1230;
     s << i;
     ASSERT_EQ("1230", s.str());
 }
@@ -19,7 +19,7 @@ TEST(Writer, DeletePageInvalidPageNum) {
     auto result = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto document = result.value();
+    auto &document = result.value();
     ASSERT_TRUE(document.delete_page(0).has_error());
     ASSERT_TRUE(document.delete_page(-1).has_error());
     ASSERT_TRUE(document.delete_page(3).has_error());
@@ -29,8 +29,8 @@ TEST(Writer, DeletePageFirst) {
     auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
     ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
 
-    auto document = documentResult.value();
-    auto result   = document.delete_page(1);
+    auto &document = documentResult.value();
+    auto result    = document.delete_page(1);
     ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
     std::string filePath = "delete-page-first.pdf";
@@ -43,8 +43,8 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
     ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
 
-    auto document = documentResult.value();
-    auto result   = document.delete_page(2);
+    auto &document = documentResult.value();
+    auto result    = document.delete_page(2);
     ASSERT_FALSE(result.has_error());
     ASSERT_EQ(document.page_count(), 1);
 
@@ -57,7 +57,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     auto testDocResult = pdf::Document::read_from_memory(buffer, size);
     ASSERT_FALSE(testDocResult.has_error()) << testDocResult.message();
 
-    auto testDoc = testDocResult.value();
+    auto &testDoc = testDocResult.value();
     ASSERT_EQ(testDoc.page_count(), 1);
     free(buffer);
 }
@@ -65,7 +65,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
 TEST(Writer, MoveImage) {
     auto result = pdf::Document::read_from_file("../../../test-files/image-1.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
-    auto document = result.value();
+    auto &document = result.value();
     document.for_each_page([&document](pdf::Page *page) {
         page->for_each_image([&document](pdf::PageImage &image) {
             image.move(document, 10, 10);
@@ -87,7 +87,7 @@ TEST(Writer, MoveImage) {
 
     auto docResult = pdf::Document::read_from_memory(buffer, size);
     ASSERT_FALSE(docResult.has_error());
-    auto doc = docResult.value();
+    auto &doc = docResult.value();
     doc.for_each_page([&assertFunc](pdf::Page *page) {
         page->for_each_image([&assertFunc](pdf::PageImage &image) {
             assertFunc(image);
@@ -98,9 +98,9 @@ TEST(Writer, MoveImage) {
 }
 
 TEST(Writer, Embed) {
-    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
-    ASSERT_FALSE(result.has_error()) << result.message();
-    auto document = result.value();
+    auto result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    ASSERT_FALSE(result_1.has_error()) << result_1.message();
+    auto &document = result_1.value();
 
     ASSERT_FALSE(document.embed_file("../../../test-files/hello-world.pdf").has_error());
 
@@ -119,9 +119,9 @@ TEST(Writer, Embed) {
         ASSERT_EQ(7350, params->must_find<pdf::Integer>("Size")->value);
     };
 
-    result = pdf::Document::read_from_memory(buffer, size);
-    ASSERT_FALSE(result.has_error()) << result.message();
-    auto doc = result.value();
+    auto result_2 = pdf::Document::read_from_memory(buffer, size);
+    ASSERT_FALSE(result_2.has_error()) << result_2.message();
+    auto &doc = result_2.value();
     doc.for_each_embedded_file([&assertFunc](pdf::EmbeddedFile *embeddedFile) {
         assertFunc(embeddedFile);
         return pdf::ForEachResult::CONTINUE;
@@ -132,7 +132,7 @@ TEST(Writer, Header) {
     auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto document   = result.value();
+    auto &document  = result.value();
     uint8_t *buffer = nullptr;
     size_t size     = 0;
     auto error      = document.write_to_memory(buffer, size);
@@ -144,7 +144,7 @@ TEST(Writer, Header) {
 TEST(Writer, Objects) {
     auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
-    auto document   = result.value();
+    auto &document  = result.value();
     uint8_t *buffer = nullptr;
     size_t size     = 0;
     auto error      = document.write_to_memory(buffer, size);
@@ -191,8 +191,8 @@ void write_pdf(const std::string &name) {
     auto result              = pdf::Document::read_from_file(testFilePath);
     ASSERT_FALSE(result.has_error()) << result.message();
 
-    auto document = result.value();
-    auto anError  = document.write_to_file(name);
+    auto &document = result.value();
+    auto anError   = document.write_to_file(name);
     ASSERT_FALSE(anError.has_error()) << anError.message();
 
 #if _WIN32

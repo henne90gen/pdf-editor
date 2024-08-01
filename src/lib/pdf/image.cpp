@@ -51,8 +51,8 @@ struct BmpInfoHeader {
 #pragma pack(pop)
 
 Result Image::write_bmp(Allocator &allocator, const std::string &fileName) const {
-    auto pixels        = stream->decode(allocator);
-    auto tempAllocator = allocator.temporary();
+    auto pixels = stream->decode(allocator);
+    auto temp   = allocator.temporary();
 
     BmpInfoHeader infoHeader = {};
     infoHeader.width         = width;
@@ -80,7 +80,7 @@ Result Image::write_bmp(Allocator &allocator, const std::string &fileName) const
     auto pixelsSize     = static_cast<size_t>(paddedRowSize * height);
     ASSERT(pixels.size() == static_cast<size_t>(currentRowSize * height));
 
-    auto pBuf = tempAllocator.arena().push(pixelsSize);
+    auto pBuf = temp.arena().push(pixelsSize);
     std::memset(pBuf, 0, pixelsSize);
 
     auto padding = paddedRowSize - currentRowSize;
@@ -146,9 +146,10 @@ ValueResult<Image *> Image::read_bmp(Allocator &allocator, const std::string &fi
     image->height           = infoHeader.height;
     image->bitsPerComponent = infoHeader.bitsPerPixel / 3;
 
-    auto imageDict = std::unordered_map<std::string, Object *>();
-    image->stream  = Stream::create_from_unencoded_data(allocator, imageDict,
-                                                        std::string_view(reinterpret_cast<char *>(pixels), pixelSize));
+    auto temp        = allocator.temporary();
+    auto pixels_view = std::string_view(reinterpret_cast<char *>(pixels), pixelSize);
+    auto imageDict   = UnorderedMap<std::string, Object *>(temp);
+    image->stream    = Stream::create_from_unencoded_data(allocator, imageDict, pixels_view);
 
     return ValueResult<Image *>::ok(image);
 }

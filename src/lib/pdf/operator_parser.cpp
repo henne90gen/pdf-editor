@@ -165,7 +165,7 @@ Operator *OperatorParser::create_operator_TJ(Operator *result) {
 
     const auto first = tokens.begin() + arrayStartIndex;
     const auto last  = first + arrayTokenCount;
-    const auto ts    = std::vector<Token>(first, last);
+    const auto ts    = Vector<Token>(first, last, arena);
     auto l           = TokenLexer(ts);
     auto p           = Parser(l, arena);
     auto arr         = p.parse()->as<Array>();

@@ -37,16 +37,16 @@ class Result {
 template <typename T> class ValueResult {
   public:
     template <typename... Args> //
-    static ValueResult error(fmt::format_string<Args...> fmt, Args &&...args) {
-        return {{}, true, fmt::format(fmt, std::forward<Args>(args)...)};
+    static ValueResult<T> error(fmt::format_string<Args...> fmt, Args &&...args) {
+        return {true, fmt::format(fmt, std::forward<Args>(args)...)};
     }
+    static ValueResult<T> error(std::string message) { return {true, message}; }
 
     template <typename... Args> //
     static ValueResult<T> ok(Args &&...args) {
-        return {T(std::forward<Args>(args)...), false, ""};
+        return {T(std::forward<Args>(args)...), false};
     }
-    static ValueResult<T> ok(T v) { return {v, false, ""}; }
-    static ValueResult<T> of(const Result &r) { return {{}, r.has_error(), r.message()}; }
+    static ValueResult<T> ok(T v) { return {std::move(v), false}; }
 
     [[nodiscard]] T &value() { return _value; }
     [[nodiscard]] T &value() const { return _value; }
@@ -54,16 +54,26 @@ template <typename T> class ValueResult {
     [[nodiscard]] std::string message() const { return errorMessage; }
     [[nodiscard]] Result drop_value() const { return Result::from_bool(hasError, "{}", errorMessage); }
 
-    ~ValueResult() = default;
+    ~ValueResult() {
+        if (!has_error()) {
+            _value.~T();
+        } else {
+            typedef std::string string_alias;
+            errorMessage.~string_alias();
+        }
+    }
 
   private:
-    T _value;
     bool hasError = false;
-    std::string errorMessage;
+    union {
+        T _value;
+        std::string errorMessage;
+    };
 
     ValueResult() = default;
-    ValueResult(T v, bool _hasError, std::string _errorMessage)
-        : _value(v), hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
+    ValueResult(T v, bool _hasError) : hasError(_hasError), _value(std::move(v)) {}
+    ValueResult(bool _hasError, std::string _errorMessage)
+        : hasError(_hasError), errorMessage(std::move(_errorMessage)) {}
 };
 
 } // namespace pdf

@@ -85,8 +85,8 @@ struct Page {
     }
     std::optional<Object *> attr_contents() { return node->attribute<Object>(document, "Contents", false); }
     std::vector<ContentStream *> content_streams();
-    std::vector<TextBlock> text_blocks();
-    std::vector<PageImage> images();
+    Vector<TextBlock> text_blocks();
+    Vector<PageImage> images();
     void for_each_image(const std::function<ForEachResult(PageImage &)> &func);
 
     int64_t rotate();

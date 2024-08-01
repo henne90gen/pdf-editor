@@ -11,7 +11,7 @@ int cmd_info(const InfoArgs &args) {
         return 1;
     }
 
-    auto document              = result.value();
+    auto &document             = result.value();
     size_t pageCount           = document.page_count();
     size_t lineCount           = document.line_count();
     size_t wordCount           = document.word_count();

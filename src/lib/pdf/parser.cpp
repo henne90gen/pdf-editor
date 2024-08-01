@@ -9,10 +9,10 @@ namespace pdf {
 NoopReferenceResolver GlobalNoopReferenceResolver = {};
 
 Parser::Parser(Lexer &_lexer, Arena &_arena)
-    : lexer(_lexer), arena(_arena), referenceResolver(&GlobalNoopReferenceResolver) {}
+    : lexer(_lexer), arena(_arena), referenceResolver(&GlobalNoopReferenceResolver), tokens(_arena) {}
 
 Parser::Parser(Lexer &_lexer, Arena &_arena, ReferenceResolver *_referenceResolver)
-    : lexer(_lexer), arena(_arena), referenceResolver(_referenceResolver) {}
+    : lexer(_lexer), arena(_arena), referenceResolver(_referenceResolver), tokens(_arena) {}
 
 bool Parser::ensure_tokens_have_been_lexed() {
     if (currentTokenIdx < tokens.size()) {
@@ -144,7 +144,7 @@ Array *Parser::parse_array() {
     auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
-    std::vector<Object *> objects = {};
+    auto objects = Vector<Object *>(arena);
     while (true) {
         if (current_token_is(Token::Type::ARRAY_END)) {
             break;
@@ -180,7 +180,7 @@ Dictionary *Parser::parse_dictionary() {
 
     ignore_new_line_tokens();
 
-    std::unordered_map<std::string, Object *> objects = {};
+    auto objects = UnorderedMap<std::string, Object *>(arena);
     while (!current_token_is(Token::Type::DICTIONARY_END)) {
         auto key = parse_name();
         if (key == nullptr) {

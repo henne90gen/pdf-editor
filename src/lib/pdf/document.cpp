@@ -82,8 +82,10 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
         auto parser       = Parser(lexer, allocator.arena(), this);
         int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
 
+        auto temp = allocator.temporary();
+
         // TODO cache objectNumbers and corresponding objects
-        auto objectNumbers = std::vector<int64_t>(N);
+        auto objectNumbers = Vector<int64_t>(N, temp);
         for (int i = 0; i < N; i++) {
             auto objNum      = parser.parse()->as<Integer>();
             objectNumbers[i] = objNum->value;
@@ -91,7 +93,7 @@ std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t obje
             parser.parse();
         }
 
-        auto objs = std::vector<Object *>(N);
+        auto objs = Vector<Object *>(N, temp);
         for (int i = 0; i < N; i++) {
             auto obj = parser.parse();
             objs[i]  = obj;
@@ -406,23 +408,22 @@ ValueResult<Stream *> create_embedded_file_stream(Allocator &allocator, const st
     is.seekg(0);
     spdlog::info("Embedding {} bytes of file '{}'", fileSize, filePath);
 
-    auto tempArena = allocator.temporary();
-    auto fileData  = tempArena.arena().push(fileSize);
+    auto temp     = allocator.temporary();
+    auto fileData = temp.arena().push(fileSize);
     is.read((char *)fileData, static_cast<std::streamsize>(fileSize));
 
-    auto checksum    = hash::md5_checksum(reinterpret_cast<const uint8_t *>(fileData), fileSize);
-    auto checksumStr = hash::to_hex_string(checksum);
-    std::unordered_map<std::string, Object *> params = {
-          {"Size", allocator.arena().push<Integer>(fileSize)},
-          // TODO add CreationDate
-          // TODO add ModDate
-          {"CheckSum", allocator.arena().push<LiteralString>(checksumStr)},
-    };
-    std::unordered_map<std::string, Object *> dict = {
-          {"Type", allocator.arena().push<Name>("EmbeddedFile")},
-          // {"SubType", MIME type}, // TODO parse MIME type and add as SubType
-          {"Params", allocator.arena().push<Dictionary>(params)},
-    };
+    auto checksum      = hash::md5_checksum(reinterpret_cast<const uint8_t *>(fileData), fileSize);
+    auto checksumStr   = hash::to_hex_string(checksum);
+    auto params        = UnorderedMap<std::string, Object *>(allocator);
+    params["Size"]     = allocator.arena().push<Integer>(fileSize);
+    params["CheckSum"] = allocator.arena().push<LiteralString>(checksumStr);
+    // TODO add CreationDate
+    // TODO add ModDate
+
+    auto dict    = UnorderedMap<std::string, Object *>(temp);
+    dict["Type"] = allocator.arena().push<Name>("EmbeddedFile");
+    // dict["SubType"] = MIME type; // TODO parse MIME type and add as SubType
+    dict["Params"] = allocator.arena().push<Dictionary>(params);
 
     auto result = Stream::create_from_unencoded_data(allocator, dict, std::string_view((char *)fileData, fileSize));
     return ValueResult<Stream *>::ok(result);

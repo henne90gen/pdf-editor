@@ -4,6 +4,12 @@
 
 namespace pdf {
 
+OperatorTraverser::OperatorTraverser(Page &_page)
+    : page(_page), stateStack(_page.document.allocator), textBlocks(_page.document.allocator),
+      images(_page.document.allocator) {
+    stateStack.emplace_back();
+}
+
 void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &crIn) {
     if (!dirty) {
         // simply draw the recorded sequence again

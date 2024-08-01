@@ -27,7 +27,7 @@ struct Parser {
     Arena &arena;
     ReferenceResolver *referenceResolver;
 
-    std::vector<Token> tokens = {};
+    Vector<Token> tokens;
     size_t currentTokenIdx    = 0;
 
     explicit Parser(Lexer &_lexer, Arena &_arena);

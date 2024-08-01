@@ -121,8 +121,8 @@ std::string_view Stream::decode(Allocator &allocator) {
             auto *input      = output;
             size_t inputSize = outputSize;
 
-            auto tempArena          = allocator.temporary();
-            output                  = tempArena.arena().push(outputSize);
+            auto temp          = allocator.temporary();
+            output                  = temp.arena().push(outputSize);
             const auto *firstOutput = output;
 
             z_stream infstream;
@@ -142,7 +142,7 @@ std::string_view Stream::decode(Allocator &allocator) {
                     break;
                 }
 
-                output              = tempArena.arena().push(outputSize);
+                output              = temp.arena().push(outputSize);
                 infstream.avail_out = (uInt)outputSize;
                 infstream.next_out  = (Bytef *)output;
             }
@@ -170,9 +170,9 @@ std::string_view Stream::decode(Allocator &allocator) {
 }
 
 std::string_view deflate_buffer(Allocator &allocator, const uint8_t *srcData, size_t srcSize) {
-    auto tempArena = allocator.temporary();
+    auto temp = allocator.temporary();
     auto tempSize  = srcSize * 2;
-    auto tempData  = tempArena.arena().push(tempSize);
+    auto tempData  = temp.arena().push(tempSize);
 
     z_stream stream  = {};
     stream.zalloc    = Z_NULL;
@@ -214,11 +214,11 @@ void Stream::encode(Allocator &allocator, const std::string &data) {
 }
 
 Stream *Stream::create_from_unencoded_data(Allocator &allocator,
-                                           const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
+                                           const UnorderedMap<std::string, Object *> &additionalDictionaryEntries,
                                            std::string_view unencodedData) {
     auto streamData = deflate_buffer(allocator, (uint8_t *)unencodedData.data(), unencodedData.size());
 
-    std::unordered_map<std::string, Object *> dict = {};
+    auto dict = UnorderedMap<std::string, Object *>(allocator);
     for (const auto &entry : additionalDictionaryEntries) {
         dict[entry.first] = entry.second;
     }

@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+#include "pdf/util/types.h"
+
 namespace pdf {
 
 struct Token {
@@ -104,10 +106,10 @@ struct TextLexer : public Lexer {
 };
 
 struct TokenLexer : public Lexer {
-    const std::vector<Token> &tokens;
+    const Vector<Token> &tokens;
     size_t currentTokenIdx = 0;
 
-    explicit TokenLexer(const std::vector<Token> &_tokens) : tokens(_tokens) {}
+    explicit TokenLexer(const Vector<Token> &_tokens) : tokens(_tokens) {}
 
     std::optional<Token> get_token() override {
         if (tokens.empty() || currentTokenIdx >= tokens.size()) {

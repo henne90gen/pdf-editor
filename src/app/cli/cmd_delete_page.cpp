@@ -12,7 +12,7 @@ int cmd_delete_page(const DeleteArgs &args) {
         return 1;
     }
 
-    auto document = documentResult.value();
+    auto &document = documentResult.value();
     auto result   = document.delete_page(args.pageNum);
     if (result.has_error()) {
         spdlog::error("Failed to delete page {}: {}", args.pageNum, result.message());

@@ -171,7 +171,7 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
         return Result::ok();
     }
 
-    currentTrailer->prev = document.allocator.arena().push<Trailer>();
+    currentTrailer->prev = document.allocator.arena().push<Trailer>(document.allocator);
     return read_trailers(document, document.file.data + opt.value()->as<Integer>()->value, currentTrailer->prev);
 }
 
@@ -328,7 +328,7 @@ Result read_trailers(Document &document, uint8_t *crossRefStartPtr, Trailer *cur
         return Result::ok();
     }
 
-    currentTrailer->prev = document.allocator.arena().push<Trailer>();
+    currentTrailer->prev = document.allocator.arena().push<Trailer>(document.allocator);
     return read_trailers(document, document.file.data + opt.value()->value, currentTrailer->prev);
 }
 
@@ -391,7 +391,8 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
         auto parser       = Parser(lexer, document.allocator.arena(), &document);
         int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
 
-        auto objectNumbers = std::vector<int64_t>(N);
+        auto temp          = document.allocator.temporary();
+        auto objectNumbers = Vector<int64_t>(N, temp);
         for (int i = 0; i < N; i++) {
             auto objNum      = parser.parse()->as<Integer>();
             objectNumbers[i] = objNum->value;
@@ -399,7 +400,7 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
             parser.parse();
         }
 
-        auto objs = std::vector<Object *>(N);
+        auto objs = Vector<Object *>(N, temp);
         for (int i = 0; i < N; i++) {
             auto obj = parser.parse();
             objs[i]  = obj;
@@ -425,7 +426,8 @@ Result load_all_objects(Document &document, Trailer *trailer) {
         CrossReferenceEntry entry;
         uint64_t objectNumber;
     };
-    auto compressedEntries = std::vector<NumberedCrossReferenceEntry>();
+    auto temp              = document.allocator.temporary();
+    auto compressedEntries = Vector<NumberedCrossReferenceEntry>(temp);
     auto &crt              = trailer->crossReferenceTable;
 
     for (uint64_t objectNumber = crt.firstObjectNumber;
@@ -534,12 +536,10 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
 
     auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
     if (!is.is_open()) {
-        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to open pdf file for reading: '{}'", filePath);
     }
 
-    Document document         = {};
-    document.allocator        = allocatorResult.value();
+    auto document             = Document(allocatorResult.value());
     document.file.path        = filePath;
     document.file.sizeInBytes = is.tellg();
     document.file.data        = document.allocator.arena().push(document.file.sizeInBytes);
@@ -550,11 +550,10 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
 
     const auto readResult = read_data(document, loadAllObjects);
     if (readResult.has_error()) {
-        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to read document: {}", readResult.message());
     }
 
-    return ValueResult<Document>::ok(document);
+    return ValueResult<Document>::ok(std::move(document));
 }
 
 ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects) {
@@ -563,8 +562,7 @@ ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t s
         return ValueResult<Document>::error("failed to create memory arena: {}", allocatorResult.message());
     }
 
-    Document document         = {};
-    document.allocator        = allocatorResult.value();
+    auto document             = Document(allocatorResult.value());
     document.file.data        = document.allocator.arena().push(size);
     document.file.sizeInBytes = size;
 
@@ -572,11 +570,10 @@ ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t s
 
     const auto readResult = read_data(document, loadAllObjects);
     if (readResult.has_error()) {
-        allocatorResult.value().destroy();
         return ValueResult<Document>::error("failed to read document: {}", readResult.message());
     }
 
-    return ValueResult<Document>::ok(document);
+    return ValueResult<Document>::ok(std::move(document));
 }
 
 } // namespace pdf

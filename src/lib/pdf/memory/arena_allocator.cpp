@@ -106,72 +106,109 @@ ValueResult<Arena> Arena::create() {
     return create(128 * GB);
 }
 
-ValueResult<Arena> Arena::create(size_t maximumSizeInBytes, size_t pageSize) {
+ValueResult<Arena> Arena::create(size_t maximumSizeInBytes, size_t page_size_in_bytes) {
     auto result = ReserveAddressRange(maximumSizeInBytes);
     if (result.has_error()) {
-        return ValueResult<Arena>::of(result.drop_value());
+        return ValueResult<Arena>::error(result.message());
     }
-    return ValueResult<Arena>::ok(result.value(), maximumSizeInBytes, pageSize);
+    return ValueResult<Arena>::ok(result.value(), maximumSizeInBytes, page_size_in_bytes);
 }
 
 Arena::Arena(uint8_t *_buffer, const size_t _maximumSizeInBytes, const size_t _pageSize) {
-    pageSize            = _pageSize;
-    virtualSizeInBytes  = _maximumSizeInBytes;
-    bufferStart         = _buffer;
-    bufferPosition      = bufferStart;
-    reservedSizeInBytes = 0;
+    page_size_in_bytes     = _pageSize;
+    virtual_size_in_bytes  = _maximumSizeInBytes;
+    buffer_start           = _buffer;
+    buffer_position        = buffer_start;
+    reserved_size_in_bytes = 0;
 }
 
-void Arena::destroy() { ReleaseAddressRange(bufferStart, virtualSizeInBytes); }
+Arena::Arena(Arena &&other) {
+    buffer_start           = other.buffer_start;
+    buffer_position        = other.buffer_position;
+    virtual_size_in_bytes  = other.virtual_size_in_bytes;
+    reserved_size_in_bytes = other.reserved_size_in_bytes;
+    page_size_in_bytes     = other.page_size_in_bytes;
+
+    other.buffer_start           = nullptr;
+    other.buffer_position        = nullptr;
+    other.virtual_size_in_bytes  = 0;
+    other.reserved_size_in_bytes = 0;
+    other.page_size_in_bytes     = 0;
+}
+
+Arena &Arena::operator=(Arena &&other) {
+    buffer_start           = other.buffer_start;
+    buffer_position        = other.buffer_position;
+    virtual_size_in_bytes  = other.virtual_size_in_bytes;
+    reserved_size_in_bytes = other.reserved_size_in_bytes;
+    page_size_in_bytes     = other.page_size_in_bytes;
+
+    other.buffer_start           = nullptr;
+    other.buffer_position        = nullptr;
+    other.virtual_size_in_bytes  = 0;
+    other.reserved_size_in_bytes = 0;
+    other.page_size_in_bytes     = 0;
+
+    return *this;
+}
+
+Arena::~Arena() {
+    if (buffer_start == nullptr) {
+        return;
+    }
+
+    ReleaseAddressRange(buffer_start, virtual_size_in_bytes);
+
+    buffer_start           = nullptr;
+    buffer_position        = nullptr;
+    virtual_size_in_bytes  = 0;
+    reserved_size_in_bytes = 0;
+    page_size_in_bytes     = 0;
+}
 
 uint8_t *Arena::push(size_t allocationSizeInBytes) {
-    ASSERT(bufferStart != nullptr);
+    ASSERT(buffer_start != nullptr);
 
-    if (bufferStart + reservedSizeInBytes < bufferPosition + allocationSizeInBytes) {
-        const auto pageCount          = (allocationSizeInBytes / pageSize) + 1;
-        const auto allocationIncrease = pageSize * pageCount;
-        ASSERT(allocationIncrease + reservedSizeInBytes <= virtualSizeInBytes);
+    if (buffer_start + reserved_size_in_bytes < buffer_position + allocationSizeInBytes) {
+        const auto pageCount          = (allocationSizeInBytes / page_size_in_bytes) + 1;
+        const auto allocationIncrease = page_size_in_bytes * pageCount;
+        ASSERT(allocationIncrease + reserved_size_in_bytes <= virtual_size_in_bytes);
 
-        const auto result = ReserveMemory(bufferStart + reservedSizeInBytes, allocationIncrease);
+        const auto result = ReserveMemory(buffer_start + reserved_size_in_bytes, allocationIncrease);
         if (result.has_error()) {
             spdlog::error(result.message());
             return nullptr;
         }
 
-        reservedSizeInBytes += allocationIncrease;
+        reserved_size_in_bytes += allocationIncrease;
     }
 
-    const auto result = bufferPosition;
-    bufferPosition += allocationSizeInBytes;
+    const auto result = buffer_position;
+    buffer_position += allocationSizeInBytes;
     return result;
 }
 
 void Arena::pop(size_t allocationSizeInBytes) {
-    ASSERT(bufferStart != nullptr);
-    bufferPosition -= allocationSizeInBytes;
+    ASSERT(buffer_start != nullptr);
+    buffer_position -= allocationSizeInBytes;
 }
 
-void Arena::pop_all() { bufferPosition = bufferStart; }
+void Arena::pop_all() { buffer_position = buffer_start; }
 
 ValueResult<Allocator> Allocator::create() {
     auto internalArenaResult = Arena::create();
     if (internalArenaResult.has_error()) {
-        return ValueResult<Allocator>::of(internalArenaResult.drop_value());
+        return ValueResult<Allocator>::error(internalArenaResult.message());
     }
 
     auto temporaryArenaResult = Arena::create();
     if (temporaryArenaResult.has_error()) {
-        return ValueResult<Allocator>::of(temporaryArenaResult.drop_value());
+        return ValueResult<Allocator>::error(temporaryArenaResult.message());
     }
 
-    auto internalArena  = internalArenaResult.value();
-    auto temporaryArena = temporaryArenaResult.value();
-    return ValueResult<Allocator>::ok(Allocator(internalArena, temporaryArena));
-}
-
-void Allocator::destroy() {
-    internalArena.destroy();
-    temporaryArena.destroy();
+    auto &internal_arena  = internalArenaResult.value();
+    auto &temporary_arena = temporaryArenaResult.value();
+    return ValueResult<Allocator>::ok(Allocator(internal_arena, temporary_arena));
 }
 
 } // namespace pdf

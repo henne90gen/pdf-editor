@@ -5,16 +5,9 @@
 
 #include "PdfWindow.h"
 
-EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, const std::string &filePath)
-    : Gtk::ApplicationWindow(obj) {
-    auto result = pdf::Document::read_from_file(filePath);
-    if (result.has_error()) {
-        spdlog::error(result.message());
-        return;
-    }
-    document = result.value();
-
-    set_title(filePath);
+EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document_)
+    : Gtk::ApplicationWindow(obj), document(std::move(document_)) {
+    set_title(document.file.path);
     set_show_menubar(true);
 
     auto pdfWindow = Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);

@@ -6,6 +6,7 @@
 #include "pdf/font.h"
 #include "pdf/image.h"
 #include "pdf/memory/arena_allocator.h"
+#include "pdf/memory/stl_allocator.h"
 #include "pdf/objects.h"
 #include "pdf/parser.h"
 
@@ -56,16 +57,20 @@ struct CrossReferenceEntry {
 };
 
 struct CrossReferenceTable {
-    int64_t firstObjectNumber                = 0;
-    int64_t objectCount                      = 0;
-    std::vector<CrossReferenceEntry> entries = {};
+    int64_t firstObjectNumber = 0;
+    int64_t objectCount       = 0;
+    Vector<CrossReferenceEntry> entries;
+
+    CrossReferenceTable(Allocator &allocator) : entries(StlAllocator<CrossReferenceEntry>(allocator)) {}
 };
 
 struct Trailer {
-    CrossReferenceTable crossReferenceTable = {};
-    Dictionary *dict                        = nullptr;
-    IndirectObject *streamObject            = nullptr;
-    Trailer *prev                           = nullptr;
+    CrossReferenceTable crossReferenceTable;
+    Dictionary *dict             = nullptr;
+    IndirectObject *streamObject = nullptr;
+    Trailer *prev                = nullptr;
+
+    Trailer(Allocator &allocator) : crossReferenceTable(allocator) {}
 };
 
 struct ObjectMetadata {
@@ -74,17 +79,22 @@ struct ObjectMetadata {
 };
 
 struct DocumentFileMetadata {
-    std::unordered_map<IndirectObject *, ObjectMetadata> objects = {};
-    std::unordered_map<Trailer *, std::string_view> trailers     = {};
+    UnorderedMap<IndirectObject *, ObjectMetadata> objects;
+    UnorderedMap<Trailer *, std::string_view> trailers;
+
+    // TODO add constructor to initialize both members
+    DocumentFileMetadata(Allocator &allocator) : objects(allocator), trailers(allocator) {}
 };
 
 struct DocumentFile {
     std::string path;
-    uint8_t *data                 = nullptr;
-    size_t sizeInBytes            = 0;
-    int64_t lastCrossRefStart     = {};
-    Trailer trailer               = {};
-    DocumentFileMetadata metadata = {};
+    uint8_t *data             = nullptr;
+    size_t sizeInBytes        = 0;
+    int64_t lastCrossRefStart = {};
+    Trailer trailer;
+    DocumentFileMetadata metadata;
+
+    DocumentFile(Allocator &allocator) : trailer(allocator), metadata(allocator) {}
 
     /// Points to the byte right after the end of the data buffer
     uint8_t *end_ptr() const { return data + sizeInBytes; }
@@ -98,16 +108,20 @@ struct DocumentFile {
 };
 
 struct ReadMetadata {
-    std::vector<std::string_view> trailers                 = {};
-    std::unordered_map<Object *, std::string_view> objects = {};
+    Vector<std::string_view> trailers;
+    UnorderedMap<Object *, std::string_view> objects;
+
+    ReadMetadata(Allocator &allocator) : trailers(allocator), objects(allocator) {}
 };
 
 struct Document : public ReferenceResolver {
-    Allocator allocator                                       = {};
-    DocumentFile file                                         = {};
-    std::unordered_map<uint64_t, IndirectObject *> objectList = {};
+    Allocator allocator;
+    DocumentFile file;
+    UnorderedMap<uint64_t, IndirectObject *> objectList;
 
-    ~Document();
+    Document(Document &&other)            = default;
+    Document &operator=(Document &&other) = default;
+    virtual ~Document();
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
@@ -180,13 +194,13 @@ struct Document : public ReferenceResolver {
     // Finds the IndirectObject that wraps the given Object
     IndirectObject *find_existing_object(Object *object);
 
-    // releases all memory that was allocated by this document instance
-    void destroy() { allocator.destroy(); }
-
   private:
     int64_t currentResolutionObjectNumber = 0;
     DocumentCatalog *cachedRoot           = nullptr;
-    std::vector<Page *> cachedPages       = {};
+    Vector<Page *> cachedPages;
+
+    Document(Allocator &allocator_)
+        : allocator(std::move(allocator_)), file(allocator), objectList(allocator), cachedPages(allocator) {}
 
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);

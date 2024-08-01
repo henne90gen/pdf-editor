@@ -13,13 +13,13 @@
 #include <pdf/document.h>
 
 #include "ContentWindow.h"
-#include "ObjectList.h"
 #include "JumpToByteDialog.h"
+#include "ObjectList.h"
 
 class DebugWindow : public Gtk::ApplicationWindow {
   public:
     [[maybe_unused]] DebugWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
-                                 const std::string &filePath);
+                                 pdf::Document &document_);
 
     void update_selected_byte_label(int b);
     void update_hovered_byte_label(int b);
@@ -45,6 +45,6 @@ class DebugWindow : public Gtk::ApplicationWindow {
     Gtk::Button *parseDocumentButton   = nullptr;
 
     ContentArea *contentArea           = nullptr;
-    ObjectList *documentTree         = nullptr;
+    ObjectList *documentTree           = nullptr;
     JumpToByteDialog *jumpToByteDialog = nullptr;
 };

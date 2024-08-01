@@ -102,7 +102,7 @@ void CMapParser::parse_code_space_range() {
     currentTokenIdx++;
 }
 
-void CMapParser::parse_bf_char(std::unordered_map<uint8_t, std::string> &charmap) {
+void CMapParser::parse_bf_char(UnorderedMap<uint8_t, std::string> &charmap) {
     auto beforeTokenIdx = currentTokenIdx;
     if (!current_token_is(Token::Type::INTEGER)) {
         return;
@@ -159,7 +159,7 @@ void CMapParser::parse_bf_char(std::unordered_map<uint8_t, std::string> &charmap
     currentTokenIdx++;
 }
 
-void CMapParser::parse_bf_range(std::unordered_map<uint8_t, std::string> &charmap) {
+void CMapParser::parse_bf_range(UnorderedMap<uint8_t, std::string> &charmap) {
     auto beforeTokenIdx = currentTokenIdx;
     if (!current_token_is(Token::Type::INTEGER)) {
         return;
@@ -247,7 +247,7 @@ CMap *CMapParser::parse() {
         currentTokenIdx++;
     }
 
-    std::unordered_map<uint8_t, std::string> charmap = {};
+    auto charmap = UnorderedMap<uint8_t, std::string>(allocator);
 
     currentTokenIdx++;
     while (true) {

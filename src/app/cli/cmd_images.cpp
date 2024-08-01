@@ -10,7 +10,7 @@ int cmd_images(const ImagesArgs &args) {
         return 1;
     }
 
-    auto document = result.value();
+    auto &document = result.value();
     int count     = 0;
     document.for_each_image([&count, &document](pdf::Image &img) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);

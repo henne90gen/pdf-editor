@@ -8,6 +8,7 @@
 
 #include "pdf/memory/arena_allocator.h"
 #include "pdf/util/debug.h"
+#include "pdf/util/types.h"
 
 namespace pdf {
 
@@ -97,20 +98,19 @@ struct Name : public Object {
 };
 
 struct Array : public Object {
-    std::vector<Object *> values;
+    Vector<Object *> values;
 
     static Type staticType() { return Type::ARRAY; }
-    explicit Array(std::vector<Object *> objects) : Object(staticType()), values(std::move(objects)) {}
+    explicit Array(Vector<Object *> objects) : Object(staticType()), values(std::move(objects)) {}
 
     void remove_element(Document &document, size_t index);
 };
 
 struct Dictionary : public Object {
-    std::unordered_map<std::string, Object *> values = {};
+    UnorderedMap<std::string, Object *> values;
 
     static Type staticType() { return Type::DICTIONARY; }
-    explicit Dictionary(std::unordered_map<std::string, Object *> &map)
-        : Object(staticType()), values(std::move(map)) {}
+    explicit Dictionary(UnorderedMap<std::string, Object *> map) : Object(staticType()), values(std::move(map)) {}
 
     template <typename T> std::optional<T *> find(const std::string &key) {
         auto itr = values.find(key);
@@ -159,10 +159,9 @@ struct Stream : public Object {
     explicit Stream(Dictionary *_dictionary, std::string_view encodedData)
         : Object(staticType()), dictionary(_dictionary), streamData(encodedData) {}
 
-    static Stream *
-    create_from_unencoded_data(Allocator &allocator,
-                               const std::unordered_map<std::string, Object *> &additionalDictionaryEntries,
-                               std::string_view unencodedData);
+    static Stream *create_from_unencoded_data(Allocator &allocator,
+                                              const UnorderedMap<std::string, Object *> &additionalDictionaryEntries,
+                                              std::string_view unencodedData);
 
     [[nodiscard]] std::string_view decode(Allocator &allocator);
     void encode(Allocator &allocator, const std::string &data);
