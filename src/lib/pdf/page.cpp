@@ -143,6 +143,6 @@ void Page::for_each_image(const std::function<ForEachResult(PageImage &)> &func)
     }
 }
 
-void Page::render(const Cairo::RefPtr<Cairo::Context> &cr) { traverser.traverse(cr); }
+void Page::render(cairo_t *cr) { traverser.traverse(cr); }
 
 } // namespace pdf

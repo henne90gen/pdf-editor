@@ -95,7 +95,7 @@ struct Page {
     size_t character_count();
     std::optional<Font *> get_font(const Tf_SetTextFontSize &data);
 
-    void render(const Cairo::RefPtr<Cairo::Context> &cr);
+    void render(cairo_t *cr);
 };
 
 } // namespace pdf

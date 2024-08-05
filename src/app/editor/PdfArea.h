@@ -74,9 +74,9 @@ class PdfArea : public ScrolledZoomedContent {
     void on_mouse_drag_update(double x, double y);
     void on_mouse_drag_end(double x, double y);
 
-    void render_pages(const Cairo::RefPtr<Cairo::Context> &cr);
-    void render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
-    void render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr);
+    void render_pages(cairo_t *cr);
+    void render_text_highlight(cairo_t *cr);
+    void render_image_highlight(cairo_t *cr);
 
     pdf::PageImage *get_image_at_position(double x, double y);
 };

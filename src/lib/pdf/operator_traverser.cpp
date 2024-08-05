@@ -1,5 +1,7 @@
 #include "operator_traverser.h"
 
+#include <cairo/cairo-ft.h>
+
 #include "pdf/page.h"
 
 namespace pdf {
@@ -10,34 +12,35 @@ OperatorTraverser::OperatorTraverser(Page &_page)
     stateStack.emplace_back();
 }
 
-void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &crIn) {
+void OperatorTraverser::traverse(cairo_t *crIn) {
     if (!dirty) {
         // simply draw the recorded sequence again
-        crIn->set_source(recordingSurface, 0.0, 0.0);
-        crIn->paint();
+        cairo_set_source_surface(crIn, recordingSurface, 0.0, 0.0);
+        cairo_paint(crIn);
         return;
     }
 
-    recordingSurface = Cairo::RecordingSurface::create();
-    auto cr          = Cairo::Context::create(recordingSurface);
+    recordingSurface = cairo_recording_surface_create(CAIRO_CONTENT_COLOR, nullptr);
+    auto cr          = cairo_create(recordingSurface);
 
     images.clear();
     textBlocks.clear();
 
-    cr->save();
+    cairo_save(cr);
 
-    cr->set_miter_limit(10.0);
+    cairo_set_miter_limit(cr, 10.0);
 
     // move (0,0) from the top-left to the bottom-left corner of the page
     // and make positive y-axis extend vertically upward
-    auto pageHeight = page.attr_height();
-    auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
-    cr->transform(matrix);
+    auto pageHeight       = page.attr_height();
+    cairo_matrix_t matrix = {};
+    cairo_matrix_init(&matrix, 1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
+    cairo_transform(cr, &matrix);
 
     auto cropBox = page.attr_crop_box();
-    cr->set_source_rgb(1, 1, 1);
-    cr->rectangle(0, 0, cropBox->width(), cropBox->height());
-    cr->fill();
+    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_rectangle(cr, 0, 0, cropBox->width(), cropBox->height());
+    cairo_fill(cr);
 
     auto streams = page.content_streams();
     ASSERT(!streams.empty());
@@ -50,19 +53,19 @@ void OperatorTraverser::traverse(const Cairo::RefPtr<Cairo::Context> &crIn) {
         });
     }
 
-    cr->restore();
+    cairo_restore(cr);
 
-    crIn->set_source(recordingSurface, 0.0, 0.0);
-    crIn->paint();
+    cairo_set_source_surface(crIn, recordingSurface, 0.0, 0.0);
+    cairo_paint(crIn);
 
     dirty = false;
 }
 
-void OperatorTraverser::apply_operator(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void OperatorTraverser::apply_operator(cairo_t *cr, Operator *op) {
     //    spdlog::info("{}", operatorTypeToString(op->type));
     switch (op->type) {
     case Operator::Type::w_SetLineWidth:
-        cr->set_line_width(op->data.w_SetLineWidth.lineWidth);
+        cairo_set_line_width(cr, op->data.w_SetLineWidth.lineWidth);
         break;
     case Operator::Type::q_PushGraphicsState:
         pushGraphicsState(cr);
@@ -111,9 +114,10 @@ void OperatorTraverser::apply_operator(const Cairo::RefPtr<Cairo::Context> &cr, 
 }
 
 void OperatorTraverser::modifyCurrentTransformationMatrix(Operator *op) {
-    const auto &m = op->data.cm_ModifyCurrentTransformationMatrix.matrix;
-    auto matrix   = Cairo::Matrix(1, m[1], m[2], 1, m[4], m[5]);
-    state().ctm.multiply(state().ctm, matrix);
+    const auto &m         = op->data.cm_ModifyCurrentTransformationMatrix.matrix;
+    cairo_matrix_t matrix = {};
+    cairo_matrix_init(&matrix, 1.0, m[1], m[2], 1, m[4], m[5]);
+    cairo_matrix_multiply(&state().ctm, &state().ctm, &matrix);
 }
 
 void OperatorTraverser::appendRectangle() const {
@@ -129,11 +133,11 @@ void OperatorTraverser::endPathWithoutFillingOrStroking() const {
     //  it does however set the clipping path, if a clipping path operator was used before it
 }
 
-void OperatorTraverser::setNonStrokingColor(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
-    cr->set_source_rgb(                         //
-          op->data.rg_SetNonStrokingColorRGB.r, //
-          op->data.rg_SetNonStrokingColorRGB.g, //
-          op->data.rg_SetNonStrokingColorRGB.b  //
+void OperatorTraverser::setNonStrokingColor(cairo_t *cr, Operator *op) {
+    cairo_set_source_rgb(cr,                                   //
+                         op->data.rg_SetNonStrokingColorRGB.r, //
+                         op->data.rg_SetNonStrokingColorRGB.g, //
+                         op->data.rg_SetNonStrokingColorRGB.b  //
     );
 }
 
@@ -149,38 +153,41 @@ void OperatorTraverser::beginText() {
     state().textState.textObjectParams = std::optional(TextObjectState());
 }
 
-void OperatorTraverser::pushGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->save();
+void OperatorTraverser::pushGraphicsState(cairo_t *cr) {
+    cairo_save(cr);
     stateStack.push_back(state());
 }
 
-void OperatorTraverser::popGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->restore();
+void OperatorTraverser::popGraphicsState(cairo_t *cr) {
+    cairo_restore(cr);
     stateStack.pop_back();
 }
 
 void OperatorTraverser::moveStartOfNextLine(Operator *op) {
-    auto tmp             = Cairo::identity_matrix();
+    cairo_matrix_t tmp = {};
+    cairo_matrix_init_identity(&tmp);
     auto startOfNextLine = op->data.Td_MoveStartOfNextLine;
-    tmp.translate(startOfNextLine.x, startOfNextLine.y);
+    cairo_matrix_translate(&tmp, startOfNextLine.x, startOfNextLine.y);
 
     ASSERT(state().textState.textObjectParams.has_value());
 
-    auto currentLineMatrix = state().textState.textObjectParams.value().textLineMatrix;
-    auto newLineMatrix     = tmp * currentLineMatrix;
+    auto currentLineMatrix       = state().textState.textObjectParams.value().textLineMatrix;
+    cairo_matrix_t newLineMatrix = {};
+    cairo_matrix_multiply(&newLineMatrix, &tmp, &currentLineMatrix);
 
     state().textState.textObjectParams.value().textLineMatrix = newLineMatrix;
     state().textState.textObjectParams.value().textMatrix     = newLineMatrix;
 }
 
-void OperatorTraverser::setTextFontAndSize(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void OperatorTraverser::setTextFontAndSize(cairo_t *cr, Operator *op) {
     auto &textState        = state().textState;
     textState.textFontSize = op->data.Tf_SetTextFontAndSize.fontSize;
 
-    auto textRenderMatrix = Cairo::identity_matrix();
-    textRenderMatrix.scale(textState.textFontSize, -textState.textFontSize);
-    textRenderMatrix.translate(0, textState.textRiseUnscaled);
-    cr->set_font_matrix(textRenderMatrix);
+    cairo_matrix_t textRenderMatrix = {};
+    cairo_matrix_init_identity(&textRenderMatrix);
+    cairo_matrix_scale(&textRenderMatrix, textState.textFontSize, -textState.textFontSize);
+    cairo_matrix_translate(&textRenderMatrix, 0, textState.textRiseUnscaled);
+    cairo_set_font_matrix(cr, &textRenderMatrix);
 
     auto fontMapOpt = page.attr_resources()->fonts(page.document);
     if (!fontMapOpt.has_value()) {
@@ -200,17 +207,19 @@ void OperatorTraverser::setTextFontAndSize(const Cairo::RefPtr<Cairo::Context> &
     state().textState.textFont.font = font;
     if (fontFace != nullptr) {
         state().textState.textFont.ftFace = fontFace;
-        cr->set_font_face(Cairo::FtFontFace::create(fontFace, 0));
+
+        auto cairo_ff = cairo_ft_font_face_create_for_ft_face(fontFace, 0);
+        cairo_set_font_face(cr, cairo_ff);
     }
 }
 
-void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void OperatorTraverser::showText(cairo_t *cr, Operator *op) {
     const auto &textState = state().textState;
-    cr->set_source_rgb(0.0, 0.0, 0.0);
+    cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
 
-    auto scaledFont = cr->get_scaled_font();
+    auto scaledFont = cairo_get_scaled_font(cr);
     auto values     = op->data.TJ_ShowOneOrMoreTextStrings.objects->values;
-    auto glyphs     = std::vector<Cairo::Glyph>();
+    auto glyphs     = std::vector<cairo_glyph_t>();
     double xOffset  = 0;
     for (auto value : values) {
         if (value->is<Integer>()) {
@@ -219,34 +228,43 @@ void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operat
         } else if (value->is<HexadecimalString>()) {
             auto str = value->as<HexadecimalString>()->to_string();
             for (char c : str) {
-                auto i             = static_cast<uint8_t>(c);
-                Cairo::Glyph glyph = {.index = i, .x = xOffset, .y = 0.0};
+                auto i              = static_cast<uint8_t>(c);
+                cairo_glyph_t glyph = {.index = i, .x = xOffset, .y = 0.0};
                 glyphs.push_back(glyph);
 
-                Cairo::TextExtents extents;
-                cairo_scaled_font_glyph_extents(scaledFont->cobj(), &glyph, 1, &extents);
+                cairo_text_extents_t extents = {};
+                cairo_scaled_font_glyph_extents(scaledFont, &glyph, 1, &extents);
                 xOffset += static_cast<double>(extents.x_advance);
             }
         } else if (value->is<LiteralString>()) {
-            const auto &utf8 = value->as<LiteralString>()->value;
-            auto clusters    = std::vector<Cairo::TextCluster>();
-            Cairo::TextClusterFlags flags;
-            std::vector<Cairo::Glyph> newGlyphs = {};
-            scaledFont->text_to_glyphs(xOffset, 0.0, utf8, newGlyphs, clusters, flags);
-            for (auto &g : newGlyphs) {
-                glyphs.push_back(g);
+            const auto &utf8                 = value->as<LiteralString>()->value;
+            cairo_glyph_t *newGlyphs         = nullptr;
+            int numNewGlyphs                 = 0;
+            cairo_text_cluster_t *clusters   = nullptr;
+            int numClusters                  = 0;
+            cairo_text_cluster_flags_t flags = {};
+            const auto status =
+                  cairo_scaled_font_text_to_glyphs(scaledFont, xOffset, 0.0, utf8.data(), utf8.size(), &newGlyphs,
+                                                   &numNewGlyphs, &clusters, &numClusters, &flags);
+            if (status != CAIRO_STATUS_SUCCESS) {
+                continue;
+            }
 
-                Cairo::TextExtents extents;
-                cairo_scaled_font_glyph_extents(scaledFont->cobj(), &g, 1, &extents);
+            for (int i = 0; i < numNewGlyphs; i++) {
+                const auto &glyph = newGlyphs[i];
+                glyphs.push_back(glyph);
+
+                cairo_text_extents_t extents = {};
+                cairo_scaled_font_glyph_extents(scaledFont, &glyph, 1, &extents);
                 xOffset += static_cast<double>(extents.x_advance);
             }
         }
     }
 
-    cr->save();
-    cr->transform(textState.textObjectParams.value().textMatrix);
-    cr->show_glyphs(glyphs);
-    cr->restore();
+    cairo_save(cr);
+    cairo_transform(cr, &textState.textObjectParams.value().textMatrix);
+    cairo_show_glyphs(cr, glyphs.data(), glyphs.size());
+    cairo_restore(cr);
 
     // TODO integrate the code below into the loop above
 
@@ -264,12 +282,12 @@ void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operat
             }
             auto str = value->as<HexadecimalString>()->to_string();
             for (char c : str) {
-                auto i             = static_cast<uint8_t>(c);
-                Cairo::Glyph glyph = {.index = i, .x = offsetX, .y = 0.0};
+                auto i              = static_cast<uint8_t>(c);
+                cairo_glyph_t glyph = {.index = i, .x = offsetX, .y = 0.0};
                 glyphs.push_back(glyph);
 
-                Cairo::TextExtents extents;
-                cairo_scaled_font_glyph_extents(scaledFont->cobj(), &glyph, 1, &extents);
+                cairo_text_extents_t extents = {};
+                cairo_scaled_font_glyph_extents(scaledFont, &glyph, 1, &extents);
                 offsetX += static_cast<double>(extents.x_advance);
             }
         } else if (value->is<LiteralString>()) {
@@ -281,10 +299,10 @@ void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operat
 
     double x = 0.0;
     double y = 0.0;
-    textState.textObjectParams->textLineMatrix.transform_point(x, y);
+    cairo_matrix_transform_point(&textState.textObjectParams->textLineMatrix, &x, &y);
 
-    Cairo::TextExtents extents = {};
-    cairo_scaled_font_glyph_extents(scaledFont->cobj(), glyphs.data(), static_cast<int>(glyphs.size()), &extents);
+    cairo_text_extents_t extents = {};
+    cairo_scaled_font_glyph_extents(scaledFont, glyphs.data(), static_cast<int>(glyphs.size()), &extents);
     textBlocks.push_back({
           .page   = &page,
           .text   = text,
@@ -297,7 +315,7 @@ void OperatorTraverser::showText(const Cairo::RefPtr<Cairo::Context> &cr, Operat
     });
 }
 
-void OperatorTraverser::onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op) {
+void OperatorTraverser::onDo(cairo_t *cr, Operator *op) {
     auto pageImageResult = pdf::PageImage::create(page, state().ctm, op, currentContentStream);
     if (pageImageResult.has_error()) {
         return;
@@ -315,7 +333,7 @@ void OperatorTraverser::onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *
         return;
     }
 
-    auto stride         = Cairo::ImageSurface::format_stride_for_width(Cairo::ImageSurface::Format::RGB24, width);
+    const auto stride   = cairo_format_stride_for_width(CAIRO_FORMAT_RGB24, width);
     auto currentRowSize = static_cast<int32_t>((bitsPerComponentOpt.value()->value * 3 * width) / 32.0 * 4.0);
 
     auto tempArena = page.document.allocator.temporary();
@@ -331,14 +349,13 @@ void OperatorTraverser::onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *
         }
     }
 
-    auto surface = Cairo::ImageSurface::create(pBuf, Cairo::ImageSurface::Format::RGB24, width, height, stride);
-    cr->set_source(surface, pageImage.xOffset, pageImage.yOffset);
-    cr->paint();
-
-    surface->finish();
+    auto surface = cairo_image_surface_create_for_data(pBuf, CAIRO_FORMAT_RGB24, width, height, stride);
+    cairo_set_source_surface(cr, surface, pageImage.xOffset, pageImage.yOffset);
+    cairo_paint(cr);
+    cairo_surface_finish(surface);
 }
 
-ValueResult<PageImage> PageImage::create(Page &page, const Cairo::Matrix &ctm, Operator *op, ContentStream *cs) {
+ValueResult<PageImage> PageImage::create(Page &page, const cairo_matrix_t &ctm, Operator *op, ContentStream *cs) {
     const auto &xObjectName = op->data.Do_PaintXObject.name->value;
 
     const auto xObjectMapOpt = page.attr_resources()->x_objects(page.document);
@@ -362,7 +379,7 @@ ValueResult<PageImage> PageImage::create(Page &page, const Cairo::Matrix &ctm, O
 
     double xOffset = 0.0;
     double yOffset = 0.0;
-    ctm.transform_point(xOffset, yOffset);
+    cairo_matrix_transform_point(&ctm, &xOffset, &yOffset);
     auto pageImage = PageImage(&page, xObjectKey, xOffset, yOffset, xObject->as<XObjectImage>(), op, cs);
     return ValueResult<PageImage>::ok(pageImage);
 }

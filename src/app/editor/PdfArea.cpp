@@ -56,17 +56,17 @@ void PdfArea::init_document_data() {
 void PdfArea::on_draw(const Cairo::RefPtr<Cairo::Context> &cr, int /*width*/, int /*height*/) {
     // spdlog::trace("PdfArea::on_draw(width={}, height={})", width, height);
 
-    cr->translate(-scrollOffsetX, -scrollOffsetY);
-    cr->scale(_zoom, _zoom);
+    cairo_translate(cr->cobj(), -scrollOffsetX, -scrollOffsetY);
+    cairo_scale(cr->cobj(), _zoom, _zoom);
 
-    render_pages(cr);
+    render_pages(cr->cobj());
 
     // render_text_highlight(cr);
     // render_image_highlight(cr);
 }
 
-void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->save();
+void PdfArea::render_pages(cairo_t *cr) {
+    cairo_save(cr);
 
     auto positionY     = 0.0;
     auto pages         = document.pages();
@@ -76,23 +76,23 @@ void PdfArea::render_pages(const Cairo::RefPtr<Cairo::Context> &cr) {
 
         if ((scrollOffsetY >= positionY && scrollOffsetY <= positionY + pageHeight) ||
             (screenEndPosY >= positionY && screenEndPosY <= positionY + pageHeight)) {
-            cr->save();
+            cairo_save(cr);
             page->render(cr);
-            cr->restore();
+            cairo_restore(cr);
         }
 
         auto dy = pageHeight + PAGE_PADDING;
         positionY += dy;
-        cr->translate(0, dy);
+        cairo_translate(cr, 0, dy);
     }
 
-    cr->restore();
+    cairo_restore(cr);
 }
 
-void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->save();
+void PdfArea::render_text_highlight(cairo_t *cr) {
+    cairo_save(cr);
 
-    cr->set_source_rgba(0, 0, 1, 0.1);
+    cairo_set_source_rgba(cr, 0, 0, 1, 0.1);
 
     for (const auto &pageTextBlock : pageTextBlocks) {
         auto verticalOffset = pageTextBlock.pageOffset - scrollOffsetY;
@@ -120,48 +120,49 @@ void PdfArea::render_text_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
                 continue;
             }
 
-            cr->rectangle(                                                   //
-                  textBlock.x,                                               //
-                  textBlock.y - textBlock.height + pageTextBlock.pageOffset, //
-                  textBlock.width,                                           //
-                  textBlock.height                                           //
+            cairo_rectangle(cr,                                                        //
+                            textBlock.x,                                               //
+                            textBlock.y - textBlock.height + pageTextBlock.pageOffset, //
+                            textBlock.width,                                           //
+                            textBlock.height                                           //
             );
         }
     }
-    cr->fill();
+    cairo_fill(cr);
 
-    cr->restore();
+    cairo_restore(cr);
 }
 
-void PdfArea::render_image_highlight(const Cairo::RefPtr<Cairo::Context> &cr) {
-    cr->save();
+void PdfArea::render_image_highlight(cairo_t *cr) {
+    cairo_save(cr);
 
     for (const auto &images : pageImages) {
-        cr->save();
+        cairo_save(cr);
 
-        auto pageHeight = images.page->attr_height();
-        auto matrix     = Cairo::Matrix(1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
-        cr->transform(matrix);
+        auto pageHeight       = images.page->attr_height();
+        cairo_matrix_t matrix = {};
+        cairo_matrix_init(&matrix, 1.0, 0.0, 0.0, -1.0, 0.0, pageHeight);
+        cairo_transform(cr, &matrix);
 
         for (const auto &image : images.images) {
             if (&image != selectedImage) {
                 continue;
             }
 
-            cr->rectangle(                                   //
-                  image.xOffset,                             //
-                  image.yOffset,                             //
-                  static_cast<double>(image.image->width()), //
-                  static_cast<double>(image.image->height()) //
+            cairo_rectangle(cr,                                        //
+                            image.xOffset,                             //
+                            image.yOffset,                             //
+                            static_cast<double>(image.image->width()), //
+                            static_cast<double>(image.image->height()) //
             );
-            cr->set_source_rgba(0, 1, 1, 0.1);
-            cr->fill();
+            cairo_set_source_rgba(cr, 0, 1, 1, 0.1);
+            cairo_fill(cr);
         }
 
-        cr->restore();
+        cairo_restore(cr);
     }
 
-    cr->restore();
+    cairo_restore(cr);
 }
 
 void PdfArea::set_offsets(const double x, const double y) {

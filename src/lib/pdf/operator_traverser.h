@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cairo/cairo.h>
 #include <vector>
 
 #include "pdf/font.h"
@@ -29,8 +30,13 @@ struct Color {
 };
 
 struct TextObjectState {
-    Cairo::Matrix textMatrix     = Cairo::identity_matrix();
-    Cairo::Matrix textLineMatrix = Cairo::identity_matrix();
+    cairo_matrix_t textMatrix     = {};
+    cairo_matrix_t textLineMatrix = {};
+
+    TextObjectState() {
+        cairo_matrix_init_identity(&textMatrix);
+        cairo_matrix_init_identity(&textLineMatrix);
+    }
 };
 
 enum class TextRenderingMode {
@@ -76,13 +82,15 @@ struct TextState {
 
 struct GraphicsState {
     // Current transformation matrix
-    Cairo::Matrix ctm = Cairo::identity_matrix();
+    cairo_matrix_t ctm = {};
 
     double colorSpace      = 0.0;
     Color strokingColor    = {};
     Color nonStrokingColor = {};
 
     TextState textState = {};
+
+    GraphicsState() { cairo_matrix_init_identity(&ctm); }
 };
 
 struct TextBlock {
@@ -134,13 +142,13 @@ struct PageImage {
     /// Moves the image on the page by the specified offset
     void move(Document &document, double offsetX, double offsetY) const;
 
-    static ValueResult<PageImage> create(Page &page, const Cairo::Matrix &ctm, Operator *op, ContentStream *cs);
+    static ValueResult<PageImage> create(Page &page, const cairo_matrix_t &ctm, Operator *op, ContentStream *cs);
 };
 
 struct OperatorTraverser {
     Page &page;
-    bool dirty = true;
-    Cairo::RefPtr<Cairo::Surface> recordingSurface;
+    bool dirty                        = true;
+    cairo_surface_t *recordingSurface = nullptr;
 
     ContentStream *currentContentStream = nullptr;
     Vector<GraphicsState> stateStack;
@@ -152,33 +160,33 @@ struct OperatorTraverser {
 
     void traverse() {
         // initialize the Cairo context with a dummy surface
-        const auto surface = Cairo::RecordingSurface::create();
-        const auto cr      = Cairo::Context::create(surface);
+        const auto surface = cairo_recording_surface_create(CAIRO_CONTENT_COLOR, nullptr);
+        const auto cr      = cairo_create(surface);
         traverse(cr);
     }
 
-    void traverse(const Cairo::RefPtr<Cairo::Context> &cr);
+    void traverse(cairo_t *cr);
 
   protected:
     GraphicsState &state() { return stateStack.back(); }
     [[nodiscard]] const GraphicsState &state() const { return stateStack.back(); }
 
   private:
-    void apply_operator(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
+    void apply_operator(cairo_t *cr, Operator *op);
 
-    void setNonStrokingColor(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
+    void setNonStrokingColor(cairo_t *cr, Operator *op);
     void endText();
     void beginText();
-    void pushGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr);
-    void popGraphicsState(const Cairo::RefPtr<Cairo::Context> &cr);
+    void pushGraphicsState(cairo_t *cr);
+    void popGraphicsState(cairo_t *cr);
     void moveStartOfNextLine(Operator *op);
-    void setTextFontAndSize(const Cairo::RefPtr<Cairo::Context> &cr, Operator *op);
+    void setTextFontAndSize(cairo_t *cr, Operator *op);
     void modifyCurrentTransformationMatrix(Operator *op);
     void endPathWithoutFillingOrStroking() const;
     void modifyClippingPathUsingEvenOddRule() const;
     void appendRectangle() const;
-    void showText(const Cairo::RefPtr<Cairo::Context> &cr, Operator *);
-    void onDo(const Cairo::RefPtr<Cairo::Context> &cr, Operator *);
+    void showText(cairo_t *cr, Operator *);
+    void onDo(cairo_t *cr, Operator *);
 };
 
 } // namespace pdf
