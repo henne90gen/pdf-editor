@@ -7,3 +7,5 @@ cmake-build-*
 *.glade~
 \#*.glade#
 __pycache__/
+zig-out
+.zig-cache
