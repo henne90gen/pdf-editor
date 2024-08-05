@@ -167,7 +167,7 @@ $(function() {
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">size_t</span> character_count();</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    std::optional&lt;Font *&gt; get_font(<span class="keyword">const</span> <a class="code" href="structpdf_1_1Tf__SetTextFontSize.html">Tf_SetTextFontSize</a> &amp;data);</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">void</span> render(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">void</span> render(cairo_t *cr);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;} <span class="comment">// namespace pdf</span></div>
@@ -176,13 +176,13 @@ $(function() {
 <div class="ttc" id="astructpdf_1_1ContentStream_html"><div class="ttname"><a href="structpdf_1_1ContentStream.html">pdf::ContentStream</a></div><div class="ttdef"><b>Definition:</b> page.h:56</div></div>
 <div class="ttc" id="astructpdf_1_1Dictionary_html"><div class="ttname"><a href="structpdf_1_1Dictionary.html">pdf::Dictionary</a></div><div class="ttdef"><b>Definition:</b> objects.h:109</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:117</div></div>
-<div class="ttc" id="astructpdf_1_1FontMap_html"><div class="ttname"><a href="structpdf_1_1FontMap.html">pdf::FontMap</a></div><div class="ttdef"><b>Definition:</b> font.h:78</div></div>
+<div class="ttc" id="astructpdf_1_1FontMap_html"><div class="ttname"><a href="structpdf_1_1FontMap.html">pdf::FontMap</a></div><div class="ttdef"><b>Definition:</b> font.h:77</div></div>
 <div class="ttc" id="astructpdf_1_1Integer_html"><div class="ttname"><a href="structpdf_1_1Integer.html">pdf::Integer</a></div><div class="ttdef"><b>Definition:</b> objects.h:60</div></div>
 <div class="ttc" id="astructpdf_1_1Name_html"><div class="ttname"><a href="structpdf_1_1Name.html">pdf::Name</a></div><div class="ttdef"><b>Definition:</b> objects.h:93</div></div>
 <div class="ttc" id="astructpdf_1_1Object_html"><div class="ttname"><a href="structpdf_1_1Object.html">pdf::Object</a></div><div class="ttdef"><b>Definition:</b> objects.h:33</div></div>
-<div class="ttc" id="astructpdf_1_1OperatorTraverser_html"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:140</div></div>
+<div class="ttc" id="astructpdf_1_1OperatorTraverser_html"><div class="ttname"><a href="structpdf_1_1OperatorTraverser.html">pdf::OperatorTraverser</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:148</div></div>
 <div class="ttc" id="astructpdf_1_1Operator_html"><div class="ttname"><a href="structpdf_1_1Operator.html">pdf::Operator</a></div><div class="ttdef"><b>Definition:</b> operator_parser.h:115</div></div>
-<div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:118</div></div>
+<div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:126</div></div>
 <div class="ttc" id="astructpdf_1_1PageTreeNode_html"><div class="ttname"><a href="structpdf_1_1PageTreeNode.html">pdf::PageTreeNode</a></div><div class="ttdef"><b>Definition:</b> page.h:15</div></div>
 <div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:60</div></div>
 <div class="ttc" id="astructpdf_1_1Rectangle_html"><div class="ttname"><a href="structpdf_1_1Rectangle.html">pdf::Rectangle</a></div><div class="ttdef"><b>Definition:</b> rectangle.h:7</div></div>

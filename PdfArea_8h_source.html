@@ -146,9 +146,9 @@ $(function() {
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_update(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keywordtype">void</span> on_mouse_drag_end(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">void</span> render_pages(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">void</span> render_text_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">void</span> render_image_highlight(<span class="keyword">const</span> Cairo::RefPtr&lt;Cairo::Context&gt; &amp;cr);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordtype">void</span> render_pages(cairo_t *cr);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">void</span> render_text_highlight(cairo_t *cr);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">void</span> render_image_highlight(cairo_t *cr);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <a class="code" href="structpdf_1_1PageImage.html">pdf::PageImage</a> *get_image_at_position(<span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;};</div>
@@ -157,7 +157,7 @@ $(function() {
 <div class="ttc" id="astructPageImages_html"><div class="ttname"><a href="structPageImages.html">PageImages</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:35</div></div>
 <div class="ttc" id="astructPageTextBlocks_html"><div class="ttname"><a href="structPageTextBlocks.html">PageTextBlocks</a></div><div class="ttdef"><b>Definition:</b> PdfArea.h:27</div></div>
 <div class="ttc" id="astructpdf_1_1Document_html"><div class="ttname"><a href="structpdf_1_1Document.html">pdf::Document</a></div><div class="ttdef"><b>Definition:</b> document.h:117</div></div>
-<div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:118</div></div>
+<div class="ttc" id="astructpdf_1_1PageImage_html"><div class="ttname"><a href="structpdf_1_1PageImage.html">pdf::PageImage</a></div><div class="ttdef"><b>Definition:</b> operator_traverser.h:126</div></div>
 <div class="ttc" id="astructpdf_1_1Page_html"><div class="ttname"><a href="structpdf_1_1Page.html">pdf::Page</a></div><div class="ttdef"><b>Definition:</b> page.h:60</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
