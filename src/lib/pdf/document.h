@@ -121,7 +121,7 @@ struct Document : public ReferenceResolver {
 
     Document(Document &&other)            = default;
     Document &operator=(Document &&other) = default;
-    virtual ~Document();
+    virtual ~Document()                   = default;
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {

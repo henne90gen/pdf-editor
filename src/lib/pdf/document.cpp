@@ -13,21 +13,6 @@
 
 namespace pdf {
 
-Document::~Document() {
-    bool isFirst        = true;
-    auto currentTrailer = &file.trailer;
-    while (currentTrailer != nullptr) {
-        auto nextTrailer = currentTrailer->prev;
-
-        if (!isFirst) {
-            currentTrailer->~Trailer();
-        }
-
-        currentTrailer = nextTrailer;
-        isFirst        = false;
-    }
-}
-
 // TODO return a ValueResult instead, for better error messages
 std::pair<IndirectObject *, std::string_view> Document::load_object(int64_t objectNumber) {
     CrossReferenceEntry *entry = nullptr;
