@@ -5,7 +5,13 @@ struct InfoArgs {
 };
 
 int cmd_info(const InfoArgs &args) {
-    auto result = pdf::Document::read_from_file(std::string(args.source));
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("failed to create allocator: {}", allocatorResult.message());
+        return 1;
+    }
+
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), std::string(args.source));
     if (result.has_error()) {
         spdlog::error(result.message());
         return 1;

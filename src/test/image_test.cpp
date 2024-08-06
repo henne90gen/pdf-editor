@@ -52,10 +52,12 @@ void assertImageCanBeExtracted(pdf::Image &image, const std::string &readFileNam
 }
 
 TEST(Image, ExtractImage1) {
-    auto readFileName  = "../../../test-files/image-1.pdf";
-    auto writeFileName = "image-1.bmp";
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    const auto readFileName  = "../../../test-files/image-1.pdf";
+    const auto writeFileName = "image-1.bmp";
 
-    auto result = pdf::Document::read_from_file(readFileName, false);
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), readFileName, false);
     ASSERT_FALSE(result.has_error());
     auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
@@ -65,10 +67,12 @@ TEST(Image, ExtractImage1) {
 }
 
 TEST(Image, ExtractImage2) {
-    auto readFileName  = "../../../test-files/image-2.pdf";
-    auto writeFileName = "image-2.bmp";
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    const auto readFileName  = "../../../test-files/image-2.pdf";
+    const auto writeFileName = "image-2.bmp";
 
-    auto result = pdf::Document::read_from_file(readFileName, false);
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), readFileName, false);
     ASSERT_FALSE(result.has_error());
     auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {
@@ -78,10 +82,12 @@ TEST(Image, ExtractImage2) {
 }
 
 TEST(Image, ExtractImage3) {
-    auto readFileName  = "../../../test-files/image-3.pdf";
-    auto writeFileName = "image-3.bmp";
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    const auto readFileName  = "../../../test-files/image-3.pdf";
+    const auto writeFileName = "image-3.bmp";
 
-    auto result = pdf::Document::read_from_file(readFileName, false);
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), readFileName, false);
     ASSERT_FALSE(result.has_error());
     auto &document = result.value();
     document.for_each_image([&readFileName, &writeFileName](pdf::Image &image) {

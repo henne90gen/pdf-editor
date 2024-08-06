@@ -4,11 +4,14 @@
 #include <pdf/page.h>
 
 TEST(Text, HelloWorldTextBlocks) {
-    auto document_result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto document_result_1 =
+          pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(document_result_1.has_error());
 
     auto &document = document_result_1.value();
-    auto pages    = document.pages();
+    auto pages     = document.pages();
     ASSERT_EQ(pages.size(), 1);
 
     auto page       = pages[0];
@@ -23,7 +26,11 @@ TEST(Text, HelloWorldTextBlocks) {
 }
 
 TEST(Text, Move) {
-    auto document_result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+
+    auto document_result_1 =
+          pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(document_result_1.has_error());
 
     auto &document = document_result_1.value();
@@ -42,7 +49,7 @@ TEST(Text, Move) {
     size_t size     = 0;
     ASSERT_FALSE(document.write_to_memory(buffer, size).has_error());
 
-    auto document_result_2 = pdf::Document::read_from_memory(buffer, size);
+    auto document_result_2 = pdf::Document::read_from_memory(allocatorResult.value(), buffer, size);
     ASSERT_FALSE(document_result_2.has_error());
 
     auto &newDocument = document_result_2.value();

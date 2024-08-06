@@ -16,7 +16,10 @@ TEST(Writer, bla) {
 }
 
 TEST(Writer, DeletePageInvalidPageNum) {
-    auto result = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/two-pages.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();
@@ -26,7 +29,9 @@ TEST(Writer, DeletePageInvalidPageNum) {
 }
 
 TEST(Writer, DeletePageFirst) {
-    auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto documentResult = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/two-pages.pdf");
     ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
 
     auto &document = documentResult.value();
@@ -40,7 +45,9 @@ TEST(Writer, DeletePageFirst) {
 }
 
 TEST(Writer, DISABLED_DeletePageSecond) {
-    auto documentResult = pdf::Document::read_from_file("../../../test-files/two-pages.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto documentResult = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/two-pages.pdf");
     ASSERT_FALSE(documentResult.has_error()) << documentResult.message();
 
     auto &document = documentResult.value();
@@ -54,7 +61,7 @@ TEST(Writer, DISABLED_DeletePageSecond) {
     ASSERT_NE(buffer, nullptr);
     ASSERT_NE(size, 0);
 
-    auto testDocResult = pdf::Document::read_from_memory(buffer, size);
+    auto testDocResult = pdf::Document::read_from_memory(allocatorResult.value(), buffer, size);
     ASSERT_FALSE(testDocResult.has_error()) << testDocResult.message();
 
     auto &testDoc = testDocResult.value();
@@ -63,7 +70,9 @@ TEST(Writer, DISABLED_DeletePageSecond) {
 }
 
 TEST(Writer, MoveImage) {
-    auto result = pdf::Document::read_from_file("../../../test-files/image-1.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/image-1.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
     auto &document = result.value();
     document.for_each_page([&document](pdf::Page *page) {
@@ -85,7 +94,7 @@ TEST(Writer, MoveImage) {
         ASSERT_EQ(704.189, image.yOffset);
     };
 
-    auto docResult = pdf::Document::read_from_memory(buffer, size);
+    auto docResult = pdf::Document::read_from_memory(allocatorResult.value(), buffer, size);
     ASSERT_FALSE(docResult.has_error());
     auto &doc = docResult.value();
     doc.for_each_page([&assertFunc](pdf::Page *page) {
@@ -98,7 +107,9 @@ TEST(Writer, MoveImage) {
 }
 
 TEST(Writer, Embed) {
-    auto result_1 = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result_1 = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(result_1.has_error()) << result_1.message();
     auto &document = result_1.value();
 
@@ -119,7 +130,7 @@ TEST(Writer, Embed) {
         ASSERT_EQ(7350, params->must_find<pdf::Integer>("Size")->value);
     };
 
-    auto result_2 = pdf::Document::read_from_memory(buffer, size);
+    auto result_2 = pdf::Document::read_from_memory(allocatorResult.value(), buffer, size);
     ASSERT_FALSE(result_2.has_error()) << result_2.message();
     auto &doc = result_2.value();
     doc.for_each_embedded_file([&assertFunc](pdf::EmbeddedFile *embeddedFile) {
@@ -129,7 +140,9 @@ TEST(Writer, Embed) {
 }
 
 TEST(Writer, Header) {
-    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document  = result.value();
@@ -142,7 +155,9 @@ TEST(Writer, Header) {
 }
 
 TEST(Writer, Objects) {
-    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
     auto &document  = result.value();
     uint8_t *buffer = nullptr;
@@ -187,8 +202,10 @@ TEST(SplitByLines, EndsWithNewline) {
 }
 
 void write_pdf(const std::string &name) {
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
     std::string testFilePath = "../../../test-files/" + name;
-    auto result              = pdf::Document::read_from_file(testFilePath);
+    auto result              = pdf::Document::read_from_file(allocatorResult.value(), testFilePath);
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();

@@ -6,14 +6,20 @@ struct DeleteArgs {
 };
 
 int cmd_delete_page(const DeleteArgs &args) {
-    auto documentResult = pdf::Document::read_from_file(std::string(args.source));
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
+        return 1;
+    }
+
+    auto documentResult = pdf::Document::read_from_file(allocatorResult.value(), std::string(args.source));
     if (documentResult.has_error()) {
         spdlog::error("Failed to load PDF document: {}", documentResult.message());
         return 1;
     }
 
     auto &document = documentResult.value();
-    auto result   = document.delete_page(args.pageNum);
+    auto result    = document.delete_page(args.pageNum);
     if (result.has_error()) {
         spdlog::error("Failed to delete page {}: {}", args.pageNum, result.message());
         return 1;

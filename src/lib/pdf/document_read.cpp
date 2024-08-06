@@ -528,18 +528,13 @@ Result read_data(Document &document, bool loadAllObjects) {
     return load_all_objects(document, &document.file.trailer);
 }
 
-ValueResult<Document> Document::read_from_file(const std::string &filePath, bool loadAllObjects) {
-    auto allocatorResult = Allocator::create();
-    if (allocatorResult.has_error()) {
-        return ValueResult<Document>::error("failed to create memory arena: {}", allocatorResult.message());
-    }
-
+ValueResult<Document> Document::read_from_file(Allocator &allocator, const std::string &filePath, bool loadAllObjects) {
     auto is = std::ifstream(filePath, std::ios::in | std::ifstream::ate | std::ios::binary);
     if (!is.is_open()) {
         return ValueResult<Document>::error("failed to open pdf file for reading: '{}'", filePath);
     }
 
-    auto document             = Document(allocatorResult.value());
+    auto document             = Document(allocator);
     document.file.path        = filePath;
     document.file.sizeInBytes = is.tellg();
     document.file.data        = document.allocator.arena().push(document.file.sizeInBytes);
@@ -556,13 +551,9 @@ ValueResult<Document> Document::read_from_file(const std::string &filePath, bool
     return ValueResult<Document>::ok(std::move(document));
 }
 
-ValueResult<Document> Document::read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects) {
-    auto allocatorResult = Allocator::create();
-    if (allocatorResult.has_error()) {
-        return ValueResult<Document>::error("failed to create memory arena: {}", allocatorResult.message());
-    }
-
-    auto document             = Document(allocatorResult.value());
+ValueResult<Document> Document::read_from_memory(Allocator &allocator, const uint8_t *buffer, size_t size,
+                                                 bool loadAllObjects) {
+    auto document             = Document(allocator);
     document.file.data        = document.allocator.arena().push(size);
     document.file.sizeInBytes = size;
 

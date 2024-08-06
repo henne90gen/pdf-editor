@@ -5,13 +5,19 @@ struct ImagesArgs {
 };
 
 int cmd_images(const ImagesArgs &args) {
-    auto result = pdf::Document::read_from_file(std::string(args.source));
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
+        return 1;
+    }
+
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), std::string(args.source));
     if (result.has_error()) {
         return 1;
     }
 
     auto &document = result.value();
-    int count     = 0;
+    int count      = 0;
     document.for_each_image([&count, &document](pdf::Image &img) {
         spdlog::info("Found image: width={}, height={}", img.width, img.height);
 

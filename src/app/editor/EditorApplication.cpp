@@ -33,7 +33,13 @@ EditorApplication::EditorApplication() : PdfApplication("de.henne90gen.pdf.edito
 void EditorApplication::open_window(const std::string &filePath) {
     spdlog::info("Opening new window: {}", filePath);
 
-    auto result = pdf::Document::read_from_file(filePath, false);
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
+        return;
+    }
+
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), filePath, false);
     if (result.has_error()) {
         spdlog::error("{}", result.message());
         return;

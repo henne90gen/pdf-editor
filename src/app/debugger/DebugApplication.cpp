@@ -10,8 +10,13 @@ DebugApplication::DebugApplication() : PdfApplication("de.henne90gen.pdf.debugge
 
 void DebugApplication::open_window(const std::string &filePath) {
     spdlog::info("Opening new window: {}", filePath);
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("failed to create allocator: {}", allocatorResult.message());
+        return;
+    }
 
-    auto result = pdf::Document::read_from_file(filePath, false);
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), filePath, false);
     if (result.has_error()) {
         spdlog::error("{}", result.message());
         return;

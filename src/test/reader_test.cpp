@@ -4,7 +4,9 @@
 #include <pdf/page.h>
 
 TEST(Reader, Blank) {
-    auto result = pdf::Document::read_from_file("../../../test-files/blank.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/blank.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();
@@ -28,7 +30,9 @@ TEST(Reader, Blank) {
 }
 
 TEST(Reader, HelloWorldGeneral) {
-    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();
@@ -52,7 +56,9 @@ TEST(Reader, HelloWorldGeneral) {
 }
 
 TEST(Reader, HelloWorldFont) {
-    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();
@@ -89,7 +95,9 @@ TEST(Reader, HelloWorldFont) {
 }
 
 TEST(Reader, HelloWorldCmap) {
-    auto result = pdf::Document::read_from_file("../../../test-files/hello-world.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/hello-world.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();
@@ -123,7 +131,9 @@ TEST(Reader, FontFlags) {
 }
 
 TEST(Reader, ObjectStream) {
-    auto result = pdf::Document::read_from_file("../../../test-files/object-stream.pdf");
+    auto allocatorResult = pdf::Allocator::create();
+    ASSERT_FALSE(allocatorResult.has_error());
+    auto result = pdf::Document::read_from_file(allocatorResult.value(), "../../../test-files/object-stream.pdf");
     ASSERT_FALSE(result.has_error()) << result.message();
 
     auto &document = result.value();

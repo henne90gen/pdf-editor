@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <stddef.h>
 #include <unordered_set>
 
 #include "pdf/font.h"
@@ -115,13 +116,11 @@ struct ReadMetadata {
 };
 
 struct Document : public ReferenceResolver {
-    Allocator allocator;
+    Allocator &allocator;
     DocumentFile file;
     UnorderedMap<uint64_t, IndirectObject *> objectList;
 
-    Document(Document &&other)            = default;
-    Document &operator=(Document &&other) = default;
-    virtual ~Document()                   = default;
+    virtual ~Document() = default;
 
     template <typename T> T *get(Object *object) {
         if (object->is<IndirectReference>()) {
@@ -177,9 +176,11 @@ struct Document : public ReferenceResolver {
     /// TODO think about who owns the memory
     [[nodiscard]] Result write_to_memory(uint8_t *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath
-    static ValueResult<Document> read_from_file(const std::string &filePath, bool loadAllObjects = true);
+    static ValueResult<Document> read_from_file(Allocator &allocator, const std::string &filePath,
+                                                bool loadAllObjects = true);
     /// Reads the PDF-document from the given buffer
-    static ValueResult<Document> read_from_memory(const uint8_t *buffer, size_t size, bool loadAllObjects = true);
+    static ValueResult<Document> read_from_memory(Allocator &allocator, const uint8_t *buffer, size_t size,
+                                                  bool loadAllObjects = true);
 
     // Deletes the page with the given page number
     Result delete_page(size_t pageNum);
@@ -200,7 +201,7 @@ struct Document : public ReferenceResolver {
     Vector<Page *> cachedPages;
 
     Document(Allocator &allocator_)
-        : allocator(std::move(allocator_)), file(allocator), objectList(allocator), cachedPages(allocator) {}
+        : allocator(allocator_), file(allocator), objectList(allocator), cachedPages(allocator) {}
 
     IndirectObject *get_object(int64_t objectNumber);
     [[nodiscard]] std::pair<IndirectObject *, std::string_view> load_object(int64_t objectNumber);

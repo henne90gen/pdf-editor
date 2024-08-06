@@ -10,7 +10,14 @@ int cmd_embed(EmbedArgs &args) {
         return 1;
     }
 
-    auto documentResult = pdf::Document::read_from_file(std::string(args.files[args.files.size() - 1]));
+    auto allocatorResult = pdf::Allocator::create();
+    if (allocatorResult.has_error()) {
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
+        return 1;
+    }
+
+    auto documentResult =
+          pdf::Document::read_from_file(allocatorResult.value(), std::string(args.files[args.files.size() - 1]));
     if (documentResult.has_error()) {
         spdlog::error(documentResult.message());
         return 1;
