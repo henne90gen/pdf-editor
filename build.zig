@@ -56,6 +56,27 @@ fn createSpdlog(b: *std.Build, optimize: std.builtin.OptimizeMode) !*std.Build.S
     return spdlog;
 }
 
+fn createGoogleTest(b: *std.Build, optimize: std.builtin.OptimizeMode) !*std.Build.Step.Compile {
+    const gtest = b.addSharedLibrary(.{
+        .name = "gtest",
+        .target = b.host,
+        .optimize = optimize,
+    });
+    gtest.addCSourceFiles(.{
+        .files = &[_][]const u8{
+            "submodules/googletest/googletest/src/gtest-all.cc",
+            "submodules/googletest/googletest/src/gtest_main.cc",
+        },
+        .flags = &[_][]const u8{"-std=c++23"},
+    });
+    gtest.addIncludePath(b.path("submodules/googletest/googletest"));
+    const includePath = b.path("submodules/googletest/googletest/include");
+    gtest.addIncludePath(includePath);
+    gtest.installHeadersDirectory(includePath, "", .{});
+    gtest.linkLibCpp();
+    return gtest;
+}
+
 fn createPdf(b: *std.Build, optimize: std.builtin.OptimizeMode, spdlog: *std.Build.Step.Compile) !*std.Build.Step.Compile {
     const pdfLib = b.addSharedLibrary(.{
         .name = "pdf",
@@ -68,14 +89,15 @@ fn createPdf(b: *std.Build, optimize: std.builtin.OptimizeMode, spdlog: *std.Bui
         .files = sources,
         .flags = &[_][]const u8{"-std=c++23"},
     });
-    pdfLib.addIncludePath(b.path("src/lib"));
+    const includePath = b.path("src/lib");
+    pdfLib.addIncludePath(includePath);
+    pdfLib.installHeadersDirectory(includePath, "", .{});
     pdfLib.linkLibC();
     pdfLib.linkLibCpp();
     pdfLib.linkSystemLibrary("cairo");
     pdfLib.linkSystemLibrary("zlib");
     pdfLib.linkSystemLibrary("freetype");
     pdfLib.linkLibrary(spdlog);
-    pdfLib.installHeadersDirectory(b.path("src/lib/pdf"), "pdf", .{});
     return pdfLib;
 }
 
@@ -110,4 +132,46 @@ pub fn build(b: *std.Build) !void {
 
     const cli = try createCli(b, optimize, pdf, spdlog);
     b.installArtifact(cli);
+
+    const gtest = try createGoogleTest(b, optimize);
+    b.installArtifact(gtest);
+
+    const testSources = try findSources(b, "src/test");
+    for (testSources) |source| {
+        if (source.len < 10) {
+            continue;
+        }
+
+        const lastPart = source[source.len - 9 ..];
+        if (!std.mem.eql(u8, lastPart, "_test.cpp")) {
+            continue;
+        }
+
+        var firstPart = source[0 .. source.len - 4];
+        if (std.mem.lastIndexOf(u8, firstPart, "/")) |index| {
+            firstPart = firstPart[index + 1 ..];
+        }
+
+        const testCase = b.addExecutable(.{
+            .name = firstPart,
+            .optimize = optimize,
+            .target = b.host,
+        });
+        testCase.addCSourceFiles(.{
+            .files = &[_][]const u8{
+                "src/test/process_win.cpp",
+                "src/test/process_linux.cpp",
+                source,
+            },
+            .flags = &[_][]const u8{"-std=c++23"},
+        });
+        testCase.addIncludePath(b.path("src/test"));
+        testCase.linkLibrary(pdf);
+        testCase.linkLibrary(gtest);
+        testCase.linkLibCpp();
+        testCase.linkSystemLibrary("cairo");
+        testCase.linkSystemLibrary("zlib");
+        testCase.linkSystemLibrary("freetype");
+        b.installArtifact(testCase);
+    }
 }
