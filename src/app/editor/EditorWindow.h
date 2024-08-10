@@ -1,24 +1,29 @@
 #pragma once
 
+#include <adwaita.h>
 #include <filesystem>
-#include <gtkmm/applicationwindow.h>
-#include <gtkmm/builder.h>
 #include <iostream>
+#include <pdf/document.h>
 
-#include "PdfArea.h"
+class EditorApplication;
 
-class EditorWindow : public Gtk::ApplicationWindow {
+class EditorWindow {
   public:
-    [[maybe_unused]] EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder,
-                                  pdf::Document &document);
+    EditorWindow(EditorApplication &app, GtkBuilder *builder, AdwApplicationWindow *window, pdf::Document &document);
 
-    void save();
+    // TODO void save();
+
+    void present() { gtk_window_present(GTK_WINDOW(window)); }
 
   private:
+    // EditorApplication &app;
+    // GtkBuilder *builder;
+    AdwApplicationWindow *window;
+
     pdf::Document document;
 
-    void on_document_change();
-    Gdk::DragAction on_dnd_enter(double x, double y);
-    Gdk::DragAction on_dnd_motion(double x, double y);
-    bool on_dnd_drop(const Glib::ValueBase &value, double x, double y);
+    // TODO void on_document_change();
+    // TODO Gdk::DragAction on_dnd_enter(double x, double y);
+    // TODO Gdk::DragAction on_dnd_motion(double x, double y);
+    // TODO bool on_dnd_drop(const Glib::ValueBase &value, double x, double y);
 };

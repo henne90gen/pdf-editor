@@ -1,5 +1,7 @@
 #include "PdfArea.h"
 
+#if 0
+
 #include <gtkmm/eventcontrollermotion.h>
 #include <gtkmm/gestureclick.h>
 #include <gtkmm/gesturedrag.h>
@@ -244,3 +246,5 @@ void PdfArea::on_mouse_drag_end(double x, double y) {
 
     queue_draw();
 }
+
+#endif

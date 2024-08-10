@@ -1,5 +1,7 @@
 #include "PdfWindow.h"
 
+#if 0
+
 PdfWindow::PdfWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &_document)
     : ScrolledZoomedWindow(obj, builder, "PdfContainer"), document(_document) {
     pdfArea = Gtk::Builder::get_widget_derived<PdfArea>(builder, "PdfArea", document);
@@ -26,3 +28,5 @@ std::pair<double, double> PdfWindow::calculate_content_size() {
 }
 
 ScrolledZoomedContent &PdfWindow::content() { return *pdfArea; }
+
+#endif

@@ -1,25 +1,26 @@
 #include "EditorWindow.h"
 
-#include <gtkmm/droptarget.h>
+#include <adwaita.h>
+#include <pdf/document.h>
 #include <spdlog/spdlog.h>
 
-#include "PdfWindow.h"
+EditorWindow::EditorWindow(EditorApplication &, GtkBuilder *, AdwApplicationWindow *window_, pdf::Document &document_)
+    : // app(app_), builder(builder_),
+      window(window_), document(std::move(document_)) {
+    gtk_window_set_title(GTK_WINDOW(window), document.file.path.c_str());
+    gtk_application_window_set_show_menubar(GTK_APPLICATION_WINDOW(window), true);
 
-EditorWindow::EditorWindow(BaseObjectType *obj, const Glib::RefPtr<Gtk::Builder> &builder, pdf::Document &document_)
-    : Gtk::ApplicationWindow(obj), document(std::move(document_)) {
-    set_title(document.file.path);
-    set_show_menubar(true);
+    // TODO auto pdfWindow = Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
+    // TODO pdfWindow->document_changed_signal().connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
 
-    auto pdfWindow = Gtk::Builder::get_widget_derived<PdfWindow>(builder, "PdfWindow", document);
-    pdfWindow->document_changed_signal().connect(sigc::mem_fun(*this, &EditorWindow::on_document_change));
-
-    auto dropTarget = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
-    dropTarget->signal_enter().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_enter), false);
-    dropTarget->signal_motion().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_motion), false);
-    dropTarget->signal_drop().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_drop), false);
-    add_controller(dropTarget);
+    // TODO auto dropTarget = Gtk::DropTarget::create(GDK_TYPE_FILE_LIST, Gdk::DragAction::COPY);
+    // TODO dropTarget->signal_enter().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_enter), false);
+    // TODO dropTarget->signal_motion().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_motion), false);
+    // TODO dropTarget->signal_drop().connect(sigc::mem_fun(*this, &EditorWindow::on_dnd_drop), false);
+    // TODO add_controller(dropTarget);
 }
 
+#if 0
 void EditorWindow::save() {
     auto path = document.file.path;
     if (path.empty()) {
@@ -73,3 +74,5 @@ bool EditorWindow::on_dnd_drop(const Glib::ValueBase &value, double, double) {
 
     return false;
 }
+
+#endif

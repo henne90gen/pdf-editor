@@ -12,6 +12,6 @@ add_executable(pdf-debugger
         ObjectList.cpp
         JumpToByteDialog.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/resources.c)
-target_link_gtk4(pdf-debugger)
+target_link_gtk4mm(pdf-debugger)
 target_link_libraries(pdf-debugger PRIVATE pdf pdf-common)
 target_include_directories(pdf-debugger PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})

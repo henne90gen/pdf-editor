@@ -1,5 +1,7 @@
 #pragma once
 
+#if 0
+
 #include <gtkmm/builder.h>
 #include <gtkmm/fixed.h>
 #include <gtkmm/scrolledwindow.h>
@@ -23,3 +25,4 @@ class PdfWindow : public ScrolledZoomedWindow {
     pdf::Document &document;
     PdfArea *pdfArea;
 };
+#endif

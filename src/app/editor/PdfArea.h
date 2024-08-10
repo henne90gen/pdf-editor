@@ -1,5 +1,7 @@
 #pragma once
 
+#if 0
+
 #include <glibmm/convert.h>
 #include <glibmm/markup.h>
 #include <gtkmm/box.h>
@@ -80,3 +82,5 @@ class PdfArea : public ScrolledZoomedContent {
 
     pdf::PageImage *get_image_at_position(double x, double y);
 };
+
+#endif
