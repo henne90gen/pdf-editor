@@ -70,40 +70,36 @@ $(function() {
 <div class="title">EditorApplication Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Inheritance diagram for EditorApplication:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classEditorApplication.png" usemap="#EditorApplication_map" alt=""/>
-  <map id="EditorApplication_map" name="EditorApplication_map">
-<area href="classPdfApplication.html" alt="PdfApplication" shape="rect" coords="0,56,108,80"/>
-  </map>
-</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a10dce717063b2dfb1b822c13c27c44fa"><td class="memItemLeft" align="right" valign="top"><a id="a10dce717063b2dfb1b822c13c27c44fa"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>open_window</b> (const std::string &amp;filePath) override</td></tr>
-<tr class="separator:a10dce717063b2dfb1b822c13c27c44fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d07e2a725b6628590ba758b2561fdf0"><td class="memItemLeft" align="right" valign="top"><a id="a3d07e2a725b6628590ba758b2561fdf0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>EditorApplication</b> (AdwApplication *app)</td></tr>
+<tr class="separator:a3d07e2a725b6628590ba758b2561fdf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a496b467035d216d6dbd60549e00f2152"><td class="memItemLeft" align="right" valign="top"><a id="a496b467035d216d6dbd60549e00f2152"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (int argc, char *argv[])</td></tr>
+<tr class="separator:a496b467035d216d6dbd60549e00f2152"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a078e85586678ec14156bb007f82bd57a"><td class="memItemLeft" align="right" valign="top"><a id="a078e85586678ec14156bb007f82bd57a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>open_window</b> (const std::string &amp;file_path)</td></tr>
+<tr class="separator:a078e85586678ec14156bb007f82bd57a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:abb67ef0e4754529efef48a930067d94e"><td class="memItemLeft" align="right" valign="top"><a id="abb67ef0e4754529efef48a930067d94e"></a>
-static Glib::RefPtr&lt; <a class="el" href="classEditorApplication.html">EditorApplication</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> ()</td></tr>
-<tr class="separator:abb67ef0e4754529efef48a930067d94e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pro_methods_classPdfApplication"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classPdfApplication')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classPdfApplication.html">PdfApplication</a></td></tr>
-<tr class="memitem:ad1fd037b84cdad054cbdf0bee7fbeafa inherit pro_methods_classPdfApplication"><td class="memItemLeft" align="right" valign="top"><a id="ad1fd037b84cdad054cbdf0bee7fbeafa"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PdfApplication</b> (const std::string &amp;appId)</td></tr>
-<tr class="separator:ad1fd037b84cdad054cbdf0bee7fbeafa inherit pro_methods_classPdfApplication"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4cc01f645a3567f6b59201c688e5ea6 inherit pro_methods_classPdfApplication"><td class="memItemLeft" align="right" valign="top"><a id="ac4cc01f645a3567f6b59201c688e5ea6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>on_activate</b> () override</td></tr>
-<tr class="separator:ac4cc01f645a3567f6b59201c688e5ea6 inherit pro_methods_classPdfApplication"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac868ebb281b67e2e70e312cc71dca593 inherit pro_methods_classPdfApplication"><td class="memItemLeft" align="right" valign="top"><a id="ac868ebb281b67e2e70e312cc71dca593"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>on_open</b> (const Gio::Application::type_vec_files &amp;files, const Glib::ustring &amp;hint) override</td></tr>
-<tr class="separator:ac868ebb281b67e2e70e312cc71dca593 inherit pro_methods_classPdfApplication"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a793bf3f4872a96e42c6b893e883fdf57"><td class="memItemLeft" align="right" valign="top"><a id="a793bf3f4872a96e42c6b893e883fdf57"></a>
+static std::shared_ptr&lt; <a class="el" href="classEditorApplication.html">EditorApplication</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>create</b> ()</td></tr>
+<tr class="separator:a793bf3f4872a96e42c6b893e883fdf57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd050c727721c7a2635b2126dd4e72c4"><td class="memItemLeft" align="right" valign="top"><a id="acd050c727721c7a2635b2126dd4e72c4"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_activate</b> (GtkApplication *, <a class="el" href="classEditorApplication.html">EditorApplication</a> *self)</td></tr>
+<tr class="separator:acd050c727721c7a2635b2126dd4e72c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaea7dac989bd0d2e7c0be463999a338"><td class="memItemLeft" align="right" valign="top"><a id="aeaea7dac989bd0d2e7c0be463999a338"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_startup</b> (GtkApplication *, <a class="el" href="classEditorApplication.html">EditorApplication</a> *self)</td></tr>
+<tr class="separator:aeaea7dac989bd0d2e7c0be463999a338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0608d6e528d7f00525b2c253d28a48c0"><td class="memItemLeft" align="right" valign="top"><a id="a0608d6e528d7f00525b2c253d28a48c0"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_open</b> (GtkApplication *, GFile **files, gint num_files, gchar *, <a class="el" href="classEditorApplication.html">EditorApplication</a> *self)</td></tr>
+<tr class="separator:a0608d6e528d7f00525b2c253d28a48c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b2d18fdffb9fbe2e3b5c13f0406f01f"><td class="memItemLeft" align="right" valign="top"><a id="a9b2d18fdffb9fbe2e3b5c13f0406f01f"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_open_file</b> (GSimpleAction *, GVariant *parameter, <a class="el" href="classEditorApplication.html">EditorApplication</a> *self)</td></tr>
+<tr class="separator:a9b2d18fdffb9fbe2e3b5c13f0406f01f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/app/editor/<a class="el" href="EditorApplication_8h_source.html">EditorApplication.h</a></li>

@@ -87,12 +87,6 @@ Inheritance diagram for pdf::Document:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a18fb36ae084ecc1894fd53d734079541"><td class="memItemLeft" align="right" valign="top"><a id="a18fb36ae084ecc1894fd53d734079541"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Document</b> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&amp;other)=default</td></tr>
-<tr class="separator:a18fb36ae084ecc1894fd53d734079541"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c2df90dfbe5a8f313c8bd2cc2c7d126"><td class="memItemLeft" align="right" valign="top"><a id="a1c2df90dfbe5a8f313c8bd2cc2c7d126"></a>
-<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="structpdf_1_1Document.html">Document</a> &amp;&amp;other)=default</td></tr>
-<tr class="separator:a1c2df90dfbe5a8f313c8bd2cc2c7d126"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3844b487b634cf5813ee8e23bea5ebf"><td class="memTemplParams" colspan="2"><a id="ad3844b487b634cf5813ee8e23bea5ebf"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ad3844b487b634cf5813ee8e23bea5ebf"><td class="memTemplItemLeft" align="right" valign="top">T *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get</b> (<a class="el" href="structpdf_1_1Object.html">Object</a> *object)</td></tr>
@@ -179,20 +173,20 @@ int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>add_object</b> (<a
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a59fa61a243f74399c7ffe1d6dc48c77d"><td class="memItemLeft" align="right" valign="top"><a id="a59fa61a243f74399c7ffe1d6dc48c77d"></a>
-static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a class="el" href="structpdf_1_1Document.html">Document</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a59fa61a243f74399c7ffe1d6dc48c77d">read_from_file</a> (const std::string &amp;filePath, bool loadAllObjects=true)</td></tr>
-<tr class="memdesc:a59fa61a243f74399c7ffe1d6dc48c77d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document specified by the given filePath. <br /></td></tr>
-<tr class="separator:a59fa61a243f74399c7ffe1d6dc48c77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5554aa17c0a625c08893eb3781f251f1"><td class="memItemLeft" align="right" valign="top"><a id="a5554aa17c0a625c08893eb3781f251f1"></a>
-static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a class="el" href="structpdf_1_1Document.html">Document</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a5554aa17c0a625c08893eb3781f251f1">read_from_memory</a> (const uint8_t *buffer, size_t size, bool loadAllObjects=true)</td></tr>
-<tr class="memdesc:a5554aa17c0a625c08893eb3781f251f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document from the given buffer. <br /></td></tr>
-<tr class="separator:a5554aa17c0a625c08893eb3781f251f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a933748db4168fed587c6708faa184ac1"><td class="memItemLeft" align="right" valign="top"><a id="a933748db4168fed587c6708faa184ac1"></a>
+static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a class="el" href="structpdf_1_1Document.html">Document</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a933748db4168fed587c6708faa184ac1">read_from_file</a> (<a class="el" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator, const std::string &amp;filePath, bool loadAllObjects=true)</td></tr>
+<tr class="memdesc:a933748db4168fed587c6708faa184ac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document specified by the given filePath. <br /></td></tr>
+<tr class="separator:a933748db4168fed587c6708faa184ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9964186593b675073a3c82394e630c28"><td class="memItemLeft" align="right" valign="top"><a id="a9964186593b675073a3c82394e630c28"></a>
+static <a class="el" href="classpdf_1_1ValueResult.html">ValueResult</a>&lt; <a class="el" href="structpdf_1_1Document.html">Document</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structpdf_1_1Document.html#a9964186593b675073a3c82394e630c28">read_from_memory</a> (<a class="el" href="structpdf_1_1Allocator.html">Allocator</a> &amp;allocator, const uint8_t *buffer, size_t size, bool loadAllObjects=true)</td></tr>
+<tr class="memdesc:a9964186593b675073a3c82394e630c28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the PDF-document from the given buffer. <br /></td></tr>
+<tr class="separator:a9964186593b675073a3c82394e630c28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memItemLeft" align="right" valign="top"><a id="aa4d2c121fdb6d73bbcb51f83bd1a2109"></a>
-<a class="el" href="structpdf_1_1Allocator.html">Allocator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b></td></tr>
-<tr class="separator:aa4d2c121fdb6d73bbcb51f83bd1a2109"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85507ed318a9cc01bbb1e99b8a400a5a"><td class="memItemLeft" align="right" valign="top"><a id="a85507ed318a9cc01bbb1e99b8a400a5a"></a>
+<a class="el" href="structpdf_1_1Allocator.html">Allocator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>allocator</b></td></tr>
+<tr class="separator:a85507ed318a9cc01bbb1e99b8a400a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aab13479934667f8f4bb9632a4bf34e"><td class="memItemLeft" align="right" valign="top"><a id="a5aab13479934667f8f4bb9632a4bf34e"></a>
 <a class="el" href="structpdf_1_1DocumentFile.html">DocumentFile</a>&#160;</td><td class="memItemRight" valign="bottom"><b>file</b></td></tr>
 <tr class="separator:a5aab13479934667f8f4bb9632a4bf34e"><td class="memSeparator" colspan="2">&#160;</td></tr>
