@@ -14,7 +14,6 @@ function(target_link_gtk4mm target)
 endfunction()
 
 function(target_link_gtk4 target)
-    message(STATUS "XXX LIBS: ${GTK4_LIBRARIES}")
     target_link_libraries(${target} PRIVATE ${GTK4_LIBRARIES})
     target_link_options(${target} PRIVATE ${GTK4_LDFLAGS_OTHER})
     target_compile_options(${target} PRIVATE ${GTK4_CFLAGS_OTHER})

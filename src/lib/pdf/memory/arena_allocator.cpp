@@ -198,12 +198,12 @@ void Arena::pop_all() { buffer_position = buffer_start; }
 ValueResult<Allocator> Allocator::create() {
     auto internalArenaResult = Arena::create();
     if (internalArenaResult.has_error()) {
-        return ValueResult<Allocator>::error(internalArenaResult.message());
+        return ValueResult<Allocator>::error("failed to create internal arena: " + internalArenaResult.message());
     }
 
     auto temporaryArenaResult = Arena::create();
     if (temporaryArenaResult.has_error()) {
-        return ValueResult<Allocator>::error(temporaryArenaResult.message());
+        return ValueResult<Allocator>::error("failed to create temporary arena: " + temporaryArenaResult.message());
     }
 
     auto &internal_arena  = internalArenaResult.value();

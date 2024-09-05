@@ -12,7 +12,7 @@ void DebugApplication::open_window(const std::string &filePath) {
     spdlog::info("Opening new window: {}", filePath);
     auto allocatorResult = pdf::Allocator::create();
     if (allocatorResult.has_error()) {
-        spdlog::error("failed to create allocator: {}", allocatorResult.message());
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
         return;
     }
 

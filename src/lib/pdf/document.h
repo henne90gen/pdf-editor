@@ -126,6 +126,7 @@ struct Document : public ReferenceResolver {
         if (object->is<IndirectReference>()) {
             auto resolvedObject = resolve(object->as<IndirectReference>());
             ASSERT(resolvedObject != nullptr);
+            ASSERT(resolvedObject->object != nullptr);
             return resolvedObject->object->as<T>();
         } else if (object->is<IndirectObject>()) {
             return object->as<IndirectObject>()->object->as<T>();

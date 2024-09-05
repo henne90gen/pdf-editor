@@ -7,7 +7,7 @@ struct InfoArgs {
 int cmd_info(const InfoArgs &args) {
     auto allocatorResult = pdf::Allocator::create();
     if (allocatorResult.has_error()) {
-        spdlog::error("failed to create allocator: {}", allocatorResult.message());
+        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
         return 1;
     }
 
