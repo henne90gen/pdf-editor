@@ -4,7 +4,7 @@
 #include <memory>
 #include <pdf/document.h>
 
-#include "EditorWindow.h"
+#include "editor_window.h"
 
 class EditorApplication {
   public:
@@ -23,9 +23,10 @@ class EditorApplication {
 
   private:
     AdwApplication *application;
-    GtkBuilder *builder;
     GtkFileDialog *dialog;
-    std::unordered_map<std::string, std::unique_ptr<EditorWindow>> windows;
+    // NOTE storing all allocators in a stable memory location
+    std::list<pdf::Allocator> allocators                                   = {};
+    std::unordered_map<std::string, std::unique_ptr<EditorWindow>> windows = {};
 
     // TODO static void on_open_file(EditorApplication *self, const Glib::VariantBase &);
     static void on_open_file_dialog(EditorApplication *self);

@@ -1,9 +1,7 @@
-#include "EditorApplication.h"
+#include "editor_application.h"
 
 #include <libintl.h>
 #include <spdlog/spdlog.h>
-
-#include "EditorWindow.h"
 
 std::shared_ptr<EditorApplication> EditorApplication::create() {
     setlocale(LC_ALL, "");
@@ -12,7 +10,8 @@ std::shared_ptr<EditorApplication> EditorApplication::create() {
     // bindtextdomain("timing", dirname.c_str());
     textdomain("timing");
 
-    const auto app = adw_application_new("de.henne90gen.pdf-editor", G_APPLICATION_DEFAULT_FLAGS);
+    const auto app = adw_application_new("de.henne90gen.pdf-editor",
+                                         (GApplicationFlags)(G_APPLICATION_DEFAULT_FLAGS | G_APPLICATION_HANDLES_OPEN));
     return std::make_shared<EditorApplication>(app);
 }
 
@@ -60,7 +59,7 @@ void EditorApplication::on_startup(GtkApplication *, EditorApplication *) {
 }
 
 void EditorApplication::on_open(GtkApplication *, GFile **files, gint num_files, gchar *, EditorApplication *self) {
-    if (num_files) {
+    if (num_files == 0) {
         spdlog::warn("There were no files to open");
         return;
     }
@@ -78,30 +77,26 @@ void EditorApplication::on_open(GtkApplication *, GFile **files, gint num_files,
 }
 
 void EditorApplication::open_window(const std::string &filePath) {
-    spdlog::info("Opening new window: {}", filePath);
-
-    auto allocatorResult = pdf::Allocator::create();
-    if (allocatorResult.has_error()) {
-        spdlog::error("Failed to create allocator: {}", allocatorResult.message());
-        return;
-    }
-
-    auto result = pdf::Document::read_from_file(allocatorResult.value(), filePath, false);
-    if (result.has_error()) {
-        spdlog::error("{}", result.message());
-        return;
-    }
-
-    auto &document = result.value();
-
-    if (not builder) {
-        builder = gtk_builder_new_from_resource("/de/henne90gen/pdf-editor/editor.ui");
-    }
+    spdlog::info("Opening new window for file: {}", filePath);
 
     if (not windows.contains(filePath)) {
+        auto allocator_result = pdf::Allocator::create();
+        if (allocator_result.has_error()) {
+            spdlog::error("Failed to create allocator: {}", allocator_result.message());
+            return;
+        }
+        allocators.push_back(std::move(allocator_result.value()));
+
+        auto document_result = pdf::Document::read_from_file(allocators.back(), filePath, false);
+        if (document_result.has_error()) {
+            spdlog::error("Failed to read document from file: {}", document_result.message());
+            return;
+        }
+
+        const auto builder            = gtk_builder_new_from_resource("/de/henne90gen/pdf-editor/editor.ui");
         const auto application_window = ADW_APPLICATION_WINDOW(gtk_builder_get_object(builder, "EditorWindow"));
         gtk_application_add_window(GTK_APPLICATION(application), GTK_WINDOW(application_window));
-        windows[filePath] = std::make_unique<EditorWindow>(*this, builder, application_window, document);
+        windows[filePath] = std::make_unique<EditorWindow>(builder, application_window, document_result.value());
     }
 
     auto itr = windows.find(filePath);

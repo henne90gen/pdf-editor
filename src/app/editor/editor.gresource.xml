@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-    <gresource prefix="/com/github/henne90gen/pdf-common">
+    <gresource prefix="/de/henne90gen/pdf-common">
         <file>../common/open.ui</file>
     </gresource>
-    <gresource prefix="/com/github/henne90gen/pdf-editor">
+    <gresource prefix="/de/henne90gen/pdf-editor">
         <file>editor.ui</file>
     </gresource>
 </gresources>

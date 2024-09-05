@@ -5,10 +5,8 @@ add_custom_command(
         DEPENDS editor.gresource.xml editor.ui)
 add_executable(pdf-editor
         main.cpp
-        EditorWindow.cpp
-        PdfArea.cpp
-        PdfWindow.cpp
-        EditorApplication.cpp
+        editor_window.cpp
+        editor_application.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/resources.c)
 target_link_gtk4(pdf-editor)
 target_link_adwaita(pdf-editor)
