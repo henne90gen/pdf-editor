@@ -38,7 +38,7 @@ void assertParsesWithReferenceResolver(const std::string &input, pdf::ReferenceR
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto &arena  = arenaResult.value();
+    auto &arena = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena, referenceResolver);
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);
@@ -72,6 +72,9 @@ TEST(Parser, Name) {
 
 TEST(Parser, ArrayEmpty) {
     assertParses<pdf::Array>("[]", [](auto *result) {
+        ASSERT_EQ(result->values.size(), 0); //
+    });
+    assertParses<pdf::Array>("[\n ]", [](auto *result) {
         ASSERT_EQ(result->values.size(), 0); //
     });
 }
@@ -227,7 +230,7 @@ TEST(Parser, MultipleObjects) {
     auto lexer        = pdf::TextLexer(textProvider);
     auto arenaResult  = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto &arena  = arenaResult.value();
+    auto &arena = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
@@ -262,10 +265,14 @@ TEST(Parser, IndirectObject1) {
     auto lexer       = pdf::TextLexer(textProvider);
     auto arenaResult = pdf::Arena::create();
     ASSERT_FALSE(arenaResult.has_error()) << arenaResult.message();
-    auto &arena  = arenaResult.value();
+    auto &arena = arenaResult.value();
     auto parser = pdf::Parser(lexer, arena);
 
     auto result = parser.parse();
     ASSERT_NE(result, nullptr);
     ASSERT_EQ(result->type, pdf::Object::Type::INDIRECT_OBJECT);
+}
+
+TEST(Parser, IgnoresNewLinesAndComments) {
+    assertParses<pdf::Integer>("\n\n% I'm a comment surrounded by new lines\n\n42", [](pdf::Integer * /*result*/) {});
 }

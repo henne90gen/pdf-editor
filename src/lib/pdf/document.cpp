@@ -97,10 +97,12 @@ IndirectObject *Document::get_object(int64_t objectNumber) {
         return objectList[objectNumber];
     }
 
-    auto object                         = load_object(objectNumber);
-    objectList[objectNumber]            = object.first;
-    file.metadata.objects[object.first] = {object.second,
-                                           false}; // TODO determine whether this obj is from an object stream or not
+    auto object              = load_object(objectNumber);
+    objectList[objectNumber] = object.first;
+
+    // TODO determine whether this obj is from an object stream or not
+    file.metadata.objects[object.first] = {object.second, false};
+
     return object.first;
 }
 

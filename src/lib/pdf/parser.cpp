@@ -146,6 +146,8 @@ Array *Parser::parse_array() {
 
     auto objects = Vector<Object *>(arena);
     while (true) {
+        ignore_new_lines_and_comments();
+
         if (current_token_is(Token::Type::ARRAY_END)) {
             break;
         }
@@ -155,7 +157,7 @@ Array *Parser::parse_array() {
             return nullptr;
         }
 
-        ignore_new_line_tokens();
+        ignore_new_lines_and_comments();
 
         objects.push_back(object);
     }
@@ -164,8 +166,8 @@ Array *Parser::parse_array() {
     return arena.push<Array>(objects);
 }
 
-void Parser::ignore_new_line_tokens() {
-    while (current_token_is(Token::Type::NEW_LINE)) {
+void Parser::ignore_new_lines_and_comments() {
+    while (current_token_is(Token::Type::NEW_LINE) || current_token_is(Token::Type::COMMENT)) {
         currentTokenIdx++;
     }
 }
@@ -178,7 +180,7 @@ Dictionary *Parser::parse_dictionary() {
     auto beforeTokenIdx = currentTokenIdx;
     currentTokenIdx++;
 
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     auto objects = UnorderedMap<std::string, Object *>(arena);
     while (!current_token_is(Token::Type::DICTIONARY_END)) {
@@ -194,7 +196,7 @@ Dictionary *Parser::parse_dictionary() {
             return nullptr;
         }
 
-        ignore_new_line_tokens();
+        ignore_new_lines_and_comments();
 
         objects[key->value] = value;
     }
@@ -235,7 +237,7 @@ IndirectObject *Parser::parse_indirect_object() {
     auto beforeTokenIndex   = currentTokenIdx;
     currentTokenIdx++;
 
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     auto object = parse();
     if (object == nullptr) {
@@ -243,7 +245,7 @@ IndirectObject *Parser::parse_indirect_object() {
         return nullptr;
     }
 
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     if (!current_token_is(Token::Type::OBJECT_END)) {
         currentTokenIdx = beforeTokenIndex;
@@ -279,7 +281,7 @@ Object *Parser::parse_stream_or_dictionary() {
         return nullptr;
     }
 
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     if (!current_token_is(Token::Type::STREAM_START)) {
         return dictionary;
@@ -325,7 +327,7 @@ Object *Parser::parse_stream_or_dictionary() {
     }
 
     auto streamData = lexer.advance_stream(length);
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     if (!current_token_is(Token::Type::STREAM_END)) {
         currentTokenIdx = beforeTokenIdx;
@@ -337,7 +339,7 @@ Object *Parser::parse_stream_or_dictionary() {
 }
 
 Object *Parser::parse() {
-    ignore_new_line_tokens();
+    ignore_new_lines_and_comments();
 
     auto boolean = parse_boolean();
     if (boolean != nullptr) {

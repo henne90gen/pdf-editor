@@ -36,7 +36,7 @@ struct Parser {
     Object *parse();
 
   private:
-    void ignore_new_line_tokens();
+    void ignore_new_lines_and_comments();
     [[nodiscard]] bool ensure_tokens_have_been_lexed();
     [[nodiscard]] bool current_token_is(Token::Type type);
 
