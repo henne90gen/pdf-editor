@@ -81,7 +81,7 @@ TEST(Writer, write_name) {
 
 TEST(Writer, write_array) {
     auto allocator_result = pdf::Allocator::create();
-    auto &allocator = allocator_result.value();
+    auto &allocator       = allocator_result.value();
     std::stringstream s;
     auto vec = pdf::Vector<pdf::Object *>(allocator);
     vec.push_back(new pdf::Name("Hello"));
@@ -93,7 +93,7 @@ TEST(Writer, write_array) {
 
 TEST(Writer, write_dictionary) {
     auto allocator_result = pdf::Allocator::create();
-    auto &allocator = allocator_result.value();
+    auto &allocator       = allocator_result.value();
     std::stringstream s;
     auto map     = pdf::UnorderedMap<std::string, pdf::Object *>(allocator);
     map["Hello"] = new pdf::Integer(123);
@@ -118,7 +118,8 @@ TEST(Writer, write_indirect_object) {
 }
 
 TEST(Writer, write_stream) {
-    auto& allocator = pdf::Allocator::create().value();
+    auto allocator_result = pdf::Allocator::create();
+    auto &allocator       = allocator_result.value();
     std::stringstream s;
     auto m    = pdf::UnorderedMap<std::string, pdf::Object *>(allocator);
     m["Size"] = new pdf::Integer(123);
