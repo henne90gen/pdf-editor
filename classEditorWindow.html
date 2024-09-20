@@ -64,6 +64,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classEditorWindow-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">EditorWindow Class Reference</div>  </div>
@@ -72,16 +73,58 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a49e76704272d0c8f5b2c8d1e4745903f"><td class="memItemLeft" align="right" valign="top"><a id="a49e76704272d0c8f5b2c8d1e4745903f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>EditorWindow</b> (<a class="el" href="classEditorApplication.html">EditorApplication</a> &amp;app, GtkBuilder *builder, AdwApplicationWindow *window, <a class="el" href="structpdf_1_1Document.html">pdf::Document</a> &amp;document)</td></tr>
-<tr class="separator:a49e76704272d0c8f5b2c8d1e4745903f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adeffc9ffcc2a51c59f80e22505a2e5dd"><td class="memItemLeft" align="right" valign="top"><a id="adeffc9ffcc2a51c59f80e22505a2e5dd"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>EditorWindow</b> (GtkBuilder *builder, AdwApplicationWindow *window, <a class="el" href="structpdf_1_1Document.html">pdf::Document</a> document)</td></tr>
+<tr class="separator:adeffc9ffcc2a51c59f80e22505a2e5dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a610b35f8407e9fd5e9777cf9666f96f6"><td class="memItemLeft" align="right" valign="top"><a id="a610b35f8407e9fd5e9777cf9666f96f6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>present</b> ()</td></tr>
 <tr class="separator:a610b35f8407e9fd5e9777cf9666f96f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a0a6c2a265c949e73962fe32d0ead462d"><td class="memItemLeft" align="right" valign="top"><a id="a0a6c2a265c949e73962fe32d0ead462d"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>scroll_value_changed</b> (GtkAdjustment *adjustment, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a0a6c2a265c949e73962fe32d0ead462d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fc9e8309e38a8f1c27bc1d0f9d43197"><td class="memItemLeft" align="right" valign="top"><a id="a7fc9e8309e38a8f1c27bc1d0f9d43197"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>on_key_pressed</b> (GtkEventControllerKey *, guint keyval, guint keycode, GdkModifierType state, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a7fc9e8309e38a8f1c27bc1d0f9d43197"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaf2f4357e2e2ded0c13f005b3ae98ac"><td class="memItemLeft" align="right" valign="top"><a id="adaf2f4357e2e2ded0c13f005b3ae98ac"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_key_released</b> (GtkEventControllerKey *, guint keyval, guint keycode, GdkModifierType state, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:adaf2f4357e2e2ded0c13f005b3ae98ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bab03c204c6904cf8f73f3bda914495"><td class="memItemLeft" align="right" valign="top"><a id="a8bab03c204c6904cf8f73f3bda914495"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>on_scroll</b> (GtkEventControllerScroll *, gdouble dx, gdouble dy, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a8bab03c204c6904cf8f73f3bda914495"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0205a31d281ba530160f65b075ec7f4"><td class="memItemLeft" align="right" valign="top"><a id="ad0205a31d281ba530160f65b075ec7f4"></a>
+static GdkDragAction&#160;</td><td class="memItemRight" valign="bottom"><b>on_dnd_enter</b> (GtkDropTarget *, gdouble x, gdouble y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:ad0205a31d281ba530160f65b075ec7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d21519d58c0f23e59e9b341a5cacd81"><td class="memItemLeft" align="right" valign="top"><a id="a7d21519d58c0f23e59e9b341a5cacd81"></a>
+static GdkDragAction&#160;</td><td class="memItemRight" valign="bottom"><b>on_dnd_motion</b> (GtkDropTarget *, gdouble x, gdouble y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a7d21519d58c0f23e59e9b341a5cacd81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94754082126968a9f61041b117c8a190"><td class="memItemLeft" align="right" valign="top"><a id="a94754082126968a9f61041b117c8a190"></a>
+static gboolean&#160;</td><td class="memItemRight" valign="bottom"><b>on_dnd_drop</b> (GtkDropTarget *, const GValue *value, gdouble x, gdouble y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a94754082126968a9f61041b117c8a190"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b31c3d92c797c0bcdb4eb82294edea7"><td class="memItemLeft" align="right" valign="top"><a id="a7b31c3d92c797c0bcdb4eb82294edea7"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_dnd_leave</b> (GtkDropTarget *, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a7b31c3d92c797c0bcdb4eb82294edea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad39e95d81f293bf58f0962bdba279aca"><td class="memItemLeft" align="right" valign="top"><a id="ad39e95d81f293bf58f0962bdba279aca"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_mouse_moved</b> (GtkEventControllerMotion *, double x, double y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:ad39e95d81f293bf58f0962bdba279aca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad05e994e583077834ddf4b321f1e4387"><td class="memItemLeft" align="right" valign="top"><a id="ad05e994e583077834ddf4b321f1e4387"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_mouse_drag_begin</b> (GtkGestureDrag *, gdouble offset_x, gdouble offset_y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:ad05e994e583077834ddf4b321f1e4387"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a443b44dd835c05033e4c4af8360f70dd"><td class="memItemLeft" align="right" valign="top"><a id="a443b44dd835c05033e4c4af8360f70dd"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_mouse_drag_update</b> (GtkGestureDrag *, gdouble offset_x, gdouble offset_y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a443b44dd835c05033e4c4af8360f70dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e31483d4e9100a9aaa78f7067667d98"><td class="memItemLeft" align="right" valign="top"><a id="a6e31483d4e9100a9aaa78f7067667d98"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>on_mouse_drag_end</b> (GtkGestureDrag *, gdouble offset_x, gdouble offset_y, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:a6e31483d4e9100a9aaa78f7067667d98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae654e266c87304369afb0965e340f435"><td class="memItemLeft" align="right" valign="top"><a id="ae654e266c87304369afb0965e340f435"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>draw_pdf_func</b> (GtkDrawingArea *area, cairo_t *cr, int width, int height, <a class="el" href="classEditorWindow.html">EditorWindow</a> *self)</td></tr>
+<tr class="separator:ae654e266c87304369afb0965e340f435"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>src/app/editor/<a class="el" href="EditorWindow_8h_source.html">EditorWindow.h</a></li>
-<li>src/app/editor/EditorWindow.cpp</li>
+<li>src/app/editor/<a class="el" href="editor__window_8h_source.html">editor_window.h</a></li>
+<li>src/app/editor/editor_window.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

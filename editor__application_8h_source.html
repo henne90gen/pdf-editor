@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>PDF Editor: src/app/editor/EditorApplication.h Source File</title>
+<title>PDF Editor: src/app/editor/editor_application.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,7 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">EditorApplication.h</div>  </div>
+<div class="title">editor_application.h</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
@@ -76,7 +76,7 @@ $(function() {
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;pdf/document.h&gt;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;EditorWindow.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;editor_window.h&quot;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="classEditorApplication.html">    9</a></span>&#160;<span class="keyword">class </span><a class="code" href="classEditorApplication.html">EditorApplication</a> {</div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  <span class="keyword">public</span>:</div>
@@ -95,16 +95,17 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    AdwApplication *application;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    GtkBuilder *builder;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    GtkFileDialog *dialog;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::unordered_map&lt;std::string, std::unique_ptr&lt;EditorWindow&gt;&gt; windows;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="comment">// TODO static void on_open_file(EditorApplication *self, const Glib::VariantBase &amp;);</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_open_file_dialog(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_open_file_dialog_response(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>, <span class="keywordtype">int</span> response);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_save(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
-<div class="ttc" id="aclassEditorApplication_html"><div class="ttname"><a href="classEditorApplication.html">EditorApplication</a></div><div class="ttdef"><b>Definition:</b> EditorApplication.h:9</div></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    GtkFileDialog *dialog;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="comment">// NOTE storing all allocators in a stable memory location</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    std::list&lt;pdf::Allocator&gt; allocators                                   = {};</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    std::unordered_map&lt;std::string, std::unique_ptr&lt;EditorWindow&gt;&gt; windows = {};</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="comment">// TODO static void on_open_file(EditorApplication *self, const Glib::VariantBase &amp;);</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_open_file_dialog(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_open_file_dialog_response(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>, <span class="keywordtype">int</span> response);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> on_save(<a class="code" href="classEditorApplication.html">EditorApplication</a> *<span class="keyword">self</span>);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
+<div class="ttc" id="aclassEditorApplication_html"><div class="ttname"><a href="classEditorApplication.html">EditorApplication</a></div><div class="ttdef"><b>Definition:</b> editor_application.h:9</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
