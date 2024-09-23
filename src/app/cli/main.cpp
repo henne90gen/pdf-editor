@@ -109,7 +109,7 @@ int parse_text_args(int argc, char **argv, TextArgs &result) {
 
 int main(int argc, char **argv) {
 #ifndef NDEBUG
-    spdlog::set_level(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::debug);
 #endif
 
     auto commandType = parse_command_type(argc, argv);

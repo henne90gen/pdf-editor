@@ -385,31 +385,42 @@ LoadObjectResult load_object(Document &document, CrossReferenceEntry &entry) {
         auto stream = streamObject->object->as<Stream>();
         ASSERT(stream->dictionary->must_find<Name>("Type")->value == "ObjStm");
 
-        auto content      = stream->decode(document.allocator);
-        auto textProvider = StringTextProvider(content);
-        auto lexer        = TextLexer(textProvider);
-        auto parser       = Parser(lexer, document.allocator.arena(), &document);
-        int64_t N         = stream->dictionary->must_find<Integer>("N")->value;
-
         auto temp          = document.allocator.temporary();
+        int64_t N          = stream->dictionary->must_find<Integer>("N")->value;
         auto objectNumbers = Vector<int64_t>(N, temp);
-        for (int i = 0; i < N; i++) {
-            auto objNum      = parser.parse()->as<Integer>();
-            objectNumbers[i] = objNum->value;
-            // parse the byteOffset as well
-            parser.parse();
+        auto byteOffsets   = Vector<int64_t>(N, temp);
+        auto content       = stream->decode(document.allocator);
+
+        int64_t readBytes = 0;
+        {
+            auto textProvider = StringTextProvider(content);
+            auto lexer        = TextLexer(textProvider);
+            auto parser       = Parser(lexer, document.allocator.arena(), &document);
+
+            for (int i = 0; i < N; i++) {
+                auto objNum      = parser.parse()->as<Integer>();
+                objectNumbers[i] = objNum->value;
+                auto byteOffset  = parser.parse()->as<Integer>();
+                byteOffsets[i]   = byteOffset->value;
+            }
+
+            readBytes = parser.already_read_bytes();
         }
 
-        auto objs = Vector<Object *>(N, temp);
-        for (int i = 0; i < N; i++) {
-            auto obj = parser.parse();
-            objs[i]  = obj;
+        Object *obj = nullptr;
+        {
+            const auto byteOffset     = byteOffsets[entry.compressed.indexInStream];
+            const auto partialContent = content.substr(byteOffset + readBytes);
+            auto textProvider         = StringTextProvider(partialContent);
+            auto lexer                = TextLexer(textProvider);
+            auto parser               = Parser(lexer, document.allocator.arena(), &document);
+            obj                       = parser.parse();
         }
 
         auto object = document.allocator.arena().push<IndirectObject>( //
               objectNumbers[entry.compressed.indexInStream],           //
               0,                                                       //
-              objs[entry.compressed.indexInStream]                     //
+              obj                                                      //
         );
         // TODO the content does not refer to the original PDF document, but instead to a decoded stream
         return LoadObjectResult::ok({object, content});

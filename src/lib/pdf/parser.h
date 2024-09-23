@@ -28,12 +28,14 @@ struct Parser {
     ReferenceResolver *referenceResolver;
 
     Vector<Token> tokens;
-    size_t currentTokenIdx    = 0;
+    size_t currentTokenIdx = 0;
 
     explicit Parser(Lexer &_lexer, Arena &_arena);
     explicit Parser(Lexer &_lexer, Arena &_arena, ReferenceResolver *_referenceResolver);
 
     Object *parse();
+
+    int64_t already_read_bytes();
 
   private:
     void ignore_new_lines_and_comments();

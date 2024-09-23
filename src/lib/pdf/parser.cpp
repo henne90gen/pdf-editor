@@ -15,19 +15,19 @@ Parser::Parser(Lexer &_lexer, Arena &_arena, ReferenceResolver *_referenceResolv
     : lexer(_lexer), arena(_arena), referenceResolver(_referenceResolver), tokens(_arena) {}
 
 bool Parser::ensure_tokens_have_been_lexed() {
-    if (currentTokenIdx < tokens.size()) {
-        return true;
+    while (currentTokenIdx >= tokens.size()) {
+        std::optional<Token> token = lexer.get_token();
+        if (!token.has_value()) {
+            return false;
+        }
+
+        if (token.value().type == Token::Type::INVALID) {
+            return false;
+        }
+
+        tokens.push_back(token.value());
     }
 
-    std::optional<Token> token = lexer.get_token();
-    if (!token.has_value()) {
-        return false;
-    }
-    if (token.value().type == Token::Type::INVALID) {
-        return false;
-    }
-
-    tokens.push_back(token.value());
     return true;
 }
 
@@ -397,6 +397,22 @@ Object *Parser::parse() {
     }
 
     return nullptr;
+}
+
+int64_t Parser::already_read_bytes() {
+    auto current_token = Token(Token::Type::INVALID, "");
+    if (ensure_tokens_have_been_lexed()) {
+        current_token = tokens[currentTokenIdx];
+    }
+
+    if (tokens.empty() || current_token.type == Token::Type::INVALID) {
+        return 0;
+    }
+
+    // TODO this only works when all tokens reference a a single large buffer
+    const auto first_token_ptr   = tokens[0].content.data();
+    const auto current_token_ptr = current_token.content.data();
+    return current_token_ptr - first_token_ptr;
 }
 
 } // namespace pdf
