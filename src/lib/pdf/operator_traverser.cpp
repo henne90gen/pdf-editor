@@ -108,7 +108,7 @@ void OperatorTraverser::apply_operator(cairo_t *cr, Operator *op) {
         break;
     default:
         // TODO unknown operator
-        // spdlog::warn("OperatorTraverser::apply_operator() - unknown operator {}", operatorTypeToString(op->type));
+        spdlog::warn("OperatorTraverser::apply_operator() - unknown operator {}", operatorTypeToString(op->type));
         break;
     }
 }

@@ -178,10 +178,10 @@ struct Document : public ReferenceResolver {
     [[nodiscard]] Result write_to_memory(uint8_t *&buffer, size_t &size);
     /// Reads the PDF-document specified by the given filePath
     static ValueResult<Document> read_from_file(Allocator &allocator, const std::string &filePath,
-                                                bool loadAllObjects = true);
+                                                bool loadAllObjects = false);
     /// Reads the PDF-document from the given buffer
     static ValueResult<Document> read_from_memory(Allocator &allocator, const uint8_t *buffer, size_t size,
-                                                  bool loadAllObjects = true);
+                                                  bool loadAllObjects = false);
 
     // Deletes the page with the given page number
     Result delete_page(size_t pageNum);

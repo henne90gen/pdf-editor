@@ -73,6 +73,7 @@ size_t count_TJ_characters(CMap *cmap, Operator *op) {
             }
         }
     }
+
     return result;
 }
 
@@ -114,9 +115,9 @@ size_t Page::character_count() {
                         cmap = cmapOpt.value();
                     }
                 }
+            } else if (op->type == Operator::Type::Tj_ShowTextString) {
+                result += count_Tj_characters(op);
             }
-
-            // TODO also count other text operators
 
             return ForEachResult::CONTINUE;
         });

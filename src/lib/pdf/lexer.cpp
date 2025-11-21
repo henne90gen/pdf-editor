@@ -85,109 +85,122 @@ std::optional<Token> matchFloatOrInt(const std::string_view &word) {
     return Token(Token::Type::REAL, word.substr(0, idx));
 }
 
+inline bool starts_with(const std::string_view &word, const std::string_view &other) {
+    if (word.size() < other.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < other.size(); i++) {
+        if (word[i] != other[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::optional<Token> matchWordToken(const std::string_view &word) {
     // TODO combine common prefixes for better performance (begin, end)
-#define STARTS_WITH(word, search) word.find(search) == 0
-    if (STARTS_WITH(word, "true")) {
+    if (starts_with(word, "true")) {
         return Token(Token::Type::BOOLEAN, word.substr(0, 4));
     }
-    if (STARTS_WITH(word, "false")) {
+    if (starts_with(word, "false")) {
         return Token(Token::Type::BOOLEAN, word.substr(0, 5));
     }
-    if (STARTS_WITH(word, "endobj")) {
+    if (starts_with(word, "endobj")) {
         return Token(Token::Type::OBJECT_END, word.substr(0, 6));
     }
-    if (STARTS_WITH(word, "stream")) {
+    if (starts_with(word, "stream")) {
         return Token(Token::Type::STREAM_START, word.substr(0, 6));
     }
-    if (STARTS_WITH(word, "endstream")) {
+    if (starts_with(word, "endstream")) {
         return Token(Token::Type::STREAM_END, word.substr(0, 9));
     }
-    if (STARTS_WITH(word, "null")) {
+    if (starts_with(word, "null")) {
         return Token(Token::Type::NULL_OBJ, word.substr(0, 4));
     }
-    if (STARTS_WITH(word, "findresource")) {
+    if (starts_with(word, "findresource")) {
         return Token(Token::Type::FIND_RESOURCE, word.substr(0, 12));
     }
-    if (STARTS_WITH(word, "defineresource")) {
+    if (starts_with(word, "defineresource")) {
         return Token(Token::Type::DEFINE_RESOURCE, word.substr(0, 14));
     }
-    if (STARTS_WITH(word, "def")) {
+    if (starts_with(word, "def")) {
         return Token(Token::Type::DEF, word.substr(0, 3));
     }
-    if (STARTS_WITH(word, "dict")) {
+    if (starts_with(word, "dict")) {
         return Token(Token::Type::DICT, word.substr(0, 4));
     }
-    if (STARTS_WITH(word, "dup")) {
+    if (starts_with(word, "dup")) {
         return Token(Token::Type::DUP, word.substr(0, 3));
     }
-    if (STARTS_WITH(word, "pop")) {
+    if (starts_with(word, "pop")) {
         return Token(Token::Type::POP, word.substr(0, 3));
     }
-    if (STARTS_WITH(word, "currentdict")) {
+    if (starts_with(word, "currentdict")) {
         return Token(Token::Type::CURRENT_DICT, word.substr(0, 11));
     }
-    if (STARTS_WITH(word, "begincmap")) {
+    if (starts_with(word, "begincmap")) {
         return Token(Token::Type::CMAP_BEGIN, word.substr(0, 9));
     }
-    if (STARTS_WITH(word, "endcmap")) {
+    if (starts_with(word, "endcmap")) {
         return Token(Token::Type::CMAP_END, word.substr(0, 7));
     }
-    if (STARTS_WITH(word, "usecmap")) {
+    if (starts_with(word, "usecmap")) {
         return Token(Token::Type::CMAP_USE, word.substr(0, 7));
     }
-    if (STARTS_WITH(word, "begincodespacerange")) {
+    if (starts_with(word, "begincodespacerange")) {
         return Token(Token::Type::CMAP_BEGIN_CODE_SPACE_RANGE, word.substr(0, 19));
     }
-    if (STARTS_WITH(word, "endcodespacerange")) {
+    if (starts_with(word, "endcodespacerange")) {
         return Token(Token::Type::CMAP_END_CODE_SPACE_RANGE, word.substr(0, 17));
     }
-    if (STARTS_WITH(word, "usefont")) {
+    if (starts_with(word, "usefont")) {
         return Token(Token::Type::CMAP_USE_FONT, word.substr(0, 7));
     }
-    if (STARTS_WITH(word, "beginbfchar")) {
+    if (starts_with(word, "beginbfchar")) {
         return Token(Token::Type::CMAP_BEGIN_BF_CHAR, word.substr(0, 11));
     }
-    if (STARTS_WITH(word, "endbfchar")) {
+    if (starts_with(word, "endbfchar")) {
         return Token(Token::Type::CMAP_END_BF_CHAR, word.substr(0, 9));
     }
-    if (STARTS_WITH(word, "beginbfrange")) {
+    if (starts_with(word, "beginbfrange")) {
         return Token(Token::Type::CMAP_BEGIN_BF_RANGE, word.substr(0, 12));
     }
-    if (STARTS_WITH(word, "endbfrange")) {
+    if (starts_with(word, "endbfrange")) {
         return Token(Token::Type::CMAP_END_BF_RANGE, word.substr(0, 10));
     }
-    if (STARTS_WITH(word, "begincidchar")) {
+    if (starts_with(word, "begincidchar")) {
         return Token(Token::Type::CMAP_BEGIN_CID_CHAR, word.substr(0, 12));
     }
-    if (STARTS_WITH(word, "endcidchar")) {
+    if (starts_with(word, "endcidchar")) {
         return Token(Token::Type::CMAP_END_CID_CHAR, word.substr(0, 10));
     }
-    if (STARTS_WITH(word, "begincidrange")) {
+    if (starts_with(word, "begincidrange")) {
         return Token(Token::Type::CMAP_BEGIN_CID_RANGE, word.substr(0, 13));
     }
-    if (STARTS_WITH(word, "endcidrange")) {
+    if (starts_with(word, "endcidrange")) {
         return Token(Token::Type::CMAP_END_CID_RANGE, word.substr(0, 11));
     }
-    if (STARTS_WITH(word, "beginnotdefchar")) {
+    if (starts_with(word, "beginnotdefchar")) {
         return Token(Token::Type::CMAP_BEGIN_NOTDEF_CHAR, word.substr(0, 15));
     }
-    if (STARTS_WITH(word, "endnotdefchar")) {
+    if (starts_with(word, "endnotdefchar")) {
         return Token(Token::Type::CMAP_END_NOTDEF_CHAR, word.substr(0, 13));
     }
-    if (STARTS_WITH(word, "beginnotdefrange")) {
+    if (starts_with(word, "beginnotdefrange")) {
         return Token(Token::Type::CMAP_BEGIN_NOTDEF_RANGE, word.substr(0, 16));
     }
-    if (STARTS_WITH(word, "endnotdefrange")) {
+    if (starts_with(word, "endnotdefrange")) {
         return Token(Token::Type::CMAP_END_NOTDEF_RANGE, word.substr(0, 14));
     }
-    if (STARTS_WITH(word, "begin")) {
+    if (starts_with(word, "begin")) {
         return Token(Token::Type::BEGIN, word.substr(0, 5));
     }
-    if (STARTS_WITH(word, "end")) {
+    if (starts_with(word, "end")) {
         return Token(Token::Type::END, word.substr(0, 3));
     }
-    if (STARTS_WITH(word, "CMapName")) {
+    if (starts_with(word, "CMapName")) {
         return Token(Token::Type::CMAP_NAME, word.substr(0, 8));
     }
     return {};
@@ -197,10 +210,10 @@ std::optional<Token> matchCharToken(const std::string_view &word) {
     if (!word.empty() && word[0] == '\n') {
         return Token(Token::Type::NEW_LINE, word.substr(0, 1));
     }
-    if (STARTS_WITH(word, "\r\n")) {
+    if (starts_with(word, "\r\n")) {
         return Token(Token::Type::NEW_LINE, word.substr(0, 2));
     }
-    if (STARTS_WITH(word, '\r')) {
+    if (starts_with(word, "\r")) {
         return Token(Token::Type::NEW_LINE, word.substr(0, 1));
     }
     if (!word.empty() && word[0] == '[') {
@@ -209,10 +222,10 @@ std::optional<Token> matchCharToken(const std::string_view &word) {
     if (!word.empty() && word[0] == ']') {
         return Token(Token::Type::ARRAY_END, word.substr(0, 1));
     }
-    if (STARTS_WITH(word, "<<")) {
+    if (starts_with(word, "<<")) {
         return Token(Token::Type::DICTIONARY_START, word.substr(0, 2));
     }
-    if (STARTS_WITH(word, ">>")) {
+    if (starts_with(word, ">>")) {
         return Token(Token::Type::DICTIONARY_END, word.substr(0, 2));
     }
     return {};
@@ -246,7 +259,7 @@ std::optional<Token> matchString(const std::string_view &word) {
 
 std::optional<Token> matchOperator(const std::string_view &word) {
     for (auto &op : operators) {
-        if (STARTS_WITH(word, op)) {
+        if (starts_with(word, op)) {
             return Token(Token::Type::OPERATOR, word.substr(0, op.size()));
         }
     }

@@ -8,13 +8,6 @@
 #include "process.h"
 #include "test_util.h"
 
-TEST(Writer, bla) {
-    auto s     = std::stringstream();
-    uint32_t i = 1230;
-    s << i;
-    ASSERT_EQ("1230", s.str());
-}
-
 TEST(Writer, DeletePageInvalidPageNum) {
     auto allocatorResult = pdf::Allocator::create();
     ASSERT_FALSE(allocatorResult.has_error());

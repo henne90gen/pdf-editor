@@ -136,34 +136,31 @@ Result read_cross_reference_stream(Document &document, IndirectObject *streamObj
             field2    = (field2 << 8) + c;
         }
 
+        CrossReferenceEntry entry = {};
         switch (type) {
-        case 0: {
-            CrossReferenceEntry entry                 = {};
+        case 0:
             entry.type                                = CrossReferenceEntryType::FREE;
             entry.free.nextFreeObjectNumber           = field1;
             entry.free.nextFreeObjectGenerationNumber = field2;
-            currentTrailer->crossReferenceTable.entries.push_back(entry);
-        } break;
-        case 1: {
-            CrossReferenceEntry entry     = {};
+            break;
+        case 1:
             entry.type                    = CrossReferenceEntryType::NORMAL;
             entry.normal.byteOffset       = field1;
             entry.normal.generationNumber = field2;
-            currentTrailer->crossReferenceTable.entries.push_back(entry);
-        } break;
-        case 2: {
-            CrossReferenceEntry entry             = {};
+            break;
+        case 2:
             entry.type                            = CrossReferenceEntryType::COMPRESSED;
             entry.compressed.objectNumberOfStream = field1;
             entry.compressed.indexInStream        = field2;
-            currentTrailer->crossReferenceTable.entries.push_back(entry);
-        } break;
+            break;
         default:
             spdlog::trace("Encountered unknown cross reference stream entry field type: {}", type);
             unknownEntryCount++;
             break;
         }
+        currentTrailer->crossReferenceTable.entries.push_back(entry);
     }
+
     spdlog::warn("Encountered {} unknown cross reference stream entries", unknownEntryCount);
 
     auto opt = stream->dictionary->find<Integer>("Prev");
